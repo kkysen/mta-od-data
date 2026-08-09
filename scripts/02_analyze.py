@@ -234,8 +234,8 @@ def main() -> None:
 
     total_riders = sum(r for _, _, r in scoped)
     one_seat_riders = 0.0
-    manhattan_one_seat_riders = 0.0
-    manhattan_close_riders = 0.0
+    trunk_check_one_seat_riders = 0.0
+    trunk_check_close_riders = 0.0
 
     individual_stations = load_individual_stations(args.stations_individual)
     points_by_complex: dict[int, list[tuple[float, float]]] = {}
@@ -289,9 +289,9 @@ def main() -> None:
                     close = dist_m <= args.close_threshold_m
 
             if dest.borough == args.trunk_check_borough:
-                manhattan_one_seat_riders += riders
+                trunk_check_one_seat_riders += riders
                 if close:
-                    manhattan_close_riders += riders
+                    trunk_check_close_riders += riders
 
         if args.csv_out:
             rows_out.append(
@@ -315,12 +315,12 @@ def main() -> None:
         print(f"Transfer required:      {total_riders - one_seat_riders:,.0f} ({100 * (1 - one_seat_riders / total_riders):.1f}%)")
 
     print(f"\n=== Of one-seat rides, destinations in {args.trunk_check_borough} ===")
-    print(f"One-seat riders to {args.trunk_check_borough}: {manhattan_one_seat_riders:,.0f}")
-    if manhattan_one_seat_riders:
-        pct = 100 * manhattan_close_riders / manhattan_one_seat_riders
+    print(f"One-seat riders to {args.trunk_check_borough}: {trunk_check_one_seat_riders:,.0f}")
+    if trunk_check_one_seat_riders:
+        pct = 100 * trunk_check_close_riders / trunk_check_one_seat_riders
         print(
             f"...within {args.close_threshold_m:.0f}m of the other trunk "
-            f"({args.trunk_a_label} vs {args.trunk_b_label}): {manhattan_close_riders:,.0f} ({pct:.1f}%)"
+            f"({args.trunk_a_label} vs {args.trunk_b_label}): {trunk_check_close_riders:,.0f} ({pct:.1f}%)"
         )
 
     print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
