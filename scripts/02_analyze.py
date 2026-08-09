@@ -128,6 +128,11 @@ def main() -> None:
     parser.add_argument("--origin-borough", default="Bk")
     parser.add_argument("--origin-side", choices=["south", "north"], default="south", help="Origin relative to boundary latitude")
     parser.add_argument("--dest-side", choices=["south", "north", "either"], default="north", help="Destination relative to boundary latitude (scopes to trips that actually cross the junction)")
+    parser.add_argument(
+        "--exclude-boundary-dest",
+        action="store_true",
+        help="Exclude the boundary complex itself from valid destinations (default: included, since ending at the junction still means the trip crossed it)",
+    )
     parser.add_argument("--routes", default="B,D,N,Q", help="Route universe: origin filter + one-seat eligibility")
 
     parser.add_argument("--trunk-a", default="B,D", help="Routes on trunk A")
@@ -189,11 +194,15 @@ def main() -> None:
     pairs = con.execute(pairs_query).fetchall()
     print(f"\n{len(pairs):,} distinct origin/destination pairs over {n_distinct_days} distinct days matching the day filter")
 
-    # Scope to trips that actually cross the boundary (dest on the far side).
+    # Scope to trips that actually cross the boundary (dest on the far side,
+    # or at the boundary complex itself unless excluded).
     scoped = []
     for origin_id, dest_id, riders in pairs:
         dest = stations.get(dest_id)
-        if dest is None or not side_ok(dest.lat, args.dest_side):
+        if dest is None:
+            continue
+        at_boundary = dest_id == args.boundary_complex_id and not args.exclude_boundary_dest
+        if not at_boundary and not side_ok(dest.lat, args.dest_side):
             continue
         scoped.append((origin_id, dest_id, riders))
 
