@@ -161,7 +161,17 @@ def main() -> None:
     parser.add_argument("--trunk-a-label", default="6 Ave express")
     parser.add_argument("--trunk-b", default="N,Q", help="Routes on trunk B")
     parser.add_argument("--trunk-b-label", default="Broadway express")
-    parser.add_argument("--trunk-check-borough", default="M", help="Borough to run the trunk-proximity check in (default: Manhattan)")
+    parser.add_argument(
+        "--trunk-check-borough",
+        default="M",
+        help=(
+            "Reporting scope only: which destinations' borough to include in the headline "
+            "one-seat/close-to-other-trunk stat (default: Manhattan, matching the original "
+            "6 Ave vs Broadway express question). Does not affect classification, which is "
+            "computed for every one-seat trip regardless of destination borough, always "
+            "against same-borough trunk candidates."
+        ),
+    )
     parser.add_argument("--close-threshold-m", type=float, default=300.0)
 
     parser.add_argument("--csv-out", type=pathlib.Path, help="Optional: dump classified per-OD-pair rows here")
@@ -245,14 +255,22 @@ def main() -> None:
     def dest_points(dest: Station) -> list[tuple[float, float]]:
         return points_by_complex.get(dest.complex_id, [(dest.lat, dest.lon)])
 
-    trunk_a_points = [
-        (s.lat, s.lon) for s in individual_stations if s.borough == args.trunk_check_borough and (s.routes & trunk_a)
-    ]
-    trunk_b_points = [
-        (s.lat, s.lon) for s in individual_stations if s.borough == args.trunk_check_borough and (s.routes & trunk_b)
-    ]
+    # Candidate points for the nearest-other-trunk search, grouped by borough:
+    # straight-line distance is only a sane walkability proxy within the same
+    # borough (crossing boroughs usually means crossing water or a big gap),
+    # so a single-trunk destination is always compared against candidates in
+    # its own borough -- never a fixed/configured one.
+    trunk_a_points_by_borough: dict[str, list[tuple[float, float]]] = {}
+    trunk_b_points_by_borough: dict[str, list[tuple[float, float]]] = {}
+    for s in individual_stations:
+        if s.routes & trunk_a:
+            trunk_a_points_by_borough.setdefault(s.borough, []).append((s.lat, s.lon))
+        if s.routes & trunk_b:
+            trunk_b_points_by_borough.setdefault(s.borough, []).append((s.lat, s.lon))
 
-    def min_dist_to_points(points: list[tuple[float, float]], candidates: list[tuple[float, float]]) -> float:
+    def min_dist_to_points(points: list[tuple[float, float]], candidates: list[tuple[float, float]]) -> float | None:
+        if not candidates:
+            return None
         return min(haversine_m(lat, lon, clat, clon) for lat, lon in points for clat, clon in candidates)
 
     rows_out = []
@@ -277,18 +295,21 @@ def main() -> None:
                 # junction complex like Atlantic Av-Barclays Ctr or DeKalb Av)
                 # -- trivially "at" the other trunk regardless of borough.
                 close, dist_m = True, 0.0
-            elif dest.borough == args.trunk_check_borough:
-                # Otherwise the nearest-other-trunk search is only meaningful
-                # within the borough we built trunk_a_points/trunk_b_points
-                # for (Manhattan by default).
-                if home_a:
-                    dist_m = min_dist_to_points(dest_points(dest), trunk_b_points)
-                    close = dist_m <= args.close_threshold_m
-                elif home_b:
-                    dist_m = min_dist_to_points(dest_points(dest), trunk_a_points)
-                    close = dist_m <= args.close_threshold_m
+            elif home_a:
+                dist_m = min_dist_to_points(dest_points(dest), trunk_b_points_by_borough.get(dest.borough, []))
+                close = None if dist_m is None else dist_m <= args.close_threshold_m
+            elif home_b:
+                dist_m = min_dist_to_points(dest_points(dest), trunk_a_points_by_borough.get(dest.borough, []))
+                close = None if dist_m is None else dist_m <= args.close_threshold_m
+            # dist_m stays None (not applicable) if the destination's borough
+            # has no stations on the other trunk at all -- e.g. there's no
+            # Broadway-express equivalent in the Bronx to compare against.
 
             if dest.borough == args.trunk_check_borough:
+                # This is purely a reporting scope: which destinations count
+                # toward the headline "% close" stat (Manhattan by default,
+                # matching the original 6 Ave vs Broadway express framing).
+                # It does not affect the classification above.
                 trunk_check_one_seat_riders += riders
                 if close:
                     trunk_check_close_riders += riders
