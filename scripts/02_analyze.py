@@ -110,6 +110,16 @@ def parse_route_set(s: str) -> set[str]:
     return {r.strip() for r in s.split(",") if r.strip()}
 
 
+def classify_one_seat(origin_routes: set[str], dest_routes: set[str], routes: set[str], primary_routes: set[str]) -> tuple[bool, set[str]]:
+    """A trip is one-seat if some shared route actually crosses the boundary
+    junction (a primary route), or if the destination isn't served by any
+    primary route anyway (so the non-primary connection, e.g. R, isn't
+    standing in for a junction crossing that never really happens)."""
+    shared = origin_routes & dest_routes & routes
+    is_one_seat = bool(shared) and (bool(shared & primary_routes) or not (dest_routes & primary_routes))
+    return is_one_seat, shared
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--parquet", type=pathlib.Path, default=DATA / "mta_od.parquet")
@@ -134,6 +144,18 @@ def main() -> None:
         help="Exclude the boundary complex itself from valid destinations (default: included, since ending at the junction still means the trip crossed it)",
     )
     parser.add_argument("--routes", default="B,D,N,Q", help="Route universe: origin filter + one-seat eligibility")
+    parser.add_argument(
+        "--primary-routes",
+        default=None,
+        help=(
+            "Routes that actually cross the boundary junction (default: same as --routes). "
+            "A route in --routes but not here (e.g. R, which reaches Manhattan via the Montague St "
+            "Tunnel and never passes DeKalb/Atlantic) only counts a trip as one-seat if the shared "
+            "route is a primary one, or if the destination isn't served by any primary route either "
+            "-- otherwise it's treated as requiring a transfer at the junction, matching real rider "
+            "behavior even though the OD data itself has no transfer field."
+        ),
+    )
 
     parser.add_argument("--trunk-a", default="B,D", help="Routes on trunk A")
     parser.add_argument("--trunk-a-label", default="6 Ave express")
@@ -147,6 +169,7 @@ def main() -> None:
 
     days = [d.strip() for d in args.days.split(",")] if args.days else DAY_TYPE_PRESETS[args.day_type]
     routes = parse_route_set(args.routes)
+    primary_routes = parse_route_set(args.primary_routes) if args.primary_routes else routes
     trunk_a = parse_route_set(args.trunk_a)
     trunk_b = parse_route_set(args.trunk_b)
 
@@ -183,16 +206,19 @@ def main() -> None:
     """
     (n_distinct_days,) = con.execute(n_days_query).fetchone()
 
+    # "riders" throughout is average weekday (or whichever day-type) ridership,
+    # i.e. the sum over all matching days divided by the number of distinct
+    # matching days -- not a multi-day total.
     pairs_query = f"""
         SELECT "Origin Station Complex ID" AS origin_id,
                "Destination Station Complex ID" AS dest_id,
-               SUM("Estimated Average Ridership") AS riders
+               SUM("Estimated Average Ridership") / {n_distinct_days} AS riders
         FROM '{args.parquet}'
         WHERE {day_filter_sql} AND {origin_filter_sql}
         GROUP BY 1, 2
     """
     pairs = con.execute(pairs_query).fetchall()
-    print(f"\n{len(pairs):,} distinct origin/destination pairs over {n_distinct_days} distinct days matching the day filter")
+    print(f"\n{len(pairs):,} distinct origin/destination pairs, averaged over {n_distinct_days} distinct days matching the day filter")
 
     # Scope to trips that actually cross the boundary (dest on the far side,
     # or at the boundary complex itself unless excluded).
@@ -234,8 +260,7 @@ def main() -> None:
         origin = stations[origin_id]
         dest = stations.get(dest_id)
         dest_routes = dest.routes if dest else set()
-        shared = origin.routes & dest_routes & routes
-        is_one_seat = bool(shared)
+        is_one_seat, shared = classify_one_seat(origin.routes, dest_routes, routes, primary_routes)
         if is_one_seat:
             one_seat_riders += riders
 
@@ -272,9 +297,7 @@ def main() -> None:
             )
 
     print(f"\n=== Scope: origin in {{south of boundary}}, destination {args.dest_side} of boundary, day-type={args.day_type} ===")
-    print(f"Total ridership (sum over {n_distinct_days} days): {total_riders:,.0f}")
-    if n_distinct_days:
-        print(f"Average per day: {total_riders / n_distinct_days:,.0f}")
+    print(f"Average {args.day_type} ridership (based on {n_distinct_days} distinct days in the data): {total_riders:,.0f}")
     if total_riders:
         print(f"One-seat (no transfer): {one_seat_riders:,.0f} ({100 * one_seat_riders / total_riders:.1f}%)")
         print(f"Transfer required:      {total_riders - one_seat_riders:,.0f} ({100 * (1 - one_seat_riders / total_riders):.1f}%)")
@@ -288,20 +311,32 @@ def main() -> None:
             f"({args.trunk_a_label} vs {args.trunk_b_label}): {manhattan_close_riders:,.0f} ({pct:.1f}%)"
         )
 
-    print("\n=== Per-origin-station breakdown ===")
+    print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
     per_origin: dict[int, list[float]] = {cid: [0.0, 0.0] for cid in origin_ids}
+    per_dest: dict[int, list[float]] = {}
     for origin_id, dest_id, riders in scoped:
         origin = stations[origin_id]
         dest = stations.get(dest_id)
         dest_routes = dest.routes if dest else set()
-        shared = origin.routes & dest_routes & routes
+        is_one_seat, _ = classify_one_seat(origin.routes, dest_routes, routes, primary_routes)
         per_origin[origin_id][0] += riders
-        if shared:
+        if is_one_seat:
             per_origin[origin_id][1] += riders
+        entry = per_dest.setdefault(dest_id, [0.0, 0.0])
+        entry[0] += riders
+        if is_one_seat:
+            entry[1] += riders
     for cid in origin_ids:
         total, one_seat = per_origin[cid]
         pct = 100 * one_seat / total if total else float("nan")
-        print(f"  {stations[cid].name:<45} total={total:>10,.0f}  one-seat={pct:5.1f}%")
+        print(f"  {stations[cid].name:<45} total={total:>9,.0f}  one-seat={pct:5.1f}%")
+
+    print("\n=== Per-destination-station breakdown (avg weekday riders, sorted by total) ===")
+    for dest_id, (total, one_seat) in sorted(per_dest.items(), key=lambda kv: kv[1][0], reverse=True):
+        dest = stations.get(dest_id)
+        name = dest.name if dest else f"complex {dest_id}"
+        pct = 100 * one_seat / total if total else float("nan")
+        print(f"  {name:<55} total={total:>9,.0f}  one-seat={pct:5.1f}%")
 
     if args.csv_out:
         with args.csv_out.open("w", newline="") as f:
