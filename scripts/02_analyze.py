@@ -268,25 +268,34 @@ def main() -> None:
         close = None
         dist_m = None
         if is_one_seat and dest:
-            # Trunk membership is a property of the destination complex
-            # itself (what it's near/at), not of which specific shared route
-            # made this particular pair one-seat.
-            home_a = bool(dest_routes & trunk_a)
-            home_b = bool(dest_routes & trunk_b)
-            if home_a and home_b:
-                # The destination already has routes from both groups (e.g. a
-                # junction complex like Atlantic Av-Barclays Ctr or DeKalb Av)
-                # -- trivially "at" the other trunk.
+            if not (shared & primary_routes):
+                # This one-seat connection doesn't use any route that
+                # actually crosses the boundary junction (e.g. it's via R,
+                # which reaches Manhattan through the Montague St Tunnel and
+                # never goes near DeKalb/Atlantic). Deinterlining the
+                # junction can't affect a trip that never uses it, so this
+                # rider needs no extra walk/transfer either way -- trivially
+                # close.
                 close, dist_m = True, 0.0
-            elif home_a:
-                dist_m = min_dist_to_points(dest_points(dest), trunk_b_points)
-                close = None if dist_m is None else dist_m <= args.close_threshold_m
-            elif home_b:
-                dist_m = min_dist_to_points(dest_points(dest), trunk_a_points)
-                close = None if dist_m is None else dist_m <= args.close_threshold_m
-            # close/dist_m stay None only if the destination has neither
-            # trunk's routes at all (e.g. a pure-R destination like Jay St)
-            # -- there's no "other trunk" to speak of for those.
+            else:
+                # Trunk membership is a property of the destination complex
+                # itself (what it's near/at), not of which specific shared
+                # route made this particular pair one-seat.
+                home_a = bool(dest_routes & trunk_a)
+                home_b = bool(dest_routes & trunk_b)
+                if home_a and home_b:
+                    # The destination already has routes from both groups
+                    # (e.g. a junction complex like Atlantic Av-Barclays Ctr
+                    # or DeKalb Av) -- trivially "at" the other trunk.
+                    close, dist_m = True, 0.0
+                elif home_a:
+                    dist_m = min_dist_to_points(dest_points(dest), trunk_b_points)
+                    close = None if dist_m is None else dist_m <= args.close_threshold_m
+                elif home_b:
+                    dist_m = min_dist_to_points(dest_points(dest), trunk_a_points)
+                    close = None if dist_m is None else dist_m <= args.close_threshold_m
+                # close/dist_m stay None only if the destination has neither
+                # trunk's routes at all -- no "other trunk" to speak of.
 
             if close is not None:
                 classified_one_seat_riders += riders
