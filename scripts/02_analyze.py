@@ -76,6 +76,27 @@ def load_stations(path: pathlib.Path) -> dict[int, Station]:
     return stations
 
 
+def load_individual_stations(path: pathlib.Path) -> list[Station]:
+    """Per-physical-station rows (not complex centroids). A complex can merge
+    several physical stations (e.g. Times Sq-42 St/Port Authority Bus
+    Terminal), so its centroid can sit well away from any actual platform;
+    these per-station points give accurate nearest-station distances."""
+    out = []
+    with path.open(newline="") as f:
+        for row in csv.DictReader(f):
+            out.append(
+                Station(
+                    complex_id=int(row["complex_id"]),
+                    name=row["stop_name"],
+                    borough=row["borough"],
+                    routes=set(row["daytime_routes"].split()),
+                    lat=float(row["gtfs_latitude"]),
+                    lon=float(row["gtfs_longitude"]),
+                )
+            )
+    return out
+
+
 def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     r = 6_371_000.0
     p1, p2 = math.radians(lat1), math.radians(lat2)
@@ -93,6 +114,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--parquet", type=pathlib.Path, default=DATA / "mta_od.parquet")
     parser.add_argument("--stations", type=pathlib.Path, default=DATA / "stations_complexes.csv")
+    parser.add_argument(
+        "--stations-individual",
+        type=pathlib.Path,
+        default=DATA / "stations_individual.csv",
+        help="Per-physical-station reference CSV, used for accurate nearest-other-trunk distances",
+    )
 
     parser.add_argument("--day-type", choices=sorted(DAY_TYPE_PRESETS), default="weekday")
     parser.add_argument("--days", help="Comma-separated exact 'Day of Week' values, overrides --day-type")
@@ -175,12 +202,23 @@ def main() -> None:
     manhattan_one_seat_riders = 0.0
     manhattan_close_riders = 0.0
 
-    trunk_a_candidates = [
-        s for s in stations.values() if s.borough == args.trunk_check_borough and (s.routes & trunk_a)
+    individual_stations = load_individual_stations(args.stations_individual)
+    points_by_complex: dict[int, list[tuple[float, float]]] = {}
+    for s in individual_stations:
+        points_by_complex.setdefault(s.complex_id, []).append((s.lat, s.lon))
+
+    def dest_points(dest: Station) -> list[tuple[float, float]]:
+        return points_by_complex.get(dest.complex_id, [(dest.lat, dest.lon)])
+
+    trunk_a_points = [
+        (s.lat, s.lon) for s in individual_stations if s.borough == args.trunk_check_borough and (s.routes & trunk_a)
     ]
-    trunk_b_candidates = [
-        s for s in stations.values() if s.borough == args.trunk_check_borough and (s.routes & trunk_b)
+    trunk_b_points = [
+        (s.lat, s.lon) for s in individual_stations if s.borough == args.trunk_check_borough and (s.routes & trunk_b)
     ]
+
+    def min_dist_to_points(points: list[tuple[float, float]], candidates: list[tuple[float, float]]) -> float:
+        return min(haversine_m(lat, lon, clat, clon) for lat, lon in points for clat, clon in candidates)
 
     rows_out = []
     for origin_id, dest_id, riders in scoped:
@@ -201,10 +239,10 @@ def main() -> None:
             if home_a and home_b:
                 close, dist_m = True, 0.0
             elif home_a:
-                dist_m = min(haversine_m(dest.lat, dest.lon, c.lat, c.lon) for c in trunk_b_candidates)
+                dist_m = min_dist_to_points(dest_points(dest), trunk_b_points)
                 close = dist_m <= args.close_threshold_m
             elif home_b:
-                dist_m = min(haversine_m(dest.lat, dest.lon, c.lat, c.lon) for c in trunk_a_candidates)
+                dist_m = min_dist_to_points(dest_points(dest), trunk_a_points)
                 close = dist_m <= args.close_threshold_m
             if close:
                 manhattan_close_riders += riders
