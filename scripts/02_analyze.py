@@ -161,17 +161,6 @@ def main() -> None:
     parser.add_argument("--trunk-a-label", default="6 Ave express")
     parser.add_argument("--trunk-b", default="N,Q", help="Routes on trunk B")
     parser.add_argument("--trunk-b-label", default="Broadway express")
-    parser.add_argument(
-        "--trunk-check-borough",
-        default="M",
-        help=(
-            "Reporting scope only: which destinations' borough to include in the headline "
-            "one-seat/close-to-other-trunk stat (default: Manhattan, matching the original "
-            "6 Ave vs Broadway express question). Does not affect classification, which is "
-            "computed for every one-seat trip regardless of destination borough, always "
-            "against same-borough trunk candidates."
-        ),
-    )
     parser.add_argument("--close-threshold-m", type=float, default=300.0)
 
     parser.add_argument("--csv-out", type=pathlib.Path, help="Optional: dump classified per-OD-pair rows here")
@@ -244,8 +233,8 @@ def main() -> None:
 
     total_riders = sum(r for _, _, r in scoped)
     one_seat_riders = 0.0
-    trunk_check_one_seat_riders = 0.0
-    trunk_check_close_riders = 0.0
+    classified_one_seat_riders = 0.0
+    close_riders = 0.0
 
     individual_stations = load_individual_stations(args.stations_individual)
     points_by_complex: dict[int, list[tuple[float, float]]] = {}
@@ -255,18 +244,12 @@ def main() -> None:
     def dest_points(dest: Station) -> list[tuple[float, float]]:
         return points_by_complex.get(dest.complex_id, [(dest.lat, dest.lon)])
 
-    # Candidate points for the nearest-other-trunk search, grouped by borough:
-    # straight-line distance is only a sane walkability proxy within the same
-    # borough (crossing boroughs usually means crossing water or a big gap),
-    # so a single-trunk destination is always compared against candidates in
-    # its own borough -- never a fixed/configured one.
-    trunk_a_points_by_borough: dict[str, list[tuple[float, float]]] = {}
-    trunk_b_points_by_borough: dict[str, list[tuple[float, float]]] = {}
-    for s in individual_stations:
-        if s.routes & trunk_a:
-            trunk_a_points_by_borough.setdefault(s.borough, []).append((s.lat, s.lon))
-        if s.routes & trunk_b:
-            trunk_b_points_by_borough.setdefault(s.borough, []).append((s.lat, s.lon))
+    # Candidate points for the nearest-other-trunk search, system-wide (not
+    # restricted to any borough): straight-line distance is already the
+    # approximation this whole script uses for "close" everywhere else, so
+    # there's no reason to special-case borough boundaries here too.
+    trunk_a_points = [(s.lat, s.lon) for s in individual_stations if s.routes & trunk_a]
+    trunk_b_points = [(s.lat, s.lon) for s in individual_stations if s.routes & trunk_b]
 
     def min_dist_to_points(points: list[tuple[float, float]], candidates: list[tuple[float, float]]) -> float | None:
         if not candidates:
@@ -293,26 +276,22 @@ def main() -> None:
             if home_a and home_b:
                 # The destination already has routes from both groups (e.g. a
                 # junction complex like Atlantic Av-Barclays Ctr or DeKalb Av)
-                # -- trivially "at" the other trunk regardless of borough.
+                # -- trivially "at" the other trunk.
                 close, dist_m = True, 0.0
             elif home_a:
-                dist_m = min_dist_to_points(dest_points(dest), trunk_b_points_by_borough.get(dest.borough, []))
+                dist_m = min_dist_to_points(dest_points(dest), trunk_b_points)
                 close = None if dist_m is None else dist_m <= args.close_threshold_m
             elif home_b:
-                dist_m = min_dist_to_points(dest_points(dest), trunk_a_points_by_borough.get(dest.borough, []))
+                dist_m = min_dist_to_points(dest_points(dest), trunk_a_points)
                 close = None if dist_m is None else dist_m <= args.close_threshold_m
-            # dist_m stays None (not applicable) if the destination's borough
-            # has no stations on the other trunk at all -- e.g. there's no
-            # Broadway-express equivalent in the Bronx to compare against.
+            # close/dist_m stay None only if the destination has neither
+            # trunk's routes at all (e.g. a pure-R destination like Jay St)
+            # -- there's no "other trunk" to speak of for those.
 
-            if dest.borough == args.trunk_check_borough:
-                # This is purely a reporting scope: which destinations count
-                # toward the headline "% close" stat (Manhattan by default,
-                # matching the original 6 Ave vs Broadway express framing).
-                # It does not affect the classification above.
-                trunk_check_one_seat_riders += riders
+            if close is not None:
+                classified_one_seat_riders += riders
                 if close:
-                    trunk_check_close_riders += riders
+                    close_riders += riders
 
         if args.csv_out:
             rows_out.append(
@@ -335,13 +314,13 @@ def main() -> None:
         print(f"One-seat (no transfer): {one_seat_riders:,.0f} ({100 * one_seat_riders / total_riders:.1f}%)")
         print(f"Transfer required:      {total_riders - one_seat_riders:,.0f} ({100 * (1 - one_seat_riders / total_riders):.1f}%)")
 
-    print(f"\n=== Of one-seat rides, destinations in {args.trunk_check_borough} ===")
-    print(f"One-seat riders to {args.trunk_check_borough}: {trunk_check_one_seat_riders:,.0f}")
-    if trunk_check_one_seat_riders:
-        pct = 100 * trunk_check_close_riders / trunk_check_one_seat_riders
+    print(f"\n=== Of one-seat rides, destinations with a {args.trunk_a_label}/{args.trunk_b_label} classification ===")
+    print(f"One-seat riders with a trunk classification: {classified_one_seat_riders:,.0f}")
+    if classified_one_seat_riders:
+        pct = 100 * close_riders / classified_one_seat_riders
         print(
             f"...within {args.close_threshold_m:.0f}m of the other trunk "
-            f"({args.trunk_a_label} vs {args.trunk_b_label}): {trunk_check_close_riders:,.0f} ({pct:.1f}%)"
+            f"({args.trunk_a_label} vs {args.trunk_b_label}): {close_riders:,.0f} ({pct:.1f}%)"
         )
 
     print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
