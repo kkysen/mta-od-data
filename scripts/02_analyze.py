@@ -266,20 +266,32 @@ def main() -> None:
 
         close = None
         dist_m = None
-        if is_one_seat and dest and dest.borough == args.trunk_check_borough:
-            manhattan_one_seat_riders += riders
-            home_a = bool(shared & trunk_a)
-            home_b = bool(shared & trunk_b)
+        if is_one_seat and dest:
+            # Trunk membership is a property of the destination complex
+            # itself (what it's near/at), not of which specific shared route
+            # made this particular pair one-seat.
+            home_a = bool(dest_routes & trunk_a)
+            home_b = bool(dest_routes & trunk_b)
             if home_a and home_b:
+                # The destination already has routes from both groups (e.g. a
+                # junction complex like Atlantic Av-Barclays Ctr or DeKalb Av)
+                # -- trivially "at" the other trunk regardless of borough.
                 close, dist_m = True, 0.0
-            elif home_a:
-                dist_m = min_dist_to_points(dest_points(dest), trunk_b_points)
-                close = dist_m <= args.close_threshold_m
-            elif home_b:
-                dist_m = min_dist_to_points(dest_points(dest), trunk_a_points)
-                close = dist_m <= args.close_threshold_m
-            if close:
-                manhattan_close_riders += riders
+            elif dest.borough == args.trunk_check_borough:
+                # Otherwise the nearest-other-trunk search is only meaningful
+                # within the borough we built trunk_a_points/trunk_b_points
+                # for (Manhattan by default).
+                if home_a:
+                    dist_m = min_dist_to_points(dest_points(dest), trunk_b_points)
+                    close = dist_m <= args.close_threshold_m
+                elif home_b:
+                    dist_m = min_dist_to_points(dest_points(dest), trunk_a_points)
+                    close = dist_m <= args.close_threshold_m
+
+            if dest.borough == args.trunk_check_borough:
+                manhattan_one_seat_riders += riders
+                if close:
+                    manhattan_close_riders += riders
 
         if args.csv_out:
             rows_out.append(
