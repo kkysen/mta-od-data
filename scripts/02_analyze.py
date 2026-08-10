@@ -51,7 +51,15 @@ DAY_TYPE_PRESETS = {
 class Station:
     __slots__ = ("complex_id", "name", "borough", "routes", "lat", "lon")
 
-    def __init__(self, complex_id: int, name: str, borough: str, routes: set[str], lat: float, lon: float):
+    def __init__(
+        self,
+        complex_id: int,
+        name: str,
+        borough: str,
+        routes: set[str],
+        lat: float,
+        lon: float,
+    ):
         self.complex_id = complex_id
         self.name = name
         self.borough = borough
@@ -102,7 +110,10 @@ def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     p1, p2 = math.radians(lat1), math.radians(lat2)
     dphi = math.radians(lat2 - lat1)
     dlambda = math.radians(lon2 - lon1)
-    a = math.sin(dphi / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlambda / 2) ** 2
+    a = (
+        math.sin(dphi / 2) ** 2
+        + math.cos(p1) * math.cos(p2) * math.sin(dlambda / 2) ** 2
+    )
     return 2 * r * math.asin(math.sqrt(a))
 
 
@@ -110,20 +121,31 @@ def parse_route_set(s: str) -> set[str]:
     return {r.strip() for r in s.split(",") if r.strip()}
 
 
-def classify_one_seat(origin_routes: set[str], dest_routes: set[str], routes: set[str], primary_routes: set[str]) -> tuple[bool, set[str]]:
+def classify_one_seat(
+    origin_routes: set[str],
+    dest_routes: set[str],
+    routes: set[str],
+    primary_routes: set[str],
+) -> tuple[bool, set[str]]:
     """A trip is one-seat if some shared route actually crosses the boundary
     junction (a primary route), or if the destination isn't served by any
     primary route anyway (so the non-primary connection, e.g. R, isn't
     standing in for a junction crossing that never really happens)."""
     shared = origin_routes & dest_routes & routes
-    is_one_seat = bool(shared) and (bool(shared & primary_routes) or not (dest_routes & primary_routes))
+    is_one_seat = bool(shared) and (
+        bool(shared & primary_routes) or not (dest_routes & primary_routes)
+    )
     return is_one_seat, shared
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--parquet", type=pathlib.Path, default=DATA / "mta_od.parquet")
-    parser.add_argument("--stations", type=pathlib.Path, default=DATA / "stations_complexes.csv")
+    parser.add_argument(
+        "--stations", type=pathlib.Path, default=DATA / "stations_complexes.csv"
+    )
     parser.add_argument(
         "--stations-individual",
         type=pathlib.Path,
@@ -131,19 +153,43 @@ def main() -> None:
         help="Per-physical-station reference CSV, used for accurate nearest-other-trunk distances",
     )
 
-    parser.add_argument("--day-type", choices=sorted(DAY_TYPE_PRESETS), default="weekday")
-    parser.add_argument("--days", help="Comma-separated exact 'Day of Week' values, overrides --day-type")
+    parser.add_argument(
+        "--day-type", choices=sorted(DAY_TYPE_PRESETS), default="weekday"
+    )
+    parser.add_argument(
+        "--days",
+        help="Comma-separated exact 'Day of Week' values, overrides --day-type",
+    )
 
-    parser.add_argument("--boundary-complex-id", type=int, default=617, help="Junction station (default: Atlantic Av-Barclays Ctr)")
+    parser.add_argument(
+        "--boundary-complex-id",
+        type=int,
+        default=617,
+        help="Junction station (default: Atlantic Av-Barclays Ctr)",
+    )
     parser.add_argument("--origin-borough", default="Bk")
-    parser.add_argument("--origin-side", choices=["south", "north"], default="south", help="Origin relative to boundary latitude")
-    parser.add_argument("--dest-side", choices=["south", "north", "either"], default="north", help="Destination relative to boundary latitude (scopes to trips that actually cross the junction)")
+    parser.add_argument(
+        "--origin-side",
+        choices=["south", "north"],
+        default="south",
+        help="Origin relative to boundary latitude",
+    )
+    parser.add_argument(
+        "--dest-side",
+        choices=["south", "north", "either"],
+        default="north",
+        help="Destination relative to boundary latitude (scopes to trips that actually cross the junction)",
+    )
     parser.add_argument(
         "--exclude-boundary-dest",
         action="store_true",
         help="Exclude the boundary complex itself from valid destinations (default: included, since ending at the junction still means the trip crossed it)",
     )
-    parser.add_argument("--routes", default="B,D,N,Q", help="Route universe: origin filter + one-seat eligibility")
+    parser.add_argument(
+        "--routes",
+        default="B,D,N,Q",
+        help="Route universe: origin filter + one-seat eligibility",
+    )
     parser.add_argument(
         "--primary-routes",
         default=None,
@@ -163,18 +209,30 @@ def main() -> None:
     parser.add_argument("--trunk-b-label", default="Broadway express")
     parser.add_argument("--close-threshold-m", type=float, default=300.0)
 
-    parser.add_argument("--csv-out", type=pathlib.Path, help="Optional: dump classified per-OD-pair rows here")
+    parser.add_argument(
+        "--csv-out",
+        type=pathlib.Path,
+        help="Optional: dump classified per-OD-pair rows here",
+    )
     args = parser.parse_args()
 
-    days = [d.strip() for d in args.days.split(",")] if args.days else DAY_TYPE_PRESETS[args.day_type]
+    days = (
+        [d.strip() for d in args.days.split(",")]
+        if args.days
+        else DAY_TYPE_PRESETS[args.day_type]
+    )
     routes = parse_route_set(args.routes)
-    primary_routes = parse_route_set(args.primary_routes) if args.primary_routes else routes
+    primary_routes = (
+        parse_route_set(args.primary_routes) if args.primary_routes else routes
+    )
     trunk_a = parse_route_set(args.trunk_a)
     trunk_b = parse_route_set(args.trunk_b)
 
     stations = load_stations(args.stations)
     boundary_lat = stations[args.boundary_complex_id].lat
-    print(f"Boundary: {stations[args.boundary_complex_id].name} (id {args.boundary_complex_id}), lat {boundary_lat:.6f}")
+    print(
+        f"Boundary: {stations[args.boundary_complex_id].name} (id {args.boundary_complex_id}), lat {boundary_lat:.6f}"
+    )
     print(f"Day filter: {days if days else 'all days'}")
     print(f"Route universe: {sorted(routes)}")
 
@@ -186,7 +244,9 @@ def main() -> None:
     origin_ids = [
         s.complex_id
         for s in stations.values()
-        if s.borough == args.origin_borough and (s.routes & routes) and side_ok(s.lat, args.origin_side)
+        if s.borough == args.origin_borough
+        and (s.routes & routes)
+        and side_ok(s.lat, args.origin_side)
     ]
     origin_ids.sort()
     print(f"\nOrigin stations ({len(origin_ids)}):")
@@ -195,8 +255,14 @@ def main() -> None:
         print(f"  {cid:>4}  {s.name}  routes={sorted(s.routes)}")
 
     con = duckdb.connect()
-    day_filter_sql = "TRUE" if not days else "\"Day of Week\" IN (" + ", ".join(f"'{d}'" for d in days) + ")"
-    origin_filter_sql = "\"Origin Station Complex ID\" IN (" + ", ".join(str(i) for i in origin_ids) + ")"
+    day_filter_sql = (
+        "TRUE"
+        if not days
+        else '"Day of Week" IN (' + ", ".join(f"'{d}'" for d in days) + ")"
+    )
+    origin_filter_sql = (
+        '"Origin Station Complex ID" IN (' + ", ".join(str(i) for i in origin_ids) + ")"
+    )
 
     n_days_query = f"""
         SELECT COUNT(DISTINCT CAST(Timestamp AS DATE))
@@ -217,7 +283,9 @@ def main() -> None:
         GROUP BY 1, 2
     """
     pairs = con.execute(pairs_query).fetchall()
-    print(f"\n{len(pairs):,} distinct origin/destination pairs, averaged over {n_distinct_days} distinct days matching the day filter")
+    print(
+        f"\n{len(pairs):,} distinct origin/destination pairs, averaged over {n_distinct_days} distinct days matching the day filter"
+    )
 
     # Scope to trips that actually cross the boundary (dest on the far side,
     # or at the boundary complex itself unless excluded).
@@ -226,7 +294,9 @@ def main() -> None:
         dest = stations.get(dest_id)
         if dest is None:
             continue
-        at_boundary = dest_id == args.boundary_complex_id and not args.exclude_boundary_dest
+        at_boundary = (
+            dest_id == args.boundary_complex_id and not args.exclude_boundary_dest
+        )
         if not at_boundary and not side_ok(dest.lat, args.dest_side):
             continue
         scoped.append((origin_id, dest_id, riders))
@@ -251,17 +321,25 @@ def main() -> None:
     trunk_a_points = [(s.lat, s.lon) for s in individual_stations if s.routes & trunk_a]
     trunk_b_points = [(s.lat, s.lon) for s in individual_stations if s.routes & trunk_b]
 
-    def min_dist_to_points(points: list[tuple[float, float]], candidates: list[tuple[float, float]]) -> float | None:
+    def min_dist_to_points(
+        points: list[tuple[float, float]], candidates: list[tuple[float, float]]
+    ) -> float | None:
         if not candidates:
             return None
-        return min(haversine_m(lat, lon, clat, clon) for lat, lon in points for clat, clon in candidates)
+        return min(
+            haversine_m(lat, lon, clat, clon)
+            for lat, lon in points
+            for clat, clon in candidates
+        )
 
     rows_out = []
     for origin_id, dest_id, riders in scoped:
         origin = stations[origin_id]
         dest = stations.get(dest_id)
         dest_routes = dest.routes if dest else set()
-        is_one_seat, shared = classify_one_seat(origin.routes, dest_routes, routes, primary_routes)
+        is_one_seat, shared = classify_one_seat(
+            origin.routes, dest_routes, routes, primary_routes
+        )
         if is_one_seat:
             one_seat_riders += riders
 
@@ -317,14 +395,26 @@ def main() -> None:
                 }
             )
 
-    print(f"\n=== Scope: origin in {{south of boundary}}, destination {args.dest_side} of boundary, day-type={args.day_type} ===")
-    print(f"Average {args.day_type} ridership (based on {n_distinct_days} distinct days in the data): {total_riders:,.0f}")
+    print(
+        f"\n=== Scope: origin in {{south of boundary}}, destination {args.dest_side} of boundary, day-type={args.day_type} ==="
+    )
+    print(
+        f"Average {args.day_type} ridership (based on {n_distinct_days} distinct days in the data): {total_riders:,.0f}"
+    )
     if total_riders:
-        print(f"One-seat (no transfer): {one_seat_riders:,.0f} ({100 * one_seat_riders / total_riders:.1f}%)")
-        print(f"Transfer required:      {total_riders - one_seat_riders:,.0f} ({100 * (1 - one_seat_riders / total_riders):.1f}%)")
+        print(
+            f"One-seat (no transfer): {one_seat_riders:,.0f} ({100 * one_seat_riders / total_riders:.1f}%)"
+        )
+        print(
+            f"Transfer required:      {total_riders - one_seat_riders:,.0f} ({100 * (1 - one_seat_riders / total_riders):.1f}%)"
+        )
 
-    print(f"\n=== Of one-seat rides, destinations with a {args.trunk_a_label}/{args.trunk_b_label} classification ===")
-    print(f"One-seat riders with a trunk classification: {classified_one_seat_riders:,.0f}")
+    print(
+        f"\n=== Of one-seat rides, destinations with a {args.trunk_a_label}/{args.trunk_b_label} classification ==="
+    )
+    print(
+        f"One-seat riders with a trunk classification: {classified_one_seat_riders:,.0f}"
+    )
     if classified_one_seat_riders:
         pct = 100 * close_riders / classified_one_seat_riders
         print(
@@ -339,7 +429,9 @@ def main() -> None:
         origin = stations[origin_id]
         dest = stations.get(dest_id)
         dest_routes = dest.routes if dest else set()
-        is_one_seat, _ = classify_one_seat(origin.routes, dest_routes, routes, primary_routes)
+        is_one_seat, _ = classify_one_seat(
+            origin.routes, dest_routes, routes, primary_routes
+        )
         per_origin[origin_id][0] += riders
         if is_one_seat:
             per_origin[origin_id][1] += riders
@@ -352,8 +444,12 @@ def main() -> None:
         pct = 100 * one_seat / total if total else float("nan")
         print(f"  {stations[cid].name:<45} total={total:>9,.0f}  one-seat={pct:5.1f}%")
 
-    print("\n=== Per-destination-station breakdown (avg weekday riders, sorted by total) ===")
-    for dest_id, (total, one_seat) in sorted(per_dest.items(), key=lambda kv: kv[1][0], reverse=True):
+    print(
+        "\n=== Per-destination-station breakdown (avg weekday riders, sorted by total) ==="
+    )
+    for dest_id, (total, one_seat) in sorted(
+        per_dest.items(), key=lambda kv: kv[1][0], reverse=True
+    ):
         dest = stations.get(dest_id)
         name = dest.name if dest else f"complex {dest_id}"
         pct = 100 * one_seat / total if total else float("nan")
@@ -361,7 +457,9 @@ def main() -> None:
 
     if args.csv_out:
         with args.csv_out.open("w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=list(rows_out[0].keys()) if rows_out else [])
+            writer = csv.DictWriter(
+                f, fieldnames=list(rows_out[0].keys()) if rows_out else []
+            )
             writer.writeheader()
             writer.writerows(rows_out)
         print(f"\nWrote {len(rows_out):,} rows to {args.csv_out}")
