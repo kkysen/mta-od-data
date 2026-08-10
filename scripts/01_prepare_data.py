@@ -64,12 +64,14 @@ def convert_od_to_parquet(
         TO '{out}' (FORMAT parquet)
         """
     )
-    row_count, min_ym, max_ym = con.execute(
+    result = con.execute(
         f"""
         SELECT count(*), min(Year * 100 + Month), max(Year * 100 + Month)
         FROM '{out}'
         """
     ).fetchone()
+    assert result is not None, "aggregate query always returns exactly one row"
+    row_count, min_ym, max_ym = result
     print(f"wrote {out}: {row_count:,} rows, year*100+month range {min_ym}-{max_ym}")
 
 
