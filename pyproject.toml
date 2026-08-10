@@ -2,11 +2,14 @@
 name = "mta-od-data"
 version = "0.1.0"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "duckdb>=1.5.5",
+]
 
 [dependency-groups]
 dev = [
     "ruff>=0.16.2",
+    "ty>=0.0.69",
 ]
 
 [tool.ruff.lint]
