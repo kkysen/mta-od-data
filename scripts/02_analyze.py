@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run
 # /// script
-# requires-python = ">=3.12"
+# requires-python = ">=3.14"
 # dependencies = ["duckdb"]
 # ///
 """Analyze one-seat-ride / deinterlining share for trips crossing a subway junction.
