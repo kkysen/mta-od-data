@@ -20,3 +20,6 @@ jobs:
 
       - name: ruff check
         run: uv run ruff check
+
+      - name: ty
+        run: uv run ty check
