@@ -150,7 +150,10 @@ def main() -> None:
         "--stations-individual",
         type=pathlib.Path,
         default=DATA / "stations_individual.csv",
-        help="Per-physical-station reference CSV, used for accurate nearest-other-trunk distances",
+        help=(
+            "Per-physical-station reference CSV, used for accurate "
+            "nearest-other-trunk distances"
+        ),
     )
 
     parser.add_argument(
@@ -178,12 +181,19 @@ def main() -> None:
         "--dest-side",
         choices=["south", "north", "either"],
         default="north",
-        help="Destination relative to boundary latitude (scopes to trips that actually cross the junction)",
+        help=(
+            "Destination relative to boundary latitude (scopes to trips "
+            "that actually cross the junction)"
+        ),
     )
     parser.add_argument(
         "--exclude-boundary-dest",
         action="store_true",
-        help="Exclude the boundary complex itself from valid destinations (default: included, since ending at the junction still means the trip crossed it)",
+        help=(
+            "Exclude the boundary complex itself from valid destinations "
+            "(default: included, since ending at the junction still means "
+            "the trip crossed it)"
+        ),
     )
     parser.add_argument(
         "--routes",
@@ -194,12 +204,14 @@ def main() -> None:
         "--primary-routes",
         default=None,
         help=(
-            "Routes that actually cross the boundary junction (default: same as --routes). "
-            "A route in --routes but not here (e.g. R, which reaches Manhattan via the Montague St "
-            "Tunnel and never passes DeKalb/Atlantic) only counts a trip as one-seat if the shared "
-            "route is a primary one, or if the destination isn't served by any primary route either "
-            "-- otherwise it's treated as requiring a transfer at the junction, matching real rider "
-            "behavior even though the OD data itself has no transfer field."
+            "Routes that actually cross the boundary junction (default: same as "
+            "--routes). A route in --routes but not here (e.g. R, which reaches "
+            "Manhattan via the Montague St Tunnel and never passes DeKalb/Atlantic) "
+            "only counts a trip as one-seat if the shared route is a primary one, "
+            "or if the destination isn't served by any primary route either -- "
+            "otherwise it's treated as requiring a transfer at the junction, "
+            "matching real rider behavior even though the OD data itself has no "
+            "transfer field."
         ),
     )
 
@@ -231,7 +243,8 @@ def main() -> None:
     stations = load_stations(args.stations)
     boundary_lat = stations[args.boundary_complex_id].lat
     print(
-        f"Boundary: {stations[args.boundary_complex_id].name} (id {args.boundary_complex_id}), lat {boundary_lat:.6f}"
+        f"Boundary: {stations[args.boundary_complex_id].name} "
+        f"(id {args.boundary_complex_id}), lat {boundary_lat:.6f}"
     )
     print(f"Day filter: {days if days else 'all days'}")
     print(f"Route universe: {sorted(routes)}")
@@ -284,7 +297,8 @@ def main() -> None:
     """
     pairs = con.execute(pairs_query).fetchall()
     print(
-        f"\n{len(pairs):,} distinct origin/destination pairs, averaged over {n_distinct_days} distinct days matching the day filter"
+        f"\n{len(pairs):,} distinct origin/destination pairs, averaged over "
+        f"{n_distinct_days} distinct days matching the day filter"
     )
 
     # Scope to trips that actually cross the boundary (dest on the far side,
@@ -396,30 +410,37 @@ def main() -> None:
             )
 
     print(
-        f"\n=== Scope: origin in {{south of boundary}}, destination {args.dest_side} of boundary, day-type={args.day_type} ==="
+        f"\n=== Scope: origin in {{south of boundary}}, destination "
+        f"{args.dest_side} of boundary, day-type={args.day_type} ==="
     )
     print(
-        f"Average {args.day_type} ridership (based on {n_distinct_days} distinct days in the data): {total_riders:,.0f}"
+        f"Average {args.day_type} ridership (based on {n_distinct_days} "
+        f"distinct days in the data): {total_riders:,.0f}"
     )
     if total_riders:
         print(
-            f"One-seat (no transfer): {one_seat_riders:,.0f} ({100 * one_seat_riders / total_riders:.1f}%)"
+            f"One-seat (no transfer): {one_seat_riders:,.0f} "
+            f"({100 * one_seat_riders / total_riders:.1f}%)"
         )
         print(
-            f"Transfer required:      {total_riders - one_seat_riders:,.0f} ({100 * (1 - one_seat_riders / total_riders):.1f}%)"
+            f"Transfer required:      {total_riders - one_seat_riders:,.0f} "
+            f"({100 * (1 - one_seat_riders / total_riders):.1f}%)"
         )
 
     print(
-        f"\n=== Of one-seat rides, destinations with a {args.trunk_a_label}/{args.trunk_b_label} classification ==="
+        f"\n=== Of one-seat rides, destinations with a "
+        f"{args.trunk_a_label}/{args.trunk_b_label} classification ==="
     )
     print(
-        f"One-seat riders with a trunk classification: {classified_one_seat_riders:,.0f}"
+        "One-seat riders with a trunk classification: "
+        f"{classified_one_seat_riders:,.0f}"
     )
     if classified_one_seat_riders:
         pct = 100 * close_riders / classified_one_seat_riders
         print(
             f"...within {args.close_threshold_m:.0f}m of the other trunk "
-            f"({args.trunk_a_label} vs {args.trunk_b_label}): {close_riders:,.0f} ({pct:.1f}%)"
+            f"({args.trunk_a_label} vs {args.trunk_b_label}): "
+            f"{close_riders:,.0f} ({pct:.1f}%)"
         )
 
     print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
@@ -445,7 +466,8 @@ def main() -> None:
         print(f"  {stations[cid].name:<45} total={total:>9,.0f}  one-seat={pct:5.1f}%")
 
     print(
-        "\n=== Per-destination-station breakdown (avg weekday riders, sorted by total) ==="
+        "\n=== Per-destination-station breakdown "
+        "(avg weekday riders, sorted by total) ==="
     )
     for dest_id, (total, one_seat) in sorted(
         per_dest.items(), key=lambda kv: kv[1][0], reverse=True

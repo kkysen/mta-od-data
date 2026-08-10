@@ -10,7 +10,9 @@ the new file(s) (globs are fine) and/or --out at a new Parquet path.
 
 Examples:
     uv run scripts/01_prepare_data.py
-    uv run scripts/01_prepare_data.py --csv 'MTA_Subway_Origin-Destination_Ridership_Estimate__2025_*.csv' --out data/mta_od_2025.parquet
+    uv run scripts/01_prepare_data.py \
+        --csv 'MTA_Subway_Origin-Destination_Ridership_Estimate__2025_*.csv' \
+        --out data/mta_od_2025.parquet
     uv run scripts/01_prepare_data.py --force-stations
 """
 
@@ -79,7 +81,10 @@ def main() -> None:
         "--csv",
         nargs="+",
         default=[DEFAULT_CSV_GLOB],
-        help="Source OD CSV path(s)/glob(s), relative to the project root (default: %(default)s)",
+        help=(
+            "Source OD CSV path(s)/glob(s), relative to the project root "
+            "(default: %(default)s)"
+        ),
     )
     parser.add_argument(
         "--out", type=pathlib.Path, default=DEFAULT_PARQUET, help="Output Parquet path"
