@@ -45,11 +45,15 @@ def fetch_csv(url: str, out: pathlib.Path, force: bool) -> None:
     print(f"wrote {out} ({n} rows)")
 
 
-def convert_od_to_parquet(csv_patterns: list[str], out: pathlib.Path, force: bool) -> None:
+def convert_od_to_parquet(
+    csv_patterns: list[str], out: pathlib.Path, force: bool
+) -> None:
     if out.exists() and not force:
         print(f"skip: {out} already exists (use --force to reconvert)")
         return
-    resolved = [str(ROOT / p) if not pathlib.Path(p).is_absolute() else p for p in csv_patterns]
+    resolved = [
+        str(ROOT / p) if not pathlib.Path(p).is_absolute() else p for p in csv_patterns
+    ]
     print(f"converting {resolved} -> {out}")
     con = duckdb.connect()
     con.execute(
@@ -68,17 +72,26 @@ def convert_od_to_parquet(csv_patterns: list[str], out: pathlib.Path, force: boo
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument(
         "--csv",
         nargs="+",
         default=[DEFAULT_CSV_GLOB],
         help="Source OD CSV path(s)/glob(s), relative to the project root (default: %(default)s)",
     )
-    parser.add_argument("--out", type=pathlib.Path, default=DEFAULT_PARQUET, help="Output Parquet path")
-    parser.add_argument("--force", action="store_true", help="Reconvert even if --out already exists")
     parser.add_argument(
-        "--stations-out", type=pathlib.Path, default=DEFAULT_STATIONS_CSV, help="Output path for complex-level station reference CSV"
+        "--out", type=pathlib.Path, default=DEFAULT_PARQUET, help="Output Parquet path"
+    )
+    parser.add_argument(
+        "--force", action="store_true", help="Reconvert even if --out already exists"
+    )
+    parser.add_argument(
+        "--stations-out",
+        type=pathlib.Path,
+        default=DEFAULT_STATIONS_CSV,
+        help="Output path for complex-level station reference CSV",
     )
     parser.add_argument(
         "--stations-individual-out",
@@ -86,12 +99,18 @@ def main() -> None:
         default=DEFAULT_STATIONS_INDIVIDUAL_CSV,
         help="Output path for individual (per-physical-station) reference CSV",
     )
-    parser.add_argument("--force-stations", action="store_true", help="Refetch station reference data even if it exists")
+    parser.add_argument(
+        "--force-stations",
+        action="store_true",
+        help="Refetch station reference data even if it exists",
+    )
     args = parser.parse_args()
 
     DATA.mkdir(exist_ok=True)
     fetch_csv(STATIONS_URL, args.stations_out, args.force_stations)
-    fetch_csv(STATIONS_INDIVIDUAL_URL, args.stations_individual_out, args.force_stations)
+    fetch_csv(
+        STATIONS_INDIVIDUAL_URL, args.stations_individual_out, args.force_stations
+    )
     convert_od_to_parquet(args.csv, args.out, args.force)
 
 
