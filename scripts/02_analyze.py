@@ -282,7 +282,9 @@ def main() -> None:
         FROM '{args.parquet}'
         WHERE {day_filter_sql}
     """
-    (n_distinct_days,) = con.execute(n_days_query).fetchone()
+    result = con.execute(n_days_query).fetchone()
+    assert result is not None, "aggregate query always returns exactly one row"
+    (n_distinct_days,) = result
 
     # "riders" throughout is average weekday (or whichever day-type) ridership,
     # i.e. the sum over all matching days divided by the number of distinct
