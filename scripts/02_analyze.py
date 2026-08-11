@@ -62,7 +62,7 @@ class Station:
         return stations
 
     @classmethod
-    def load_individual(cls, path: Path) -> list[Self]:
+    def load_individuals(cls, path: Path) -> list[Self]:
         """Per-physical-station rows (not complex centroids). A complex can merge
         several physical stations (e.g. Times Sq-42 St/Port Authority Bus
         Terminal), so its centroid can sit well away from any actual platform;
@@ -1084,7 +1084,7 @@ def main(
 
     total_riders = sum(r for _, _, r in scoped)
 
-    individual_stations = Station.load_individual(stations_individual)
+    individual_stations = Station.load_individuals(stations_individual)
     points_by_complex: dict[int, list[tuple[float, float]]] = {}
     for s in individual_stations:
         points_by_complex.setdefault(s.complex_id, []).append((s.lat, s.lon))
