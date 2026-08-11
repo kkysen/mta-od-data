@@ -50,7 +50,7 @@ def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> No
         TO '{out}' (FORMAT parquet)
         """
     )
-    result = con.execute(
+    result: tuple[int, int, int] | None = con.execute(
         f"""
         SELECT count(*), min(Year * 100 + Month), max(Year * 100 + Month)
         FROM '{out}'
