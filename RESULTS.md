@@ -5,14 +5,14 @@ Average weekday ridership is the same 152,882/weekday across every scenario belo
 | Scenario | Direct one-seat % | Effective one-seat % (direct + close) |
 | --- | --- | --- |
 | today's actual routing | 40.8% | -- |
-| B,D on 4 Ave express, N,Q,R on Brighton | 37.5% | 54.8% |
-| N,Q,R on 4 Ave express, B,D on Brighton | 35.4% | 52.3% |
+| B,D on 4 Av express, N,Q,R on Brighton | 37.5% | 54.8% |
+| N,Q,R on 4 Av express, B,D on Brighton | 35.4% | 52.3% |
 
 `--` marks today's actual routing: it has no "effective one-seat" figure because that metric only applies under a corridor scenario (crediting riders who lose their direct one-seat ride but stay close to an alternative). Today's actual routing answers a different question instead -- of *today's* one-seat riders, how many would stay close to the other trunk if deinterlined generically -- see its own section below for that number.
 
 ---
 
-# 6 Ave express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
+# 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
 
 **Scenario: today's actual routing**
 
@@ -24,7 +24,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 
 - **Total: 152,882 riders/weekday**
 - **One-seat rides (no transfer): 40.8%** (62,425/weekday)
-- **Close to the other trunk if deinterlined: 64.1%** of one-seat riders (39,995 of 62,425) -- i.e. wouldn't need a materially longer walk/transfer even if 6 Ave express and Broadway express stopped interlining at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R).
+- **Close to the other trunk if deinterlined: 64.1%** of one-seat riders (39,995 of 62,425) -- i.e. wouldn't need a materially longer walk/transfer even if 6 Av express and Broadway express stopped interlining at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R).
 
 ## Top 25 origin/destination pairs (avg weekday riders)
 
@@ -90,20 +90,20 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 62,425/we
 
 ## Notes on reading these tables
 
-- "Close?"/"Dist" describe distance from the destination to the nearest station on the trunk *not* used to reach it one-seat (6 Ave express vs Broadway express), thresholded at 300m. In the per-pair table this is a single trip's classification; `True`/`0m` covers destinations already served by both trunks, and one-seat connections that never actually cross the junction (via a route in the universe but not in `--primary-routes`) -- those can't be affected by deinterlining either way.
+- "Close?"/"Dist" describe distance from the destination to the nearest station on the trunk *not* used to reach it one-seat (6 Av express vs Broadway express), thresholded at 300m. In the per-pair table this is a single trip's classification; `True`/`0m` covers destinations already served by both trunks, and one-seat connections that never actually cross the junction (via a route in the universe but not in `--primary-routes`) -- those can't be affected by deinterlining either way.
 - In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified one-seat pairs.
 - `xfer` rows have no close/dist value since the classification only applies to one-seat trips.
 - Full row-level detail (every origin/destination pair, not just the top 25) is in the `--csv-out` file (`data/dekalb_weekday_pairs_actual.csv`), if one was written.
 
 ---
 
-# 6 Ave express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
+# 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
 
-**Scenario: B,D on 4 Ave express, N,Q,R on Brighton**
+**Scenario: B,D on 4 Av express, N,Q,R on Brighton**
 
 Scenario: average weekday ridership (35 distinct days in the data) on trains originating at stations served by B,D,N,Q,R, south of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R), with destinations north of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) (i.e. trips that cross the junction).
 
-Deinterlining scenario: 4 Ave express served by B,D; Brighton served by N,Q,R (each origin's one-seat eligibility uses these assigned routes instead of its real current routes; a station touching both corridors keeps access to both).
+Deinterlining scenario: 4 Av express served by B,D; Brighton served by N,Q,R (each origin's one-seat eligibility uses these assigned routes instead of its real current routes; a station touching both corridors keeps access to both).
 
 Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
 
@@ -185,13 +185,13 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 57,398/we
 
 ---
 
-# 6 Ave express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
+# 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
 
-**Scenario: N,Q,R on 4 Ave express, B,D on Brighton**
+**Scenario: N,Q,R on 4 Av express, B,D on Brighton**
 
 Scenario: average weekday ridership (35 distinct days in the data) on trains originating at stations served by B,D,N,Q,R, south of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R), with destinations north of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) (i.e. trips that cross the junction).
 
-Deinterlining scenario: 4 Ave express served by N,Q,R; Brighton served by B,D (each origin's one-seat eligibility uses these assigned routes instead of its real current routes; a station touching both corridors keeps access to both).
+Deinterlining scenario: 4 Av express served by N,Q,R; Brighton served by B,D (each origin's one-seat eligibility uses these assigned routes instead of its real current routes; a station touching both corridors keeps access to both).
 
 Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
 

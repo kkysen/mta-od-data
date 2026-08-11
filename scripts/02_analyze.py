@@ -814,7 +814,7 @@ def main(
         ),
     ] = None,
     trunk_a: Annotated[str, Option(help="Routes on trunk A")] = "B,D",
-    trunk_a_label: Annotated[str, Option()] = "6 Ave express",
+    trunk_a_label: Annotated[str, Option()] = "6 Av express",
     trunk_b: Annotated[str, Option(help="Routes on trunk B")] = "N,Q",
     trunk_b_label: Annotated[str, Option()] = "Broadway express",
     origin_corridor_a_routes: Annotated[
@@ -827,7 +827,7 @@ def main(
             )
         ),
     ] = "D,N",
-    origin_corridor_a_label: Annotated[str, Option()] = "4 Ave express",
+    origin_corridor_a_label: Annotated[str, Option()] = "4 Av express",
     origin_corridor_b_routes: Annotated[
         str, Option(help="Real-world routes that put an origin station on corridor B")
     ] = "B,Q",
@@ -888,7 +888,7 @@ def main(
 
     Default scenario (the one this was built for): weekday trips on B/D/N/Q
     originating south of Atlantic Av-Barclays Ctr in Brooklyn, heading toward
-    Manhattan through the DeKalb Ave interlining junction.
+    Manhattan through the DeKalb Av interlining junction.
 
     \b
     Examples:
@@ -916,7 +916,7 @@ def main(
             --trunk-b 2,3 --trunk-b-label "7 Av express"
 
     \b
-        # Full DeKalb deinterlining: N,Q run the 4 Ave express corridor,
+        # Full DeKalb deinterlining: N,Q run the 4 Av express corridor,
         # B,D run Brighton (origin one-seat eligibility uses these assigned
         # routes instead of each station's real current routes)
         uv run scripts/02_analyze.py --corridor-a-assigned N,Q --corridor-b-assigned B,D
