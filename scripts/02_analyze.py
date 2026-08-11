@@ -982,6 +982,18 @@ def main(
         parse_route_set(corridor_b_assigned) if corridor_b_assigned else set()
     )
 
+    # Today's actual routing isn't a single corridor->trunk assignment the way
+    # the deinterlined scenarios are -- interlining lets each Brooklyn corridor
+    # reach *both* Manhattan trunks today (e.g. 4 Av express gets both D, to 6
+    # Av express, and N, to Broadway express), which is exactly why it beats
+    # either pure swap on direct one-seat rides. Label it by the real routes
+    # serving each corridor instead of a trunk assignment.
+    actual_routing_label = corridor_swap_label(
+        origin_corridor_a_routes_set,
+        origin_corridor_b_routes_set,
+        origin_corridor_a_label,
+        origin_corridor_b_label,
+    )
     if all_corridor_scenarios:
         # Only primary routes actually interline at the junction, so only
         # they're swappable between corridors -- a non-primary route on
@@ -991,7 +1003,7 @@ def main(
         trunk_a_primary_set = trunk_a_set & primary_routes_set
         trunk_b_primary_set = trunk_b_set & primary_routes_set
         scenario_defs = [
-            ScenarioDef("today's actual routing", set(), set(), False, "actual"),
+            ScenarioDef(actual_routing_label, set(), set(), False, "actual"),
             ScenarioDef(
                 corridor_swap_label(
                     trunk_a_primary_set,
@@ -1026,7 +1038,7 @@ def main(
                 origin_corridor_b_label,
             )
             if corridor_scenario_active
-            else "today's actual routing"
+            else actual_routing_label
         )
         scenario_defs = [
             ScenarioDef(
