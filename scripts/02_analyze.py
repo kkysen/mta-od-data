@@ -660,7 +660,12 @@ def run_scenario(
             # transfer.
             dist_m = min_dist_to_points(
                 dest_points(dest),
-                assigned_points(effective_origin_routes[origin_id]),
+                # Scoped to --routes: effective_origin_routes can carry real
+                # routes far outside this analysis (e.g. a station's F/G
+                # service alongside its R), and without this filter those
+                # would credit "close" via a line that has nothing to do with
+                # the junction being analyzed.
+                assigned_points(effective_origin_routes[origin_id] & routes_set),
             )
             close = None if dist_m is None else dist_m <= close_threshold_m
             if close is not None:
