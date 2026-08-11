@@ -10,9 +10,9 @@ from pathlib import Path
 from typing import Annotated
 
 import duckdb
-import typer
+from typer import BadParameter, Option, Typer
 
-app = typer.Typer(rich_markup_mode=None, add_completion=False)
+app = Typer(rich_markup_mode=None, add_completion=False)
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -108,11 +108,11 @@ def classify_one_seat(
 
 @app.command()
 def main(
-    parquet: Annotated[Path, typer.Option()] = DATA / "mta_od.parquet",
-    stations: Annotated[Path, typer.Option()] = DATA / "stations_complexes.csv",
+    parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
+    stations: Annotated[Path, Option()] = DATA / "stations_complexes.csv",
     stations_individual: Annotated[
         Path,
-        typer.Option(
+        Option(
             help=(
                 "Per-physical-station reference CSV, used for accurate "
                 "nearest-other-trunk distances"
@@ -120,25 +120,23 @@ def main(
         ),
     ] = DATA / "stations_individual.csv",
     day_type: Annotated[
-        str, typer.Option(help="One of: " + ", ".join(sorted(DAY_TYPE_PRESETS)))
+        str, Option(help="One of: " + ", ".join(sorted(DAY_TYPE_PRESETS)))
     ] = "weekday",
     days: Annotated[
         str | None,
-        typer.Option(
-            help="Comma-separated exact 'Day of Week' values, overrides --day-type"
-        ),
+        Option(help="Comma-separated exact 'Day of Week' values, overrides --day-type"),
     ] = None,
     boundary_complex_id: Annotated[
-        int, typer.Option(help="Junction station (default: Atlantic Av-Barclays Ctr)")
+        int, Option(help="Junction station (default: Atlantic Av-Barclays Ctr)")
     ] = 617,
-    origin_borough: Annotated[str, typer.Option()] = "Bk",
+    origin_borough: Annotated[str, Option()] = "Bk",
     origin_side: Annotated[
         str,
-        typer.Option(help="One of: south, north. Origin relative to boundary latitude"),
+        Option(help="One of: south, north. Origin relative to boundary latitude"),
     ] = "south",
     dest_side: Annotated[
         str,
-        typer.Option(
+        Option(
             help=(
                 "One of: south, north, either. Destination relative to boundary "
                 "latitude (scopes to trips that actually cross the junction)"
@@ -147,7 +145,7 @@ def main(
     ] = "north",
     exclude_boundary_dest: Annotated[
         bool,
-        typer.Option(
+        Option(
             help=(
                 "Exclude the boundary complex itself from valid destinations "
                 "(default: included, since ending at the junction still means "
@@ -156,11 +154,11 @@ def main(
         ),
     ] = False,
     routes: Annotated[
-        str, typer.Option(help="Route universe: origin filter + one-seat eligibility")
+        str, Option(help="Route universe: origin filter + one-seat eligibility")
     ] = "B,D,N,Q",
     primary_routes: Annotated[
         str | None,
-        typer.Option(
+        Option(
             help=(
                 "Routes that actually cross the boundary junction (default: same as "
                 "--routes). A route in --routes but not here (e.g. R, which reaches "
@@ -174,14 +172,14 @@ def main(
             ),
         ),
     ] = None,
-    trunk_a: Annotated[str, typer.Option(help="Routes on trunk A")] = "B,D",
-    trunk_a_label: Annotated[str, typer.Option()] = "6 Ave express",
-    trunk_b: Annotated[str, typer.Option(help="Routes on trunk B")] = "N,Q",
-    trunk_b_label: Annotated[str, typer.Option()] = "Broadway express",
-    close_threshold_m: Annotated[float, typer.Option()] = 300.0,
+    trunk_a: Annotated[str, Option(help="Routes on trunk A")] = "B,D",
+    trunk_a_label: Annotated[str, Option()] = "6 Ave express",
+    trunk_b: Annotated[str, Option(help="Routes on trunk B")] = "N,Q",
+    trunk_b_label: Annotated[str, Option()] = "Broadway express",
+    close_threshold_m: Annotated[float, Option()] = 300.0,
     csv_out: Annotated[
         Path | None,
-        typer.Option(help="Optional: dump classified per-OD-pair rows here"),
+        Option(help="Optional: dump classified per-OD-pair rows here"),
     ] = None,
 ) -> None:
     """Analyze one-seat-ride / deinterlining share for trips crossing a subway junction.
@@ -214,15 +212,15 @@ def main(
             --trunk-b 2,3 --trunk-b-label "7 Av express"
     """
     if day_type not in DAY_TYPE_PRESETS:
-        raise typer.BadParameter(
+        raise BadParameter(
             f"--day-type must be one of {sorted(DAY_TYPE_PRESETS)}, got {day_type!r}"
         )
     if origin_side not in ("south", "north"):
-        raise typer.BadParameter(
+        raise BadParameter(
             f"--origin-side must be one of ['south', 'north'], got {origin_side!r}"
         )
     if dest_side not in ("south", "north", "either"):
-        raise typer.BadParameter(
+        raise BadParameter(
             "--dest-side must be one of ['south', 'north', 'either'], "
             f"got {dest_side!r}"
         )

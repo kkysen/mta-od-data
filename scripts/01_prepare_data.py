@@ -8,9 +8,9 @@ from pathlib import Path
 from typing import Annotated
 
 import duckdb
-import typer
+from typer import Option, Typer
 
-app = typer.Typer(rich_markup_mode=None, add_completion=False)
+app = Typer(rich_markup_mode=None, add_completion=False)
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -65,29 +65,27 @@ def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> No
 def main(
     csv: Annotated[
         list[str] | None,
-        typer.Option(
+        Option(
             help=(
                 "Source OD CSV path(s)/glob(s), relative to the project root "
                 f"(repeatable; default: {DEFAULT_CSV_GLOB})"
             ),
         ),
     ] = None,
-    out: Annotated[Path, typer.Option(help="Output Parquet path")] = DEFAULT_PARQUET,
+    out: Annotated[Path, Option(help="Output Parquet path")] = DEFAULT_PARQUET,
     force: Annotated[
-        bool, typer.Option(help="Reconvert even if --out already exists")
+        bool, Option(help="Reconvert even if --out already exists")
     ] = False,
     stations_out: Annotated[
         Path,
-        typer.Option(help="Output path for complex-level station reference CSV"),
+        Option(help="Output path for complex-level station reference CSV"),
     ] = DEFAULT_STATIONS_CSV,
     stations_individual_out: Annotated[
         Path,
-        typer.Option(
-            help="Output path for individual (per-physical-station) reference CSV"
-        ),
+        Option(help="Output path for individual (per-physical-station) reference CSV"),
     ] = DEFAULT_STATIONS_INDIVIDUAL_CSV,
     force_stations: Annotated[
-        bool, typer.Option(help="Refetch station reference data even if it exists")
+        bool, Option(help="Refetch station reference data even if it exists")
     ] = False,
 ) -> None:
     """Fetch station reference data and convert MTA OD CSV extract(s) to Parquet.
