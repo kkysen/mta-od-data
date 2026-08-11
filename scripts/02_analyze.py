@@ -41,7 +41,6 @@ DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {
 class Station:
     complex_id: int
     name: str
-    borough: str
     routes: set[str]
     lat: float
     lon: float
@@ -91,7 +90,6 @@ def load_stations(path: Path) -> dict[int, Station]:
             stations[cid] = Station(
                 complex_id=cid,
                 name=row["display_name"],
-                borough=row["borough"],
                 routes=set(row["daytime_routes"].split()),
                 lat=float(row["latitude"]),
                 lon=float(row["longitude"]),
@@ -111,7 +109,6 @@ def load_individual_stations(path: Path) -> list[Station]:
                 Station(
                     complex_id=int(row["complex_id"]),
                     name=row["stop_name"],
-                    borough=row["borough"],
                     routes=set(row["daytime_routes"].split()),
                     lat=float(row["gtfs_latitude"]),
                     lon=float(row["gtfs_longitude"]),
@@ -170,7 +167,6 @@ def render_markdown(
     boundary_name: str,
     day_type: DayType,
     n_distinct_days: int,
-    origin_borough: str,
     routes_set: set[str],
     origin_side: str,
     dest_side: str,
@@ -194,8 +190,8 @@ def render_markdown(
     lines.append("")
     lines.append(
         f"Scenario: average {day_type} ridership ({n_distinct_days} distinct days "
-        f"in the data) on trains originating at `{origin_borough}` stations served "
-        f"by {','.join(sorted(routes_set))}, {origin_side} of {boundary_name}, with "
+        f"in the data) on trains originating at stations served by "
+        f"{','.join(sorted(routes_set))}, {origin_side} of {boundary_name}, with "
         f"destinations {dest_side} of {boundary_name} (i.e. trips that cross the "
         f"junction)."
     )
@@ -324,7 +320,6 @@ def main(
     boundary_complex_id: Annotated[
         int, Option(help="Junction station (default: Atlantic Av-Barclays Ctr)")
     ] = 617,
-    origin_borough: Annotated[str, Option()] = "Bk",
     origin_side: Annotated[
         Literal["south", "north"],
         Option(help="Origin relative to boundary latitude"),
@@ -416,7 +411,7 @@ def main(
     \b
         # A different junction/trunk pair, e.g. hypothetically Rogers Jct area
         uv run scripts/02_analyze.py --boundary-complex-id <id> --routes 2,3,4,5 \\
-            --origin-borough Bk --trunk-a 4,5 --trunk-a-label "Lexington Av express" \\
+            --trunk-a 4,5 --trunk-a-label "Lexington Av express" \\
             --trunk-b 2,3 --trunk-b-label "7 Av express"
     """
     days_list = (
@@ -446,9 +441,7 @@ def main(
     origin_ids = [
         s.complex_id
         for s in stations_by_id.values()
-        if s.borough == origin_borough
-        and (s.routes & routes_set)
-        and side_ok(s.lat, origin_side)
+        if (s.routes & routes_set) and side_ok(s.lat, origin_side)
     ]
     origin_ids.sort()
     print(f"\nOrigin stations ({len(origin_ids)}):")
@@ -680,7 +673,6 @@ def main(
             boundary_name=boundary_name,
             day_type=day_type,
             n_distinct_days=n_distinct_days,
-            origin_borough=origin_borough,
             routes_set=routes_set,
             origin_side=origin_side,
             dest_side=dest_side,

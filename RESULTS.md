@@ -1,6 +1,6 @@
 # 6 Ave express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
 
-Scenario: average weekday ridership (35 distinct days in the data) on trains originating at `Bk` stations served by B,D,N,Q,R, south of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R), with destinations north of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) (i.e. trips that cross the junction).
+Scenario: average weekday ridership (35 distinct days in the data) on trains originating at stations served by B,D,N,Q,R, south of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R), with destinations north of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) (i.e. trips that cross the junction).
 
 Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
 
