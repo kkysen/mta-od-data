@@ -6,23 +6,32 @@
 import csv
 import math
 from dataclasses import dataclass
+from enum import StrEnum
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 import duckdb
-from typer import BadParameter, Option, Typer
+from typer import Option, Typer
 
 app = Typer(rich_markup_mode=None)
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 
+
+class DayType(StrEnum):
+    WEEKDAY = "weekday"
+    SATURDAY = "saturday"
+    SUNDAY = "sunday"
+    ALL = "all"
+
+
 WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
-DAY_TYPE_PRESETS = {
-    "weekday": WEEKDAYS,
-    "saturday": ("Saturday",),
-    "sunday": ("Sunday",),
-    "all": None,
+DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {
+    DayType.WEEKDAY: WEEKDAYS,
+    DayType.SATURDAY: ("Saturday",),
+    DayType.SUNDAY: ("Sunday",),
+    DayType.ALL: None,
 }
 
 
@@ -123,9 +132,7 @@ def main(
             ),
         ),
     ] = DATA / "stations_individual.csv",
-    day_type: Annotated[
-        str, Option(help="One of: " + ", ".join(sorted(DAY_TYPE_PRESETS)))
-    ] = "weekday",
+    day_type: Annotated[DayType, Option()] = DayType.WEEKDAY,
     days: Annotated[
         str | None,
         Option(help="Comma-separated exact 'Day of Week' values, overrides --day-type"),
@@ -135,15 +142,15 @@ def main(
     ] = 617,
     origin_borough: Annotated[str, Option()] = "Bk",
     origin_side: Annotated[
-        str,
-        Option(help="One of: south, north. Origin relative to boundary latitude"),
+        Literal["south", "north"],
+        Option(help="Origin relative to boundary latitude"),
     ] = "south",
     dest_side: Annotated[
-        str,
+        Literal["south", "north", "either"],
         Option(
             help=(
-                "One of: south, north, either. Destination relative to boundary "
-                "latitude (scopes to trips that actually cross the junction)"
+                "Destination relative to boundary latitude "
+                "(scopes to trips that actually cross the junction)"
             )
         ),
     ] = "north",
@@ -215,20 +222,6 @@ def main(
             --origin-borough Bk --trunk-a 4,5 --trunk-a-label "Lexington Av express" \\
             --trunk-b 2,3 --trunk-b-label "7 Av express"
     """
-    if day_type not in DAY_TYPE_PRESETS:
-        raise BadParameter(
-            f"--day-type must be one of {sorted(DAY_TYPE_PRESETS)}, got {day_type!r}"
-        )
-    if origin_side not in ("south", "north"):
-        raise BadParameter(
-            f"--origin-side must be one of ['south', 'north'], got {origin_side!r}"
-        )
-    if dest_side not in ("south", "north", "either"):
-        raise BadParameter(
-            "--dest-side must be one of ['south', 'north', 'either'], "
-            f"got {dest_side!r}"
-        )
-
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
     )
