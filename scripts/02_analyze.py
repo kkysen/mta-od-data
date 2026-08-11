@@ -240,10 +240,15 @@ class ScenarioResult:
         top_n: int,
         csv_out: Path | None,
     ) -> str:
+        # Nested under the comparison table's own `#` heading when there's more
+        # than one scenario, so this section and its subsections drop a level
+        # to keep the document outline correct instead of repeating `#`/`##`.
+        h1 = "##" if show_label else "#"
+        h2 = "###" if show_label else "##"
         lines: list[str] = []
         lines.append(
-            f"# {trunk_a_label}/{trunk_b_label} deinterlining: one-seat-ride results "
-            f"at {boundary_name}"
+            f"{h1} {trunk_a_label}/{trunk_b_label} deinterlining: one-seat-ride "
+            f"results at {boundary_name}"
         )
         lines.append("")
         if show_label:
@@ -263,7 +268,7 @@ class ScenarioResult:
         lines.append(f"Produced by `{shlex.join(sys.argv)}`.")
         lines.append("")
 
-        lines.append("## Headline numbers")
+        lines.append(f"{h2} Headline numbers")
         lines.append("")
         lines.append(f"- **Total: {self.total_riders:,.0f} riders/{day_type}**")
         if self.total_riders:
@@ -306,7 +311,9 @@ class ScenarioResult:
             )
         lines.append("")
 
-        lines.append(f"## Top {top_n} origin/destination pairs (avg {day_type} riders)")
+        lines.append(
+            f"{h2} Top {top_n} origin/destination pairs (avg {day_type} riders)"
+        )
         lines.append("")
         lines.append(
             "| # | Riders | % of total | % of one-seat | Type | Close? | Dist "
@@ -334,7 +341,7 @@ class ScenarioResult:
         lines.append("")
 
         lines.append(
-            f"## Top {top_n} destination stations, summed across all origins "
+            f"{h2} Top {top_n} destination stations, summed across all origins "
             f"(avg {day_type} riders)"
         )
         lines.append("")
@@ -366,7 +373,7 @@ class ScenarioResult:
             )
         lines.append("")
 
-        lines.append("## Notes on reading these tables")
+        lines.append(f"{h2} Notes on reading these tables")
         lines.append("")
         if self.corridor_scenario_active:
             lines.append(
