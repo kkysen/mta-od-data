@@ -4,7 +4,7 @@ Average weekday ridership is the same 152,882/weekday across every scenario belo
 
 | Scenario | Direct one-seat % | Effective one-seat % (direct + close) |
 | --- | --- | --- |
-| D,N on 4 Av express, B,Q on Brighton | 40.8% | -- |
+| D,N on 4 Av express, B,Q on Brighton | 40.8% | 53.5% |
 | B,D on 4 Av express, N,Q on Brighton | 34.5% | 50.8% |
 | N,Q on 4 Av express, B,D on Brighton | 32.2% | 48.0% |
 
@@ -24,6 +24,8 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 
 - **Total: 152,882 riders/weekday**
 - **One-seat rides (no transfer): 40.8%** (62,425/weekday)
+- **Close one-seat rides: 21.3%** of the riders without a direct one-seat ride (19,304 of 90,457) are within 300m of a station on one of their origin's own routes -- i.e. no train change, just a short walk at the end to reach their actual destination.
+- **Effective one-seat rides (direct + close): 53.5%** (81,729/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip.
 - **Close to the other trunk if deinterlined: 64.1%** of one-seat riders (39,995 of 62,425) -- i.e. wouldn't need a materially longer walk/transfer even if 6 Av express and Broadway express stopped interlining at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R).
 
 ### Top 25 origin/destination pairs (avg weekday riders)
@@ -50,7 +52,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 | 18 | 320 | 0.21% | 0.51% | 1-seat | True | 0m | 7 Av (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 19 | 317 | 0.21% | 0.51% | 1-seat | True | 0m | Sheepshead Bay (B,Q) → DeKalb Av (B,Q,R) |
 | 20 | 310 | 0.20% | 0.50% | 1-seat | False | 565m | Bay Pkwy (D) → Grand St (B,D) |
-| 21 | 310 | 0.20% | -- | xfer | -- | -- | 86 St (R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 21 | 310 | 0.20% | -- | xfer | True | 0m | 86 St (R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
 | 22 | 306 | 0.20% | 0.49% | 1-seat | True | 0m | 8 Av (N) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
 | 23 | 306 | 0.20% | 0.49% | 1-seat | True | 191m | Kings Hwy (B,Q) → Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
 | 24 | 304 | 0.20% | 0.49% | 1-seat | True | 0m | 36 St (D,N,R) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
@@ -90,9 +92,8 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 62,425/we
 
 ### Notes on reading these tables
 
-- "Close?"/"Dist" describe distance from the destination to the nearest station on the trunk *not* used to reach it one-seat (6 Av express vs Broadway express), thresholded at 300m. In the per-pair table this is a single trip's classification; `True`/`0m` covers destinations already served by both trunks, and one-seat connections that never actually cross the junction (via a route in the universe but not in `--primary-routes`) -- those can't be affected by deinterlining either way.
-- In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified one-seat pairs.
-- `xfer` rows have no close/dist value since the classification only applies to one-seat trips.
+- "Close?"/"Dist" mean different things depending on `Type`. For `1-seat` rows: distance from the destination to the nearest station on the trunk *not* used to reach it one-seat (6 Av express vs Broadway express) -- i.e. how exposed that one-seat ride is to a generic future deinterlining; `True`/`0m` covers destinations already served by both trunks, and one-seat connections that never actually cross the junction (via a route in the universe but not in `--primary-routes`) -- those can't be affected by deinterlining either way. For `xfer` rows (riders without a direct one-seat ride): distance to the nearest station on one of the origin's own routes -- a close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination. Both thresholded at 300m.
+- In the per-destination table, "Close?"/"Dist" cover only that destination's classified *one-seat* pairs (ridership-weighted), matching the table's one-seat focus -- see the CSV or the per-pair table above for the `xfer` close/dist data.
 - Full row-level detail (every origin/destination pair, not just the top 25) is in the `--csv-out` file (`data/dekalb_weekday_pairs_actual.csv`), if one was written.
 
 ---

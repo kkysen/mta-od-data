@@ -104,21 +104,52 @@ class DestStats:
     name: str
     total: float = 0.0
     one_seat: float = 0.0
-    classified: float = 0.0
-    close: float = 0.0
-    dist_weighted: float = 0.0
+    # Close/dist tracked separately per row `Type`, since the two mean
+    # different things (close to the *other* trunk for `1-seat` rows, close
+    # to the origin's *own* routes/assigned trunk for `xfer` rows) and a
+    # destination can have rows of both types.
+    one_seat_classified: float = 0.0
+    one_seat_close: float = 0.0
+    one_seat_dist_weighted: float = 0.0
+    indirect_classified: float = 0.0
+    indirect_close: float = 0.0
+    indirect_dist_weighted: float = 0.0
 
     @property
     def one_seat_pct(self) -> float:
         return 100 * self.one_seat / self.total if self.total else float("nan")
 
     @property
-    def close_pct(self) -> float | None:
-        return 100 * self.close / self.classified if self.classified else None
+    def one_seat_close_pct(self) -> float | None:
+        return (
+            100 * self.one_seat_close / self.one_seat_classified
+            if self.one_seat_classified
+            else None
+        )
 
     @property
-    def avg_dist_m(self) -> float | None:
-        return self.dist_weighted / self.classified if self.classified else None
+    def one_seat_avg_dist_m(self) -> float | None:
+        return (
+            self.one_seat_dist_weighted / self.one_seat_classified
+            if self.one_seat_classified
+            else None
+        )
+
+    @property
+    def indirect_close_pct(self) -> float | None:
+        return (
+            100 * self.indirect_close / self.indirect_classified
+            if self.indirect_classified
+            else None
+        )
+
+    @property
+    def indirect_avg_dist_m(self) -> float | None:
+        return (
+            self.indirect_dist_weighted / self.indirect_classified
+            if self.indirect_classified
+            else None
+        )
 
 
 @dataclass(slots=True)
@@ -147,7 +178,7 @@ class ScenarioResult:
 
     @property
     def effective_one_seat_pct(self) -> float | None:
-        if not self.corridor_scenario_active or not self.total_riders:
+        if not self.total_riders:
             return None
         return 100 * self.effective_one_seat_riders / self.total_riders
 
@@ -180,22 +211,21 @@ class ScenarioResult:
                 f"({100 * (1 - self.one_seat_riders / self.total_riders):.1f}%)"
             )
 
-        if self.corridor_scenario_active:
-            if self.classified_indirect_riders:
-                pct = 100 * self.close_one_seat_riders / self.classified_indirect_riders
-                print(
-                    f"Close one-seat (short walk instead): "
-                    f"{self.close_one_seat_riders:,.0f} of "
-                    f"{self.classified_indirect_riders:,.0f} riders without a "
-                    f"direct one-seat ride ({pct:.1f}%)"
-                )
-            if self.total_riders:
-                print(
-                    f"Effective one-seat (direct + close): "
-                    f"{self.effective_one_seat_riders:,.0f} "
-                    f"({100 * self.effective_one_seat_riders / self.total_riders:.1f}%)"
-                )
-        elif self.classified_one_seat_riders:
+        if self.classified_indirect_riders:
+            pct = 100 * self.close_one_seat_riders / self.classified_indirect_riders
+            print(
+                f"Close one-seat (short walk instead): "
+                f"{self.close_one_seat_riders:,.0f} of "
+                f"{self.classified_indirect_riders:,.0f} riders without a "
+                f"direct one-seat ride ({pct:.1f}%)"
+            )
+        if self.total_riders:
+            print(
+                f"Effective one-seat (direct + close): "
+                f"{self.effective_one_seat_riders:,.0f} "
+                f"({100 * self.effective_one_seat_riders / self.total_riders:.1f}%)"
+            )
+        if not self.corridor_scenario_active and self.classified_one_seat_riders:
             pct = 100 * self.close_riders / self.classified_one_seat_riders
             print(
                 f"Close to the other trunk if deinterlined "
@@ -277,30 +307,38 @@ class ScenarioResult:
                 f"- **One-seat rides (no transfer): {one_seat_pct:.1f}%** "
                 f"({self.one_seat_riders:,.0f}/{day_type})"
             )
-        if self.corridor_scenario_active:
-            if self.classified_indirect_riders:
-                close_pct = (
-                    100 * self.close_one_seat_riders / self.classified_indirect_riders
-                )
-                lines.append(
-                    f"- **Close one-seat rides: {close_pct:.1f}%** of the riders "
-                    f"without a direct one-seat ride under this scenario "
-                    f"({self.close_one_seat_riders:,.0f} of "
-                    f"{self.classified_indirect_riders:,.0f}) are within "
-                    f"{close_threshold_m:.0f}m of a station on their own corridor's "
-                    f"assigned trunk -- i.e. no train change, just a short walk at "
-                    f"the end to reach their actual destination."
-                )
-            if self.total_riders:
-                effective_pct = 100 * self.effective_one_seat_riders / self.total_riders
-                lines.append(
-                    f"- **Effective one-seat rides (direct + close): "
-                    f"{effective_pct:.1f}%** ({self.effective_one_seat_riders:,.0f}/"
-                    f"{day_type}) -- direct one-seat riders plus the close one-seat "
-                    f"riders above, i.e. riders who wouldn't feel a materially worse "
-                    f"trip under this scenario."
-                )
-        elif self.classified_one_seat_riders:
+        if self.classified_indirect_riders:
+            close_pct = (
+                100 * self.close_one_seat_riders / self.classified_indirect_riders
+            )
+            if self.corridor_scenario_active:
+                scope_note = "under this scenario "
+                own_routes_desc = "their own corridor's assigned trunk"
+            else:
+                scope_note = ""
+                own_routes_desc = "one of their origin's own routes"
+            lines.append(
+                f"- **Close one-seat rides: {close_pct:.1f}%** of the riders "
+                f"without a direct one-seat ride {scope_note}"
+                f"({self.close_one_seat_riders:,.0f} of "
+                f"{self.classified_indirect_riders:,.0f}) are within "
+                f"{close_threshold_m:.0f}m of a station on {own_routes_desc} -- "
+                f"i.e. no train change, just a short walk at the end to reach "
+                f"their actual destination."
+            )
+        if self.total_riders:
+            effective_pct = 100 * self.effective_one_seat_riders / self.total_riders
+            scenario_note = (
+                " under this scenario" if self.corridor_scenario_active else ""
+            )
+            lines.append(
+                f"- **Effective one-seat rides (direct + close): "
+                f"{effective_pct:.1f}%** ({self.effective_one_seat_riders:,.0f}/"
+                f"{day_type}) -- direct one-seat riders plus the close one-seat "
+                f"riders above, i.e. riders who wouldn't feel a materially worse "
+                f"trip{scenario_note}."
+            )
+        if not self.corridor_scenario_active and self.classified_one_seat_riders:
             close_pct = 100 * self.close_riders / self.classified_one_seat_riders
             lines.append(
                 f"- **Close to the other trunk if deinterlined: {close_pct:.1f}%** of "
@@ -363,9 +401,22 @@ class ScenarioResult:
                 if self.one_seat_riders
                 else float("nan")
             )
-            close_pct = d.close_pct
+            # This table is scoped to one-seat ridership (see the sort/caption
+            # above), so its "Close?"/"Dist" columns stay scoped to one-seat
+            # pairs in baseline mode and indirect pairs in scenario mode,
+            # matching whichever population `Type` can actually be non-`--`
+            # for in the per-pair table above.
+            close_pct = (
+                d.indirect_close_pct
+                if self.corridor_scenario_active
+                else d.one_seat_close_pct
+            )
             close_str = "--" if close_pct is None else f"{close_pct:.0f}%"
-            avg_dist = d.avg_dist_m
+            avg_dist = (
+                d.indirect_avg_dist_m
+                if self.corridor_scenario_active
+                else d.one_seat_avg_dist_m
+            )
             dist_str = "--" if avg_dist is None else f"{avg_dist:.0f}m"
             lines.append(
                 f"| {d.total:,.0f} | {d.one_seat_pct:.1f}% | {pct_all_one_seat:.2f}% | "
@@ -398,24 +449,28 @@ class ScenarioResult:
             )
         else:
             lines.append(
-                f'- "Close?"/"Dist" describe distance from the destination to the '
+                f'- "Close?"/"Dist" mean different things depending on `Type`. '
+                f"For `1-seat` rows: distance from the destination to the "
                 f"nearest station on the trunk *not* used to reach it one-seat "
-                f"({trunk_a_label} vs {trunk_b_label}), thresholded at "
-                f"{close_threshold_m:.0f}m. In the per-pair table this is a single "
-                f"trip's classification; `True`/`0m` covers destinations already "
-                f"served by both trunks, and one-seat connections that never "
-                f"actually cross the junction (via a route in the universe but not "
-                f"in `--primary-routes`) -- those can't be affected by deinterlining "
-                f"either way."
+                f"({trunk_a_label} vs {trunk_b_label}) -- i.e. how exposed that "
+                f"one-seat ride is to a generic future deinterlining; "
+                f"`True`/`0m` covers destinations already served by both "
+                f"trunks, and one-seat connections that never actually cross "
+                f"the junction (via a route in the universe but not in "
+                f"`--primary-routes`) -- those can't be affected by "
+                f"deinterlining either way. For `xfer` rows (riders without a "
+                f"direct one-seat ride): distance to the nearest station on "
+                f"one of the origin's own routes -- a close `xfer` row is a "
+                f"*close one-seat ride*: no train change, just a short walk "
+                f"to the actual destination. Both thresholded at "
+                f"{close_threshold_m:.0f}m."
             )
             lines.append(
-                '- In the per-destination table, "Close?"/"Dist" are '
-                "ridership-weighted across that destination's classified "
-                "one-seat pairs."
-            )
-            lines.append(
-                "- `xfer` rows have no close/dist value since the classification only "
-                "applies to one-seat trips."
+                '- In the per-destination table, "Close?"/"Dist" cover only '
+                "that destination's classified *one-seat* pairs "
+                "(ridership-weighted), matching the table's one-seat focus -- "
+                "see the CSV or the per-pair table above for the `xfer` "
+                "close/dist data."
             )
         csv_note = f" (`{csv_out}`)" if csv_out else ""
         lines.append(
@@ -592,25 +647,32 @@ def run_scenario(
 
         close = None
         dist_m = None
-        if corridor_scenario_active:
-            # is_one_seat already reflects this scenario's deinterlined
-            # routing, so a one-seat rider here already has a direct train --
-            # no walk to evaluate. The riders worth asking about are the ones
-            # who DON'T connect one-seat: how far would they need to walk to
-            # reach a station on the trunk their own corridor actually got
-            # assigned? If it's close, that's a "close one-seat ride" (get
-            # off/board a short walk away, no train change), not a transfer.
-            if not is_one_seat and dest:
-                dist_m = min_dist_to_points(
-                    dest_points(dest),
-                    assigned_points(effective_origin_routes[origin_id]),
-                )
-                close = None if dist_m is None else dist_m <= close_threshold_m
-                if close is not None:
-                    classified_indirect_riders += riders
-                    if close:
-                        close_one_seat_riders += riders
-        elif is_one_seat and dest:
+        if not is_one_seat and dest:
+            # is_one_seat already reflects this scenario's effective routing
+            # (real current routes in baseline mode, the scenario's assigned
+            # routes otherwise), so a one-seat rider here already has a
+            # direct train -- no walk to evaluate. The riders worth asking
+            # about are the ones who DON'T connect one-seat: how far would
+            # they need to walk to reach a station on a route their own
+            # corridor actually has (today's real routes, or the scenario's
+            # assigned routes)? If it's close, that's a "close one-seat ride"
+            # (get off/board a short walk away, no train change), not a
+            # transfer.
+            dist_m = min_dist_to_points(
+                dest_points(dest),
+                assigned_points(effective_origin_routes[origin_id]),
+            )
+            close = None if dist_m is None else dist_m <= close_threshold_m
+            if close is not None:
+                classified_indirect_riders += riders
+                if close:
+                    close_one_seat_riders += riders
+        elif is_one_seat and dest and not corridor_scenario_active:
+            # Baseline-only: of TODAY's one-seat riders, how many would stay
+            # close to the trunk they *don't* currently use if the junction
+            # were deinterlined generically -- a different question from the
+            # scenario-specific one above, so it doesn't apply once a
+            # specific corridor scenario is active.
             if not (shared & primary_routes_set):
                 # This one-seat connection doesn't use any route that
                 # actually crosses the boundary junction (e.g. it's via R,
@@ -678,10 +740,16 @@ def run_scenario(
             d.one_seat += r.riders
         if r.close is not None:
             assert r.dist_m is not None
-            d.classified += r.riders
-            d.dist_weighted += r.riders * r.dist_m
-            if r.close:
-                d.close += r.riders
+            if r.one_seat:
+                d.one_seat_classified += r.riders
+                d.one_seat_dist_weighted += r.riders * r.dist_m
+                if r.close:
+                    d.one_seat_close += r.riders
+            else:
+                d.indirect_classified += r.riders
+                d.indirect_dist_weighted += r.riders * r.dist_m
+                if r.close:
+                    d.indirect_close += r.riders
 
     corridor_scenario_note = None
     if corridor_scenario_active:
