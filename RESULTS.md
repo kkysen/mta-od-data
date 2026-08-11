@@ -4,7 +4,7 @@ Average weekday ridership is the same 152,882/weekday across every scenario belo
 
 | Scenario | Direct one-seat % | Effective one-seat % (direct + close) |
 | --- | --- | --- |
-| today's actual routing | 40.8% | -- |
+| D,N on 4 Av express, B,Q on Brighton | 40.8% | -- |
 | B,D on 4 Av express, N,Q on Brighton | 34.5% | 50.8% |
 | N,Q on 4 Av express, B,D on Brighton | 32.2% | 48.0% |
 
@@ -14,7 +14,7 @@ Average weekday ridership is the same 152,882/weekday across every scenario belo
 
 ## 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
 
-**Scenario: today's actual routing**
+**Scenario: D,N on 4 Av express, B,Q on Brighton**
 
 Scenario: average weekday ridership (35 distinct days in the data) on trains originating at stations served by B,D,N,Q,R, south of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R), with destinations north of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) (i.e. trips that cross the junction).
 
