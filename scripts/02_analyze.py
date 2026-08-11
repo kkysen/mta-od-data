@@ -356,7 +356,7 @@ class ScenarioResult:
         )
         lines.append("")
         lines.append(
-            "| # | Riders | % Total | % One-Seat | Type | Close? | Dist "
+            "| # | Riders | % Total | % 1-Seat | Type | Close? | Dist "
             "| Origin → Destination |"
         )
         lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
@@ -391,7 +391,7 @@ class ScenarioResult:
         )
         lines.append("")
         lines.append(
-            "| Riders | One-Seat % | % All One-Seat | Close? | Dist | Destination |"
+            "| Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |"
         )
         lines.append("| --- | --- | --- | --- | --- | --- |")
         top_dests = sorted(self.dest_stats.values(), key=_dest_one_seat, reverse=True)[
@@ -814,8 +814,8 @@ def render_scenario_comparison(results: list[ScenarioResult], day_type: DayType)
     )
     lines.append("")
     lines.append(
-        "| Scenario | Total Riders | Direct One-Seat | Direct One-Seat % | "
-        "Close One-Seat | Effective One-Seat | Effective One-Seat % |"
+        "| Scenario | Total Riders | Direct 1-Seat | Direct 1-Seat % | "
+        "Close 1-Seat | Effective 1-Seat | Effective 1-Seat % |"
     )
     lines.append("| --- | --- | --- | --- | --- | --- | --- |")
     for r in results:
