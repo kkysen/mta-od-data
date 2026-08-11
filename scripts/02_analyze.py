@@ -182,6 +182,11 @@ class ScenarioResult:
             return None
         return 100 * self.effective_one_seat_riders / self.total_riders
 
+    @property
+    def effective_one_seat_pct_str(self) -> str:
+        pct = self.effective_one_seat_pct
+        return "--" if pct is None else f"{pct:.1f}%"
+
     def print_headline(
         self,
         *,
@@ -792,11 +797,12 @@ def run_scenario(
 def print_scenario_comparison(results: list[ScenarioResult], day_type: DayType) -> None:
     print(f"\n=== Scenario comparison (avg {day_type} riders) ===")
     for r in results:
-        effective_pct = r.effective_one_seat_pct
-        effective_str = "n/a" if effective_pct is None else f"{effective_pct:.1f}%"
         print(
-            f"  {r.label:<55} direct={r.direct_one_seat_pct:5.1f}%  "
-            f"effective={effective_str}"
+            f"  {r.label:<55} total={r.total_riders:>9,.0f}  "
+            f"direct={r.one_seat_riders:>8,.0f} ({r.direct_one_seat_pct:5.1f}%)  "
+            f"close={r.close_one_seat_riders:>7,.0f}  "
+            f"effective={r.effective_one_seat_riders:>8,.0f} "
+            f"({r.effective_one_seat_pct_str})"
         )
 
 
@@ -811,22 +817,22 @@ def render_scenario_comparison(results: list[ScenarioResult], day_type: DayType)
     )
     lines.append("")
     lines.append(
-        "| Scenario | Direct one-seat % | Effective one-seat % (direct + close) |"
+        "| Scenario | Total riders | Direct one-seat | Direct one-seat % | "
+        "Close one-seat | Effective one-seat | Effective one-seat % |"
     )
-    lines.append("| --- | --- | --- |")
+    lines.append("| --- | --- | --- | --- | --- | --- | --- |")
     for r in results:
-        effective_pct = r.effective_one_seat_pct
-        effective_str = "--" if effective_pct is None else f"{effective_pct:.1f}%"
-        lines.append(f"| {r.label} | {r.direct_one_seat_pct:.1f}% | {effective_str} |")
+        lines.append(
+            f"| {r.label} | {r.total_riders:,.0f} | {r.one_seat_riders:,.0f} | "
+            f"{r.direct_one_seat_pct:.1f}% | {r.close_one_seat_riders:,.0f} | "
+            f"{r.effective_one_seat_riders:,.0f} | "
+            f"{r.effective_one_seat_pct_str} |"
+        )
     lines.append("")
     lines.append(
-        '`--` marks today\'s actual routing: it has no "effective one-seat" '
-        "figure because that metric only applies under a corridor scenario "
-        "(crediting riders who lose their direct one-seat ride but stay close "
-        "to an alternative). Today's actual routing answers a different "
-        "question instead -- of *today's* one-seat riders, how many would "
-        "stay close to the other trunk if deinterlined generically -- see its "
-        "own section below for that number."
+        '"Close one-seat" is the many-seat riders (see "Notes on reading these '
+        'tables" below) close enough to an alternative not to need a materially '
+        'worse trip; "Effective one-seat" is direct + close.'
     )
     lines.append("")
     return "\n".join(lines)
