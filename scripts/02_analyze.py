@@ -346,7 +346,7 @@ class ScenarioResult:
         lines.append(
             "| Riders | One-seat % | % of all one-seat | Close? | Dist | Destination |"
         )
-        lines.append("|---|---|---|---|---|---|")
+        lines.append("| --- | --- | --- | --- | --- | --- |")
         top_dests = sorted(self.dest_stats.values(), key=_dest_one_seat, reverse=True)[
             :top_n
         ]
