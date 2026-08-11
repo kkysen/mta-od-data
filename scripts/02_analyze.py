@@ -177,15 +177,12 @@ class ScenarioResult:
         )
 
     @property
-    def effective_one_seat_pct(self) -> float | None:
-        if not self.total_riders:
-            return None
-        return 100 * self.effective_one_seat_riders / self.total_riders
-
-    @property
-    def effective_one_seat_pct_str(self) -> str:
-        pct = self.effective_one_seat_pct
-        return "--" if pct is None else f"{pct:.1f}%"
+    def effective_one_seat_pct(self) -> float:
+        return (
+            100 * self.effective_one_seat_riders / self.total_riders
+            if self.total_riders
+            else float("nan")
+        )
 
     def print_headline(
         self,
@@ -219,7 +216,7 @@ class ScenarioResult:
         if self.classified_many_seat_riders:
             pct = 100 * self.close_one_seat_riders / self.classified_many_seat_riders
             print(
-                f"Close one-seat (short walk instead): "
+                f"Close one-seat (within {close_threshold_m:.0f}m instead): "
                 f"{self.close_one_seat_riders:,.0f} of "
                 f"{self.classified_many_seat_riders:,.0f} riders without a "
                 f"direct one-seat ride ({pct:.1f}%)"
@@ -802,7 +799,7 @@ def print_scenario_comparison(results: list[ScenarioResult], day_type: DayType) 
             f"direct={r.one_seat_riders:>8,.0f} ({r.direct_one_seat_pct:5.1f}%)  "
             f"close={r.close_one_seat_riders:>7,.0f}  "
             f"effective={r.effective_one_seat_riders:>8,.0f} "
-            f"({r.effective_one_seat_pct_str})"
+            f"({r.effective_one_seat_pct:5.1f}%)"
         )
 
 
@@ -826,7 +823,7 @@ def render_scenario_comparison(results: list[ScenarioResult], day_type: DayType)
             f"| {r.label} | {r.total_riders:,.0f} | {r.one_seat_riders:,.0f} | "
             f"{r.direct_one_seat_pct:.1f}% | {r.close_one_seat_riders:,.0f} | "
             f"{r.effective_one_seat_riders:,.0f} | "
-            f"{r.effective_one_seat_pct_str} |"
+            f"{r.effective_one_seat_pct:.1f}% |"
         )
     lines.append("")
     lines.append(
