@@ -524,11 +524,15 @@ def run_scenario(
     verbose: bool,
 ) -> ScenarioResult:
     # Effective routes used for one-seat classification at each origin. Under
-    # a corridor scenario, this replaces an origin's real current routes with
-    # whichever routes the scenario assigns to its physical corridor -- a
+    # a corridor scenario, this replaces an origin's real current *primary*
+    # routes (the ones that actually interline at the junction) with whichever
+    # primary routes the scenario assigns to its physical corridor -- a
     # station that touches both corridors (e.g. a shared terminal) keeps
     # access to both assigned route sets, since no DeKalb-only deinterlining
-    # scenario changes what serves it.
+    # scenario changes what serves it. Any real route the station already has
+    # that *doesn't* interline (e.g. R, which never crosses DeKalb) is kept
+    # as-is regardless of scenario -- deinterlining the junction can't move a
+    # route that never used it.
     effective_origin_routes: dict[int, set[str]] = {}
     if verbose:
         print(f"\nCorridor assignment (scenario active: {corridor_scenario_active}):")
@@ -537,16 +541,21 @@ def run_scenario(
         in_a = bool(s.routes & origin_corridor_a_routes_set)
         in_b = bool(s.routes & origin_corridor_b_routes_set)
         corridor_tag = "a+b" if in_a and in_b else "a" if in_a else "b" if in_b else "?"
+        non_reassignable_routes = s.routes - primary_routes_set
         if not corridor_scenario_active:
             effective_origin_routes[cid] = s.routes
         elif in_a and in_b:
-            effective_origin_routes[cid] = (
-                corridor_a_assigned_set | corridor_b_assigned_set
+            effective_origin_routes[cid] = non_reassignable_routes | (
+                (corridor_a_assigned_set | corridor_b_assigned_set) & primary_routes_set
             )
         elif in_a:
-            effective_origin_routes[cid] = corridor_a_assigned_set
+            effective_origin_routes[cid] = non_reassignable_routes | (
+                corridor_a_assigned_set & primary_routes_set
+            )
         elif in_b:
-            effective_origin_routes[cid] = corridor_b_assigned_set
+            effective_origin_routes[cid] = non_reassignable_routes | (
+                corridor_b_assigned_set & primary_routes_set
+            )
         else:
             effective_origin_routes[cid] = s.routes
             if corridor_scenario_active:
@@ -676,13 +685,18 @@ def run_scenario(
 
     corridor_scenario_note = None
     if corridor_scenario_active:
+        corridor_a_assigned_primary = corridor_a_assigned_set & primary_routes_set
+        corridor_b_assigned_primary = corridor_b_assigned_set & primary_routes_set
         corridor_scenario_note = (
             f"Deinterlining scenario: {origin_corridor_a_label} served by "
-            f"{','.join(sorted(corridor_a_assigned_set))}; {origin_corridor_b_label} "
-            f"served by {','.join(sorted(corridor_b_assigned_set))} (each origin's "
-            f"one-seat eligibility uses these assigned routes instead of its real "
-            f"current routes; a station touching both corridors keeps access to "
-            f"both)."
+            f"{','.join(sorted(corridor_a_assigned_primary))}; "
+            f"{origin_corridor_b_label} served by "
+            f"{','.join(sorted(corridor_b_assigned_primary))} (each origin's "
+            f"one-seat eligibility swaps in these assigned primary routes in "
+            f"place of its real current primary routes; any non-primary route "
+            f"it already has (e.g. R, which never crosses the junction) is "
+            f"unaffected, and a station touching both corridors keeps access "
+            f"to both)."
         )
 
     return ScenarioResult(
@@ -969,29 +983,36 @@ def main(
     )
 
     if all_corridor_scenarios:
+        # Only primary routes actually interline at the junction, so only
+        # they're swappable between corridors -- a non-primary route on
+        # --trunk-a/--trunk-b (e.g. R via --trunk-b for the baseline
+        # "close to the other trunk" metric) never moves and shouldn't be
+        # named in the swap label.
+        trunk_a_primary_set = trunk_a_set & primary_routes_set
+        trunk_b_primary_set = trunk_b_set & primary_routes_set
         scenario_defs = [
             ScenarioDef("today's actual routing", set(), set(), False, "actual"),
             ScenarioDef(
                 corridor_swap_label(
-                    trunk_a_set,
-                    trunk_b_set,
+                    trunk_a_primary_set,
+                    trunk_b_primary_set,
                     origin_corridor_a_label,
                     origin_corridor_b_label,
                 ),
-                trunk_a_set,
-                trunk_b_set,
+                trunk_a_primary_set,
+                trunk_b_primary_set,
                 True,
                 "a",
             ),
             ScenarioDef(
                 corridor_swap_label(
-                    trunk_b_set,
-                    trunk_a_set,
+                    trunk_b_primary_set,
+                    trunk_a_primary_set,
                     origin_corridor_a_label,
                     origin_corridor_b_label,
                 ),
-                trunk_b_set,
-                trunk_a_set,
+                trunk_b_primary_set,
+                trunk_a_primary_set,
                 True,
                 "b",
             ),
