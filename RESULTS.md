@@ -12,7 +12,7 @@ Average weekday ridership is the same 152,882/weekday across every scenario belo
 
 ---
 
-# 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
+## 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
 
 **Scenario: today's actual routing**
 
@@ -20,13 +20,13 @@ Scenario: average weekday ridership (35 distinct days in the data) on trains ori
 
 Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
 
-## Headline numbers
+### Headline numbers
 
 - **Total: 152,882 riders/weekday**
 - **One-seat rides (no transfer): 40.8%** (62,425/weekday)
 - **Close to the other trunk if deinterlined: 64.1%** of one-seat riders (39,995 of 62,425) -- i.e. wouldn't need a materially longer walk/transfer even if 6 Av express and Broadway express stopped interlining at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R).
 
-## Top 25 origin/destination pairs (avg weekday riders)
+### Top 25 origin/destination pairs (avg weekday riders)
 
 | # | Riders | % of total | % of one-seat | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -56,7 +56,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 | 24 | 304 | 0.20% | 0.49% | 1-seat | True | 0m | 36 St (D,N,R) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 25 | 304 | 0.20% | 0.49% | 1-seat | False | 867m | Prospect Park (B,Q,S) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 
-## Top 25 destination stations, summed across all origins (avg weekday riders)
+### Top 25 destination stations, summed across all origins (avg weekday riders)
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 62,425/weekday one-seat total).
 
@@ -88,7 +88,7 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 62,425/we
 | 1,447 | 34.7% | 0.80% | 0% | 1152m | Lexington Av/59 St (4,5,6,N,R,W) |
 | 957 | 51.6% | 0.79% | 100% | 0m | City Hall (R,W) |
 
-## Notes on reading these tables
+### Notes on reading these tables
 
 - "Close?"/"Dist" describe distance from the destination to the nearest station on the trunk *not* used to reach it one-seat (6 Av express vs Broadway express), thresholded at 300m. In the per-pair table this is a single trip's classification; `True`/`0m` covers destinations already served by both trunks, and one-seat connections that never actually cross the junction (via a route in the universe but not in `--primary-routes`) -- those can't be affected by deinterlining either way.
 - In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified one-seat pairs.
@@ -97,7 +97,7 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 62,425/we
 
 ---
 
-# 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
+## 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
 
 **Scenario: B,D on 4 Av express, N,Q,R on Brighton**
 
@@ -107,14 +107,14 @@ Deinterlining scenario: 4 Av express served by B,D; Brighton served by N,Q,R (ea
 
 Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
 
-## Headline numbers
+### Headline numbers
 
 - **Total: 152,882 riders/weekday**
 - **One-seat rides (no transfer): 37.5%** (57,398/weekday)
 - **Close one-seat rides: 27.6%** of the riders without a direct one-seat ride under this scenario (26,361 of 95,483) are within 300m of a station on their own corridor's assigned trunk -- i.e. no train change, just a short walk at the end to reach their actual destination.
 - **Effective one-seat rides (direct + close): 54.8%** (83,760/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip under this scenario.
 
-## Top 25 origin/destination pairs (avg weekday riders)
+### Top 25 origin/destination pairs (avg weekday riders)
 
 | # | Riders | % of total | % of one-seat | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -144,7 +144,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 | 24 | 304 | 0.20% | 0.53% | 1-seat | -- | -- | 36 St (D,N,R) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 25 | 304 | 0.20% | 0.53% | 1-seat | -- | -- | Prospect Park (B,Q,S) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 
-## Top 25 destination stations, summed across all origins (avg weekday riders)
+### Top 25 destination stations, summed across all origins (avg weekday riders)
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 57,398/weekday one-seat total).
 
@@ -176,7 +176,7 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 57,398/we
 | 885 | 67.3% | 1.04% | 0% | 7689m | Jackson Hts-Roosevelt Av/74 St-Broadway (7,E,F,M,R) |
 | 720 | 73.1% | 0.92% | 0% | 635m | 8 St-NYU (R,W) |
 
-## Notes on reading these tables
+### Notes on reading these tables
 
 - "Close?"/"Dist" describe distance from the destination to the nearest station on the trunk the origin's *own* corridor got assigned in this scenario, thresholded at 300m. They only apply to `xfer` rows -- riders without a direct one-seat ride under this scenario -- since a `1-seat` row already has a direct train and needs no walk. A close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination.
 - In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified indirect (non-direct-one-seat) pairs.
@@ -185,7 +185,7 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 57,398/we
 
 ---
 
-# 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
+## 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
 
 **Scenario: N,Q,R on 4 Av express, B,D on Brighton**
 
@@ -195,14 +195,14 @@ Deinterlining scenario: 4 Av express served by N,Q,R; Brighton served by B,D (ea
 
 Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
 
-## Headline numbers
+### Headline numbers
 
 - **Total: 152,882 riders/weekday**
 - **One-seat rides (no transfer): 35.4%** (54,186/weekday)
 - **Close one-seat rides: 26.1%** of the riders without a direct one-seat ride under this scenario (25,752 of 98,695) are within 300m of a station on their own corridor's assigned trunk -- i.e. no train change, just a short walk at the end to reach their actual destination.
 - **Effective one-seat rides (direct + close): 52.3%** (79,938/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip under this scenario.
 
-## Top 25 origin/destination pairs (avg weekday riders)
+### Top 25 origin/destination pairs (avg weekday riders)
 
 | # | Riders | % of total | % of one-seat | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -232,7 +232,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 | 24 | 304 | 0.20% | 0.56% | 1-seat | -- | -- | 36 St (D,N,R) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 25 | 304 | 0.20% | -- | xfer | False | 867m | Prospect Park (B,Q,S) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 
-## Top 25 destination stations, summed across all origins (avg weekday riders)
+### Top 25 destination stations, summed across all origins (avg weekday riders)
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 54,186/weekday one-seat total).
 
@@ -264,7 +264,7 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 54,186/we
 | 736 | 73.2% | 0.99% | 0% | 2058m | Rector St (R,W) |
 | 720 | 72.5% | 0.96% | 0% | 635m | 8 St-NYU (R,W) |
 
-## Notes on reading these tables
+### Notes on reading these tables
 
 - "Close?"/"Dist" describe distance from the destination to the nearest station on the trunk the origin's *own* corridor got assigned in this scenario, thresholded at 300m. They only apply to `xfer` rows -- riders without a direct one-seat ride under this scenario -- since a `1-seat` row already has a direct train and needs no walk. A close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination.
 - In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified indirect (non-direct-one-seat) pairs.
