@@ -186,6 +186,200 @@ class ScenarioResult:
             pct = 100 * d.one_seat / d.total if d.total else float("nan")
             print(f"  {d.name:<55} total={d.total:>9,.0f}  one-seat={pct:5.1f}%")
 
+    def render_markdown(
+        self,
+        *,
+        show_label: bool,
+        boundary_name: str,
+        day_type: DayType,
+        n_distinct_days: int,
+        routes_set: set[str],
+        origin_side: str,
+        dest_side: str,
+        trunk_a_label: str,
+        trunk_b_label: str,
+        close_threshold_m: float,
+        top_n: int,
+        csv_out: Path | None,
+    ) -> str:
+        lines: list[str] = []
+        lines.append(
+            f"# {trunk_a_label}/{trunk_b_label} deinterlining: one-seat-ride results "
+            f"at {boundary_name}"
+        )
+        lines.append("")
+        if show_label:
+            lines.append(f"**Scenario: {self.label}**")
+            lines.append("")
+        lines.append(
+            f"Scenario: average {day_type} ridership ({n_distinct_days} distinct days "
+            f"in the data) on trains originating at stations served by "
+            f"{','.join(sorted(routes_set))}, {origin_side} of {boundary_name}, with "
+            f"destinations {dest_side} of {boundary_name} (i.e. trips that cross the "
+            f"junction)."
+        )
+        lines.append("")
+        if self.corridor_scenario_note:
+            lines.append(self.corridor_scenario_note)
+            lines.append("")
+        lines.append(f"Produced by `{shlex.join(sys.argv)}`.")
+        lines.append("")
+
+        lines.append("## Headline numbers")
+        lines.append("")
+        lines.append(f"- **Total: {self.total_riders:,.0f} riders/{day_type}**")
+        if self.total_riders:
+            one_seat_pct = 100 * self.one_seat_riders / self.total_riders
+            lines.append(
+                f"- **One-seat rides (no transfer): {one_seat_pct:.1f}%** "
+                f"({self.one_seat_riders:,.0f}/{day_type})"
+            )
+        if self.corridor_scenario_active:
+            if self.classified_indirect_riders:
+                close_pct = (
+                    100 * self.close_one_seat_riders / self.classified_indirect_riders
+                )
+                lines.append(
+                    f"- **Close one-seat rides: {close_pct:.1f}%** of the riders "
+                    f"without a direct one-seat ride under this scenario "
+                    f"({self.close_one_seat_riders:,.0f} of "
+                    f"{self.classified_indirect_riders:,.0f}) are within "
+                    f"{close_threshold_m:.0f}m of a station on their own corridor's "
+                    f"assigned trunk -- i.e. no train change, just a short walk at "
+                    f"the end to reach their actual destination."
+                )
+            if self.total_riders:
+                effective_pct = 100 * self.effective_one_seat_riders / self.total_riders
+                lines.append(
+                    f"- **Effective one-seat rides (direct + close): "
+                    f"{effective_pct:.1f}%** ({self.effective_one_seat_riders:,.0f}/"
+                    f"{day_type}) -- direct one-seat riders plus the close one-seat "
+                    f"riders above, i.e. riders who wouldn't feel a materially worse "
+                    f"trip under this scenario."
+                )
+        elif self.classified_one_seat_riders:
+            close_pct = 100 * self.close_riders / self.classified_one_seat_riders
+            lines.append(
+                f"- **Close to the other trunk if deinterlined: {close_pct:.1f}%** of "
+                f"one-seat riders ({self.close_riders:,.0f} of "
+                f"{self.classified_one_seat_riders:,.0f}) -- i.e. wouldn't need a "
+                f"materially longer walk/transfer even if {trunk_a_label} and "
+                f"{trunk_b_label} stopped interlining at {boundary_name}."
+            )
+        lines.append("")
+
+        lines.append(f"## Top {top_n} origin/destination pairs (avg {day_type} riders)")
+        lines.append("")
+        lines.append(
+            "| # | Riders | % of total | % of one-seat | Type | Close? | Dist "
+            "| Origin → Destination |"
+        )
+        lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+        top_pairs = sorted(self.rows, key=_pair_riders, reverse=True)[:top_n]
+        for i, r in enumerate(top_pairs, start=1):
+            pct_total = (
+                100 * r.riders / self.total_riders
+                if self.total_riders
+                else float("nan")
+            )
+            pct_one_seat_str = "--"
+            if r.one_seat and self.one_seat_riders:
+                pct_one_seat_str = f"{100 * r.riders / self.one_seat_riders:.2f}%"
+            type_str = "1-seat" if r.one_seat else "xfer"
+            close_str = "--" if r.close is None else str(r.close)
+            dist_str = "--" if r.dist_m is None else f"{r.dist_m:.0f}m"
+            lines.append(
+                f"| {i} | {r.riders:,.0f} | {pct_total:.2f}% | {pct_one_seat_str} | "
+                f"{type_str} | {close_str} | {dist_str} | "
+                f"{r.origin_name} → {r.dest_name} |"
+            )
+        lines.append("")
+
+        lines.append(
+            f"## Top {top_n} destination stations, summed across all origins "
+            f"(avg {day_type} riders)"
+        )
+        lines.append("")
+        lines.append(
+            "Sorted by each destination's one-seat ridership (i.e. its share of the "
+            f"{self.one_seat_riders:,.0f}/{day_type} one-seat total)."
+        )
+        lines.append("")
+        lines.append(
+            "| Riders | One-seat % | % of all one-seat | Close? | Dist | Destination |"
+        )
+        lines.append("|---|---|---|---|---|---|")
+        top_dests = sorted(self.dest_stats.values(), key=_dest_one_seat, reverse=True)[
+            :top_n
+        ]
+        for d in top_dests:
+            pct_all_one_seat = (
+                100 * d.one_seat / self.one_seat_riders
+                if self.one_seat_riders
+                else float("nan")
+            )
+            close_pct = d.close_pct
+            close_str = "--" if close_pct is None else f"{close_pct:.0f}%"
+            avg_dist = d.avg_dist_m
+            dist_str = "--" if avg_dist is None else f"{avg_dist:.0f}m"
+            lines.append(
+                f"| {d.total:,.0f} | {d.one_seat_pct:.1f}% | {pct_all_one_seat:.2f}% | "
+                f"{close_str} | {dist_str} | {d.name} |"
+            )
+        lines.append("")
+
+        lines.append("## Notes on reading these tables")
+        lines.append("")
+        if self.corridor_scenario_active:
+            lines.append(
+                f'- "Close?"/"Dist" describe distance from the destination to the '
+                f"nearest station on the trunk the origin's *own* corridor got "
+                f"assigned in this scenario, thresholded at {close_threshold_m:.0f}m. "
+                f"They only apply to `xfer` rows -- riders without a direct "
+                f"one-seat ride under this scenario -- since a `1-seat` row "
+                f"already has a direct train and needs no walk. A close `xfer` "
+                f"row is a *close one-seat ride*: no train change, just a short "
+                f"walk to the actual destination."
+            )
+            lines.append(
+                '- In the per-destination table, "Close?"/"Dist" are '
+                "ridership-weighted across that destination's classified "
+                "indirect (non-direct-one-seat) pairs."
+            )
+            lines.append(
+                "- `1-seat` rows have no close/dist value since the classification "
+                "only applies to trips without a direct one-seat ride under this "
+                "scenario."
+            )
+        else:
+            lines.append(
+                f'- "Close?"/"Dist" describe distance from the destination to the '
+                f"nearest station on the trunk *not* used to reach it one-seat "
+                f"({trunk_a_label} vs {trunk_b_label}), thresholded at "
+                f"{close_threshold_m:.0f}m. In the per-pair table this is a single "
+                f"trip's classification; `True`/`0m` covers destinations already "
+                f"served by both trunks, and one-seat connections that never "
+                f"actually cross the junction (via a route in the universe but not "
+                f"in `--primary-routes`) -- those can't be affected by deinterlining "
+                f"either way."
+            )
+            lines.append(
+                '- In the per-destination table, "Close?"/"Dist" are '
+                "ridership-weighted across that destination's classified "
+                "one-seat pairs."
+            )
+            lines.append(
+                "- `xfer` rows have no close/dist value since the classification only "
+                "applies to one-seat trips."
+            )
+        csv_note = f" (`{csv_out}`)" if csv_out else ""
+        lines.append(
+            f"- Full row-level detail (every origin/destination pair, not just the top "
+            f"{top_n}) is in the `--csv-out` file{csv_note}, if one was written."
+        )
+        lines.append("")
+        return "\n".join(lines)
+
 
 @dataclass(slots=True)
 class ScenarioDef:
@@ -551,199 +745,6 @@ def _dest_one_seat(d: DestStats) -> float:
 
 def _pair_riders(r: PairRow) -> float:
     return r.riders
-
-
-def render_markdown(
-    *,
-    result: ScenarioResult,
-    show_label: bool,
-    boundary_name: str,
-    day_type: DayType,
-    n_distinct_days: int,
-    routes_set: set[str],
-    origin_side: str,
-    dest_side: str,
-    trunk_a_label: str,
-    trunk_b_label: str,
-    close_threshold_m: float,
-    top_n: int,
-    csv_out: Path | None,
-) -> str:
-    lines: list[str] = []
-    lines.append(
-        f"# {trunk_a_label}/{trunk_b_label} deinterlining: one-seat-ride results "
-        f"at {boundary_name}"
-    )
-    lines.append("")
-    if show_label:
-        lines.append(f"**Scenario: {result.label}**")
-        lines.append("")
-    lines.append(
-        f"Scenario: average {day_type} ridership ({n_distinct_days} distinct days "
-        f"in the data) on trains originating at stations served by "
-        f"{','.join(sorted(routes_set))}, {origin_side} of {boundary_name}, with "
-        f"destinations {dest_side} of {boundary_name} (i.e. trips that cross the "
-        f"junction)."
-    )
-    lines.append("")
-    if result.corridor_scenario_note:
-        lines.append(result.corridor_scenario_note)
-        lines.append("")
-    lines.append(f"Produced by `{shlex.join(sys.argv)}`.")
-    lines.append("")
-
-    lines.append("## Headline numbers")
-    lines.append("")
-    lines.append(f"- **Total: {result.total_riders:,.0f} riders/{day_type}**")
-    if result.total_riders:
-        one_seat_pct = 100 * result.one_seat_riders / result.total_riders
-        lines.append(
-            f"- **One-seat rides (no transfer): {one_seat_pct:.1f}%** "
-            f"({result.one_seat_riders:,.0f}/{day_type})"
-        )
-    if result.corridor_scenario_active:
-        if result.classified_indirect_riders:
-            close_pct = (
-                100 * result.close_one_seat_riders / result.classified_indirect_riders
-            )
-            lines.append(
-                f"- **Close one-seat rides: {close_pct:.1f}%** of the riders "
-                f"without a direct one-seat ride under this scenario "
-                f"({result.close_one_seat_riders:,.0f} of "
-                f"{result.classified_indirect_riders:,.0f}) are within "
-                f"{close_threshold_m:.0f}m of a station on their own corridor's "
-                f"assigned trunk -- i.e. no train change, just a short walk at "
-                f"the end to reach their actual destination."
-            )
-        if result.total_riders:
-            effective_pct = 100 * result.effective_one_seat_riders / result.total_riders
-            lines.append(
-                f"- **Effective one-seat rides (direct + close): "
-                f"{effective_pct:.1f}%** ({result.effective_one_seat_riders:,.0f}/"
-                f"{day_type}) -- direct one-seat riders plus the close one-seat "
-                f"riders above, i.e. riders who wouldn't feel a materially worse "
-                f"trip under this scenario."
-            )
-    elif result.classified_one_seat_riders:
-        close_pct = 100 * result.close_riders / result.classified_one_seat_riders
-        lines.append(
-            f"- **Close to the other trunk if deinterlined: {close_pct:.1f}%** of "
-            f"one-seat riders ({result.close_riders:,.0f} of "
-            f"{result.classified_one_seat_riders:,.0f}) -- i.e. wouldn't need a "
-            f"materially longer walk/transfer even if {trunk_a_label} and "
-            f"{trunk_b_label} stopped interlining at {boundary_name}."
-        )
-    lines.append("")
-
-    lines.append(f"## Top {top_n} origin/destination pairs (avg {day_type} riders)")
-    lines.append("")
-    lines.append(
-        "| # | Riders | % of total | % of one-seat | Type | Close? | Dist "
-        "| Origin → Destination |"
-    )
-    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
-    top_pairs = sorted(result.rows, key=_pair_riders, reverse=True)[:top_n]
-    for i, r in enumerate(top_pairs, start=1):
-        pct_total = (
-            100 * r.riders / result.total_riders
-            if result.total_riders
-            else float("nan")
-        )
-        pct_one_seat_str = "--"
-        if r.one_seat and result.one_seat_riders:
-            pct_one_seat_str = f"{100 * r.riders / result.one_seat_riders:.2f}%"
-        type_str = "1-seat" if r.one_seat else "xfer"
-        close_str = "--" if r.close is None else str(r.close)
-        dist_str = "--" if r.dist_m is None else f"{r.dist_m:.0f}m"
-        lines.append(
-            f"| {i} | {r.riders:,.0f} | {pct_total:.2f}% | {pct_one_seat_str} | "
-            f"{type_str} | {close_str} | {dist_str} | "
-            f"{r.origin_name} → {r.dest_name} |"
-        )
-    lines.append("")
-
-    lines.append(
-        f"## Top {top_n} destination stations, summed across all origins "
-        f"(avg {day_type} riders)"
-    )
-    lines.append("")
-    lines.append(
-        "Sorted by each destination's one-seat ridership (i.e. its share of the "
-        f"{result.one_seat_riders:,.0f}/{day_type} one-seat total)."
-    )
-    lines.append("")
-    lines.append(
-        "| Riders | One-seat % | % of all one-seat | Close? | Dist | Destination |"
-    )
-    lines.append("|---|---|---|---|---|---|")
-    top_dests = sorted(result.dest_stats.values(), key=_dest_one_seat, reverse=True)[
-        :top_n
-    ]
-    for d in top_dests:
-        pct_all_one_seat = (
-            100 * d.one_seat / result.one_seat_riders
-            if result.one_seat_riders
-            else float("nan")
-        )
-        close_pct = d.close_pct
-        close_str = "--" if close_pct is None else f"{close_pct:.0f}%"
-        avg_dist = d.avg_dist_m
-        dist_str = "--" if avg_dist is None else f"{avg_dist:.0f}m"
-        lines.append(
-            f"| {d.total:,.0f} | {d.one_seat_pct:.1f}% | {pct_all_one_seat:.2f}% | "
-            f"{close_str} | {dist_str} | {d.name} |"
-        )
-    lines.append("")
-
-    lines.append("## Notes on reading these tables")
-    lines.append("")
-    if result.corridor_scenario_active:
-        lines.append(
-            f'- "Close?"/"Dist" describe distance from the destination to the '
-            f"nearest station on the trunk the origin's *own* corridor got "
-            f"assigned in this scenario, thresholded at {close_threshold_m:.0f}m. "
-            f"They only apply to `xfer` rows -- riders without a direct "
-            f"one-seat ride under this scenario -- since a `1-seat` row "
-            f"already has a direct train and needs no walk. A close `xfer` "
-            f"row is a *close one-seat ride*: no train change, just a short "
-            f"walk to the actual destination."
-        )
-        lines.append(
-            '- In the per-destination table, "Close?"/"Dist" are ridership-weighted '
-            "across that destination's classified indirect (non-direct-one-seat) pairs."
-        )
-        lines.append(
-            "- `1-seat` rows have no close/dist value since the classification "
-            "only applies to trips without a direct one-seat ride under this "
-            "scenario."
-        )
-    else:
-        lines.append(
-            f'- "Close?"/"Dist" describe distance from the destination to the '
-            f"nearest station on the trunk *not* used to reach it one-seat "
-            f"({trunk_a_label} vs {trunk_b_label}), thresholded at "
-            f"{close_threshold_m:.0f}m. In the per-pair table this is a single "
-            f"trip's classification; `True`/`0m` covers destinations already "
-            f"served by both trunks, and one-seat connections that never "
-            f"actually cross the junction (via a route in the universe but not "
-            f"in `--primary-routes`) -- those can't be affected by deinterlining "
-            f"either way."
-        )
-        lines.append(
-            '- In the per-destination table, "Close?"/"Dist" are ridership-weighted '
-            "across that destination's classified one-seat pairs."
-        )
-        lines.append(
-            "- `xfer` rows have no close/dist value since the classification only "
-            "applies to one-seat trips."
-        )
-    csv_note = f" (`{csv_out}`)" if csv_out else ""
-    lines.append(
-        f"- Full row-level detail (every origin/destination pair, not just the top "
-        f"{top_n}) is in the `--csv-out` file{csv_note}, if one was written."
-    )
-    lines.append("")
-    return "\n".join(lines)
 
 
 @app.command()
@@ -1187,8 +1188,7 @@ def main(
 
     if markdown_out:
         sections = [
-            render_markdown(
-                result=result,
+            result.render_markdown(
                 show_label=show_label,
                 boundary_name=boundary_name,
                 day_type=day_type,
