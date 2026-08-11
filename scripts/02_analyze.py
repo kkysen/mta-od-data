@@ -82,11 +82,8 @@ class Station:
 
     @classmethod
     def load_individuals(cls, path: Path) -> list[Self]:
-        out: list[Self] = []
         with path.open(newline="") as f:
-            for row in csv.DictReader(f):
-                out.append(cls.load_individual(row))
-        return out
+            return [cls.load_individual(row) for row in csv.DictReader(f)]
 
 
 @dataclass(slots=True)
