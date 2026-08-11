@@ -99,6 +99,93 @@ class ScenarioResult:
     dest_stats: dict[int, DestStats]
     per_origin: dict[int, list[float]]
 
+    @property
+    def direct_one_seat_pct(self) -> float:
+        return (
+            100 * self.one_seat_riders / self.total_riders
+            if self.total_riders
+            else float("nan")
+        )
+
+    @property
+    def effective_one_seat_pct(self) -> float | None:
+        if not self.corridor_scenario_active or not self.total_riders:
+            return None
+        return 100 * self.effective_one_seat_riders / self.total_riders
+
+    def print_headline(
+        self,
+        *,
+        show_label: bool,
+        day_type: DayType,
+        dest_side: str,
+        trunk_a_label: str,
+        trunk_b_label: str,
+        close_threshold_m: float,
+    ) -> None:
+        if show_label:
+            print(f"\n=== Scenario: {self.label} ===")
+        else:
+            print(
+                f"\n=== Scope: origin in {{south of boundary}}, destination "
+                f"{dest_side} of boundary, day-type={day_type} ==="
+            )
+        print(f"Average {day_type} ridership: {self.total_riders:,.0f}")
+        if self.total_riders:
+            print(
+                f"One-seat (no transfer): {self.one_seat_riders:,.0f} "
+                f"({100 * self.one_seat_riders / self.total_riders:.1f}%)"
+            )
+            print(
+                f"Transfer required:      "
+                f"{self.total_riders - self.one_seat_riders:,.0f} "
+                f"({100 * (1 - self.one_seat_riders / self.total_riders):.1f}%)"
+            )
+
+        if self.corridor_scenario_active:
+            if self.classified_indirect_riders:
+                pct = 100 * self.close_one_seat_riders / self.classified_indirect_riders
+                print(
+                    f"Close one-seat (short walk instead): "
+                    f"{self.close_one_seat_riders:,.0f} of "
+                    f"{self.classified_indirect_riders:,.0f} riders without a "
+                    f"direct one-seat ride ({pct:.1f}%)"
+                )
+            if self.total_riders:
+                print(
+                    f"Effective one-seat (direct + close): "
+                    f"{self.effective_one_seat_riders:,.0f} "
+                    f"({100 * self.effective_one_seat_riders / self.total_riders:.1f}%)"
+                )
+        elif self.classified_one_seat_riders:
+            pct = 100 * self.close_riders / self.classified_one_seat_riders
+            print(
+                f"Close to the other trunk if deinterlined "
+                f"({trunk_a_label} vs {trunk_b_label}): "
+                f"{self.close_riders:,.0f} of "
+                f"{self.classified_one_seat_riders:,.0f} one-seat riders ({pct:.1f}%)"
+            )
+
+    def print_details(
+        self,
+        stations_by_id: dict[int, Station],
+        origin_ids: list[int],
+    ) -> None:
+        print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
+        for cid in origin_ids:
+            name = stations_by_id[cid].name
+            total, one_seat = self.per_origin[cid]
+            pct = 100 * one_seat / total if total else float("nan")
+            print(f"  {name:<45} total={total:>9,.0f}  one-seat={pct:5.1f}%")
+
+        print(
+            "\n=== Per-destination-station breakdown "
+            "(avg weekday riders, sorted by total) ==="
+        )
+        for d in sorted(self.dest_stats.values(), key=_dest_total, reverse=True):
+            pct = 100 * d.one_seat / d.total if d.total else float("nan")
+            print(f"  {d.name:<55} total={d.total:>9,.0f}  one-seat={pct:5.1f}%")
+
 
 @dataclass(slots=True)
 class ScenarioDef:
@@ -411,102 +498,13 @@ def run_scenario(
     )
 
 
-def print_scenario_headline(
-    result: ScenarioResult,
-    *,
-    show_label: bool,
-    day_type: DayType,
-    dest_side: str,
-    trunk_a_label: str,
-    trunk_b_label: str,
-    close_threshold_m: float,
-) -> None:
-    if show_label:
-        print(f"\n=== Scenario: {result.label} ===")
-    else:
-        print(
-            f"\n=== Scope: origin in {{south of boundary}}, destination "
-            f"{dest_side} of boundary, day-type={day_type} ==="
-        )
-    print(f"Average {day_type} ridership: {result.total_riders:,.0f}")
-    if result.total_riders:
-        print(
-            f"One-seat (no transfer): {result.one_seat_riders:,.0f} "
-            f"({100 * result.one_seat_riders / result.total_riders:.1f}%)"
-        )
-        print(
-            f"Transfer required:      "
-            f"{result.total_riders - result.one_seat_riders:,.0f} "
-            f"({100 * (1 - result.one_seat_riders / result.total_riders):.1f}%)"
-        )
-
-    if result.corridor_scenario_active:
-        if result.classified_indirect_riders:
-            pct = 100 * result.close_one_seat_riders / result.classified_indirect_riders
-            print(
-                f"Close one-seat (short walk instead): "
-                f"{result.close_one_seat_riders:,.0f} of "
-                f"{result.classified_indirect_riders:,.0f} riders without a "
-                f"direct one-seat ride ({pct:.1f}%)"
-            )
-        if result.total_riders:
-            print(
-                f"Effective one-seat (direct + close): "
-                f"{result.effective_one_seat_riders:,.0f} "
-                f"({100 * result.effective_one_seat_riders / result.total_riders:.1f}%)"
-            )
-    elif result.classified_one_seat_riders:
-        pct = 100 * result.close_riders / result.classified_one_seat_riders
-        print(
-            f"Close to the other trunk if deinterlined "
-            f"({trunk_a_label} vs {trunk_b_label}): "
-            f"{result.close_riders:,.0f} of "
-            f"{result.classified_one_seat_riders:,.0f} one-seat riders ({pct:.1f}%)"
-        )
-
-
-def print_scenario_details(
-    result: ScenarioResult,
-    stations_by_id: dict[int, Station],
-    origin_ids: list[int],
-) -> None:
-    print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
-    for cid in origin_ids:
-        name = stations_by_id[cid].name
-        total, one_seat = result.per_origin[cid]
-        pct = 100 * one_seat / total if total else float("nan")
-        print(f"  {name:<45} total={total:>9,.0f}  one-seat={pct:5.1f}%")
-
-    print(
-        "\n=== Per-destination-station breakdown "
-        "(avg weekday riders, sorted by total) ==="
-    )
-    for d in sorted(result.dest_stats.values(), key=_dest_total, reverse=True):
-        pct = 100 * d.one_seat / d.total if d.total else float("nan")
-        print(f"  {d.name:<55} total={d.total:>9,.0f}  one-seat={pct:5.1f}%")
-
-
-def _direct_one_seat_pct(result: ScenarioResult) -> float:
-    return (
-        100 * result.one_seat_riders / result.total_riders
-        if result.total_riders
-        else float("nan")
-    )
-
-
-def _effective_one_seat_pct(result: ScenarioResult) -> float | None:
-    if not result.corridor_scenario_active or not result.total_riders:
-        return None
-    return 100 * result.effective_one_seat_riders / result.total_riders
-
-
 def print_scenario_comparison(results: list[ScenarioResult], day_type: DayType) -> None:
     print(f"\n=== Scenario comparison (avg {day_type} riders) ===")
     for r in results:
-        effective_pct = _effective_one_seat_pct(r)
+        effective_pct = r.effective_one_seat_pct
         effective_str = "n/a" if effective_pct is None else f"{effective_pct:.1f}%"
         print(
-            f"  {r.label:<55} direct={_direct_one_seat_pct(r):5.1f}%  "
+            f"  {r.label:<55} direct={r.direct_one_seat_pct:5.1f}%  "
             f"effective={effective_str}"
         )
 
@@ -526,11 +524,9 @@ def render_scenario_comparison(results: list[ScenarioResult], day_type: DayType)
     )
     lines.append("| --- | --- | --- |")
     for r in results:
-        effective_pct = _effective_one_seat_pct(r)
+        effective_pct = r.effective_one_seat_pct
         effective_str = "--" if effective_pct is None else f"{effective_pct:.1f}%"
-        lines.append(
-            f"| {r.label} | {_direct_one_seat_pct(r):.1f}% | {effective_str} |"
-        )
+        lines.append(f"| {r.label} | {r.direct_one_seat_pct:.1f}% | {effective_str} |")
     lines.append("")
     lines.append(
         '`--` marks today\'s actual routing: it has no "effective one-seat" '
@@ -1162,8 +1158,7 @@ def main(
             corridor_scenario_active=sdef.active,
             verbose=not show_label,
         )
-        print_scenario_headline(
-            result,
+        result.print_headline(
             show_label=show_label,
             day_type=day_type,
             dest_side=dest_side,
@@ -1172,7 +1167,7 @@ def main(
             close_threshold_m=close_threshold_m,
         )
         if not show_label:
-            print_scenario_details(result, stations_by_id, origin_ids)
+            result.print_details(stations_by_id, origin_ids)
         results.append(result)
 
     if show_label:
