@@ -73,12 +73,11 @@ worked examples.
 
 ## How the classification works
 
-- **Origin set**: stations in `--origin-borough` (default Brooklyn) served
-  by at least one route in `--routes`, on the `--origin-side` (default
-  south) of `--boundary-complex-id`'s latitude (default Atlantic
-  Av-Barclays Ctr). This is a latitude-based proxy, not real route topology,
-  but it cleanly separates the Brooklyn B/D/N/Q/R branches from everything
-  else without needing a GTFS feed.
+- **Origin set**: stations served by at least one route in `--routes`, on
+  the `--origin-side` (default south) of `--boundary-complex-id`'s latitude
+  (default Atlantic Av-Barclays Ctr). This is a latitude-based proxy, not
+  real route topology, but it cleanly separates the Brooklyn B/D/N/Q/R
+  branches from everything else without needing a GTFS feed.
 - **Destination scope**: destinations on `--dest-side` (default north) of
   the same boundary latitude, i.e. trips that actually cross the junction —
   intra-Brooklyn trips that never reach it are excluded. The boundary
