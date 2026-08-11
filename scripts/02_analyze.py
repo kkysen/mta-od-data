@@ -177,10 +177,14 @@ def render_markdown(
     one_seat_riders: float,
     classified_one_seat_riders: float,
     close_riders: float,
+    classified_transfer_riders: float,
+    close_transfer_riders: float,
+    corridor_scenario_active: bool,
     rows: list[PairRow],
     dest_stats: dict[int, DestStats],
     top_n: int,
     csv_out: Path | None,
+    corridor_scenario_note: str | None,
 ) -> str:
     lines: list[str] = []
     lines.append(
@@ -196,6 +200,9 @@ def render_markdown(
         f"junction)."
     )
     lines.append("")
+    if corridor_scenario_note:
+        lines.append(corridor_scenario_note)
+        lines.append("")
     lines.append(f"Produced by `{shlex.join(sys.argv)}`.")
     lines.append("")
 
@@ -208,7 +215,18 @@ def render_markdown(
             f"- **One-seat rides (no transfer): {one_seat_pct:.1f}%** "
             f"({one_seat_riders:,.0f}/{day_type})"
         )
-    if classified_one_seat_riders:
+    if corridor_scenario_active:
+        if classified_transfer_riders:
+            close_pct = 100 * close_transfer_riders / classified_transfer_riders
+            lines.append(
+                f"- **Close to a one-seat alternative: {close_pct:.1f}%** of the "
+                f"riders who lose their one-seat ride under this scenario "
+                f"({close_transfer_riders:,.0f} of {classified_transfer_riders:,.0f}) "
+                f"are within {close_threshold_m:.0f}m of a station on their own "
+                f"corridor's assigned trunk -- i.e. wouldn't need a materially "
+                f"longer walk even though their trip now requires a transfer."
+            )
+    elif classified_one_seat_riders:
         close_pct = 100 * close_riders / classified_one_seat_riders
         lines.append(
             f"- **Close to the other trunk if deinterlined: {close_pct:.1f}%** of "
@@ -273,23 +291,43 @@ def render_markdown(
 
     lines.append("## Notes on reading these tables")
     lines.append("")
-    lines.append(
-        f'- "Close?"/"Dist" describe distance from the destination to the nearest '
-        f"station on the trunk *not* used to reach it one-seat ({trunk_a_label} vs "
-        f"{trunk_b_label}), thresholded at {close_threshold_m:.0f}m. In the "
-        f"per-pair table this is a single trip's classification; `True`/`0m` covers "
-        f"destinations already served by both trunks, and one-seat connections that "
-        f"never actually cross the junction (via a route in the universe but not in "
-        f"`--primary-routes`) -- those can't be affected by deinterlining either way."
-    )
-    lines.append(
-        '- In the per-destination table, "Close?"/"Dist" are ridership-weighted '
-        "across that destination's classified one-seat pairs."
-    )
-    lines.append(
-        "- `xfer` rows have no close/dist value since the classification only "
-        "applies to one-seat trips."
-    )
+    if corridor_scenario_active:
+        lines.append(
+            f'- "Close?"/"Dist" describe distance from the destination to the '
+            f"nearest station on the trunk the origin's *own* corridor got "
+            f"assigned in this scenario, thresholded at {close_threshold_m:.0f}m. "
+            f"They only apply to `xfer` rows -- riders who lose their one-seat "
+            f"ride under this scenario -- since a `1-seat` row already has a "
+            f"direct train and needs no walk."
+        )
+        lines.append(
+            '- In the per-destination table, "Close?"/"Dist" are ridership-weighted '
+            "across that destination's classified transfer-needing pairs."
+        )
+        lines.append(
+            "- `1-seat` rows have no close/dist value since the classification "
+            "only applies to trips that need a transfer under this scenario."
+        )
+    else:
+        lines.append(
+            f'- "Close?"/"Dist" describe distance from the destination to the '
+            f"nearest station on the trunk *not* used to reach it one-seat "
+            f"({trunk_a_label} vs {trunk_b_label}), thresholded at "
+            f"{close_threshold_m:.0f}m. In the per-pair table this is a single "
+            f"trip's classification; `True`/`0m` covers destinations already "
+            f"served by both trunks, and one-seat connections that never "
+            f"actually cross the junction (via a route in the universe but not "
+            f"in `--primary-routes`) -- those can't be affected by deinterlining "
+            f"either way."
+        )
+        lines.append(
+            '- In the per-destination table, "Close?"/"Dist" are ridership-weighted '
+            "across that destination's classified one-seat pairs."
+        )
+        lines.append(
+            "- `xfer` rows have no close/dist value since the classification only "
+            "applies to one-seat trips."
+        )
     csv_note = f" (`{csv_out}`)" if csv_out else ""
     lines.append(
         f"- Full row-level detail (every origin/destination pair, not just the top "
@@ -366,6 +404,42 @@ def main(
     trunk_a_label: Annotated[str, Option()] = "6 Ave express",
     trunk_b: Annotated[str, Option(help="Routes on trunk B")] = "N,Q",
     trunk_b_label: Annotated[str, Option()] = "Broadway express",
+    origin_corridor_a_routes: Annotated[
+        str,
+        Option(
+            help=(
+                "Real-world routes that put an origin station on physical corridor "
+                "A (used only to sort origins into a corridor, independent of any "
+                "--corridor-a-assigned override below)"
+            )
+        ),
+    ] = "D,N",
+    origin_corridor_a_label: Annotated[str, Option()] = "4 Ave express",
+    origin_corridor_b_routes: Annotated[
+        str, Option(help="Real-world routes that put an origin station on corridor B")
+    ] = "B,Q",
+    origin_corridor_b_label: Annotated[str, Option()] = "Brighton",
+    corridor_a_assigned: Annotated[
+        str | None,
+        Option(
+            help=(
+                "Deinterlining scenario override: routes that would actually serve "
+                "corridor A stations (e.g. N,Q), replacing each such origin's real "
+                "current routes for one-seat classification. Must be given together "
+                "with --corridor-b-assigned; omit both to use each origin's real "
+                "current routes (today's actual service, the default)."
+            )
+        ),
+    ] = None,
+    corridor_b_assigned: Annotated[
+        str | None,
+        Option(
+            help=(
+                "Deinterlining scenario override for corridor B. See "
+                "--corridor-a-assigned."
+            )
+        ),
+    ] = None,
     close_threshold_m: Annotated[float, Option()] = 300.0,
     csv_out: Annotated[
         Path | None,
@@ -413,6 +487,12 @@ def main(
         uv run scripts/02_analyze.py --boundary-complex-id <id> --routes 2,3,4,5 \\
             --trunk-a 4,5 --trunk-a-label "Lexington Av express" \\
             --trunk-b 2,3 --trunk-b-label "7 Av express"
+
+    \b
+        # Full DeKalb deinterlining: N,Q run the 4 Ave express corridor,
+        # B,D run Brighton (origin one-seat eligibility uses these assigned
+        # routes instead of each station's real current routes)
+        uv run scripts/02_analyze.py --corridor-a-assigned N,Q --corridor-b-assigned B,D
     """
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
@@ -423,6 +503,22 @@ def main(
     )
     trunk_a_set = parse_route_set(trunk_a)
     trunk_b_set = parse_route_set(trunk_b)
+    origin_corridor_a_routes_set = parse_route_set(origin_corridor_a_routes)
+    origin_corridor_b_routes_set = parse_route_set(origin_corridor_b_routes)
+    if (corridor_a_assigned is None) != (corridor_b_assigned is None):
+        print(
+            "error: --corridor-a-assigned and --corridor-b-assigned must be given "
+            "together (or both omitted)",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
+    corridor_scenario_active = corridor_a_assigned is not None
+    corridor_a_assigned_set = (
+        parse_route_set(corridor_a_assigned) if corridor_a_assigned else set()
+    )
+    corridor_b_assigned_set = (
+        parse_route_set(corridor_b_assigned) if corridor_b_assigned else set()
+    )
 
     stations_by_id = load_stations(stations)
     boundary_lat = stations_by_id[boundary_complex_id].lat
@@ -448,6 +544,42 @@ def main(
     for cid in origin_ids:
         s = stations_by_id[cid]
         print(f"  {cid:>4}  {s.name}  routes={sorted(s.routes)}")
+
+    # Effective routes used for one-seat classification at each origin. Under
+    # a corridor scenario, this replaces an origin's real current routes with
+    # whichever routes the scenario assigns to its physical corridor -- a
+    # station that touches both corridors (e.g. a shared terminal) keeps
+    # access to both assigned route sets, since no DeKalb-only deinterlining
+    # scenario changes what serves it.
+    effective_origin_routes: dict[int, set[str]] = {}
+    print(f"\nCorridor assignment (scenario active: {corridor_scenario_active}):")
+    for cid in origin_ids:
+        s = stations_by_id[cid]
+        in_a = bool(s.routes & origin_corridor_a_routes_set)
+        in_b = bool(s.routes & origin_corridor_b_routes_set)
+        corridor_tag = "a+b" if in_a and in_b else "a" if in_a else "b" if in_b else "?"
+        if not corridor_scenario_active:
+            effective_origin_routes[cid] = s.routes
+        elif in_a and in_b:
+            effective_origin_routes[cid] = (
+                corridor_a_assigned_set | corridor_b_assigned_set
+            )
+        elif in_a:
+            effective_origin_routes[cid] = corridor_a_assigned_set
+        elif in_b:
+            effective_origin_routes[cid] = corridor_b_assigned_set
+        else:
+            effective_origin_routes[cid] = s.routes
+            if corridor_scenario_active:
+                print(
+                    f"  warning: {s.name} (routes={sorted(s.routes)}) matches "
+                    f"neither --origin-corridor-a-routes nor "
+                    f"--origin-corridor-b-routes; leaving its real routes unscoped"
+                )
+        print(
+            f"  {cid:>4}  {s.name:<40}  corridor={corridor_tag:<3}  "
+            f"effective_routes={sorted(effective_origin_routes[cid])}"
+        )
 
     con = duckdb.connect()
     day_filter_sql = (
@@ -501,6 +633,8 @@ def main(
     one_seat_riders = 0.0
     classified_one_seat_riders = 0.0
     close_riders = 0.0
+    classified_transfer_riders = 0.0
+    close_transfer_riders = 0.0
 
     individual_stations = load_individual_stations(stations_individual)
     points_by_complex: dict[int, list[tuple[float, float]]] = {}
@@ -521,6 +655,22 @@ def main(
         (s.lat, s.lon) for s in individual_stations if s.routes & trunk_b_set
     ]
 
+    # Under a corridor scenario, "close" is about walking to whichever trunk
+    # an origin's own corridor got assigned -- not to trunk_a/trunk_b as a
+    # fixed pair -- so cache point sets per distinct assigned-route-set
+    # instead of hardcoding just two.
+    assigned_points_cache: dict[frozenset[str], list[tuple[float, float]]] = {}
+
+    def assigned_points(assigned_routes: set[str]) -> list[tuple[float, float]]:
+        key = frozenset(assigned_routes)
+        if key not in assigned_points_cache:
+            assigned_points_cache[key] = [
+                (s.lat, s.lon)
+                for s in individual_stations
+                if s.routes & assigned_routes
+            ]
+        return assigned_points_cache[key]
+
     def min_dist_to_points(
         points: list[tuple[float, float]], candidates: list[tuple[float, float]]
     ) -> float | None:
@@ -538,14 +688,34 @@ def main(
         dest = stations_by_id.get(dest_id)
         dest_routes = dest.routes if dest else set()
         is_one_seat, shared = classify_one_seat(
-            origin.routes, dest_routes, routes_set, primary_routes_set
+            effective_origin_routes[origin_id],
+            dest_routes,
+            routes_set,
+            primary_routes_set,
         )
         if is_one_seat:
             one_seat_riders += riders
 
         close = None
         dist_m = None
-        if is_one_seat and dest:
+        if corridor_scenario_active:
+            # is_one_seat already reflects this scenario's deinterlined
+            # routing, so a one-seat rider here already has a direct train --
+            # no walk to evaluate. The riders worth asking about are the ones
+            # who DON'T connect one-seat: how far would they need to walk to
+            # reach a station on the trunk their own corridor actually got
+            # assigned?
+            if not is_one_seat and dest:
+                dist_m = min_dist_to_points(
+                    dest_points(dest),
+                    assigned_points(effective_origin_routes[origin_id]),
+                )
+                close = None if dist_m is None else dist_m <= close_threshold_m
+                if close is not None:
+                    classified_transfer_riders += riders
+                    if close:
+                        close_transfer_riders += riders
+        elif is_one_seat and dest:
             if not (shared & primary_routes_set):
                 # This one-seat connection doesn't use any route that
                 # actually crosses the boundary junction (e.g. it's via R,
@@ -584,7 +754,7 @@ def main(
             PairRow(
                 origin_id=origin_id,
                 origin_name=origin.name,
-                origin_routes=",".join(sorted(origin.routes)),
+                origin_routes=",".join(sorted(effective_origin_routes[origin_id])),
                 dest_id=dest_id,
                 dest_name=dest.name if dest else f"complex {dest_id}",
                 dest_routes=",".join(sorted(dest_routes)),
@@ -613,21 +783,38 @@ def main(
             f"({100 * (1 - one_seat_riders / total_riders):.1f}%)"
         )
 
-    print(
-        f"\n=== Of one-seat rides, destinations with a "
-        f"{trunk_a_label}/{trunk_b_label} classification ==="
-    )
-    print(
-        "One-seat riders with a trunk classification: "
-        f"{classified_one_seat_riders:,.0f}"
-    )
-    if classified_one_seat_riders:
-        pct = 100 * close_riders / classified_one_seat_riders
+    if corridor_scenario_active:
         print(
-            f"...within {close_threshold_m:.0f}m of the other trunk "
-            f"({trunk_a_label} vs {trunk_b_label}): "
-            f"{close_riders:,.0f} ({pct:.1f}%)"
+            "\n=== Of riders needing a transfer under this scenario, "
+            "destinations with a trunk classification ==="
         )
+        print(
+            "Transfer-needing riders with a trunk classification: "
+            f"{classified_transfer_riders:,.0f}"
+        )
+        if classified_transfer_riders:
+            pct = 100 * close_transfer_riders / classified_transfer_riders
+            print(
+                f"...within {close_threshold_m:.0f}m of a station on their own "
+                f"corridor's assigned trunk: "
+                f"{close_transfer_riders:,.0f} ({pct:.1f}%)"
+            )
+    else:
+        print(
+            f"\n=== Of one-seat rides, destinations with a "
+            f"{trunk_a_label}/{trunk_b_label} classification ==="
+        )
+        print(
+            "One-seat riders with a trunk classification: "
+            f"{classified_one_seat_riders:,.0f}"
+        )
+        if classified_one_seat_riders:
+            pct = 100 * close_riders / classified_one_seat_riders
+            print(
+                f"...within {close_threshold_m:.0f}m of the other trunk "
+                f"({trunk_a_label} vs {trunk_b_label}): "
+                f"{close_riders:,.0f} ({pct:.1f}%)"
+            )
 
     per_origin: dict[int, list[float]] = {cid: [0.0, 0.0] for cid in origin_ids}
     dest_stats: dict[int, DestStats] = {}
@@ -668,6 +855,17 @@ def main(
             writer.writerows(asdict(r) for r in rows)
         print(f"\nWrote {len(rows):,} rows to {csv_out}")
 
+    corridor_scenario_note = None
+    if corridor_scenario_active:
+        corridor_scenario_note = (
+            f"Deinterlining scenario: {origin_corridor_a_label} served by "
+            f"{','.join(sorted(corridor_a_assigned_set))}; {origin_corridor_b_label} "
+            f"served by {','.join(sorted(corridor_b_assigned_set))} (each origin's "
+            f"one-seat eligibility uses these assigned routes instead of its real "
+            f"current routes; a station touching both corridors keeps access to "
+            f"both)."
+        )
+
     if markdown_out:
         markdown = render_markdown(
             boundary_name=boundary_name,
@@ -683,10 +881,14 @@ def main(
             one_seat_riders=one_seat_riders,
             classified_one_seat_riders=classified_one_seat_riders,
             close_riders=close_riders,
+            classified_transfer_riders=classified_transfer_riders,
+            close_transfer_riders=close_transfer_riders,
+            corridor_scenario_active=corridor_scenario_active,
             rows=rows,
             dest_stats=dest_stats,
             top_n=top_n,
             csv_out=csv_out,
+            corridor_scenario_note=corridor_scenario_note,
         )
         markdown_out.write_text(markdown)
         print(f"\nWrote markdown report to {markdown_out}")
