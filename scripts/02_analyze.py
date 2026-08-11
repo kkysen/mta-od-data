@@ -179,6 +179,7 @@ def render_markdown(
     close_riders: float,
     classified_transfer_riders: float,
     close_transfer_riders: float,
+    effective_one_seat_riders: float,
     corridor_scenario_active: bool,
     rows: list[PairRow],
     dest_stats: dict[int, DestStats],
@@ -225,6 +226,15 @@ def render_markdown(
                 f"are within {close_threshold_m:.0f}m of a station on their own "
                 f"corridor's assigned trunk -- i.e. wouldn't need a materially "
                 f"longer walk even though their trip now requires a transfer."
+            )
+        if total_riders:
+            effective_pct = 100 * effective_one_seat_riders / total_riders
+            lines.append(
+                f"- **Effective one-seat rides (crediting close alternatives): "
+                f"{effective_pct:.1f}%** ({effective_one_seat_riders:,.0f}/"
+                f"{day_type}) -- one-seat riders plus the close-to-an-alternative "
+                f"transfer riders above, i.e. riders who wouldn't feel a "
+                f"materially worse trip under this scenario."
             )
     elif classified_one_seat_riders:
         close_pct = 100 * close_riders / classified_one_seat_riders
@@ -765,6 +775,12 @@ def main(
             )
         )
 
+    # Riders who either kept a direct train, or lost one but are still close
+    # enough to an alternative not to feel a materially worse trip. Only
+    # meaningful under a corridor scenario -- close_transfer_riders is always
+    # 0 otherwise, so this trivially equals one_seat_riders in baseline mode.
+    effective_one_seat_riders = one_seat_riders + close_transfer_riders
+
     print(
         f"\n=== Scope: origin in {{south of boundary}}, destination "
         f"{dest_side} of boundary, day-type={day_type} ==="
@@ -798,6 +814,12 @@ def main(
                 f"...within {close_threshold_m:.0f}m of a station on their own "
                 f"corridor's assigned trunk: "
                 f"{close_transfer_riders:,.0f} ({pct:.1f}%)"
+            )
+        if total_riders:
+            print(
+                f"Effective one-seat (crediting close alternatives): "
+                f"{effective_one_seat_riders:,.0f} "
+                f"({100 * effective_one_seat_riders / total_riders:.1f}%)"
             )
     else:
         print(
@@ -883,6 +905,7 @@ def main(
             close_riders=close_riders,
             classified_transfer_riders=classified_transfer_riders,
             close_transfer_riders=close_transfer_riders,
+            effective_one_seat_riders=effective_one_seat_riders,
             corridor_scenario_active=corridor_scenario_active,
             rows=rows,
             dest_stats=dest_stats,
