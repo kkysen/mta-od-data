@@ -17,12 +17,12 @@ Examples:
 """
 
 import argparse
-import pathlib
 import urllib.request
+from pathlib import Path
 
 import duckdb
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 
 DEFAULT_CSV_GLOB = "MTA_Subway_Origin-Destination_Ridership_Estimate_*.csv"
@@ -37,7 +37,7 @@ STATIONS_URL = "https://data.ny.gov/resource/5f5g-n3cz.csv?$limit=1000"
 STATIONS_INDIVIDUAL_URL = "https://data.ny.gov/resource/39hk-dx4f.csv?$limit=1000"
 
 
-def fetch_csv(url: str, out: pathlib.Path, force: bool) -> None:
+def fetch_csv(url: str, out: Path, force: bool) -> None:
     if out.exists() and not force:
         print(f"skip: {out} already exists (use --force-stations to refetch)")
         return
@@ -47,15 +47,11 @@ def fetch_csv(url: str, out: pathlib.Path, force: bool) -> None:
     print(f"wrote {out} ({n} rows)")
 
 
-def convert_od_to_parquet(
-    csv_patterns: list[str], out: pathlib.Path, force: bool
-) -> None:
+def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> None:
     if out.exists() and not force:
         print(f"skip: {out} already exists (use --force to reconvert)")
         return
-    resolved = [
-        str(ROOT / p) if not pathlib.Path(p).is_absolute() else p for p in csv_patterns
-    ]
+    resolved = [str(ROOT / p) if not Path(p).is_absolute() else p for p in csv_patterns]
     print(f"converting {resolved} -> {out}")
     con = duckdb.connect()
     con.execute(
@@ -89,20 +85,20 @@ def main() -> None:
         ),
     )
     parser.add_argument(
-        "--out", type=pathlib.Path, default=DEFAULT_PARQUET, help="Output Parquet path"
+        "--out", type=Path, default=DEFAULT_PARQUET, help="Output Parquet path"
     )
     parser.add_argument(
         "--force", action="store_true", help="Reconvert even if --out already exists"
     )
     parser.add_argument(
         "--stations-out",
-        type=pathlib.Path,
+        type=Path,
         default=DEFAULT_STATIONS_CSV,
         help="Output path for complex-level station reference CSV",
     )
     parser.add_argument(
         "--stations-individual-out",
-        type=pathlib.Path,
+        type=Path,
         default=DEFAULT_STATIONS_INDIVIDUAL_CSV,
         help="Output path for individual (per-physical-station) reference CSV",
     )

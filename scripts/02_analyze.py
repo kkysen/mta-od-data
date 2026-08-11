@@ -32,11 +32,11 @@ Examples:
 import argparse
 import csv
 import math
-import pathlib
+from pathlib import Path
 
 import duckdb
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 
 WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
@@ -68,7 +68,7 @@ class Station:
         self.lon = lon
 
 
-def load_stations(path: pathlib.Path) -> dict[int, Station]:
+def load_stations(path: Path) -> dict[int, Station]:
     stations: dict[int, Station] = {}
     with path.open(newline="") as f:
         for row in csv.DictReader(f):
@@ -84,7 +84,7 @@ def load_stations(path: pathlib.Path) -> dict[int, Station]:
     return stations
 
 
-def load_individual_stations(path: pathlib.Path) -> list[Station]:
+def load_individual_stations(path: Path) -> list[Station]:
     """Per-physical-station rows (not complex centroids). A complex can merge
     several physical stations (e.g. Times Sq-42 St/Port Authority Bus
     Terminal), so its centroid can sit well away from any actual platform;
@@ -142,13 +142,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--parquet", type=pathlib.Path, default=DATA / "mta_od.parquet")
+    parser.add_argument("--parquet", type=Path, default=DATA / "mta_od.parquet")
     parser.add_argument(
-        "--stations", type=pathlib.Path, default=DATA / "stations_complexes.csv"
+        "--stations", type=Path, default=DATA / "stations_complexes.csv"
     )
     parser.add_argument(
         "--stations-individual",
-        type=pathlib.Path,
+        type=Path,
         default=DATA / "stations_individual.csv",
         help=(
             "Per-physical-station reference CSV, used for accurate "
@@ -223,7 +223,7 @@ def main() -> None:
 
     parser.add_argument(
         "--csv-out",
-        type=pathlib.Path,
+        type=Path,
         help="Optional: dump classified per-OD-pair rows here",
     )
     args = parser.parse_args()
