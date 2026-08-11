@@ -32,6 +32,7 @@ Examples:
 import csv
 import math
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from dataclasses import dataclass
 from pathlib import Path
 
 import duckdb
@@ -48,24 +49,14 @@ DAY_TYPE_PRESETS = {
 }
 
 
+@dataclass(slots=True)
 class Station:
-    __slots__ = ("complex_id", "name", "borough", "routes", "lat", "lon")
-
-    def __init__(
-        self,
-        complex_id: int,
-        name: str,
-        borough: str,
-        routes: set[str],
-        lat: float,
-        lon: float,
-    ):
-        self.complex_id = complex_id
-        self.name = name
-        self.borough = borough
-        self.routes = routes
-        self.lat = lat
-        self.lon = lon
+    complex_id: int
+    name: str
+    borough: str
+    routes: set[str]
+    lat: float
+    lon: float
 
 
 def load_stations(path: Path) -> dict[int, Station]:
