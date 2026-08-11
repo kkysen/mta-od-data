@@ -11,7 +11,7 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from enum import StrEnum
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 
 import duckdb
 from typer import Option, Typer
@@ -45,6 +45,41 @@ class Station:
     routes: set[str]
     lat: float
     lon: float
+
+    @classmethod
+    def load_complexes(cls, path: Path) -> dict[int, Self]:
+        stations: dict[int, Self] = {}
+        with path.open(newline="") as f:
+            for row in csv.DictReader(f):
+                cid = int(row["complex_id"])
+                stations[cid] = cls(
+                    complex_id=cid,
+                    name=row["display_name"],
+                    routes=set(row["daytime_routes"].split()),
+                    lat=float(row["latitude"]),
+                    lon=float(row["longitude"]),
+                )
+        return stations
+
+    @classmethod
+    def load_individual(cls, path: Path) -> list[Self]:
+        """Per-physical-station rows (not complex centroids). A complex can merge
+        several physical stations (e.g. Times Sq-42 St/Port Authority Bus
+        Terminal), so its centroid can sit well away from any actual platform;
+        these per-station points give accurate nearest-station distances."""
+        out: list[Self] = []
+        with path.open(newline="") as f:
+            for row in csv.DictReader(f):
+                out.append(
+                    cls(
+                        complex_id=int(row["complex_id"]),
+                        name=row["stop_name"],
+                        routes=set(row["daytime_routes"].split()),
+                        lat=float(row["gtfs_latitude"]),
+                        lon=float(row["gtfs_longitude"]),
+                    )
+                )
+        return out
 
 
 @dataclass(slots=True)
@@ -391,41 +426,6 @@ class ScenarioDef:
     # given path unchanged" (only used when there's exactly one scenario, so
     # single-scenario invocations keep their exact historical filenames).
     suffix: str | None
-
-
-def load_stations(path: Path) -> dict[int, Station]:
-    stations: dict[int, Station] = {}
-    with path.open(newline="") as f:
-        for row in csv.DictReader(f):
-            cid = int(row["complex_id"])
-            stations[cid] = Station(
-                complex_id=cid,
-                name=row["display_name"],
-                routes=set(row["daytime_routes"].split()),
-                lat=float(row["latitude"]),
-                lon=float(row["longitude"]),
-            )
-    return stations
-
-
-def load_individual_stations(path: Path) -> list[Station]:
-    """Per-physical-station rows (not complex centroids). A complex can merge
-    several physical stations (e.g. Times Sq-42 St/Port Authority Bus
-    Terminal), so its centroid can sit well away from any actual platform;
-    these per-station points give accurate nearest-station distances."""
-    out = []
-    with path.open(newline="") as f:
-        for row in csv.DictReader(f):
-            out.append(
-                Station(
-                    complex_id=int(row["complex_id"]),
-                    name=row["stop_name"],
-                    routes=set(row["daytime_routes"].split()),
-                    lat=float(row["gtfs_latitude"]),
-                    lon=float(row["gtfs_longitude"]),
-                )
-            )
-    return out
 
 
 def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -1008,7 +1008,7 @@ def main(
         ]
     show_label = len(scenario_defs) > 1
 
-    stations_by_id = load_stations(stations)
+    stations_by_id = Station.load_complexes(stations)
     boundary_lat = stations_by_id[boundary_complex_id].lat
     boundary_name = stations_by_id[boundary_complex_id].name
     print(
@@ -1084,7 +1084,7 @@ def main(
 
     total_riders = sum(r for _, _, r in scoped)
 
-    individual_stations = load_individual_stations(stations_individual)
+    individual_stations = Station.load_individual(stations_individual)
     points_by_complex: dict[int, list[tuple[float, float]]] = {}
     for s in individual_stations:
         points_by_complex.setdefault(s.complex_id, []).append((s.lat, s.lon))
