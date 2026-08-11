@@ -2,7 +2,7 @@
 
 Average weekday ridership is the same 152,882/weekday across every scenario below -- only how many of those riders get a one-seat ride changes.
 
-| Scenario | Total riders | Direct one-seat | Direct one-seat % | Close one-seat | Effective one-seat | Effective one-seat % |
+| Scenario | Total Riders | Direct One-Seat | Direct One-Seat % | Close One-Seat | Effective One-Seat | Effective One-Seat % |
 | --- | --- | --- | --- | --- | --- | --- |
 | D,N on 4 Av express, B,Q on Brighton | 152,882 | 62,425 | 40.8% | 16,805 | 79,230 | 51.8% |
 | B,D on 4 Av express, N,Q on Brighton | 152,882 | 52,723 | 34.5% | 22,410 | 75,132 | 49.1% |
@@ -30,7 +30,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 
 ### Top 25 origin/destination pairs (avg weekday riders)
 
-| # | Riders | % of total | % of one-seat | Type | Close? | Dist | Origin → Destination |
+| # | Riders | % Total | % One-Seat | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 722 | 0.47% | 1.16% | 1-seat | True | 0m | Kings Hwy (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 2 | 548 | 0.36% | 0.88% | 1-seat | True | 0m | 36 St (D,N,R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
@@ -62,7 +62,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 62,425/weekday one-seat total).
 
-| Riders | One-seat % | % of all one-seat | Close? | Dist | Destination |
+| Riders | One-Seat % | % All One-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
 | 9,376 | 83.5% | 12.55% | 100% | 0m | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 8,565 | 78.5% | 10.77% | 100% | 0m | Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
@@ -117,7 +117,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 
 ### Top 25 origin/destination pairs (avg weekday riders)
 
-| # | Riders | % of total | % of one-seat | Type | Close? | Dist | Origin → Destination |
+| # | Riders | % Total | % One-Seat | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 722 | 0.47% | 1.37% | 1-seat | -- | -- | Kings Hwy (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 2 | 548 | 0.36% | 1.04% | 1-seat | -- | -- | 36 St (D,N,R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
@@ -149,7 +149,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 52,723/weekday one-seat total).
 
-| Riders | One-seat % | % of all one-seat | Close? | Dist | Destination |
+| Riders | One-Seat % | % All One-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
 | 9,376 | 83.5% | 14.86% | 100% | 0m | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 8,565 | 78.5% | 12.76% | 100% | 0m | Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
@@ -205,7 +205,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 
 ### Top 25 origin/destination pairs (avg weekday riders)
 
-| # | Riders | % of total | % of one-seat | Type | Close? | Dist | Origin → Destination |
+| # | Riders | % Total | % One-Seat | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 722 | 0.47% | 1.47% | 1-seat | -- | -- | Kings Hwy (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 2 | 548 | 0.36% | 1.11% | 1-seat | -- | -- | 36 St (D,N,R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
@@ -237,7 +237,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 49,180/weekday one-seat total).
 
-| Riders | One-seat % | % of all one-seat | Close? | Dist | Destination |
+| Riders | One-Seat % | % All One-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
 | 9,376 | 83.5% | 15.93% | 100% | 0m | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 8,565 | 78.5% | 13.68% | 100% | 0m | Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
