@@ -29,9 +29,9 @@ Examples:
         --trunk-b 2,3 --trunk-b-label "7 Av express"
 """
 
-import argparse
 import csv
 import math
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pathlib import Path
 
 import duckdb
@@ -139,8 +139,8 @@ def classify_one_seat(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    parser = ArgumentParser(
+        description=__doc__, formatter_class=RawDescriptionHelpFormatter
     )
     parser.add_argument("--parquet", type=Path, default=DATA / "mta_od.parquet")
     parser.add_argument(

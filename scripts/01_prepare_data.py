@@ -16,8 +16,8 @@ Examples:
     uv run scripts/01_prepare_data.py --force-stations
 """
 
-import argparse
 import urllib.request
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pathlib import Path
 
 import duckdb
@@ -72,8 +72,8 @@ def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> No
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    parser = ArgumentParser(
+        description=__doc__, formatter_class=RawDescriptionHelpFormatter
     )
     parser.add_argument(
         "--csv",
