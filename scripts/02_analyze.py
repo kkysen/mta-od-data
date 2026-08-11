@@ -5,7 +5,9 @@
 # ///
 import csv
 import math
-from dataclasses import dataclass
+import shlex
+import sys
+from dataclasses import asdict, dataclass, fields
 from enum import StrEnum
 from pathlib import Path
 from typing import Annotated, Literal
@@ -43,6 +45,42 @@ class Station:
     routes: set[str]
     lat: float
     lon: float
+
+
+@dataclass(slots=True)
+class PairRow:
+    origin_id: int
+    origin_name: str
+    origin_routes: str
+    dest_id: int
+    dest_name: str
+    dest_routes: str
+    riders: float
+    one_seat: bool
+    close: bool | None
+    dist_m: float | None
+
+
+@dataclass(slots=True)
+class DestStats:
+    name: str
+    total: float = 0.0
+    one_seat: float = 0.0
+    classified: float = 0.0
+    close: float = 0.0
+    dist_weighted: float = 0.0
+
+    @property
+    def one_seat_pct(self) -> float:
+        return 100 * self.one_seat / self.total if self.total else float("nan")
+
+    @property
+    def close_pct(self) -> float | None:
+        return 100 * self.close / self.classified if self.classified else None
+
+    @property
+    def avg_dist_m(self) -> float | None:
+        return self.dist_weighted / self.classified if self.classified else None
 
 
 def load_stations(path: Path) -> dict[int, Station]:
@@ -115,8 +153,154 @@ def classify_one_seat(
     return is_one_seat, shared
 
 
-def _dest_total(item: tuple[int, list[float]]) -> float:
-    return item[1][0]
+def _dest_total(d: DestStats) -> float:
+    return d.total
+
+
+def _dest_one_seat(d: DestStats) -> float:
+    return d.one_seat
+
+
+def _pair_riders(r: PairRow) -> float:
+    return r.riders
+
+
+def render_markdown(
+    *,
+    boundary_name: str,
+    day_type: DayType,
+    n_distinct_days: int,
+    origin_borough: str,
+    routes_set: set[str],
+    origin_side: str,
+    dest_side: str,
+    trunk_a_label: str,
+    trunk_b_label: str,
+    close_threshold_m: float,
+    total_riders: float,
+    one_seat_riders: float,
+    classified_one_seat_riders: float,
+    close_riders: float,
+    rows: list[PairRow],
+    dest_stats: dict[int, DestStats],
+    top_n: int,
+    csv_out: Path | None,
+) -> str:
+    lines: list[str] = []
+    lines.append(
+        f"# {trunk_a_label}/{trunk_b_label} deinterlining: one-seat-ride results "
+        f"at {boundary_name}"
+    )
+    lines.append("")
+    lines.append(
+        f"Scenario: average {day_type} ridership ({n_distinct_days} distinct days "
+        f"in the data) on trains originating at `{origin_borough}` stations served "
+        f"by {','.join(sorted(routes_set))}, {origin_side} of {boundary_name}, with "
+        f"destinations {dest_side} of {boundary_name} (i.e. trips that cross the "
+        f"junction)."
+    )
+    lines.append("")
+    lines.append(f"Produced by `{shlex.join(sys.argv)}`.")
+    lines.append("")
+
+    lines.append("## Headline numbers")
+    lines.append("")
+    lines.append(f"- **Total: {total_riders:,.0f} riders/{day_type}**")
+    if total_riders:
+        one_seat_pct = 100 * one_seat_riders / total_riders
+        lines.append(
+            f"- **One-seat rides (no transfer): {one_seat_pct:.1f}%** "
+            f"({one_seat_riders:,.0f}/{day_type})"
+        )
+    if classified_one_seat_riders:
+        close_pct = 100 * close_riders / classified_one_seat_riders
+        lines.append(
+            f"- **Close to the other trunk if deinterlined: {close_pct:.1f}%** of "
+            f"one-seat riders ({close_riders:,.0f} of "
+            f"{classified_one_seat_riders:,.0f}) -- i.e. wouldn't need a materially "
+            f"longer walk/transfer even if {trunk_a_label} and {trunk_b_label} "
+            f"stopped interlining at {boundary_name}."
+        )
+    lines.append("")
+
+    lines.append(f"## Top {top_n} origin/destination pairs (avg {day_type} riders)")
+    lines.append("")
+    lines.append(
+        "| # | Riders | % of total | % of one-seat | Type | Close? | Dist "
+        "| Origin → Destination |"
+    )
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+    top_pairs = sorted(rows, key=_pair_riders, reverse=True)[:top_n]
+    for i, r in enumerate(top_pairs, start=1):
+        pct_total = 100 * r.riders / total_riders if total_riders else float("nan")
+        pct_one_seat_str = "--"
+        if r.one_seat and one_seat_riders:
+            pct_one_seat_str = f"{100 * r.riders / one_seat_riders:.2f}%"
+        type_str = "1-seat" if r.one_seat else "xfer"
+        close_str = "--" if r.close is None else str(r.close)
+        dist_str = "--" if r.dist_m is None else f"{r.dist_m:.0f}m"
+        lines.append(
+            f"| {i} | {r.riders:,.0f} | {pct_total:.2f}% | {pct_one_seat_str} | "
+            f"{type_str} | {close_str} | {dist_str} | "
+            f"{r.origin_name} → {r.dest_name} |"
+        )
+    lines.append("")
+
+    lines.append(
+        f"## Top {top_n} destination stations, summed across all origins "
+        f"(avg {day_type} riders)"
+    )
+    lines.append("")
+    lines.append(
+        "Sorted by each destination's one-seat ridership (i.e. its share of the "
+        f"{one_seat_riders:,.0f}/{day_type} one-seat total)."
+    )
+    lines.append("")
+    lines.append(
+        "| Riders | One-seat % | % of all one-seat | Close? | Dist | Destination |"
+    )
+    lines.append("|---|---|---|---|---|---|")
+    top_dests = sorted(dest_stats.values(), key=_dest_one_seat, reverse=True)[:top_n]
+    for d in top_dests:
+        pct_all_one_seat = (
+            100 * d.one_seat / one_seat_riders if one_seat_riders else float("nan")
+        )
+        close_pct = d.close_pct
+        close_str = "--" if close_pct is None else f"{close_pct:.0f}%"
+        avg_dist = d.avg_dist_m
+        dist_str = "--" if avg_dist is None else f"{avg_dist:.0f}m"
+        lines.append(
+            f"| {d.total:,.0f} | {d.one_seat_pct:.1f}% | {pct_all_one_seat:.2f}% | "
+            f"{close_str} | {dist_str} | {d.name} |"
+        )
+    lines.append("")
+
+    lines.append("## Notes on reading these tables")
+    lines.append("")
+    lines.append(
+        f'- "Close?"/"Dist" describe distance from the destination to the nearest '
+        f"station on the trunk *not* used to reach it one-seat ({trunk_a_label} vs "
+        f"{trunk_b_label}), thresholded at {close_threshold_m:.0f}m. In the "
+        f"per-pair table this is a single trip's classification; `True`/`0m` covers "
+        f"destinations already served by both trunks, and one-seat connections that "
+        f"never actually cross the junction (via a route in the universe but not in "
+        f"`--primary-routes`) -- those can't be affected by deinterlining either way."
+    )
+    lines.append(
+        '- In the per-destination table, "Close?"/"Dist" are ridership-weighted '
+        "across that destination's classified one-seat pairs."
+    )
+    lines.append(
+        "- `xfer` rows have no close/dist value since the classification only "
+        "applies to one-seat trips."
+    )
+    csv_note = f" (`{csv_out}`)" if csv_out else ""
+    lines.append(
+        f"- Full row-level detail (every origin/destination pair, not just the top "
+        f"{top_n}) is in the `--csv-out` file{csv_note}, if one was written."
+    )
+    lines.append("")
+    return "\n".join(lines)
 
 
 @app.command()
@@ -192,6 +376,13 @@ def main(
         Path | None,
         Option(help="Optional: dump classified per-OD-pair rows here"),
     ] = None,
+    markdown_out: Annotated[
+        Path | None,
+        Option(help="Optional: write a RESULTS.md-style markdown report here"),
+    ] = None,
+    top_n: Annotated[
+        int, Option(help="Row count for the markdown top-pairs/top-destinations tables")
+    ] = 25,
 ) -> None:
     """Analyze one-seat-ride / deinterlining share for trips crossing a subway junction.
 
@@ -217,6 +408,12 @@ def main(
         uv run scripts/02_analyze.py --parquet data/mta_od_2025.parquet
 
     \b
+        # Write RESULTS.md automatically instead of transcribing output by hand
+        uv run scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q \\
+            --trunk-b N,Q,R --csv-out data/dekalb_weekday_pairs.csv \\
+            --markdown-out RESULTS.md
+
+    \b
         # A different junction/trunk pair, e.g. hypothetically Rogers Jct area
         uv run scripts/02_analyze.py --boundary-complex-id <id> --routes 2,3,4,5 \\
             --origin-borough Bk --trunk-a 4,5 --trunk-a-label "Lexington Av express" \\
@@ -234,9 +431,9 @@ def main(
 
     stations_by_id = load_stations(stations)
     boundary_lat = stations_by_id[boundary_complex_id].lat
+    boundary_name = stations_by_id[boundary_complex_id].name
     print(
-        f"Boundary: {stations_by_id[boundary_complex_id].name} "
-        f"(id {boundary_complex_id}), lat {boundary_lat:.6f}"
+        f"Boundary: {boundary_name} (id {boundary_complex_id}), lat {boundary_lat:.6f}"
     )
     print(f"Day filter: {days_list if days_list else 'all days'}")
     print(f"Route universe: {sorted(routes_set)}")
@@ -342,7 +539,7 @@ def main(
             for clat, clon in candidates
         )
 
-    rows_out = []
+    rows: list[PairRow] = []
     for origin_id, dest_id, riders in scoped:
         origin = stations_by_id[origin_id]
         dest = stations_by_id.get(dest_id)
@@ -390,20 +587,20 @@ def main(
                 if close:
                     close_riders += riders
 
-        if csv_out:
-            rows_out.append(
-                {
-                    "origin_id": origin_id,
-                    "origin_name": origin.name,
-                    "dest_id": dest_id,
-                    "dest_name": dest.name if dest else "",
-                    "riders": riders,
-                    "one_seat": is_one_seat,
-                    "dest_borough": dest.borough if dest else "",
-                    "close_to_other_trunk": close,
-                    "dist_to_other_trunk_m": dist_m,
-                }
+        rows.append(
+            PairRow(
+                origin_id=origin_id,
+                origin_name=origin.name,
+                origin_routes=",".join(sorted(origin.routes)),
+                dest_id=dest_id,
+                dest_name=dest.name if dest else f"complex {dest_id}",
+                dest_routes=",".join(sorted(dest_routes)),
+                riders=riders,
+                one_seat=is_one_seat,
+                close=close,
+                dist_m=dist_m,
             )
+        )
 
     print(
         f"\n=== Scope: origin in {{south of boundary}}, destination "
@@ -439,23 +636,24 @@ def main(
             f"{close_riders:,.0f} ({pct:.1f}%)"
         )
 
-    print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
     per_origin: dict[int, list[float]] = {cid: [0.0, 0.0] for cid in origin_ids}
-    per_dest: dict[int, list[float]] = {}
-    for origin_id, dest_id, riders in scoped:
-        origin = stations_by_id[origin_id]
-        dest = stations_by_id.get(dest_id)
-        dest_routes = dest.routes if dest else set()
-        is_one_seat, _ = classify_one_seat(
-            origin.routes, dest_routes, routes_set, primary_routes_set
-        )
-        per_origin[origin_id][0] += riders
-        if is_one_seat:
-            per_origin[origin_id][1] += riders
-        entry = per_dest.setdefault(dest_id, [0.0, 0.0])
-        entry[0] += riders
-        if is_one_seat:
-            entry[1] += riders
+    dest_stats: dict[int, DestStats] = {}
+    for r in rows:
+        per_origin[r.origin_id][0] += r.riders
+        if r.one_seat:
+            per_origin[r.origin_id][1] += r.riders
+        d = dest_stats.setdefault(r.dest_id, DestStats(name=r.dest_name))
+        d.total += r.riders
+        if r.one_seat:
+            d.one_seat += r.riders
+        if r.close is not None:
+            assert r.dist_m is not None
+            d.classified += r.riders
+            d.dist_weighted += r.riders * r.dist_m
+            if r.close:
+                d.close += r.riders
+
+    print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
     for cid in origin_ids:
         name = stations_by_id[cid].name
         total, one_seat = per_origin[cid]
@@ -466,22 +664,40 @@ def main(
         "\n=== Per-destination-station breakdown "
         "(avg weekday riders, sorted by total) ==="
     )
-    for dest_id, (total, one_seat) in sorted(
-        per_dest.items(), key=_dest_total, reverse=True
-    ):
-        dest = stations_by_id.get(dest_id)
-        name = dest.name if dest else f"complex {dest_id}"
-        pct = 100 * one_seat / total if total else float("nan")
-        print(f"  {name:<55} total={total:>9,.0f}  one-seat={pct:5.1f}%")
+    for d in sorted(dest_stats.values(), key=_dest_total, reverse=True):
+        pct = 100 * d.one_seat / d.total if d.total else float("nan")
+        print(f"  {d.name:<55} total={d.total:>9,.0f}  one-seat={pct:5.1f}%")
 
     if csv_out:
         with csv_out.open("w", newline="") as f:
-            writer = csv.DictWriter(
-                f, fieldnames=list(rows_out[0].keys()) if rows_out else []
-            )
+            writer = csv.DictWriter(f, fieldnames=[fld.name for fld in fields(PairRow)])
             writer.writeheader()
-            writer.writerows(rows_out)
-        print(f"\nWrote {len(rows_out):,} rows to {csv_out}")
+            writer.writerows(asdict(r) for r in rows)
+        print(f"\nWrote {len(rows):,} rows to {csv_out}")
+
+    if markdown_out:
+        markdown = render_markdown(
+            boundary_name=boundary_name,
+            day_type=day_type,
+            n_distinct_days=n_distinct_days,
+            origin_borough=origin_borough,
+            routes_set=routes_set,
+            origin_side=origin_side,
+            dest_side=dest_side,
+            trunk_a_label=trunk_a_label,
+            trunk_b_label=trunk_b_label,
+            close_threshold_m=close_threshold_m,
+            total_riders=total_riders,
+            one_seat_riders=one_seat_riders,
+            classified_one_seat_riders=classified_one_seat_riders,
+            close_riders=close_riders,
+            rows=rows,
+            dest_stats=dest_stats,
+            top_n=top_n,
+            csv_out=csv_out,
+        )
+        markdown_out.write_text(markdown)
+        print(f"\nWrote markdown report to {markdown_out}")
 
 
 if __name__ == "__main__":
