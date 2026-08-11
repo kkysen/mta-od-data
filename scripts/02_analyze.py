@@ -59,12 +59,11 @@ class Station:
 
     @classmethod
     def load_complexes(cls, path: Path) -> dict[int, Self]:
-        stations: dict[int, Self] = {}
         with path.open(newline="") as f:
-            for row in csv.DictReader(f):
-                station = cls.load_complex(row)
-                stations[station.complex_id] = station
-        return stations
+            return {
+                (station := cls.load_complex(row)).complex_id: station
+                for row in csv.DictReader(f)
+            }
 
     @classmethod
     def load_individual(cls, row: dict[str, str]) -> Self:
