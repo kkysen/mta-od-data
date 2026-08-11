@@ -274,9 +274,9 @@ def main(
         FROM '{parquet}'
         WHERE {day_filter_sql}
     """
-    result = con.execute(n_days_query).fetchone()
-    assert result is not None, "aggregate query always returns exactly one row"
-    (n_distinct_days,) = result
+    n_days_result: tuple[int] | None = con.execute(n_days_query).fetchone()
+    assert n_days_result is not None, "aggregate query always returns exactly one row"
+    (n_distinct_days,) = n_days_result
 
     # "riders" throughout is average weekday (or whichever day-type) ridership,
     # i.e. the sum over all matching days divided by the number of distinct
@@ -289,7 +289,7 @@ def main(
         WHERE {day_filter_sql} AND {origin_filter_sql}
         GROUP BY 1, 2
     """
-    pairs = con.execute(pairs_query).fetchall()
+    pairs: list[tuple[int, int, float]] = con.execute(pairs_query).fetchall()
     print(
         f"\n{len(pairs):,} distinct origin/destination pairs, averaged over "
         f"{n_distinct_days} distinct days matching the day filter"
