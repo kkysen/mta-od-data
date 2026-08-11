@@ -9,12 +9,16 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "pyrefly>=1.2.0",
     "ruff>=0.16.2",
     "ty>=0.0.69",
 ]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pyrefly]
+preset = "strict"
 
 [tool.ty.rules]
 blanket-ignore-comment = "warn"

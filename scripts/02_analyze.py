@@ -106,6 +106,10 @@ def classify_one_seat(
     return is_one_seat, shared
 
 
+def _dest_total(item: tuple[int, list[float]]) -> float:
+    return item[1][0]
+
+
 @app.command()
 def main(
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
@@ -470,7 +474,7 @@ def main(
         "(avg weekday riders, sorted by total) ==="
     )
     for dest_id, (total, one_seat) in sorted(
-        per_dest.items(), key=lambda kv: kv[1][0], reverse=True
+        per_dest.items(), key=_dest_total, reverse=True
     ):
         dest = stations_by_id.get(dest_id)
         name = dest.name if dest else f"complex {dest_id}"
