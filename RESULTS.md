@@ -2,13 +2,13 @@
 
 Average weekday ridership is the same 152,882/weekday across every scenario below -- only how many of those riders get a one-seat ride changes.
 
-| Scenario | Direct one-seat % | Effective one-seat % (direct + close) |
-| --- | --- | --- |
-| D,N on 4 Av express, B,Q on Brighton | 40.8% | 51.8% |
-| B,D on 4 Av express, N,Q on Brighton | 34.5% | 49.1% |
-| N,Q on 4 Av express, B,D on Brighton | 32.2% | 46.4% |
+| Scenario | Total riders | Direct one-seat | Direct one-seat % | Close one-seat | Effective one-seat | Effective one-seat % |
+| --- | --- | --- | --- | --- | --- | --- |
+| D,N on 4 Av express, B,Q on Brighton | 152,882 | 62,425 | 40.8% | 16,805 | 79,230 | 51.8% |
+| B,D on 4 Av express, N,Q on Brighton | 152,882 | 52,723 | 34.5% | 22,410 | 75,132 | 49.1% |
+| N,Q on 4 Av express, B,D on Brighton | 152,882 | 49,180 | 32.2% | 21,813 | 70,993 | 46.4% |
 
-`--` marks today's actual routing: it has no "effective one-seat" figure because that metric only applies under a corridor scenario (crediting riders who lose their direct one-seat ride but stay close to an alternative). Today's actual routing answers a different question instead -- of *today's* one-seat riders, how many would stay close to the other trunk if deinterlined generically -- see its own section below for that number.
+"Close one-seat" is the many-seat riders (see "Notes on reading these tables" below) close enough to an alternative not to need a materially worse trip; "Effective one-seat" is direct + close.
 
 ---
 
