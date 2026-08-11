@@ -61,7 +61,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 Sorted by each destination's one-seat ridership (i.e. its share of the 62,425/weekday one-seat total).
 
 | Riders | One-seat % | % of all one-seat | Close? | Dist | Destination |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | 9,376 | 83.5% | 12.55% | 100% | 0m | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 8,565 | 78.5% | 10.77% | 100% | 0m | Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
 | 6,250 | 73.0% | 7.30% | 0% | 867m | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
@@ -149,7 +149,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 Sorted by each destination's one-seat ridership (i.e. its share of the 57,398/weekday one-seat total).
 
 | Riders | One-seat % | % of all one-seat | Close? | Dist | Destination |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | 9,376 | 83.5% | 13.65% | 100% | 0m | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 8,565 | 78.5% | 11.72% | 100% | 0m | Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
 | 5,513 | 77.2% | 7.41% | 100% | 0m | DeKalb Av (B,Q,R) |
@@ -237,7 +237,7 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 Sorted by each destination's one-seat ridership (i.e. its share of the 54,186/weekday one-seat total).
 
 | Riders | One-seat % | % of all one-seat | Close? | Dist | Destination |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | 9,376 | 83.5% | 14.46% | 100% | 0m | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 8,565 | 78.5% | 12.41% | 100% | 0m | Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
 | 5,513 | 77.2% | 7.85% | 100% | 0m | DeKalb Av (B,Q,R) |
