@@ -177,8 +177,8 @@ def render_markdown(
     one_seat_riders: float,
     classified_one_seat_riders: float,
     close_riders: float,
-    classified_transfer_riders: float,
-    close_transfer_riders: float,
+    classified_indirect_riders: float,
+    close_one_seat_riders: float,
     effective_one_seat_riders: float,
     corridor_scenario_active: bool,
     rows: list[PairRow],
@@ -217,24 +217,24 @@ def render_markdown(
             f"({one_seat_riders:,.0f}/{day_type})"
         )
     if corridor_scenario_active:
-        if classified_transfer_riders:
-            close_pct = 100 * close_transfer_riders / classified_transfer_riders
+        if classified_indirect_riders:
+            close_pct = 100 * close_one_seat_riders / classified_indirect_riders
             lines.append(
-                f"- **Close to a one-seat alternative: {close_pct:.1f}%** of the "
-                f"riders who lose their one-seat ride under this scenario "
-                f"({close_transfer_riders:,.0f} of {classified_transfer_riders:,.0f}) "
+                f"- **Close one-seat rides: {close_pct:.1f}%** of the riders "
+                f"without a direct one-seat ride under this scenario "
+                f"({close_one_seat_riders:,.0f} of {classified_indirect_riders:,.0f}) "
                 f"are within {close_threshold_m:.0f}m of a station on their own "
-                f"corridor's assigned trunk -- i.e. wouldn't need a materially "
-                f"longer walk even though their trip now requires a transfer."
+                f"corridor's assigned trunk -- i.e. no train change, just a short "
+                f"walk at the end to reach their actual destination."
             )
         if total_riders:
             effective_pct = 100 * effective_one_seat_riders / total_riders
             lines.append(
-                f"- **Effective one-seat rides (crediting close alternatives): "
+                f"- **Effective one-seat rides (direct + close): "
                 f"{effective_pct:.1f}%** ({effective_one_seat_riders:,.0f}/"
-                f"{day_type}) -- one-seat riders plus the close-to-an-alternative "
-                f"transfer riders above, i.e. riders who wouldn't feel a "
-                f"materially worse trip under this scenario."
+                f"{day_type}) -- direct one-seat riders plus the close one-seat "
+                f"riders above, i.e. riders who wouldn't feel a materially worse "
+                f"trip under this scenario."
             )
     elif classified_one_seat_riders:
         close_pct = 100 * close_riders / classified_one_seat_riders
@@ -306,17 +306,20 @@ def render_markdown(
             f'- "Close?"/"Dist" describe distance from the destination to the '
             f"nearest station on the trunk the origin's *own* corridor got "
             f"assigned in this scenario, thresholded at {close_threshold_m:.0f}m. "
-            f"They only apply to `xfer` rows -- riders who lose their one-seat "
-            f"ride under this scenario -- since a `1-seat` row already has a "
-            f"direct train and needs no walk."
+            f"They only apply to `xfer` rows -- riders without a direct "
+            f"one-seat ride under this scenario -- since a `1-seat` row "
+            f"already has a direct train and needs no walk. A close `xfer` "
+            f"row is a *close one-seat ride*: no train change, just a short "
+            f"walk to the actual destination."
         )
         lines.append(
             '- In the per-destination table, "Close?"/"Dist" are ridership-weighted '
-            "across that destination's classified transfer-needing pairs."
+            "across that destination's classified indirect (non-direct-one-seat) pairs."
         )
         lines.append(
             "- `1-seat` rows have no close/dist value since the classification "
-            "only applies to trips that need a transfer under this scenario."
+            "only applies to trips without a direct one-seat ride under this "
+            "scenario."
         )
     else:
         lines.append(
@@ -643,8 +646,8 @@ def main(
     one_seat_riders = 0.0
     classified_one_seat_riders = 0.0
     close_riders = 0.0
-    classified_transfer_riders = 0.0
-    close_transfer_riders = 0.0
+    classified_indirect_riders = 0.0
+    close_one_seat_riders = 0.0
 
     individual_stations = load_individual_stations(stations_individual)
     points_by_complex: dict[int, list[tuple[float, float]]] = {}
@@ -714,7 +717,8 @@ def main(
             # no walk to evaluate. The riders worth asking about are the ones
             # who DON'T connect one-seat: how far would they need to walk to
             # reach a station on the trunk their own corridor actually got
-            # assigned?
+            # assigned? If it's close, that's a "close one-seat ride" (get
+            # off/board a short walk away, no train change), not a transfer.
             if not is_one_seat and dest:
                 dist_m = min_dist_to_points(
                     dest_points(dest),
@@ -722,9 +726,9 @@ def main(
                 )
                 close = None if dist_m is None else dist_m <= close_threshold_m
                 if close is not None:
-                    classified_transfer_riders += riders
+                    classified_indirect_riders += riders
                     if close:
-                        close_transfer_riders += riders
+                        close_one_seat_riders += riders
         elif is_one_seat and dest:
             if not (shared & primary_routes_set):
                 # This one-seat connection doesn't use any route that
@@ -775,11 +779,11 @@ def main(
             )
         )
 
-    # Riders who either kept a direct train, or lost one but are still close
-    # enough to an alternative not to feel a materially worse trip. Only
-    # meaningful under a corridor scenario -- close_transfer_riders is always
-    # 0 otherwise, so this trivially equals one_seat_riders in baseline mode.
-    effective_one_seat_riders = one_seat_riders + close_transfer_riders
+    # Riders with either a direct one-seat ride, or a close one-seat ride
+    # instead (short walk, no train change). Only meaningful under a
+    # corridor scenario -- close_one_seat_riders is always 0 otherwise, so
+    # this trivially equals one_seat_riders in baseline mode.
+    effective_one_seat_riders = one_seat_riders + close_one_seat_riders
 
     print(
         f"\n=== Scope: origin in {{south of boundary}}, destination "
@@ -801,23 +805,23 @@ def main(
 
     if corridor_scenario_active:
         print(
-            "\n=== Of riders needing a transfer under this scenario, "
-            "destinations with a trunk classification ==="
+            "\n=== Of riders without a direct one-seat ride under this "
+            "scenario, destinations with a trunk classification ==="
         )
         print(
-            "Transfer-needing riders with a trunk classification: "
-            f"{classified_transfer_riders:,.0f}"
+            "Riders without a direct one-seat ride, with a trunk "
+            f"classification: {classified_indirect_riders:,.0f}"
         )
-        if classified_transfer_riders:
-            pct = 100 * close_transfer_riders / classified_transfer_riders
+        if classified_indirect_riders:
+            pct = 100 * close_one_seat_riders / classified_indirect_riders
             print(
                 f"...within {close_threshold_m:.0f}m of a station on their own "
-                f"corridor's assigned trunk: "
-                f"{close_transfer_riders:,.0f} ({pct:.1f}%)"
+                f"corridor's assigned trunk (a close one-seat ride): "
+                f"{close_one_seat_riders:,.0f} ({pct:.1f}%)"
             )
         if total_riders:
             print(
-                f"Effective one-seat (crediting close alternatives): "
+                f"Effective one-seat (direct + close): "
                 f"{effective_one_seat_riders:,.0f} "
                 f"({100 * effective_one_seat_riders / total_riders:.1f}%)"
             )
@@ -903,8 +907,8 @@ def main(
             one_seat_riders=one_seat_riders,
             classified_one_seat_riders=classified_one_seat_riders,
             close_riders=close_riders,
-            classified_transfer_riders=classified_transfer_riders,
-            close_transfer_riders=close_transfer_riders,
+            classified_indirect_riders=classified_indirect_riders,
+            close_one_seat_riders=close_one_seat_riders,
             effective_one_seat_riders=effective_one_seat_riders,
             corridor_scenario_active=corridor_scenario_active,
             rows=rows,
