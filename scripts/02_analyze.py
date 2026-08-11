@@ -486,6 +486,65 @@ def print_scenario_details(
         print(f"  {d.name:<55} total={d.total:>9,.0f}  one-seat={pct:5.1f}%")
 
 
+def _direct_one_seat_pct(result: ScenarioResult) -> float:
+    return (
+        100 * result.one_seat_riders / result.total_riders
+        if result.total_riders
+        else float("nan")
+    )
+
+
+def _effective_one_seat_pct(result: ScenarioResult) -> float | None:
+    if not result.corridor_scenario_active or not result.total_riders:
+        return None
+    return 100 * result.effective_one_seat_riders / result.total_riders
+
+
+def print_scenario_comparison(results: list[ScenarioResult], day_type: DayType) -> None:
+    print(f"\n=== Scenario comparison (avg {day_type} riders) ===")
+    for r in results:
+        effective_pct = _effective_one_seat_pct(r)
+        effective_str = "n/a" if effective_pct is None else f"{effective_pct:.1f}%"
+        print(
+            f"  {r.label:<55} direct={_direct_one_seat_pct(r):5.1f}%  "
+            f"effective={effective_str}"
+        )
+
+
+def render_scenario_comparison(results: list[ScenarioResult], day_type: DayType) -> str:
+    lines: list[str] = []
+    lines.append("# Scenario comparison")
+    lines.append("")
+    lines.append(
+        f"Average {day_type} ridership is the same {results[0].total_riders:,.0f}/"
+        f"{day_type} across every scenario below -- only how many of those "
+        f"riders get a one-seat ride changes."
+    )
+    lines.append("")
+    lines.append(
+        "| Scenario | Direct one-seat % | Effective one-seat % (direct + close) |"
+    )
+    lines.append("| --- | --- | --- |")
+    for r in results:
+        effective_pct = _effective_one_seat_pct(r)
+        effective_str = "--" if effective_pct is None else f"{effective_pct:.1f}%"
+        lines.append(
+            f"| {r.label} | {_direct_one_seat_pct(r):.1f}% | {effective_str} |"
+        )
+    lines.append("")
+    lines.append(
+        '`--` marks today\'s actual routing: it has no "effective one-seat" '
+        "figure because that metric only applies under a corridor scenario "
+        "(crediting riders who lose their direct one-seat ride but stay close "
+        "to an alternative). Today's actual routing answers a different "
+        "question instead -- of *today's* one-seat riders, how many would "
+        "stay close to the other trunk if deinterlined generically -- see its "
+        "own section below for that number."
+    )
+    lines.append("")
+    return "\n".join(lines)
+
+
 def _dest_total(d: DestStats) -> float:
     return d.total
 
@@ -1116,6 +1175,9 @@ def main(
             print_scenario_details(result, stations_by_id, origin_ids)
         results.append(result)
 
+    if show_label:
+        print_scenario_comparison(results, day_type)
+
     csv_paths: list[Path | None] = [
         None
         if csv_out is None
@@ -1147,6 +1209,8 @@ def main(
             )
             for result, path in zip(results, csv_paths, strict=True)
         ]
+        if show_label:
+            sections = [render_scenario_comparison(results, day_type), *sections]
         markdown_out.write_text("\n---\n\n".join(sections))
         print(f"\nWrote markdown report to {markdown_out}")
 
