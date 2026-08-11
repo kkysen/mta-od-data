@@ -111,9 +111,9 @@ class DestStats:
     one_seat_classified: float = 0.0
     one_seat_close: float = 0.0
     one_seat_dist_weighted: float = 0.0
-    indirect_classified: float = 0.0
-    indirect_close: float = 0.0
-    indirect_dist_weighted: float = 0.0
+    many_seat_classified: float = 0.0
+    many_seat_close: float = 0.0
+    many_seat_dist_weighted: float = 0.0
 
     @property
     def one_seat_pct(self) -> float:
@@ -136,18 +136,18 @@ class DestStats:
         )
 
     @property
-    def indirect_close_pct(self) -> float | None:
+    def many_seat_close_pct(self) -> float | None:
         return (
-            100 * self.indirect_close / self.indirect_classified
-            if self.indirect_classified
+            100 * self.many_seat_close / self.many_seat_classified
+            if self.many_seat_classified
             else None
         )
 
     @property
-    def indirect_avg_dist_m(self) -> float | None:
+    def many_seat_avg_dist_m(self) -> float | None:
         return (
-            self.indirect_dist_weighted / self.indirect_classified
-            if self.indirect_classified
+            self.many_seat_dist_weighted / self.many_seat_classified
+            if self.many_seat_classified
             else None
         )
 
@@ -161,7 +161,7 @@ class ScenarioResult:
     one_seat_riders: float
     classified_one_seat_riders: float
     close_riders: float
-    classified_indirect_riders: float
+    classified_many_seat_riders: float
     close_one_seat_riders: float
     effective_one_seat_riders: float
     rows: list[PairRow]
@@ -211,12 +211,12 @@ class ScenarioResult:
                 f"({100 * (1 - self.one_seat_riders / self.total_riders):.1f}%)"
             )
 
-        if self.classified_indirect_riders:
-            pct = 100 * self.close_one_seat_riders / self.classified_indirect_riders
+        if self.classified_many_seat_riders:
+            pct = 100 * self.close_one_seat_riders / self.classified_many_seat_riders
             print(
                 f"Close one-seat (short walk instead): "
                 f"{self.close_one_seat_riders:,.0f} of "
-                f"{self.classified_indirect_riders:,.0f} riders without a "
+                f"{self.classified_many_seat_riders:,.0f} riders without a "
                 f"direct one-seat ride ({pct:.1f}%)"
             )
         if self.total_riders:
@@ -307,9 +307,9 @@ class ScenarioResult:
                 f"- **One-seat rides (no transfer): {one_seat_pct:.1f}%** "
                 f"({self.one_seat_riders:,.0f}/{day_type})"
             )
-        if self.classified_indirect_riders:
+        if self.classified_many_seat_riders:
             close_pct = (
-                100 * self.close_one_seat_riders / self.classified_indirect_riders
+                100 * self.close_one_seat_riders / self.classified_many_seat_riders
             )
             if self.corridor_scenario_active:
                 scope_note = "under this scenario "
@@ -321,7 +321,7 @@ class ScenarioResult:
                 f"- **Close one-seat rides: {close_pct:.1f}%** of the riders "
                 f"without a direct one-seat ride {scope_note}"
                 f"({self.close_one_seat_riders:,.0f} of "
-                f"{self.classified_indirect_riders:,.0f}) are within "
+                f"{self.classified_many_seat_riders:,.0f}) are within "
                 f"{close_threshold_m:.0f}m of a station on {own_routes_desc} -- "
                 f"i.e. no train change, just a short walk at the end to reach "
                 f"their actual destination."
@@ -403,17 +403,17 @@ class ScenarioResult:
             )
             # This table is scoped to one-seat ridership (see the sort/caption
             # above), so its "Close?"/"Dist" columns stay scoped to one-seat
-            # pairs in baseline mode and indirect pairs in scenario mode,
+            # pairs in baseline mode and many-seat pairs in scenario mode,
             # matching whichever population `Type` can actually be non-`--`
             # for in the per-pair table above.
             close_pct = (
-                d.indirect_close_pct
+                d.many_seat_close_pct
                 if self.corridor_scenario_active
                 else d.one_seat_close_pct
             )
             close_str = "--" if close_pct is None else f"{close_pct:.0f}%"
             avg_dist = (
-                d.indirect_avg_dist_m
+                d.many_seat_avg_dist_m
                 if self.corridor_scenario_active
                 else d.one_seat_avg_dist_m
             )
@@ -440,7 +440,7 @@ class ScenarioResult:
             lines.append(
                 '- In the per-destination table, "Close?"/"Dist" are '
                 "ridership-weighted across that destination's classified "
-                "indirect (non-direct-one-seat) pairs."
+                "many-seat (non-direct-one-seat) pairs."
             )
             lines.append(
                 "- `1-seat` rows have no close/dist value since the classification "
@@ -628,7 +628,7 @@ def run_scenario(
     one_seat_riders = 0.0
     classified_one_seat_riders = 0.0
     close_riders = 0.0
-    classified_indirect_riders = 0.0
+    classified_many_seat_riders = 0.0
     close_one_seat_riders = 0.0
 
     rows: list[PairRow] = []
@@ -664,7 +664,7 @@ def run_scenario(
             )
             close = None if dist_m is None else dist_m <= close_threshold_m
             if close is not None:
-                classified_indirect_riders += riders
+                classified_many_seat_riders += riders
                 if close:
                     close_one_seat_riders += riders
         elif is_one_seat and dest and not corridor_scenario_active:
@@ -746,10 +746,10 @@ def run_scenario(
                 if r.close:
                     d.one_seat_close += r.riders
             else:
-                d.indirect_classified += r.riders
-                d.indirect_dist_weighted += r.riders * r.dist_m
+                d.many_seat_classified += r.riders
+                d.many_seat_dist_weighted += r.riders * r.dist_m
                 if r.close:
-                    d.indirect_close += r.riders
+                    d.many_seat_close += r.riders
 
     corridor_scenario_note = None
     if corridor_scenario_active:
@@ -775,7 +775,7 @@ def run_scenario(
         one_seat_riders=one_seat_riders,
         classified_one_seat_riders=classified_one_seat_riders,
         close_riders=close_riders,
-        classified_indirect_riders=classified_indirect_riders,
+        classified_many_seat_riders=classified_many_seat_riders,
         close_one_seat_riders=close_one_seat_riders,
         effective_one_seat_riders=effective_one_seat_riders,
         rows=rows,
