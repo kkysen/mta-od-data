@@ -10,7 +10,7 @@ from typing import Annotated
 import duckdb
 from typer import Option, Typer
 
-app = Typer(rich_markup_mode=None, add_completion=False)
+app = Typer(rich_markup_mode=None)
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
