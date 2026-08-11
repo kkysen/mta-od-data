@@ -445,7 +445,7 @@ class ScenarioResult:
             lines.append(
                 '- In the per-destination table, "Close?"/"Dist" are '
                 "ridership-weighted across that destination's classified "
-                "many-seat (non-direct-one-seat) pairs."
+                "many-seat pairs."
             )
             lines.append(
                 "- `1-seat` rows have no close/dist value since the classification "
