@@ -4,9 +4,9 @@ Average weekday ridership is the same 152,882/weekday across every scenario belo
 
 | Scenario | Direct one-seat % | Effective one-seat % (direct + close) |
 | --- | --- | --- |
-| D,N on 4 Av express, B,Q on Brighton | 40.8% | 53.5% |
-| B,D on 4 Av express, N,Q on Brighton | 34.5% | 50.8% |
-| N,Q on 4 Av express, B,D on Brighton | 32.2% | 48.0% |
+| D,N on 4 Av express, B,Q on Brighton | 40.8% | 51.8% |
+| B,D on 4 Av express, N,Q on Brighton | 34.5% | 49.1% |
+| N,Q on 4 Av express, B,D on Brighton | 32.2% | 46.4% |
 
 `--` marks today's actual routing: it has no "effective one-seat" figure because that metric only applies under a corridor scenario (crediting riders who lose their direct one-seat ride but stay close to an alternative). Today's actual routing answers a different question instead -- of *today's* one-seat riders, how many would stay close to the other trunk if deinterlined generically -- see its own section below for that number.
 
@@ -24,8 +24,8 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 
 - **Total: 152,882 riders/weekday**
 - **One-seat rides (no transfer): 40.8%** (62,425/weekday)
-- **Close one-seat rides: 21.3%** of the riders without a direct one-seat ride (19,304 of 90,457) are within 300m of a station on one of their origin's own routes -- i.e. no train change, just a short walk at the end to reach their actual destination.
-- **Effective one-seat rides (direct + close): 53.5%** (81,729/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip.
+- **Close one-seat rides: 18.6%** of the riders without a direct one-seat ride (16,805 of 90,457) are within 300m of a station on one of their origin's own routes -- i.e. no train change, just a short walk at the end to reach their actual destination.
+- **Effective one-seat rides (direct + close): 51.8%** (79,230/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip.
 - **Close to the other trunk if deinterlined: 64.1%** of one-seat riders (39,995 of 62,425) -- i.e. wouldn't need a materially longer walk/transfer even if 6 Av express and Broadway express stopped interlining at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R).
 
 ### Top 25 origin/destination pairs (avg weekday riders)
@@ -112,8 +112,8 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 
 - **Total: 152,882 riders/weekday**
 - **One-seat rides (no transfer): 34.5%** (52,723/weekday)
-- **Close one-seat rides: 24.8%** of the riders without a direct one-seat ride under this scenario (24,877 of 100,159) are within 300m of a station on their own corridor's assigned trunk -- i.e. no train change, just a short walk at the end to reach their actual destination.
-- **Effective one-seat rides (direct + close): 50.8%** (77,600/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip under this scenario.
+- **Close one-seat rides: 22.4%** of the riders without a direct one-seat ride under this scenario (22,410 of 100,159) are within 300m of a station on their own corridor's assigned trunk -- i.e. no train change, just a short walk at the end to reach their actual destination.
+- **Effective one-seat rides (direct + close): 49.1%** (75,132/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip under this scenario.
 
 ### Top 25 origin/destination pairs (avg weekday riders)
 
@@ -154,26 +154,26 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 52,723/we
 | 9,376 | 83.5% | 14.86% | 100% | 0m | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 8,565 | 78.5% | 12.76% | 100% | 0m | Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
 | 5,513 | 77.2% | 8.07% | 100% | 0m | DeKalb Av (B,Q,R) |
-| 5,521 | 62.6% | 6.56% | 0% | 602m | Grand St (B,D) |
+| 5,521 | 62.6% | 6.56% | 0% | 606m | Grand St (B,D) |
 | 6,250 | 52.1% | 6.17% | 58% | 361m | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 | 6,000 | 48.3% | 5.50% | 100% | 86m | Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
 | 5,768 | 37.9% | 4.15% | 36% | 333m | Canal St (6,J,Z,N,Q,R,W) |
 | 3,612 | 44.6% | 3.06% | 0% | 1044m | Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) |
-| 3,283 | 48.3% | 3.01% | 11% | 345m | Jay St-MetroTech (A,C,F,R) |
-| 4,179 | 34.1% | 2.70% | 100% | 257m | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
-| 3,476 | 38.7% | 2.55% | 100% | 176m | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
+| 3,283 | 48.3% | 3.01% | 0% | 387m | Jay St-MetroTech (A,C,F,R) |
+| 4,179 | 34.1% | 2.70% | 100% | 274m | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
+| 3,476 | 38.7% | 2.55% | 100% | 191m | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
 | 2,191 | 61.2% | 2.54% | 0% | 1365m | 72 St (Q) |
 | 2,167 | 59.9% | 2.46% | 100% | 97m | 57 St-7 Av (N,Q,R,W) |
-| 2,542 | 40.6% | 1.96% | 4% | 710m | Borough Hall/Court St (2,3,4,5,R) |
+| 2,542 | 40.6% | 1.96% | 0% | 729m | Borough Hall/Court St (2,3,4,5,R) |
 | 1,988 | 46.0% | 1.73% | 0% | 2141m | Whitehall St-South Ferry (1,R,W) |
-| 2,444 | 36.5% | 1.69% | 9% | 775m | W 4 St-Wash Sq (A,C,E,B,D,F,M) |
-| 2,413 | 34.8% | 1.59% | 29% | 635m | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
+| 2,444 | 36.5% | 1.69% | 0% | 841m | W 4 St-Wash Sq (A,C,E,B,D,F,M) |
+| 2,413 | 34.8% | 1.59% | 29% | 653m | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
 | 2,210 | 36.9% | 1.55% | 0% | 413m | 59 St-Columbus Circle (1,A,C,B,D) |
 | 982 | 73.7% | 1.37% | 49% | 796m | Lexington Av/63 St (M,Q) |
 | 1,126 | 57.7% | 1.23% | 0% | 1851m | 86 St (Q) |
 | 1,002 | 63.5% | 1.21% | 0% | 2165m | 96 St (Q) |
 | 957 | 51.6% | 0.94% | 0% | 1018m | City Hall (R,W) |
-| 1,110 | 44.3% | 0.93% | 0% | 732m | 23 St (R,W) |
+| 1,110 | 44.3% | 0.93% | 0% | 744m | 23 St (R,W) |
 | 1,447 | 31.5% | 0.86% | 51% | 565m | Lexington Av/59 St (4,5,6,N,R,W) |
 | 1,351 | 31.1% | 0.80% | 100% | 117m | 49 St (N,R,W) |
 
@@ -200,8 +200,8 @@ Produced by `scripts/02_analyze.py --routes B,D,N,Q,R --primary-routes B,D,N,Q -
 
 - **Total: 152,882 riders/weekday**
 - **One-seat rides (no transfer): 32.2%** (49,180/weekday)
-- **Close one-seat rides: 23.4%** of the riders without a direct one-seat ride under this scenario (24,256 of 103,702) are within 300m of a station on their own corridor's assigned trunk -- i.e. no train change, just a short walk at the end to reach their actual destination.
-- **Effective one-seat rides (direct + close): 48.0%** (73,436/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip under this scenario.
+- **Close one-seat rides: 21.0%** of the riders without a direct one-seat ride under this scenario (21,813 of 103,702) are within 300m of a station on their own corridor's assigned trunk -- i.e. no train change, just a short walk at the end to reach their actual destination.
+- **Effective one-seat rides (direct + close): 46.4%** (70,993/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip under this scenario.
 
 ### Top 25 origin/destination pairs (avg weekday riders)
 
@@ -243,27 +243,27 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 49,180/we
 | 8,565 | 78.5% | 13.68% | 100% | 0m | Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
 | 5,513 | 77.2% | 8.65% | 100% | 0m | DeKalb Av (B,Q,R) |
 | 5,768 | 48.4% | 5.67% | 30% | 362m | Canal St (6,J,Z,N,Q,R,W) |
-| 4,179 | 50.4% | 4.29% | 100% | 254m | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
-| 6,000 | 34.7% | 4.24% | 100% | 121m | Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
-| 6,250 | 29.7% | 3.78% | 29% | 615m | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
+| 4,179 | 50.4% | 4.29% | 100% | 274m | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
+| 6,000 | 34.7% | 4.24% | 100% | 131m | Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
+| 6,250 | 29.7% | 3.78% | 29% | 617m | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 | 3,612 | 44.6% | 3.28% | 0% | 1104m | Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) |
-| 3,476 | 46.1% | 3.26% | 100% | 176m | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
-| 3,283 | 48.3% | 3.22% | 11% | 345m | Jay St-MetroTech (A,C,F,R) |
-| 5,521 | 27.0% | 3.03% | 0% | 584m | Grand St (B,D) |
-| 2,413 | 48.3% | 2.37% | 50% | 491m | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
-| 2,444 | 42.8% | 2.13% | 9% | 735m | W 4 St-Wash Sq (A,C,E,B,D,F,M) |
-| 2,542 | 40.6% | 2.10% | 4% | 710m | Borough Hall/Court St (2,3,4,5,R) |
+| 3,476 | 46.1% | 3.26% | 100% | 191m | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
+| 3,283 | 48.3% | 3.22% | 0% | 387m | Jay St-MetroTech (A,C,F,R) |
+| 5,521 | 27.0% | 3.03% | 0% | 586m | Grand St (B,D) |
+| 2,413 | 48.3% | 2.37% | 50% | 507m | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
+| 2,444 | 42.8% | 2.13% | 0% | 800m | W 4 St-Wash Sq (A,C,E,B,D,F,M) |
+| 2,542 | 40.6% | 2.10% | 0% | 729m | Borough Hall/Court St (2,3,4,5,R) |
 | 2,210 | 46.3% | 2.08% | 0% | 413m | 59 St-Columbus Circle (1,A,C,B,D) |
-| 1,988 | 46.0% | 1.86% | 0% | 2185m | Whitehall St-South Ferry (1,R,W) |
-| 1,447 | 46.1% | 1.36% | 47% | 609m | Lexington Av/59 St (4,5,6,N,R,W) |
+| 1,988 | 46.0% | 1.86% | 0% | 2186m | Whitehall St-South Ferry (1,R,W) |
+| 1,447 | 46.1% | 1.36% | 47% | 614m | Lexington Av/59 St (4,5,6,N,R,W) |
 | 1,351 | 43.7% | 1.20% | 100% | 137m | 49 St (N,R,W) |
-| 2,191 | 26.4% | 1.18% | 0% | 1559m | 72 St (Q) |
+| 2,191 | 26.4% | 1.18% | 0% | 1560m | 72 St (Q) |
 | 2,167 | 26.1% | 1.15% | 100% | 170m | 57 St-7 Av (N,Q,R,W) |
 | 957 | 51.6% | 1.00% | 0% | 1001m | City Hall (R,W) |
-| 1,110 | 44.3% | 1.00% | 0% | 801m | 23 St (R,W) |
+| 1,110 | 44.3% | 1.00% | 0% | 816m | 23 St (R,W) |
 | 898 | 50.4% | 0.92% | 100% | 217m | 7 Av (E,B,D) |
 | 720 | 52.7% | 0.77% | 0% | 631m | 8 St-NYU (R,W) |
-| 810 | 44.7% | 0.74% | 45% | 397m | 5 Av/59 St (N,R,W) |
+| 810 | 44.7% | 0.74% | 45% | 399m | 5 Av/59 St (N,R,W) |
 
 ### Notes on reading these tables
 
