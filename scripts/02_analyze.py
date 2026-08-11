@@ -47,38 +47,45 @@ class Station:
     lon: float
 
     @classmethod
+    def load_complex(cls, row: dict[str, str]) -> Self:
+        cid = int(row["complex_id"])
+        return cls(
+            complex_id=cid,
+            name=row["display_name"],
+            routes=set(row["daytime_routes"].split()),
+            lat=float(row["latitude"]),
+            lon=float(row["longitude"]),
+        )
+
+    @classmethod
     def load_complexes(cls, path: Path) -> dict[int, Self]:
         stations: dict[int, Self] = {}
         with path.open(newline="") as f:
             for row in csv.DictReader(f):
-                cid = int(row["complex_id"])
-                stations[cid] = cls(
-                    complex_id=cid,
-                    name=row["display_name"],
-                    routes=set(row["daytime_routes"].split()),
-                    lat=float(row["latitude"]),
-                    lon=float(row["longitude"]),
-                )
+                station = cls.load_complex(row)
+                stations[station.complex_id] = station
         return stations
 
     @classmethod
-    def load_individuals(cls, path: Path) -> list[Self]:
+    def load_individual(cls, row: dict[str, str]) -> Self:
         """Per-physical-station rows (not complex centroids). A complex can merge
         several physical stations (e.g. Times Sq-42 St/Port Authority Bus
         Terminal), so its centroid can sit well away from any actual platform;
         these per-station points give accurate nearest-station distances."""
+        return cls(
+            complex_id=int(row["complex_id"]),
+            name=row["stop_name"],
+            routes=set(row["daytime_routes"].split()),
+            lat=float(row["gtfs_latitude"]),
+            lon=float(row["gtfs_longitude"]),
+        )
+
+    @classmethod
+    def load_individuals(cls, path: Path) -> list[Self]:
         out: list[Self] = []
         with path.open(newline="") as f:
             for row in csv.DictReader(f):
-                out.append(
-                    cls(
-                        complex_id=int(row["complex_id"]),
-                        name=row["stop_name"],
-                        routes=set(row["daytime_routes"].split()),
-                        lat=float(row["gtfs_latitude"]),
-                        lon=float(row["gtfs_longitude"]),
-                    )
-                )
+                out.append(cls.load_individual(row))
         return out
 
 
