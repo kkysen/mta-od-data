@@ -180,7 +180,7 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 52,723/we
 ### Notes on reading these tables
 
 - "Close?"/"Dist" describe distance from the destination to the nearest station on the trunk the origin's *own* corridor got assigned in this scenario, thresholded at 300m. They only apply to `xfer` rows -- riders without a direct one-seat ride under this scenario -- since a `1-seat` row already has a direct train and needs no walk. A close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination.
-- In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified indirect (non-direct-one-seat) pairs.
+- In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified many-seat (non-direct-one-seat) pairs.
 - `1-seat` rows have no close/dist value since the classification only applies to trips without a direct one-seat ride under this scenario.
 - Full row-level detail (every origin/destination pair, not just the top 25) is in the `--csv-out` file (`data/dekalb_weekday_pairs_a.csv`), if one was written.
 
@@ -268,6 +268,6 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 49,180/we
 ### Notes on reading these tables
 
 - "Close?"/"Dist" describe distance from the destination to the nearest station on the trunk the origin's *own* corridor got assigned in this scenario, thresholded at 300m. They only apply to `xfer` rows -- riders without a direct one-seat ride under this scenario -- since a `1-seat` row already has a direct train and needs no walk. A close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination.
-- In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified indirect (non-direct-one-seat) pairs.
+- In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified many-seat (non-direct-one-seat) pairs.
 - `1-seat` rows have no close/dist value since the classification only applies to trips without a direct one-seat ride under this scenario.
 - Full row-level detail (every origin/destination pair, not just the top 25) is in the `--csv-out` file (`data/dekalb_weekday_pairs_b.csv`), if one was written.
