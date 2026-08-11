@@ -1,26 +1,16 @@
 #!/usr/bin/env -S uv run
 # /// script
 # requires-python = ">=3.14"
-# dependencies = ["duckdb"]
+# dependencies = ["duckdb", "typer"]
 # ///
-"""Fetch station reference data and convert MTA OD CSV extract(s) to Parquet.
-
-Re-runnable as new monthly/yearly OD extracts are released: point --csv at
-the new file(s) (globs are fine) and/or --out at a new Parquet path.
-
-Examples:
-    uv run scripts/01_prepare_data.py
-    uv run scripts/01_prepare_data.py \
-        --csv 'MTA_Subway_Origin-Destination_Ridership_Estimate__2025_*.csv' \
-        --out data/mta_od_2025.parquet
-    uv run scripts/01_prepare_data.py --force-stations
-"""
-
 import urllib.request
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pathlib import Path
+from typing import Annotated
 
 import duckdb
+import typer
+
+app = typer.Typer(rich_markup_mode=None, add_completion=False)
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -71,51 +61,53 @@ def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> No
     print(f"wrote {out}: {row_count:,} rows, year*100+month range {min_ym}-{max_ym}")
 
 
-def main() -> None:
-    parser = ArgumentParser(
-        description=__doc__, formatter_class=RawDescriptionHelpFormatter
-    )
-    parser.add_argument(
-        "--csv",
-        nargs="+",
-        default=[DEFAULT_CSV_GLOB],
-        help=(
-            "Source OD CSV path(s)/glob(s), relative to the project root "
-            "(default: %(default)s)"
+@app.command()
+def main(
+    csv: Annotated[
+        list[str] | None,
+        typer.Option(
+            help=(
+                "Source OD CSV path(s)/glob(s), relative to the project root "
+                f"(repeatable; default: {DEFAULT_CSV_GLOB})"
+            ),
         ),
-    )
-    parser.add_argument(
-        "--out", type=Path, default=DEFAULT_PARQUET, help="Output Parquet path"
-    )
-    parser.add_argument(
-        "--force", action="store_true", help="Reconvert even if --out already exists"
-    )
-    parser.add_argument(
-        "--stations-out",
-        type=Path,
-        default=DEFAULT_STATIONS_CSV,
-        help="Output path for complex-level station reference CSV",
-    )
-    parser.add_argument(
-        "--stations-individual-out",
-        type=Path,
-        default=DEFAULT_STATIONS_INDIVIDUAL_CSV,
-        help="Output path for individual (per-physical-station) reference CSV",
-    )
-    parser.add_argument(
-        "--force-stations",
-        action="store_true",
-        help="Refetch station reference data even if it exists",
-    )
-    args = parser.parse_args()
+    ] = None,
+    out: Annotated[Path, typer.Option(help="Output Parquet path")] = DEFAULT_PARQUET,
+    force: Annotated[
+        bool, typer.Option(help="Reconvert even if --out already exists")
+    ] = False,
+    stations_out: Annotated[
+        Path,
+        typer.Option(help="Output path for complex-level station reference CSV"),
+    ] = DEFAULT_STATIONS_CSV,
+    stations_individual_out: Annotated[
+        Path,
+        typer.Option(
+            help="Output path for individual (per-physical-station) reference CSV"
+        ),
+    ] = DEFAULT_STATIONS_INDIVIDUAL_CSV,
+    force_stations: Annotated[
+        bool, typer.Option(help="Refetch station reference data even if it exists")
+    ] = False,
+) -> None:
+    """Fetch station reference data and convert MTA OD CSV extract(s) to Parquet.
 
+    Re-runnable as new monthly/yearly OD extracts are released: point --csv at
+    the new file(s) (globs are fine) and/or --out at a new Parquet path.
+
+    \b
+    Examples:
+        uv run scripts/01_prepare_data.py
+        uv run scripts/01_prepare_data.py \\
+            --csv 'MTA_Subway_Origin-Destination_Ridership_Estimate__2025_*.csv' \\
+            --out data/mta_od_2025.parquet
+        uv run scripts/01_prepare_data.py --force-stations
+    """
     DATA.mkdir(exist_ok=True)
-    fetch_csv(STATIONS_URL, args.stations_out, args.force_stations)
-    fetch_csv(
-        STATIONS_INDIVIDUAL_URL, args.stations_individual_out, args.force_stations
-    )
-    convert_od_to_parquet(args.csv, args.out, args.force)
+    fetch_csv(STATIONS_URL, stations_out, force_stations)
+    fetch_csv(STATIONS_INDIVIDUAL_URL, stations_individual_out, force_stations)
+    convert_od_to_parquet(csv if csv else [DEFAULT_CSV_GLOB], out, force)
 
 
 if __name__ == "__main__":
-    main()
+    app()
