@@ -86,11 +86,11 @@ def main(
 
     \b
     Examples:
-        analyze-mta-od-data prepare-data
-        analyze-mta-od-data prepare-data \\
+        mta-od-data prepare
+        mta-od-data prepare \\
             --csv 'MTA_Subway_Origin-Destination_Ridership_Estimate__2025_*.csv' \\
             --out data/mta_od_2025.parquet
-        analyze-mta-od-data prepare-data --force-stations
+        mta-od-data prepare --force-stations
     """
     DATA.mkdir(exist_ok=True)
     fetch_csv(STATIONS_URL, stations_out, force_stations)

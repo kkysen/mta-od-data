@@ -982,25 +982,25 @@ def main(
     \b
     Examples:
         # Default DeKalb scenario
-        analyze-mta-od-data one-seat-rides
+        mta-od-data analyze one-seat-rides
 
     \b
         # Same scenario, Saturdays instead of weekdays
-        analyze-mta-od-data one-seat-rides --day-type saturday
+        mta-od-data analyze one-seat-rides --day-type saturday
 
     \b
         # Same scenario, against a newer data extract
-        analyze-mta-od-data one-seat-rides --parquet data/mta_od_2025.parquet
+        mta-od-data analyze one-seat-rides --parquet data/mta_od_2025.parquet
 
     \b
         # Write RESULTS.md automatically instead of transcribing output by hand
-        analyze-mta-od-data one-seat-rides --routes B,D,N,Q,R \\
+        mta-od-data analyze one-seat-rides --routes B,D,N,Q,R \\
             --primary-routes B,D,N,Q --trunk-b N,Q,R \\
             --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md
 
     \b
         # A different junction/trunk pair, e.g. hypothetically Rogers Jct area
-        analyze-mta-od-data one-seat-rides --boundary-complex-id <id> \\
+        mta-od-data analyze one-seat-rides --boundary-complex-id <id> \\
             --routes 2,3,4,5 --trunk-a 4,5 --trunk-a-label "Lexington Av express" \\
             --trunk-b 2,3 --trunk-b-label "7 Av express"
 
@@ -1008,13 +1008,13 @@ def main(
         # Full DeKalb deinterlining: N,Q run the 4 Av express corridor,
         # B,D run Brighton (origin one-seat eligibility uses these assigned
         # routes instead of each station's real current routes)
-        analyze-mta-od-data one-seat-rides \\
+        mta-od-data analyze one-seat-rides \\
             --corridor-a-assigned N,Q --corridor-b-assigned B,D
 
     \b
         # Today's actual routing plus both full B,D/N,Q corridor swaps, in
         # one invocation
-        analyze-mta-od-data one-seat-rides \\
+        mta-od-data analyze one-seat-rides \\
             --all-corridor-scenarios --markdown-out RESULTS.md
     """
     days_list = (
@@ -1301,8 +1301,8 @@ def main(
 
     if markdown_out:
         # argv[0] is the installed entry point's absolute path (e.g.
-        # .venv/bin/analyze-mta-od-data), not stable across machines/checkouts
-        # -- use just its basename so this line stays reproducible.
+        # .venv/bin/mta-od-data), not stable across machines/checkouts -- use
+        # just its basename so this line stays reproducible.
         produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
         sections = [
             result.render_markdown(
