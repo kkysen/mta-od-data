@@ -1,10 +1,10 @@
 import csv
-import math
 import shlex
 import sys
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from enum import StrEnum
+from math import asin, cos, radians, sin, sqrt
 from pathlib import Path
 from typing import Annotated, Literal, Self
 
@@ -492,14 +492,11 @@ class Coord:
 
 def haversine_m(c1: Coord, c2: Coord) -> float:
     r = 6_371_000.0
-    p1, p2 = math.radians(c1.lat), math.radians(c2.lat)
-    dphi = math.radians(c2.lat - c1.lat)
-    dlambda = math.radians(c2.lon - c1.lon)
-    a = (
-        math.sin(dphi / 2) ** 2
-        + math.cos(p1) * math.cos(p2) * math.sin(dlambda / 2) ** 2
-    )
-    return 2 * r * math.asin(math.sqrt(a))
+    p1, p2 = radians(c1.lat), radians(c2.lat)
+    dphi = radians(c2.lat - c1.lat)
+    dlambda = radians(c2.lon - c1.lon)
+    a = sin(dphi / 2) ** 2 + cos(p1) * cos(p2) * sin(dlambda / 2) ** 2
+    return 2 * r * asin(sqrt(a))
 
 
 def parse_route_set(s: str) -> set[str]:
