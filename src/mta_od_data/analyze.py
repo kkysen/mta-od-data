@@ -490,11 +490,11 @@ class Coord:
     lon: float
 
 
-def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+def haversine_m(c1: Coord, c2: Coord) -> float:
     r = 6_371_000.0
-    p1, p2 = math.radians(lat1), math.radians(lat2)
-    dphi = math.radians(lat2 - lat1)
-    dlambda = math.radians(lon2 - lon1)
+    p1, p2 = math.radians(c1.lat), math.radians(c2.lat)
+    dphi = math.radians(c2.lat - c1.lat)
+    dlambda = math.radians(c2.lon - c1.lon)
     a = (
         math.sin(dphi / 2) ** 2
         + math.cos(p1) * math.cos(p2) * math.sin(dlambda / 2) ** 2
@@ -1397,9 +1397,7 @@ def one_seat_rides(
     ) -> float | None:
         if not candidates:
             return None
-        return min(
-            haversine_m(p.lat, p.lon, c.lat, c.lon) for p in points for c in candidates
-        )
+        return min(haversine_m(p, c) for p in points for c in candidates)
 
     results: list[ScenarioResult] = []
     for sdef in scenario_defs:
