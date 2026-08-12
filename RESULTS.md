@@ -10,11 +10,11 @@ Produced by `mta-od-data analyze one-seat-rides --routes B,D,N,Q,R --primary-rou
 
 Average weekday ridership is the same 152,882/weekday across every scenario below -- only how many of those riders get a one-seat ride changes.
 
-| Scenario | Total Riders | Direct 1-Seat | Direct 1-Seat % | Close 1-Seat | Effective 1-Seat | Effective 1-Seat % |
-| --- | --- | --- | --- | --- | --- | --- |
-| D,N on 4 Av express, B,Q on Brighton | 152,882 | 62,425 | 40.8% | 16,805 | 79,230 | 51.8% |
-| B,D on 4 Av express, N,Q on Brighton | 152,882 | 52,723 | 34.5% | 22,410 | 75,132 | 49.1% |
-| N,Q on 4 Av express, B,D on Brighton | 152,882 | 49,180 | 32.2% | 21,813 | 70,993 | 46.4% |
+| Scenario | Total Riders | Direct 1-Seat | Direct 1-Seat % | Close 1-Seat | Close 1-Seat % | Effective 1-Seat | Effective 1-Seat % |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| D,N on 4 Av express, B,Q on Brighton | 152,882 | 62,425 | 40.8% | 16,805 | 18.6% | 79,230 | 51.8% |
+| B,D on 4 Av express, N,Q on Brighton | 152,882 | 52,723 | 34.5% | 22,410 | 22.4% | 75,132 | 49.1% |
+| N,Q on 4 Av express, B,D on Brighton | 152,882 | 49,180 | 32.2% | 21,813 | 21.0% | 70,993 | 46.4% |
 
 ---
 
