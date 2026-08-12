@@ -18,7 +18,7 @@ Average weekday ridership is the same 152,882/weekday across every scenario belo
 
 Scenario: average weekday ridership (35 distinct days in the data) on trains originating at stations served by B,D,N,Q,R, south of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R), with destinations north of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) (i.e. trips that cross the junction).
 
-Produced by `analyze-mta-od-data one-seat-rides --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
+Produced by `mta-od-data analyze one-seat-rides --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
 
 ### Headline numbers
 
@@ -106,7 +106,7 @@ Scenario: average weekday ridership (35 distinct days in the data) on trains ori
 
 Deinterlining scenario: 4 Av express served by B,D; Brighton served by N,Q (each origin's one-seat eligibility swaps in these assigned primary routes in place of its real current primary routes; any non-primary route it already has (e.g. R, which never crosses the junction) is unaffected, and a station touching both corridors keeps access to both).
 
-Produced by `analyze-mta-od-data one-seat-rides --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
+Produced by `mta-od-data analyze one-seat-rides --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
 
 ### Headline numbers
 
@@ -194,7 +194,7 @@ Scenario: average weekday ridership (35 distinct days in the data) on trains ori
 
 Deinterlining scenario: 4 Av express served by N,Q; Brighton served by B,D (each origin's one-seat eligibility swaps in these assigned primary routes in place of its real current primary routes; any non-primary route it already has (e.g. R, which never crosses the junction) is unaffected, and a station touching both corridors keeps access to both).
 
-Produced by `analyze-mta-od-data one-seat-rides --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
+Produced by `mta-od-data analyze one-seat-rides --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
 
 ### Headline numbers
 
