@@ -213,6 +213,16 @@ class ScenarioResult:
         )
 
     @property
+    def close_one_seat_pct(self) -> float:
+        # Of the riders without a direct one-seat ride, not of total
+        # ridership -- matches the "Close one-seat rides" headline bullet.
+        return (
+            100 * self.close_one_seat_riders / self.classified_many_seat_riders
+            if self.classified_many_seat_riders
+            else float("nan")
+        )
+
+    @property
     def effective_one_seat_pct(self) -> float:
         return (
             100 * self.effective_one_seat_riders / self.total_riders
@@ -857,14 +867,14 @@ def render_scenario_comparison(results: list[ScenarioResult], day_type: DayType)
     lines.append("")
     lines.append(
         "| Scenario | Total Riders | Direct 1-Seat | Direct 1-Seat % | "
-        "Close 1-Seat | Effective 1-Seat | Effective 1-Seat % |"
+        "Close 1-Seat | Close 1-Seat % | Effective 1-Seat | Effective 1-Seat % |"
     )
-    lines.append("| --- | --- | --- | --- | --- | --- | --- |")
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
     for r in results:
         lines.append(
             f"| {r.label} | {r.total_riders:,.0f} | {r.one_seat_riders:,.0f} | "
             f"{r.direct_one_seat_pct:.1f}% | {r.close_one_seat_riders:,.0f} | "
-            f"{r.effective_one_seat_riders:,.0f} | "
+            f"{r.close_one_seat_pct:.1f}% | {r.effective_one_seat_riders:,.0f} | "
             f"{r.effective_one_seat_pct:.1f}% |"
         )
     lines.append("")
