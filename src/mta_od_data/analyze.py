@@ -688,7 +688,15 @@ def run_scenario(
                 classified_many_seat_riders += riders
                 if close:
                     close_one_seat_riders += riders
-        elif is_one_seat and dest and not corridor_scenario_active:
+        elif is_one_seat and dest and corridor_scenario_active:
+            # The destination is a Complex ID in the source data, not a
+            # specific platform -- so we have no way to tell which platform
+            # of a merged complex a rider actually used. `is_one_seat` here
+            # already means the scenario's assigned route stops somewhere in
+            # this same complex, which is the rider's real historical
+            # destination either way -- trivially close, no walk to model.
+            close, dist_m = True, 0.0
+        elif is_one_seat and dest:
             # Baseline-only: of TODAY's one-seat riders, how many would stay
             # close to the trunk they *don't* currently use if the junction
             # were deinterlined generically -- a different question from the
@@ -944,22 +952,21 @@ def render_notes(
         lines.append(
             '- "Close?"/"Dist" describe distance from the destination to the '
             "nearest station on the trunk the origin's *own* corridor got "
-            f"assigned in that scenario, thresholded at {close_threshold_m:.0f}m. "
-            "They only apply to `xfer` rows -- riders without a direct "
-            "one-seat ride under the scenario -- since a `1-seat` row already "
-            "has a direct train and needs no walk. A close `xfer` row is a "
-            "*close one-seat ride*: no train change, just a short walk to the "
-            "actual destination."
+            f"assigned in that scenario, thresholded at {close_threshold_m:.0f}m, "
+            "for `xfer` rows -- riders without a direct one-seat ride under "
+            "the scenario. A close `xfer` row is a *close one-seat ride*: no "
+            "train change, just a short walk to the actual destination. "
+            "`1-seat` rows are always `close`/`0m`: the destination is a "
+            "Complex ID in the source data, not a specific platform, so "
+            "there's no way to tell which platform a rider actually used -- "
+            "the scenario's assigned route already stops somewhere in that "
+            "same complex, the rider's real historical destination either "
+            "way."
         )
         lines.append(
             '- In the per-destination table, "Close?"/"Dist" are '
             "ridership-weighted across that destination's classified "
             "many-seat pairs."
-        )
-        lines.append(
-            "- `1-seat` rows have no close/dist value since the classification "
-            "only applies to trips without a direct one-seat ride under the "
-            "scenario."
         )
         lines.append("")
     return "\n".join(lines)
