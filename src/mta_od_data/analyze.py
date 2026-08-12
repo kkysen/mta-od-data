@@ -1276,10 +1276,11 @@ def one_seat_rides(
         print(f"  {cid:>4}  {s.name}  routes={sorted(s.routes)}")
 
     con = duckdb.connect()
+    day_params: list[str] = list(days_list) if days_list else []
     day_filter_sql = (
         "TRUE"
         if not days_list
-        else '"Day of Week" IN (' + ", ".join(f"'{d}'" for d in days_list) + ")"
+        else '"Day of Week" IN (' + ", ".join("?" for _ in days_list) + ")"
     )
     origin_filter_sql = (
         '"Origin Station Complex ID" IN (' + ", ".join(str(i) for i in origin_ids) + ")"
@@ -1287,10 +1288,12 @@ def one_seat_rides(
 
     n_days_query = f"""
         SELECT COUNT(DISTINCT CAST(Timestamp AS DATE))
-        FROM '{parquet}'
+        FROM read_parquet(?)
         WHERE {day_filter_sql}
     """
-    n_days_result: tuple[int] | None = con.execute(n_days_query).fetchone()
+    n_days_result: tuple[int] | None = con.execute(
+        n_days_query, [str(parquet), *day_params]
+    ).fetchone()
     assert n_days_result is not None, "aggregate query always returns exactly one row"
     (n_distinct_days,) = n_days_result
 
@@ -1301,11 +1304,13 @@ def one_seat_rides(
         SELECT "Origin Station Complex ID" AS origin_id,
                "Destination Station Complex ID" AS dest_id,
                SUM("Estimated Average Ridership") / {n_distinct_days} AS riders
-        FROM '{parquet}'
+        FROM read_parquet(?)
         WHERE {day_filter_sql} AND {origin_filter_sql}
         GROUP BY 1, 2
     """
-    pairs: list[tuple[int, int, float]] = con.execute(pairs_query).fetchall()
+    pairs: list[tuple[int, int, float]] = con.execute(
+        pairs_query, [str(parquet), *day_params]
+    ).fetchall()
     print(
         f"\n{len(pairs):,} distinct origin/destination pairs, averaged over "
         f"{n_distinct_days} distinct days matching the day filter"
