@@ -6,7 +6,7 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from enum import StrEnum
 from pathlib import Path
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal, NamedTuple, Self
 
 import duckdb
 from typer import Option, Typer
@@ -475,6 +475,11 @@ class ScenarioDef:
     suffix: str | None
 
 
+class Coord(NamedTuple):
+    lat: float
+    lon: float
+
+
 def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     r = 6_371_000.0
     p1, p2 = math.radians(lat1), math.radians(lat2)
@@ -543,13 +548,11 @@ def run_scenario(
     primary_routes_set: set[str],
     trunk_a_set: set[str],
     trunk_b_set: set[str],
-    trunk_a_points: list[tuple[float, float]],
-    trunk_b_points: list[tuple[float, float]],
-    assigned_points: Callable[[set[str]], list[tuple[float, float]]],
-    dest_points: Callable[[Station], list[tuple[float, float]]],
-    min_dist_to_points: Callable[
-        [list[tuple[float, float]], list[tuple[float, float]]], float | None
-    ],
+    trunk_a_points: list[Coord],
+    trunk_b_points: list[Coord],
+    assigned_points: Callable[[set[str]], list[Coord]],
+    dest_points: Callable[[Station], list[Coord]],
+    min_dist_to_points: Callable[[list[Coord], list[Coord]], float | None],
     origin_express_partners: dict[int, set[str]],
     close_threshold_m: float,
     origin_corridor_a_routes_set: set[str],
@@ -1336,9 +1339,10 @@ def one_seat_rides(
     for s in individual_stations:
         platforms_by_complex.setdefault(s.complex_id, []).append(s)
 
-    def dest_points(dest: Station) -> list[tuple[float, float]]:
+    def dest_points(dest: Station) -> list[Coord]:
         return [
-            (s.lat, s.lon) for s in platforms_by_complex.get(dest.complex_id, [dest])
+            Coord(s.lat, s.lon)
+            for s in platforms_by_complex.get(dest.complex_id, [dest])
         ]
 
     routes_by_line: dict[str, set[str]] = {}
@@ -1366,10 +1370,10 @@ def one_seat_rides(
     # approximation this whole script uses for "close" everywhere else, so
     # there's no reason to special-case borough boundaries here too.
     trunk_a_points = [
-        (s.lat, s.lon) for s in individual_stations if s.routes & trunk_a_set
+        Coord(s.lat, s.lon) for s in individual_stations if s.routes & trunk_a_set
     ]
     trunk_b_points = [
-        (s.lat, s.lon) for s in individual_stations if s.routes & trunk_b_set
+        Coord(s.lat, s.lon) for s in individual_stations if s.routes & trunk_b_set
     ]
 
     # Under a corridor scenario, "close" is about walking to whichever trunk
@@ -1378,20 +1382,20 @@ def one_seat_rides(
     # instead of hardcoding just two. Shared across scenarios: route sets
     # repeat (e.g. corridor A's assignment in one scenario is corridor B's in
     # the other), so the cache pays off across scenario runs too.
-    assigned_points_cache: dict[frozenset[str], list[tuple[float, float]]] = {}
+    assigned_points_cache: dict[frozenset[str], list[Coord]] = {}
 
-    def assigned_points(assigned_routes: set[str]) -> list[tuple[float, float]]:
+    def assigned_points(assigned_routes: set[str]) -> list[Coord]:
         key = frozenset(assigned_routes)
         if key not in assigned_points_cache:
             assigned_points_cache[key] = [
-                (s.lat, s.lon)
+                Coord(s.lat, s.lon)
                 for s in individual_stations
                 if s.routes & assigned_routes
             ]
         return assigned_points_cache[key]
 
     def min_dist_to_points(
-        points: list[tuple[float, float]], candidates: list[tuple[float, float]]
+        points: list[Coord], candidates: list[Coord]
     ) -> float | None:
         if not candidates:
             return None
