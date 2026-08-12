@@ -22,10 +22,6 @@ Average weekday ridership is the same 152,882/weekday across every scenario belo
 
 ### Headline numbers
 
-- **Total: 152,882 riders/weekday**
-- **One-seat rides (no transfer): 40.8%** (62,425/weekday)
-- **Close one-seat rides: 18.6%** of the riders without a direct one-seat ride (16,805 of 90,457) are within 300m of a station on one of their origin's own routes -- i.e. no train change, just a short walk at the end to reach their actual destination.
-- **Effective one-seat rides (direct + close): 51.8%** (79,230/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip.
 - **Close to the other trunk if deinterlined: 64.1%** of one-seat riders (39,995 of 62,425) -- i.e. wouldn't need a materially longer walk/transfer even if the two trunks stopped interlining at the junction.
 
 ### Top 25 origin/destination pairs
@@ -98,13 +94,6 @@ _Full row-level detail (every origin/destination pair, not just the top 25): `da
 
 Deinterlining scenario: 4 Av express served by B,D; Brighton served by N,Q (each origin's one-seat eligibility swaps in these assigned primary routes in place of its real current primary routes; any non-primary route it already has (e.g. R, which never crosses the junction) is unaffected, and a station touching both corridors keeps access to both).
 
-### Headline numbers
-
-- **Total: 152,882 riders/weekday**
-- **One-seat rides (no transfer): 34.5%** (52,723/weekday)
-- **Close one-seat rides: 22.4%** of the riders without a direct one-seat ride under this scenario (22,410 of 100,159) are within 300m of a station on their own corridor's assigned trunk -- i.e. no train change, just a short walk at the end to reach their actual destination.
-- **Effective one-seat rides (direct + close): 49.1%** (75,132/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip under this scenario.
-
 ### Top 25 origin/destination pairs
 
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination |
@@ -174,13 +163,6 @@ _Full row-level detail (every origin/destination pair, not just the top 25): `da
 ## N,Q on 4 Av express, B,D on Brighton
 
 Deinterlining scenario: 4 Av express served by N,Q; Brighton served by B,D (each origin's one-seat eligibility swaps in these assigned primary routes in place of its real current primary routes; any non-primary route it already has (e.g. R, which never crosses the junction) is unaffected, and a station touching both corridors keeps access to both).
-
-### Headline numbers
-
-- **Total: 152,882 riders/weekday**
-- **One-seat rides (no transfer): 32.2%** (49,180/weekday)
-- **Close one-seat rides: 21.0%** of the riders without a direct one-seat ride under this scenario (21,813 of 103,702) are within 300m of a station on their own corridor's assigned trunk -- i.e. no train change, just a short walk at the end to reach their actual destination.
-- **Effective one-seat rides (direct + close): 46.4%** (70,993/weekday) -- direct one-seat riders plus the close one-seat riders above, i.e. riders who wouldn't feel a materially worse trip under this scenario.
 
 ### Top 25 origin/destination pairs
 

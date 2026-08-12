@@ -323,16 +323,21 @@ class ScenarioResult:
             lines.append(self.corridor_scenario_note)
             lines.append("")
 
-        lines.append(f"{h2} Headline numbers")
-        lines.append("")
-        lines.append(f"- **Total: {self.total_riders:,.0f} riders/{day_type}**")
-        if self.total_riders:
-            one_seat_pct = 100 * self.one_seat_riders / self.total_riders
-            lines.append(
-                f"- **One-seat rides (no transfer): {one_seat_pct:.1f}%** "
-                f"({self.one_seat_riders:,.0f}/{day_type})"
-            )
-        if self.classified_many_seat_riders:
+        # Total/direct/close/effective one-seat are already the comparison
+        # table's own columns when there's more than one scenario --
+        # restating them here would just repeat those same numbers under
+        # every section, so keep them only when there's no such table to
+        # refer back to.
+        headline: list[str] = []
+        if not show_label:
+            headline.append(f"- **Total: {self.total_riders:,.0f} riders/{day_type}**")
+            if self.total_riders:
+                one_seat_pct = 100 * self.one_seat_riders / self.total_riders
+                headline.append(
+                    f"- **One-seat rides (no transfer): {one_seat_pct:.1f}%** "
+                    f"({self.one_seat_riders:,.0f}/{day_type})"
+                )
+        if not show_label and self.classified_many_seat_riders:
             close_pct = (
                 100 * self.close_one_seat_riders / self.classified_many_seat_riders
             )
@@ -342,7 +347,7 @@ class ScenarioResult:
             else:
                 scope_note = ""
                 own_routes_desc = "one of their origin's own routes"
-            lines.append(
+            headline.append(
                 f"- **Close one-seat rides: {close_pct:.1f}%** of the riders "
                 f"without a direct one-seat ride {scope_note}"
                 f"({self.close_one_seat_riders:,.0f} of "
@@ -351,28 +356,34 @@ class ScenarioResult:
                 f"i.e. no train change, just a short walk at the end to reach "
                 f"their actual destination."
             )
-        if self.total_riders:
+        if not show_label and self.total_riders:
             effective_pct = 100 * self.effective_one_seat_riders / self.total_riders
             scenario_note = (
                 " under this scenario" if self.corridor_scenario_active else ""
             )
-            lines.append(
+            headline.append(
                 f"- **Effective one-seat rides (direct + close): "
                 f"{effective_pct:.1f}%** ({self.effective_one_seat_riders:,.0f}/"
                 f"{day_type}) -- direct one-seat riders plus the close one-seat "
                 f"riders above, i.e. riders who wouldn't feel a materially worse "
                 f"trip{scenario_note}."
             )
+        # Not covered by the comparison table at any point (baseline-only,
+        # and not one of its columns even there), so always shown.
         if not self.corridor_scenario_active and self.classified_one_seat_riders:
             close_pct = 100 * self.close_riders / self.classified_one_seat_riders
-            lines.append(
+            headline.append(
                 f"- **Close to the other trunk if deinterlined: {close_pct:.1f}%** of "
                 f"one-seat riders ({self.close_riders:,.0f} of "
                 f"{self.classified_one_seat_riders:,.0f}) -- i.e. wouldn't need a "
                 f"materially longer walk/transfer even if the two trunks stopped "
                 f"interlining at the junction."
             )
-        lines.append("")
+        if headline:
+            lines.append(f"{h2} Headline numbers")
+            lines.append("")
+            lines.extend(headline)
+            lines.append("")
 
         lines.append(f"{h2} Top {top_n} origin/destination pairs")
         lines.append("")
