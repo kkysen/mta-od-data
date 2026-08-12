@@ -147,7 +147,7 @@ class DestStats:
 
     @property
     def one_seat_pct(self) -> float:
-        return 100 * self.one_seat / self.total if self.total else float("nan")
+        return 100 * self.one_seat / self.total
 
     @property
     def one_seat_close_pct(self) -> float | None:
