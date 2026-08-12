@@ -403,7 +403,7 @@ class ScenarioResult:
             if r.one_seat and self.one_seat_riders:
                 pct_one_seat_str = f"{100 * r.riders / self.one_seat_riders:.2f}%"
             type_str = "1-seat" if r.one_seat else "xfer"
-            close_str = "--" if r.close is None else str(r.close)
+            close_str = "--" if r.close is None else ("close" if r.close else "far")
             dist_str = "--" if r.dist_m is None else f"{r.dist_m:.0f}m"
             lines.append(
                 f"| {i} | {r.riders:,.0f} | {pct_total:.2f}% | {pct_one_seat_str} | "
@@ -912,7 +912,7 @@ def render_notes(
             f"`1-seat` rows: distance from the destination to the nearest "
             f"station on the trunk *not* used to reach it one-seat "
             f"({trunk_a_label} vs {trunk_b_label}) -- i.e. how exposed that "
-            f"one-seat ride is to a generic future deinterlining; `True`/`0m` "
+            f"one-seat ride is to a generic future deinterlining; `close`/`0m` "
             f"covers destinations already served by both trunks, and one-seat "
             f"connections that never actually cross the junction (via a route "
             f"in the universe but not in `--primary-routes`) -- those can't be "
