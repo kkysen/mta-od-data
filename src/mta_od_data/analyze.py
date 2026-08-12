@@ -23,6 +23,24 @@ class DayType(StrEnum):
     ALL = "all"
 
 
+# Shortened forms for station names that are unwieldy at their full length,
+# especially once a route list gets appended in parentheses. Applied as a
+# plain substring replacement, so it also shortens compound complex names
+# that merge in the long form (e.g. "Chambers St/WTC/Park Place/Cortlandt
+# St").
+NAME_ABBREVIATIONS: tuple[tuple[str, str], ...] = (
+    ("Atlantic Av-Barclays Ctr", "Atlantic Av"),
+    ("Port Authority Bus Terminal", "PABT"),
+    ("Park Place", "Park Pl"),
+)
+
+
+def abbreviate_name(name: str) -> str:
+    for long, short in NAME_ABBREVIATIONS:
+        name = name.replace(long, short)
+    return name
+
+
 WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {
     DayType.WEEKDAY: WEEKDAYS,
@@ -45,7 +63,7 @@ class Station:
         cid = int(row["complex_id"])
         return cls(
             complex_id=cid,
-            name=row["display_name"],
+            name=abbreviate_name(row["display_name"]),
             routes=set(row["daytime_routes"].split()),
             lat=float(row["latitude"]),
             lon=float(row["longitude"]),
@@ -67,7 +85,7 @@ class Station:
         these per-station points give accurate nearest-station distances."""
         return cls(
             complex_id=int(row["complex_id"]),
-            name=row["stop_name"],
+            name=abbreviate_name(row["stop_name"]),
             routes=set(row["daytime_routes"].split()),
             lat=float(row["gtfs_latitude"]),
             lon=float(row["gtfs_longitude"]),
