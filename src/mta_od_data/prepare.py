@@ -1,6 +1,6 @@
-import urllib.request
 from pathlib import Path
 from typing import Annotated
+from urllib.request import urlretrieve
 
 import duckdb
 from typer import Option, Typer
@@ -26,7 +26,7 @@ def fetch_csv(url: str, out: Path, force: bool) -> None:
         print(f"skip: {out} already exists (use --force-stations to refetch)")
         return
     print(f"fetching {url}")
-    urllib.request.urlretrieve(url, out)
+    urlretrieve(url, out)
     n = sum(1 for _ in out.open()) - 1
     print(f"wrote {out} ({n} rows)")
 
