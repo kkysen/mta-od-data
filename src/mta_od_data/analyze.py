@@ -672,7 +672,9 @@ def run_scenario(
 
         if dest is None:
             dest_name = f"complex {dest_id}"
-            origin_name = origin.display(effective_origin_routes[origin_id])
+            origin_name = origin.display(
+                effective_origin_routes[origin_id] & routes_set
+            )
         elif is_one_seat:
             # A one-seat ride's `shared` route(s) are the one(s) actually
             # ridden, so they pin down which physical platform of a merged
@@ -692,8 +694,15 @@ def run_scenario(
             dest_name = dest.display(ridden_routes)
             origin_name = origin.display(ridden_routes)
         else:
-            dest_name = dest.display()
-            origin_name = origin.display(effective_origin_routes[origin_id])
+            # Scoped to --routes: a station can carry real service (e.g. F,
+            # G) with nothing to do with this analysis, and showing it here
+            # would be just as much noise as the 2,3,4,5 at Atlantic Av
+            # (never part of --routes, so never a route any of these trips
+            # could have used).
+            dest_name = dest.display(dest.routes & routes_set)
+            origin_name = origin.display(
+                effective_origin_routes[origin_id] & routes_set
+            )
 
         rows.append(
             PairRow(
@@ -1183,7 +1192,8 @@ def one_seat_rides(
 
     stations_by_id = Station.load_complexes(stations)
     boundary_lat = stations_by_id[boundary_complex_id].lat
-    boundary_name = stations_by_id[boundary_complex_id].display()
+    boundary_station = stations_by_id[boundary_complex_id]
+    boundary_name = boundary_station.display(boundary_station.routes & routes_set)
     print(
         f"Boundary: {boundary_name} (id {boundary_complex_id}), lat {boundary_lat:.6f}"
     )
