@@ -41,6 +41,10 @@ def abbreviate_name(name: str) -> str:
     return name
 
 
+def format_station(name: str, routes: set[str]) -> str:
+    return f"{name} ({','.join(sorted(routes))})"
+
+
 WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {
     DayType.WEEKDAY: WEEKDAYS,
@@ -53,17 +57,25 @@ DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {
 @dataclass(slots=True)
 class Station:
     complex_id: int
+    # Base name, without a route list baked in -- callers wanting one call
+    # `display()`, either with this station's own full route set (the
+    # default) or a narrower one (e.g. just the route(s) a given trip
+    # actually used, for a merged complex where those stop at only one of
+    # several physical platforms).
     name: str
     routes: set[str]
     lat: float
     lon: float
+
+    def display(self, routes: set[str] | None = None) -> str:
+        return format_station(self.name, self.routes if routes is None else routes)
 
     @classmethod
     def load_complex(cls, row: dict[str, str]) -> Self:
         cid = int(row["complex_id"])
         return cls(
             complex_id=cid,
-            name=abbreviate_name(row["display_name"]),
+            name=abbreviate_name(row["stop_name"]),
             routes=set(row["daytime_routes"].split()),
             lat=float(row["latitude"]),
             lon=float(row["longitude"]),
@@ -255,7 +267,7 @@ class ScenarioResult:
     ) -> None:
         print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
         for cid in origin_ids:
-            name = stations_by_id[cid].name
+            name = stations_by_id[cid].display()
             total, one_seat = self.per_origin[cid]
             pct = 100 * one_seat / total if total else float("nan")
             print(f"  {name:<45} total={total:>9,.0f}  one-seat={pct:5.1f}%")
@@ -555,13 +567,13 @@ def run_scenario(
             effective_origin_routes[cid] = s.routes
             if corridor_scenario_active:
                 print(
-                    f"  warning: {s.name} (routes={sorted(s.routes)}) matches "
-                    f"neither --origin-corridor-a-routes nor "
-                    f"--origin-corridor-b-routes; leaving its real routes unscoped"
+                    f"  warning: {s.display()} matches neither "
+                    f"--origin-corridor-a-routes nor --origin-corridor-b-routes; "
+                    f"leaving its real routes unscoped"
                 )
         if verbose:
             print(
-                f"  {cid:>4}  {s.name:<40}  corridor={corridor_tag:<3}  "
+                f"  {cid:>4}  {s.display():<40}  corridor={corridor_tag:<3}  "
                 f"effective_routes={sorted(effective_origin_routes[cid])}"
             )
 
@@ -652,13 +664,25 @@ def run_scenario(
                 if close:
                     close_riders += riders
 
+        if dest is None:
+            dest_name = f"complex {dest_id}"
+        elif is_one_seat:
+            # A one-seat ride's `shared` route(s) are the one(s) actually
+            # ridden, so they pin down which physical platform of a merged
+            # complex the rider lands on -- show just that, not every route
+            # in the complex (most of which may be on a different platform
+            # the rider never sees).
+            dest_name = dest.display(shared)
+        else:
+            dest_name = dest.display()
+
         rows.append(
             PairRow(
                 origin_id=origin_id,
-                origin_name=origin.name,
+                origin_name=origin.display(),
                 origin_routes=",".join(sorted(effective_origin_routes[origin_id])),
                 dest_id=dest_id,
-                dest_name=dest.name if dest else f"complex {dest_id}",
+                dest_name=dest_name,
                 dest_routes=",".join(sorted(dest_routes)),
                 riders=riders,
                 one_seat=is_one_seat,
@@ -679,7 +703,12 @@ def run_scenario(
         per_origin[r.origin_id][0] += r.riders
         if r.one_seat:
             per_origin[r.origin_id][1] += r.riders
-        d = dest_stats.setdefault(r.dest_id, DestStats(name=r.dest_name))
+        # Summed across all origins, so unlike `r.dest_name` this always
+        # shows the destination's full route list -- no single arrival
+        # route/platform applies to an aggregate over every origin.
+        dest_station = stations_by_id.get(r.dest_id)
+        dest_display_name = dest_station.display() if dest_station else r.dest_name
+        d = dest_stats.setdefault(r.dest_id, DestStats(name=dest_display_name))
         d.total += r.riders
         if r.one_seat:
             d.one_seat += r.riders
@@ -1130,7 +1159,7 @@ def one_seat_rides(
 
     stations_by_id = Station.load_complexes(stations)
     boundary_lat = stations_by_id[boundary_complex_id].lat
-    boundary_name = stations_by_id[boundary_complex_id].name
+    boundary_name = stations_by_id[boundary_complex_id].display()
     print(
         f"Boundary: {boundary_name} (id {boundary_complex_id}), lat {boundary_lat:.6f}"
     )
