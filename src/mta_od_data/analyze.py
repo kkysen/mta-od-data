@@ -45,6 +45,14 @@ def format_station(name: str, routes: set[str]) -> str:
     return f"{name} ({','.join(sorted(routes))})"
 
 
+def prefer_primary(routes: set[str], primary_routes: set[str]) -> set[str]:
+    # A primary/express route beats a non-primary/local one (e.g. R) when
+    # both are available: a rider with the choice just takes the express, so
+    # a merely-present local isn't worth listing alongside it. Falls back to
+    # the full set when there's no primary route in it at all.
+    return (routes & primary_routes) or routes
+
+
 WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {
     DayType.WEEKDAY: WEEKDAYS,
@@ -633,16 +641,18 @@ def run_scenario(
                 assigned_points(effective_origin_routes[origin_id] & routes_set),
             )
             close = None if dist_m is None else dist_m <= close_threshold_m
-            if close:
-                # Close enough that we assume no real transfer happens --
-                # the rider is exiting here, not changing platforms, so
-                # which specific platform they land on doesn't matter. What
-                # matters is that a non-primary route (e.g. R) is slower
-                # than an express, so a rider with an express option
-                # available on their own physical line (e.g. R's 4th Av
-                # line also carries D and N) is assumed to have already
-                # ridden that instead, wherever it also reaches this
-                # destination.
+            if dist_m == 0.0:
+                # The origin's own assigned route stops right at this
+                # destination (not just nearby), so there's no real transfer
+                # happening -- the rider is exiting here, not changing
+                # platforms, so which specific platform they land on doesn't
+                # matter. What matters is that a non-primary route (e.g. R)
+                # is slower than an express, so a rider with an express
+                # option available on their own physical line (e.g. R's 4th
+                # Av line also carries D and N) is assumed to have already
+                # ridden that instead. A positive `dist_m` means an actual
+                # transfer to a *different* nearby station instead -- see
+                # the fallback below, which covers that case generically.
                 xfer_applicable_routes = (
                     origin_express_partners.get(origin_id, set()) & dest_routes
                 )
@@ -700,16 +710,12 @@ def run_scenario(
             # ridden, so they pin down which physical platform of a merged
             # complex the rider lands on -- show just that, not every route
             # in the complex (most of which may be on a different platform
-            # the rider never sees). Prefer a primary/express route over a
-            # non-primary one (e.g. R) when both connect the same pair: a
-            # rider with an express option just takes it, so a merely
-            # possible local alternative isn't worth listing. Applies to
-            # both ends, since it's the same ride either way. An `xfer`
-            # ride's arrival route isn't in the data at all, so it
-            # contributes no evidence either way (not even the full list --
-            # that would swamp the one-seat signal, since almost every
-            # destination has some xfer riders).
-            ridden_routes = (shared & primary_routes_set) or shared
+            # the rider never sees). Applies to both ends, since it's the
+            # same ride either way. An `xfer` ride's arrival route isn't in
+            # the data at all, so it contributes no evidence either way (not
+            # even the full list -- that would swamp the one-seat signal,
+            # since almost every destination has some xfer riders).
+            ridden_routes = prefer_primary(shared, primary_routes_set)
             dest_route_union.setdefault(dest_id, set()).update(ridden_routes)
             dest_name = dest.display(ridden_routes)
             origin_name = origin.display(ridden_routes)
@@ -720,15 +726,22 @@ def run_scenario(
                 effective_origin_routes[origin_id] & routes_set
             )
         else:
-            # Not close (a real transfer/walk elsewhere), or close but with
-            # no express route on the origin's own line reaching this
-            # destination -- either way there's no specific route to assume,
-            # so show the whole complex's list. Scoped to --routes, since a
-            # station can carry real service (e.g. F, G) with nothing to do
-            # with this analysis, and showing it here would be just as much
-            # noise as the 2,3,4,5 at Atlantic Av (never part of --routes, so
-            # never a route any of these trips could have used).
-            dest_name = dest.display(dest.routes & routes_set)
+            # No specific same-complex route to assume (see `dist_m == 0.0`
+            # above). Either way, a transfer is needed -- to whichever of
+            # the destination's own routes are in scope, preferring a
+            # primary/express one the same as everywhere else. (By
+            # construction none of these can be routes the origin's own
+            # corridor already has -- that would have made it a `1-seat`
+            # row instead -- so this is exactly "the other corridor",
+            # without needing to compute that separately.) Scoped to
+            # --routes, since a station can carry real service (e.g. F, G)
+            # with nothing to do with this analysis, and showing it here
+            # would be just as much noise as the 2,3,4,5 at Atlantic Av
+            # (never part of --routes, so never a route any of these trips
+            # could have used).
+            dest_name = dest.display(
+                prefer_primary(dest.routes & routes_set, primary_routes_set)
+            )
             origin_name = origin.display(
                 effective_origin_routes[origin_id] & routes_set
             )
