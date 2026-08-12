@@ -38,10 +38,6 @@ def abbreviate_name(name: str) -> str:
     return name
 
 
-def format_station(name: str, routes: set[str]) -> str:
-    return f"{name} ({','.join(sorted(routes))})"
-
-
 def prefer_primary(routes: set[str], primary_routes: set[str]) -> set[str]:
     """A primary/express route beats a non-primary/local one (e.g. R)
     when both are available: a rider with the choice just takes the express,
@@ -76,7 +72,8 @@ class Station:
     line: str = ""
 
     def display(self, routes: set[str] | None = None) -> str:
-        return format_station(self.name, self.routes if routes is None else routes)
+        shown_routes = self.routes if routes is None else routes
+        return f"{self.name} ({','.join(sorted(shown_routes))})"
 
     @classmethod
     def load_complex(cls, row: dict[str, str]) -> Self:
