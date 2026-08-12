@@ -6,7 +6,7 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from enum import StrEnum
 from pathlib import Path
-from typing import Annotated, Literal, NamedTuple, Self
+from typing import Annotated, Literal, Self
 
 import duckdb
 from typer import Option, Typer
@@ -475,7 +475,8 @@ class ScenarioDef:
     suffix: str | None
 
 
-class Coord(NamedTuple):
+@dataclass(slots=True)
+class Coord:
     lat: float
     lon: float
 
@@ -1400,9 +1401,7 @@ def one_seat_rides(
         if not candidates:
             return None
         return min(
-            haversine_m(lat, lon, clat, clon)
-            for lat, lon in points
-            for clat, clon in candidates
+            haversine_m(p.lat, p.lon, c.lat, c.lon) for p in points for c in candidates
         )
 
     results: list[ScenarioResult] = []
