@@ -877,16 +877,15 @@ def render_scenario_comparison(results: list[ScenarioResult], day_type: DayType)
     )
     lines.append("")
     lines.append(
-        "| Scenario | Total Riders | Direct 1-Seat | Direct 1-Seat % | "
-        "Close 1-Seat | Close 1-Seat % | Effective 1-Seat | Effective 1-Seat % |"
+        "| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |"
     )
-    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+    lines.append("| --- | --- | --- | --- | --- |")
     for r in results:
         lines.append(
-            f"| {r.label} | {r.total_riders:,.0f} | {r.one_seat_riders:,.0f} | "
-            f"{r.direct_one_seat_pct:.1f}% | {r.close_one_seat_riders:,.0f} | "
-            f"{r.close_one_seat_pct:.1f}% | {r.effective_one_seat_riders:,.0f} | "
-            f"{r.effective_one_seat_pct:.1f}% |"
+            f"| {r.label} | {r.total_riders:,.0f} | "
+            f"{r.one_seat_riders:,.0f} ({r.direct_one_seat_pct:.1f}%) | "
+            f"{r.close_one_seat_riders:,.0f} ({r.close_one_seat_pct:.1f}%) | "
+            f"{r.effective_one_seat_riders:,.0f} ({r.effective_one_seat_pct:.1f}%) |"
         )
     lines.append("")
     return "\n".join(lines)
