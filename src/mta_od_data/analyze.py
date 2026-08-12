@@ -211,8 +211,8 @@ class ScenarioResult:
 
     @property
     def close_one_seat_pct(self) -> float:
-        # Of the riders without a direct one-seat ride, not of total
-        # ridership -- matches the "Close one-seat rides" headline bullet.
+        """Of the riders without a direct one-seat ride, not of total
+        ridership -- matches the "Close one-seat rides" headline bullet."""
         return (
             100 * self.close_one_seat_riders / self.classified_many_seat_riders
             if self.classified_many_seat_riders
