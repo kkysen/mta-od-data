@@ -43,10 +43,10 @@ def format_station(name: str, routes: set[str]) -> str:
 
 
 def prefer_primary(routes: set[str], primary_routes: set[str]) -> set[str]:
-    # A primary/express route beats a non-primary/local one (e.g. R) when
-    # both are available: a rider with the choice just takes the express, so
-    # a merely-present local isn't worth listing alongside it. Falls back to
-    # the full set when there's no primary route in it at all.
+    """A primary/express route beats a non-primary/local one (e.g. R)
+    when both are available: a rider with the choice just takes the express,
+    so a merely-present local isn't worth listing alongside it.
+    Falls back to the full set when there's no primary route in it at all."""
     return (routes & primary_routes) or routes
 
 
