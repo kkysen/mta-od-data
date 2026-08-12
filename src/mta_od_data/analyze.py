@@ -23,20 +23,17 @@ class DayType(StrEnum):
     ALL = "all"
 
 
-# Shortened forms for station names that are unwieldy at their full length,
-# especially once a route list gets appended in parentheses. Applied as a
-# plain substring replacement, so it also shortens compound complex names
-# that merge in the long form (e.g. "Chambers St/WTC/Park Place/Cortlandt
-# St").
-NAME_ABBREVIATIONS: tuple[tuple[str, str], ...] = (
-    ("Atlantic Av-Barclays Ctr", "Atlantic Av"),
-    ("Port Authority Bus Terminal", "PABT"),
-    ("Park Place", "Park Pl"),
-)
-
-
 def abbreviate_name(name: str) -> str:
-    for long, short in NAME_ABBREVIATIONS:
+    """Shortened forms for station names that are unwieldy at their full length,
+    especially once a route list gets appended in parentheses.
+    Applied as a plain substring replacement, so it also shortens compound complex names
+    that merge in the long form (e.g. "Chambers St/WTC/Park Place/Cortlandt St")."""
+    abbreviations = (
+        ("Atlantic Av-Barclays Ctr", "Atlantic Av"),
+        ("Port Authority Bus Terminal", "PABT"),
+        ("Park Place", "Park Pl"),
+    )
+    for long, short in abbreviations:
         name = name.replace(long, short)
     return name
 
