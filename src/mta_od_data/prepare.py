@@ -7,7 +7,7 @@ from typer import Option, Typer
 
 from mta_od_data import DATA, ROOT
 
-app = Typer(rich_markup_mode=None)
+app = Typer()
 
 DEFAULT_CSV_GLOB = "MTA_Subway_Origin-Destination_Ridership_Estimate_*.csv"
 DEFAULT_PARQUET = DATA / "mta_od.parquet"

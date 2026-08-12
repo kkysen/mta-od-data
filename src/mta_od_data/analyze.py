@@ -13,7 +13,7 @@ from typer import Option, Typer
 
 from mta_od_data import DATA
 
-app = Typer(rich_markup_mode=None)
+app = Typer()
 
 
 class DayType(StrEnum):
