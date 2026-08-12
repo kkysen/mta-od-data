@@ -39,16 +39,18 @@ def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> No
     print(f"converting {resolved} -> {out}")
     con = duckdb.connect()
     con.execute(
-        f"""
-        COPY (SELECT * FROM read_csv_auto({resolved}, union_by_name=true))
-        TO '{out}' (FORMAT parquet)
         """
+        COPY (SELECT * FROM read_csv_auto($csv_patterns, union_by_name=true))
+        TO $out (FORMAT parquet)
+        """,
+        {"csv_patterns": resolved, "out": str(out)},
     )
     result: tuple[int, int, int] | None = con.execute(
-        f"""
-        SELECT count(*), min(Year * 100 + Month), max(Year * 100 + Month)
-        FROM '{out}'
         """
+        SELECT count(*), min(Year * 100 + Month), max(Year * 100 + Month)
+        FROM read_parquet($out)
+        """,
+        {"out": str(out)},
     ).fetchone()
     assert result is not None, "aggregate query always returns exactly one row"
     row_count, min_ym, max_ym = result
