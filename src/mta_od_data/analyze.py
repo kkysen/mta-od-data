@@ -254,46 +254,22 @@ class ScenarioResult:
         self,
         *,
         show_label: bool,
-        boundary_name: str,
         day_type: DayType,
-        n_distinct_days: int,
-        routes_set: set[str],
-        origin_side: str,
-        dest_side: str,
-        trunk_a_label: str,
-        trunk_b_label: str,
         close_threshold_m: float,
         top_n: int,
         csv_out: Path | None,
-        produced_by: str,
     ) -> str:
-        # Nested under the comparison table's own `#` heading when there's more
-        # than one scenario, so this section and its subsections drop a level
-        # to keep the document outline correct instead of repeating `#`/`##`.
-        h1 = "##" if show_label else "#"
+        # Nested one level deeper under the document's own `#` title when
+        # there's more than one scenario, to keep the document outline
+        # correct instead of repeating `##` for every scenario's subsections.
         h2 = "###" if show_label else "##"
         lines: list[str] = []
-        lines.append(
-            f"{h1} {trunk_a_label}/{trunk_b_label} deinterlining: one-seat-ride "
-            f"results at {boundary_name}"
-        )
-        lines.append("")
         if show_label:
-            lines.append(f"**Scenario: {self.label}**")
+            lines.append(f"## {self.label}")
             lines.append("")
-        lines.append(
-            f"Scenario: average {day_type} ridership ({n_distinct_days} distinct days "
-            f"in the data) on trains originating at stations served by "
-            f"{','.join(sorted(routes_set))}, {origin_side} of {boundary_name}, with "
-            f"destinations {dest_side} of {boundary_name} (i.e. trips that cross the "
-            f"junction)."
-        )
-        lines.append("")
         if self.corridor_scenario_note:
             lines.append(self.corridor_scenario_note)
             lines.append("")
-        lines.append(f"Produced by `{produced_by}`.")
-        lines.append("")
 
         lines.append(f"{h2} Headline numbers")
         lines.append("")
@@ -341,14 +317,12 @@ class ScenarioResult:
                 f"- **Close to the other trunk if deinterlined: {close_pct:.1f}%** of "
                 f"one-seat riders ({self.close_riders:,.0f} of "
                 f"{self.classified_one_seat_riders:,.0f}) -- i.e. wouldn't need a "
-                f"materially longer walk/transfer even if {trunk_a_label} and "
-                f"{trunk_b_label} stopped interlining at {boundary_name}."
+                f"materially longer walk/transfer even if the two trunks stopped "
+                f"interlining at the junction."
             )
         lines.append("")
 
-        lines.append(
-            f"{h2} Top {top_n} origin/destination pairs (avg {day_type} riders)"
-        )
+        lines.append(f"{h2} Top {top_n} origin/destination pairs")
         lines.append("")
         lines.append(
             "| # | Riders | % Total | % 1-Seat | Type | Close? | Dist "
@@ -376,8 +350,7 @@ class ScenarioResult:
         lines.append("")
 
         lines.append(
-            f"{h2} Top {top_n} destination stations, summed across all origins "
-            f"(avg {day_type} riders)"
+            f"{h2} Top {top_n} destination stations, summed across all origins"
         )
         lines.append("")
         lines.append(
@@ -421,60 +394,12 @@ class ScenarioResult:
             )
         lines.append("")
 
-        lines.append(f"{h2} Notes on reading these tables")
-        lines.append("")
-        if self.corridor_scenario_active:
+        if csv_out:
             lines.append(
-                f'- "Close?"/"Dist" describe distance from the destination to the '
-                f"nearest station on the trunk the origin's *own* corridor got "
-                f"assigned in this scenario, thresholded at {close_threshold_m:.0f}m. "
-                f"They only apply to `xfer` rows -- riders without a direct "
-                f"one-seat ride under this scenario -- since a `1-seat` row "
-                f"already has a direct train and needs no walk. A close `xfer` "
-                f"row is a *close one-seat ride*: no train change, just a short "
-                f"walk to the actual destination."
+                f"_Full row-level detail (every origin/destination pair, not just "
+                f"the top {top_n}): `{csv_out}`._"
             )
-            lines.append(
-                '- In the per-destination table, "Close?"/"Dist" are '
-                "ridership-weighted across that destination's classified "
-                "many-seat pairs."
-            )
-            lines.append(
-                "- `1-seat` rows have no close/dist value since the classification "
-                "only applies to trips without a direct one-seat ride under this "
-                "scenario."
-            )
-        else:
-            lines.append(
-                f'- "Close?"/"Dist" mean different things depending on `Type`. '
-                f"For `1-seat` rows: distance from the destination to the "
-                f"nearest station on the trunk *not* used to reach it one-seat "
-                f"({trunk_a_label} vs {trunk_b_label}) -- i.e. how exposed that "
-                f"one-seat ride is to a generic future deinterlining; "
-                f"`True`/`0m` covers destinations already served by both "
-                f"trunks, and one-seat connections that never actually cross "
-                f"the junction (via a route in the universe but not in "
-                f"`--primary-routes`) -- those can't be affected by "
-                f"deinterlining either way. For `xfer` rows (riders without a "
-                f"direct one-seat ride): distance to the nearest station on "
-                f"one of the origin's own routes -- a close `xfer` row is a "
-                f"*close one-seat ride*: no train change, just a short walk "
-                f"to the actual destination. Both thresholded at "
-                f"{close_threshold_m:.0f}m."
-            )
-            lines.append(
-                '- In the per-destination table, "Close?"/"Dist" cover only '
-                "that destination's classified *one-seat* pairs "
-                "(ridership-weighted), matching the table's one-seat focus -- "
-                "see the CSV or the per-pair table above for the `xfer` "
-                "close/dist data."
-            )
-        csv_note = f" (`{csv_out}`)" if csv_out else ""
-        lines.append(
-            f"- Full row-level detail (every origin/destination pair, not just the top "
-            f"{top_n}) is in the `--csv-out` file{csv_note}, if one was written."
-        )
-        lines.append("")
+            lines.append("")
         return "\n".join(lines)
 
 
@@ -800,7 +725,7 @@ def print_scenario_comparison(results: list[ScenarioResult], day_type: DayType) 
 
 def render_scenario_comparison(results: list[ScenarioResult], day_type: DayType) -> str:
     lines: list[str] = []
-    lines.append("# Scenario comparison")
+    lines.append("## Scenario comparison")
     lines.append("")
     lines.append(
         f"Average {day_type} ridership is the same {results[0].total_riders:,.0f}/"
@@ -821,12 +746,73 @@ def render_scenario_comparison(results: list[ScenarioResult], day_type: DayType)
             f"{r.effective_one_seat_pct:.1f}% |"
         )
     lines.append("")
-    lines.append(
-        '"Close one-seat" is the many-seat riders (see "Notes on reading these '
-        'tables" below) close enough to an alternative not to need a materially '
-        'worse trip; "Effective one-seat" is direct + close.'
-    )
-    lines.append("")
+    return "\n".join(lines)
+
+
+def render_notes(
+    results: list[ScenarioResult],
+    *,
+    trunk_a_label: str,
+    trunk_b_label: str,
+    close_threshold_m: float,
+) -> str:
+    baseline_results = [r for r in results if not r.corridor_scenario_active]
+    scenario_results = [r for r in results if r.corridor_scenario_active]
+    both = bool(baseline_results) and bool(scenario_results)
+    lines: list[str] = ["## Notes on reading these tables", ""]
+    if baseline_results:
+        if both:
+            (baseline,) = baseline_results
+            lines.append(f'**"{baseline.label}"** (today\'s actual routing):')
+            lines.append("")
+        lines.append(
+            f'- "Close?"/"Dist" mean different things depending on `Type`. For '
+            f"`1-seat` rows: distance from the destination to the nearest "
+            f"station on the trunk *not* used to reach it one-seat "
+            f"({trunk_a_label} vs {trunk_b_label}) -- i.e. how exposed that "
+            f"one-seat ride is to a generic future deinterlining; `True`/`0m` "
+            f"covers destinations already served by both trunks, and one-seat "
+            f"connections that never actually cross the junction (via a route "
+            f"in the universe but not in `--primary-routes`) -- those can't be "
+            f"affected by deinterlining either way. For `xfer` rows (riders "
+            f"without a direct one-seat ride): distance to the nearest station "
+            f"on one of the origin's own routes -- a close `xfer` row is a "
+            f"*close one-seat ride*: no train change, just a short walk to the "
+            f"actual destination. Both thresholded at {close_threshold_m:.0f}m."
+        )
+        lines.append(
+            '- In the per-destination table, "Close?"/"Dist" cover only that '
+            "destination's classified *one-seat* pairs (ridership-weighted), "
+            "matching the table's one-seat focus -- see the CSV or the "
+            "per-pair table above for the `xfer` close/dist data."
+        )
+        lines.append("")
+    if scenario_results:
+        if both:
+            labels = " / ".join(f'"{r.label}"' for r in scenario_results)
+            lines.append(f"**{labels}** (deinterlining scenarios):")
+            lines.append("")
+        lines.append(
+            '- "Close?"/"Dist" describe distance from the destination to the '
+            "nearest station on the trunk the origin's *own* corridor got "
+            f"assigned in that scenario, thresholded at {close_threshold_m:.0f}m. "
+            "They only apply to `xfer` rows -- riders without a direct "
+            "one-seat ride under the scenario -- since a `1-seat` row already "
+            "has a direct train and needs no walk. A close `xfer` row is a "
+            "*close one-seat ride*: no train change, just a short walk to the "
+            "actual destination."
+        )
+        lines.append(
+            '- In the per-destination table, "Close?"/"Dist" are '
+            "ridership-weighted across that destination's classified "
+            "many-seat pairs."
+        )
+        lines.append(
+            "- `1-seat` rows have no close/dist value since the classification "
+            "only applies to trips without a direct one-seat ride under the "
+            "scenario."
+        )
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -1307,25 +1293,38 @@ def one_seat_rides(
         # .venv/bin/mta-od-data), not stable across machines/checkouts -- use
         # just its basename so this line stays reproducible.
         produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
+        preamble_lines = [
+            f"# {trunk_a_label}/{trunk_b_label} deinterlining: one-seat-ride "
+            f"results at {boundary_name}",
+            "",
+            f"Scenario: average {day_type} ridership ({n_distinct_days} distinct "
+            f"days in the data) on trains originating at stations served by "
+            f"{','.join(sorted(routes_set))}, {origin_side} of {boundary_name}, "
+            f"with destinations {dest_side} of it (i.e. trips that cross the "
+            f"junction).",
+            "",
+            f"Produced by `{produced_by}`.",
+            "",
+        ]
         sections = [
-            result.render_markdown(
-                show_label=show_label,
-                boundary_name=boundary_name,
-                day_type=day_type,
-                n_distinct_days=n_distinct_days,
-                routes_set=routes_set,
-                origin_side=origin_side,
-                dest_side=dest_side,
+            "\n".join(preamble_lines),
+            *([render_scenario_comparison(results, day_type)] if show_label else []),
+            *(
+                result.render_markdown(
+                    show_label=show_label,
+                    day_type=day_type,
+                    close_threshold_m=close_threshold_m,
+                    top_n=top_n,
+                    csv_out=path,
+                )
+                for result, path in zip(results, csv_paths, strict=True)
+            ),
+            render_notes(
+                results,
                 trunk_a_label=trunk_a_label,
                 trunk_b_label=trunk_b_label,
                 close_threshold_m=close_threshold_m,
-                top_n=top_n,
-                csv_out=path,
-                produced_by=produced_by,
-            )
-            for result, path in zip(results, csv_paths, strict=True)
+            ),
         ]
-        if show_label:
-            sections = [render_scenario_comparison(results, day_type), *sections]
         markdown_out.write_text("\n---\n\n".join(sections))
         print(f"\nWrote markdown report to {markdown_out}")
