@@ -55,7 +55,7 @@ def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> No
     print(f"wrote {out}: {row_count:,} rows, year*100+month range {min_ym}-{max_ym}")
 
 
-@app.command("prepare")
+@app.command()
 def prepare(
     csv: Annotated[
         list[str] | None,

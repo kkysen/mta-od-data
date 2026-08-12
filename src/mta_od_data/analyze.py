@@ -842,7 +842,7 @@ def _pair_riders(r: PairRow) -> float:
     return r.riders
 
 
-@app.command("one-seat-rides")
+@app.command()
 def one_seat_rides(
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
     stations: Annotated[Path, Option()] = DATA / "stations_complexes.csv",
