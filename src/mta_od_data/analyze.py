@@ -689,7 +689,7 @@ def run_scenario(
         rows.append(
             PairRow(
                 origin_id=origin_id,
-                origin_name=origin.display(),
+                origin_name=origin.display(effective_origin_routes[origin_id]),
                 origin_routes=",".join(sorted(effective_origin_routes[origin_id])),
                 dest_id=dest_id,
                 dest_name=dest_name,
