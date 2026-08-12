@@ -271,6 +271,7 @@ class ScenarioResult:
         close_threshold_m: float,
         top_n: int,
         csv_out: Path | None,
+        produced_by: str,
     ) -> str:
         # Nested under the comparison table's own `#` heading when there's more
         # than one scenario, so this section and its subsections drop a level
@@ -297,7 +298,7 @@ class ScenarioResult:
         if self.corridor_scenario_note:
             lines.append(self.corridor_scenario_note)
             lines.append("")
-        lines.append(f"Produced by `{shlex.join(sys.argv)}`.")
+        lines.append(f"Produced by `{produced_by}`.")
         lines.append("")
 
         lines.append(f"{h2} Headline numbers")
@@ -1306,6 +1307,7 @@ def main(
             write_csv(path, result.rows)
 
     if markdown_out:
+        produced_by = shlex.join(sys.argv)
         sections = [
             result.render_markdown(
                 show_label=show_label,
@@ -1320,6 +1322,7 @@ def main(
                 close_threshold_m=close_threshold_m,
                 top_n=top_n,
                 csv_out=path,
+                produced_by=produced_by,
             )
             for result, path in zip(results, csv_paths, strict=True)
         ]
