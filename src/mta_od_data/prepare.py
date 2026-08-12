@@ -3,9 +3,11 @@ from pathlib import Path
 from typing import Annotated
 
 import duckdb
-from typer import Option
+from typer import Option, Typer
 
 from mta_od_data import DATA, ROOT
+
+app = Typer(rich_markup_mode=None)
 
 DEFAULT_CSV_GLOB = "MTA_Subway_Origin-Destination_Ridership_Estimate_*.csv"
 DEFAULT_PARQUET = DATA / "mta_od.parquet"
@@ -53,7 +55,8 @@ def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> No
     print(f"wrote {out}: {row_count:,} rows, year*100+month range {min_ym}-{max_ym}")
 
 
-def main(
+@app.command("prepare")
+def prepare(
     csv: Annotated[
         list[str] | None,
         Option(

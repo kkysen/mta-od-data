@@ -9,9 +9,11 @@ from pathlib import Path
 from typing import Annotated, Literal, Self
 
 import duckdb
-from typer import Option
+from typer import Option, Typer
 
 from mta_od_data import DATA
+
+app = Typer(rich_markup_mode=None)
 
 
 class DayType(StrEnum):
@@ -840,7 +842,8 @@ def _pair_riders(r: PairRow) -> float:
     return r.riders
 
 
-def main(
+@app.command("one-seat-rides")
+def one_seat_rides(
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
     stations: Annotated[Path, Option()] = DATA / "stations_complexes.csv",
     stations_individual: Annotated[
