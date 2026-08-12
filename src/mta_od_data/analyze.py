@@ -584,6 +584,12 @@ def run_scenario(
     close_one_seat_riders = 0.0
 
     rows: list[PairRow] = []
+    # Which of a destination's routes were actually observed as a one-seat
+    # arrival route across all origins, for the aggregate per-destination
+    # table. Only `1-seat` rows contribute (their `shared` route(s)); a
+    # destination with no one-seat riders at all is left out here and falls
+    # back to its full route list when the table is built below.
+    dest_route_union: dict[int, set[str]] = {}
     for origin_id, dest_id, riders in scoped:
         origin = stations_by_id[origin_id]
         dest = stations_by_id.get(dest_id)
@@ -671,7 +677,11 @@ def run_scenario(
             # ridden, so they pin down which physical platform of a merged
             # complex the rider lands on -- show just that, not every route
             # in the complex (most of which may be on a different platform
-            # the rider never sees).
+            # the rider never sees). An `xfer` ride's arrival route isn't in
+            # the data at all, so it contributes no evidence either way
+            # (not even the full list -- that would swamp the one-seat
+            # signal, since almost every destination has some xfer riders).
+            dest_route_union.setdefault(dest_id, set()).update(shared)
             dest_name = dest.display(shared)
         else:
             dest_name = dest.display()
@@ -703,11 +713,16 @@ def run_scenario(
         per_origin[r.origin_id][0] += r.riders
         if r.one_seat:
             per_origin[r.origin_id][1] += r.riders
-        # Summed across all origins, so unlike `r.dest_name` this always
-        # shows the destination's full route list -- no single arrival
-        # route/platform applies to an aggregate over every origin.
+        # Summed across all origins, so unlike a single row's `dest_name`
+        # this shows every route observed as an arrival route across all of
+        # them -- not just the route(s) accounting for the last row seen.
         dest_station = stations_by_id.get(r.dest_id)
-        dest_display_name = dest_station.display() if dest_station else r.dest_name
+        arrival_routes = dest_route_union.get(r.dest_id)
+        dest_display_name = (
+            dest_station.display(arrival_routes)
+            if dest_station and arrival_routes
+            else r.dest_name
+        )
         d = dest_stats.setdefault(r.dest_id, DestStats(name=dest_display_name))
         d.total += r.riders
         if r.one_seat:
