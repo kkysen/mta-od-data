@@ -672,24 +672,33 @@ def run_scenario(
 
         if dest is None:
             dest_name = f"complex {dest_id}"
+            origin_name = origin.display(effective_origin_routes[origin_id])
         elif is_one_seat:
             # A one-seat ride's `shared` route(s) are the one(s) actually
             # ridden, so they pin down which physical platform of a merged
             # complex the rider lands on -- show just that, not every route
             # in the complex (most of which may be on a different platform
-            # the rider never sees). An `xfer` ride's arrival route isn't in
-            # the data at all, so it contributes no evidence either way
-            # (not even the full list -- that would swamp the one-seat
-            # signal, since almost every destination has some xfer riders).
-            dest_route_union.setdefault(dest_id, set()).update(shared)
-            dest_name = dest.display(shared)
+            # the rider never sees). Prefer a primary/express route over a
+            # non-primary one (e.g. R) when both connect the same pair: a
+            # rider with an express option just takes it, so a merely
+            # possible local alternative isn't worth listing. Applies to
+            # both ends, since it's the same ride either way. An `xfer`
+            # ride's arrival route isn't in the data at all, so it
+            # contributes no evidence either way (not even the full list --
+            # that would swamp the one-seat signal, since almost every
+            # destination has some xfer riders).
+            ridden_routes = (shared & primary_routes_set) or shared
+            dest_route_union.setdefault(dest_id, set()).update(ridden_routes)
+            dest_name = dest.display(ridden_routes)
+            origin_name = origin.display(ridden_routes)
         else:
             dest_name = dest.display()
+            origin_name = origin.display(effective_origin_routes[origin_id])
 
         rows.append(
             PairRow(
                 origin_id=origin_id,
-                origin_name=origin.display(effective_origin_routes[origin_id]),
+                origin_name=origin_name,
                 origin_routes=",".join(sorted(effective_origin_routes[origin_id])),
                 dest_id=dest_id,
                 dest_name=dest_name,
