@@ -295,7 +295,11 @@ class ScenarioResult:
             "\n=== Per-destination-station breakdown "
             "(avg weekday riders, sorted by total) ==="
         )
-        for d in sorted(self.dest_stats.values(), key=_dest_total, reverse=True):
+
+        def dest_total(d: DestStats) -> float:
+            return d.total
+
+        for d in sorted(self.dest_stats.values(), key=dest_total, reverse=True):
             pct = 100 * d.one_seat / d.total if d.total else float("nan")
             print(f"  {d.name:<55} total={d.total:>9,.0f}  one-seat={pct:5.1f}%")
 
@@ -389,7 +393,11 @@ class ScenarioResult:
             "| Origin → Destination |"
         )
         lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
-        top_pairs = sorted(self.rows, key=_pair_riders, reverse=True)[:top_n]
+
+        def pair_riders(r: PairRow) -> float:
+            return r.riders
+
+        top_pairs = sorted(self.rows, key=pair_riders, reverse=True)[:top_n]
         for i, r in enumerate(top_pairs, start=1):
             pct_total = (
                 100 * r.riders / self.total_riders
@@ -422,7 +430,11 @@ class ScenarioResult:
             "| Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |"
         )
         lines.append("| --- | --- | --- | --- | --- | --- |")
-        top_dests = sorted(self.dest_stats.values(), key=_dest_one_seat, reverse=True)[
+
+        def dest_one_seat(d: DestStats) -> float:
+            return d.one_seat
+
+        top_dests = sorted(self.dest_stats.values(), key=dest_one_seat, reverse=True)[
             :top_n
         ]
         for d in top_dests:
@@ -957,18 +969,6 @@ def render_notes(
         )
         lines.append("")
     return "\n".join(lines)
-
-
-def _dest_total(d: DestStats) -> float:
-    return d.total
-
-
-def _dest_one_seat(d: DestStats) -> float:
-    return d.one_seat
-
-
-def _pair_riders(r: PairRow) -> float:
-    return r.riders
 
 
 @app.command()
