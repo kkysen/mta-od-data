@@ -1,5 +1,6 @@
 import csv
 import math
+import operator
 import shlex
 import sys
 from collections.abc import Callable
@@ -517,8 +518,12 @@ def run_scenario(
     trunk_b_points: list[tuple[float, float]],
     assigned_points: Callable[[set[str]], list[tuple[float, float]]],
     dest_points: Callable[[Station], list[tuple[float, float]]],
+    dest_platforms: Callable[[Station], list[Station]],
     min_dist_to_points: Callable[
         [list[tuple[float, float]], list[tuple[float, float]]], float | None
+    ],
+    nearest_platform: Callable[
+        [list[Station], list[tuple[float, float]]], tuple[Station, float] | None
     ],
     close_threshold_m: float,
     origin_corridor_a_routes_set: set[str],
@@ -584,11 +589,12 @@ def run_scenario(
     close_one_seat_riders = 0.0
 
     rows: list[PairRow] = []
-    # Which of a destination's routes were actually observed as a one-seat
-    # arrival route across all origins, for the aggregate per-destination
-    # table. Only `1-seat` rows contribute (their `shared` route(s)); a
-    # destination with no one-seat riders at all is left out here and falls
-    # back to its full route list when the table is built below.
+    # Which of a destination's routes were actually applicable across all
+    # origins, for the aggregate per-destination table -- the same per-row
+    # narrowing as `dest_name` (a `1-seat` row's `shared` route(s), or a
+    # close `xfer` row's assumed same-platform transfer), unioned. A
+    # destination with no such rows at all is left out here and falls back
+    # to its full route list when the table is built below.
     dest_route_union: dict[int, set[str]] = {}
     for origin_id, dest_id, riders in scoped:
         origin = stations_by_id[origin_id]
@@ -605,6 +611,7 @@ def run_scenario(
 
         close = None
         dist_m = None
+        xfer_platform_routes: set[str] | None = None
         if not is_one_seat and dest:
             # is_one_seat already reflects this scenario's effective routing
             # (real current routes in baseline mode, the scenario's assigned
@@ -616,8 +623,8 @@ def run_scenario(
             # assigned routes)? If it's close, that's a "close one-seat ride"
             # (get off/board a short walk away, no train change), not a
             # transfer.
-            dist_m = min_dist_to_points(
-                dest_points(dest),
+            nearest = nearest_platform(
+                dest_platforms(dest),
                 # Scoped to --routes: effective_origin_routes can carry real
                 # routes far outside this analysis (e.g. a station's F/G
                 # service alongside its R), and without this filter those
@@ -625,7 +632,23 @@ def run_scenario(
                 # the junction being analyzed.
                 assigned_points(effective_origin_routes[origin_id] & routes_set),
             )
-            close = None if dist_m is None else dist_m <= close_threshold_m
+            if nearest is not None:
+                nearest_station, dist_m = nearest
+                close = dist_m <= close_threshold_m
+                if close:
+                    # Close enough that we assume the rider treats it as a
+                    # same-platform transfer onto whatever interlined
+                    # service actually stops there today, not a real
+                    # transfer elsewhere in the complex -- so show that
+                    # specific platform's own routes (preferring a
+                    # primary/express one over a merely-present local, same
+                    # as a one-seat ride) instead of the whole complex's
+                    # route list.
+                    platform_routes = nearest_station.routes & routes_set
+                    if platform_routes:
+                        xfer_platform_routes = (
+                            platform_routes & primary_routes_set
+                        ) or platform_routes
             if close is not None:
                 classified_many_seat_riders += riders
                 if close:
@@ -693,12 +716,19 @@ def run_scenario(
             dest_route_union.setdefault(dest_id, set()).update(ridden_routes)
             dest_name = dest.display(ridden_routes)
             origin_name = origin.display(ridden_routes)
+        elif xfer_platform_routes:
+            dest_route_union.setdefault(dest_id, set()).update(xfer_platform_routes)
+            dest_name = dest.display(xfer_platform_routes)
+            origin_name = origin.display(
+                effective_origin_routes[origin_id] & routes_set
+            )
         else:
-            # Scoped to --routes: a station can carry real service (e.g. F,
-            # G) with nothing to do with this analysis, and showing it here
-            # would be just as much noise as the 2,3,4,5 at Atlantic Av
-            # (never part of --routes, so never a route any of these trips
-            # could have used).
+            # Not close enough to assume a same-platform transfer, so there's
+            # no specific platform to point to -- scoped to --routes, since a
+            # station can carry real service (e.g. F, G) with nothing to do
+            # with this analysis, and showing it here would be just as much
+            # noise as the 2,3,4,5 at Atlantic Av (never part of --routes, so
+            # never a route any of these trips could have used).
             dest_name = dest.display(dest.routes & routes_set)
             origin_name = origin.display(
                 effective_origin_routes[origin_id] & routes_set
@@ -1268,12 +1298,15 @@ def one_seat_rides(
     total_riders = sum(r for _, _, r in scoped)
 
     individual_stations = Station.load_individuals(stations_individual)
-    points_by_complex: dict[int, list[tuple[float, float]]] = {}
+    platforms_by_complex: dict[int, list[Station]] = {}
     for s in individual_stations:
-        points_by_complex.setdefault(s.complex_id, []).append((s.lat, s.lon))
+        platforms_by_complex.setdefault(s.complex_id, []).append(s)
+
+    def dest_platforms(dest: Station) -> list[Station]:
+        return platforms_by_complex.get(dest.complex_id, [dest])
 
     def dest_points(dest: Station) -> list[tuple[float, float]]:
-        return points_by_complex.get(dest.complex_id, [(dest.lat, dest.lon)])
+        return [(s.lat, s.lon) for s in dest_platforms(dest)]
 
     # Candidate points for the nearest-other-trunk search, system-wide (not
     # restricted to any borough): straight-line distance is already the
@@ -1315,6 +1348,25 @@ def one_seat_rides(
             for clat, clon in candidates
         )
 
+    def nearest_platform(
+        platforms: list[Station], candidates: list[tuple[float, float]]
+    ) -> tuple[Station, float] | None:
+        if not candidates or not platforms:
+            return None
+        return min(
+            (
+                (
+                    s,
+                    min(
+                        haversine_m(s.lat, s.lon, clat, clon)
+                        for clat, clon in candidates
+                    ),
+                )
+                for s in platforms
+            ),
+            key=operator.itemgetter(1),
+        )
+
     results: list[ScenarioResult] = []
     for sdef in scenario_defs:
         result = run_scenario(
@@ -1331,7 +1383,9 @@ def one_seat_rides(
             trunk_b_points=trunk_b_points,
             assigned_points=assigned_points,
             dest_points=dest_points,
+            dest_platforms=dest_platforms,
             min_dist_to_points=min_dist_to_points,
+            nearest_platform=nearest_platform,
             close_threshold_m=close_threshold_m,
             origin_corridor_a_routes_set=origin_corridor_a_routes_set,
             origin_corridor_b_routes_set=origin_corridor_b_routes_set,
