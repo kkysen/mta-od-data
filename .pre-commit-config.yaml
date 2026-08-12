@@ -16,3 +16,12 @@ repos:
     hooks:
       - id: pyrefly-check
         additional_dependencies: ["duckdb>=1.5.5", "typer>=0.27.1"]
+
+  - repo: local
+    hooks:
+      - id: check-results-md
+        name: Check RESULTS.md is up to date
+        entry: scripts/check_results_md.py
+        language: system
+        pass_filenames: false
+        files: ^(scripts/02_analyze\.py|scripts/check_results_md\.py|RESULTS\.md)$
