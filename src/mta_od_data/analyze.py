@@ -1,6 +1,5 @@
 import csv
 import math
-import operator
 import shlex
 import sys
 from collections.abc import Callable
@@ -67,6 +66,9 @@ class Station:
     routes: set[str]
     lat: float
     lon: float
+    # Physical line name (e.g. "4th Av"), individual per-platform stations
+    # only -- empty for a complex, which can span several lines.
+    line: str = ""
 
     def display(self, routes: set[str] | None = None) -> str:
         return format_station(self.name, self.routes if routes is None else routes)
@@ -102,6 +104,7 @@ class Station:
             routes=set(row["daytime_routes"].split()),
             lat=float(row["gtfs_latitude"]),
             lon=float(row["gtfs_longitude"]),
+            line=row["line"],
         )
 
     @classmethod
@@ -518,13 +521,10 @@ def run_scenario(
     trunk_b_points: list[tuple[float, float]],
     assigned_points: Callable[[set[str]], list[tuple[float, float]]],
     dest_points: Callable[[Station], list[tuple[float, float]]],
-    dest_platforms: Callable[[Station], list[Station]],
     min_dist_to_points: Callable[
         [list[tuple[float, float]], list[tuple[float, float]]], float | None
     ],
-    nearest_platform: Callable[
-        [list[Station], list[tuple[float, float]]], tuple[Station, float] | None
-    ],
+    origin_express_partners: dict[int, set[str]],
     close_threshold_m: float,
     origin_corridor_a_routes_set: set[str],
     origin_corridor_b_routes_set: set[str],
@@ -592,9 +592,9 @@ def run_scenario(
     # Which of a destination's routes were actually applicable across all
     # origins, for the aggregate per-destination table -- the same per-row
     # narrowing as `dest_name` (a `1-seat` row's `shared` route(s), or a
-    # close `xfer` row's assumed same-platform transfer), unioned. A
-    # destination with no such rows at all is left out here and falls back
-    # to its full route list when the table is built below.
+    # close `xfer` row's assumed express transfer), unioned. A destination
+    # with no such rows at all is left out here and falls back to its full
+    # route list when the table is built below.
     dest_route_union: dict[int, set[str]] = {}
     for origin_id, dest_id, riders in scoped:
         origin = stations_by_id[origin_id]
@@ -611,7 +611,7 @@ def run_scenario(
 
         close = None
         dist_m = None
-        xfer_platform_routes: set[str] | None = None
+        xfer_applicable_routes: set[str] | None = None
         if not is_one_seat and dest:
             # is_one_seat already reflects this scenario's effective routing
             # (real current routes in baseline mode, the scenario's assigned
@@ -623,8 +623,8 @@ def run_scenario(
             # assigned routes)? If it's close, that's a "close one-seat ride"
             # (get off/board a short walk away, no train change), not a
             # transfer.
-            nearest = nearest_platform(
-                dest_platforms(dest),
+            dist_m = min_dist_to_points(
+                dest_points(dest),
                 # Scoped to --routes: effective_origin_routes can carry real
                 # routes far outside this analysis (e.g. a station's F/G
                 # service alongside its R), and without this filter those
@@ -632,23 +632,20 @@ def run_scenario(
                 # the junction being analyzed.
                 assigned_points(effective_origin_routes[origin_id] & routes_set),
             )
-            if nearest is not None:
-                nearest_station, dist_m = nearest
-                close = dist_m <= close_threshold_m
-                if close:
-                    # Close enough that we assume the rider treats it as a
-                    # same-platform transfer onto whatever interlined
-                    # service actually stops there today, not a real
-                    # transfer elsewhere in the complex -- so show that
-                    # specific platform's own routes (preferring a
-                    # primary/express one over a merely-present local, same
-                    # as a one-seat ride) instead of the whole complex's
-                    # route list.
-                    platform_routes = nearest_station.routes & routes_set
-                    if platform_routes:
-                        xfer_platform_routes = (
-                            platform_routes & primary_routes_set
-                        ) or platform_routes
+            close = None if dist_m is None else dist_m <= close_threshold_m
+            if close:
+                # Close enough that we assume no real transfer happens --
+                # the rider is exiting here, not changing platforms, so
+                # which specific platform they land on doesn't matter. What
+                # matters is that a non-primary route (e.g. R) is slower
+                # than an express, so a rider with an express option
+                # available on their own physical line (e.g. R's 4th Av
+                # line also carries D and N) is assumed to have already
+                # ridden that instead, wherever it also reaches this
+                # destination.
+                xfer_applicable_routes = (
+                    origin_express_partners.get(origin_id, set()) & dest_routes
+                )
             if close is not None:
                 classified_many_seat_riders += riders
                 if close:
@@ -716,15 +713,17 @@ def run_scenario(
             dest_route_union.setdefault(dest_id, set()).update(ridden_routes)
             dest_name = dest.display(ridden_routes)
             origin_name = origin.display(ridden_routes)
-        elif xfer_platform_routes:
-            dest_route_union.setdefault(dest_id, set()).update(xfer_platform_routes)
-            dest_name = dest.display(xfer_platform_routes)
+        elif xfer_applicable_routes:
+            dest_route_union.setdefault(dest_id, set()).update(xfer_applicable_routes)
+            dest_name = dest.display(xfer_applicable_routes)
             origin_name = origin.display(
                 effective_origin_routes[origin_id] & routes_set
             )
         else:
-            # Not close enough to assume a same-platform transfer, so there's
-            # no specific platform to point to -- scoped to --routes, since a
+            # Not close (a real transfer/walk elsewhere), or close but with
+            # no express route on the origin's own line reaching this
+            # destination -- either way there's no specific route to assume,
+            # so show the whole complex's list. Scoped to --routes, since a
             # station can carry real service (e.g. F, G) with nothing to do
             # with this analysis, and showing it here would be just as much
             # noise as the 2,3,4,5 at Atlantic Av (never part of --routes, so
@@ -1302,11 +1301,30 @@ def one_seat_rides(
     for s in individual_stations:
         platforms_by_complex.setdefault(s.complex_id, []).append(s)
 
-    def dest_platforms(dest: Station) -> list[Station]:
-        return platforms_by_complex.get(dest.complex_id, [dest])
-
     def dest_points(dest: Station) -> list[tuple[float, float]]:
-        return [(s.lat, s.lon) for s in dest_platforms(dest)]
+        return [
+            (s.lat, s.lon) for s in platforms_by_complex.get(dest.complex_id, [dest])
+        ]
+
+    routes_by_line: dict[str, set[str]] = {}
+    for s in individual_stations:
+        routes_by_line.setdefault(s.line, set()).update(s.routes)
+
+    # For an origin with no primary route of its own (e.g. an R-only
+    # station), which primary routes are assumed reachable anyway: whichever
+    # primary routes run on the same physical line the origin's own
+    # non-primary route does (e.g. R's 4th Av line also carries D, N). A
+    # rider whose real service is slower than that is assumed to have
+    # already ridden the faster one instead, wherever it also reaches the
+    # destination -- see its use for close `xfer` rows below.
+    origin_express_partners: dict[int, set[str]] = {
+        cid: {
+            route
+            for s in platforms_by_complex.get(cid, [])
+            for route in routes_by_line.get(s.line, set()) & primary_routes_set
+        }
+        for cid in origin_ids
+    }
 
     # Candidate points for the nearest-other-trunk search, system-wide (not
     # restricted to any borough): straight-line distance is already the
@@ -1348,25 +1366,6 @@ def one_seat_rides(
             for clat, clon in candidates
         )
 
-    def nearest_platform(
-        platforms: list[Station], candidates: list[tuple[float, float]]
-    ) -> tuple[Station, float] | None:
-        if not candidates or not platforms:
-            return None
-        return min(
-            (
-                (
-                    s,
-                    min(
-                        haversine_m(s.lat, s.lon, clat, clon)
-                        for clat, clon in candidates
-                    ),
-                )
-                for s in platforms
-            ),
-            key=operator.itemgetter(1),
-        )
-
     results: list[ScenarioResult] = []
     for sdef in scenario_defs:
         result = run_scenario(
@@ -1383,9 +1382,8 @@ def one_seat_rides(
             trunk_b_points=trunk_b_points,
             assigned_points=assigned_points,
             dest_points=dest_points,
-            dest_platforms=dest_platforms,
             min_dist_to_points=min_dist_to_points,
-            nearest_platform=nearest_platform,
+            origin_express_partners=origin_express_partners,
             close_threshold_m=close_threshold_m,
             origin_corridor_a_routes_set=origin_corridor_a_routes_set,
             origin_corridor_b_routes_set=origin_corridor_b_routes_set,
