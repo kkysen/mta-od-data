@@ -1,6 +1,6 @@
-# 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R)
+# 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av (2,3,4,5,B,D,N,Q,R)
 
-Scenario: average weekday ridership (35 distinct days in the data) on trains originating at stations served by B,D,N,Q,R, south of Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R), with destinations north of it (i.e. trips that cross the junction).
+Scenario: average weekday ridership (35 distinct days in the data) on trains originating at stations served by B,D,N,Q,R, south of Atlantic Av (2,3,4,5,B,D,N,Q,R), with destinations north of it (i.e. trips that cross the junction).
 
 Produced by `mta-od-data analyze one-seat-rides --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md`.
 
@@ -33,28 +33,28 @@ Average weekday ridership is the same 152,882/weekday across every scenario belo
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 722 | 0.47% | 1.16% | 1-seat | True | 0m | Kings Hwy (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 2 | 548 | 0.36% | 0.88% | 1-seat | True | 0m | 36 St (D,N,R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 2 | 548 | 0.36% | 0.88% | 1-seat | True | 0m | 36 St (D,N,R) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 3 | 530 | 0.35% | 0.85% | 1-seat | False | 867m | 7 Av (B,Q) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 | 4 | 471 | 0.31% | 0.75% | 1-seat | True | 0m | Church Av (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 5 | 444 | 0.29% | 0.71% | 1-seat | True | 0m | Church Av (B,Q) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 5 | 444 | 0.29% | 0.71% | 1-seat | True | 0m | Church Av (B,Q) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 6 | 439 | 0.29% | 0.70% | 1-seat | True | 0m | Kings Hwy (B,Q) → DeKalb Av (B,Q,R) |
 | 7 | 429 | 0.28% | 0.69% | 1-seat | False | 518m | 8 Av (N) → Canal St (6,J,Z,N,Q,R,W) |
 | 8 | 409 | 0.27% | 0.65% | 1-seat | True | 0m | Sheepshead Bay (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 9 | 400 | 0.26% | 0.64% | 1-seat | True | 0m | 59 St (N,R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 9 | 400 | 0.26% | 0.64% | 1-seat | True | 0m | 59 St (N,R) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 10 | 392 | 0.26% | 0.63% | 1-seat | True | 274m | Kings Hwy (B,Q) → 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
 | 11 | 390 | 0.26% | 0.63% | 1-seat | False | 867m | Church Av (B,Q) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 | 12 | 382 | 0.25% | 0.61% | 1-seat | True | 0m | Church Av (B,Q) → DeKalb Av (B,Q,R) |
 | 13 | 347 | 0.23% | 0.56% | 1-seat | True | 191m | Kings Hwy (B,Q) → 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
 | 14 | 332 | 0.22% | 0.53% | 1-seat | True | 0m | Newkirk Plaza (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 15 | 330 | 0.22% | 0.53% | 1-seat | False | 565m | 79 St (D) → Grand St (B,D) |
-| 16 | 328 | 0.21% | 0.53% | 1-seat | True | 191m | Church Av (B,Q) → Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
-| 17 | 325 | 0.21% | 0.52% | 1-seat | True | 0m | Kings Hwy (B,Q) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 16 | 328 | 0.21% | 0.53% | 1-seat | True | 191m | Church Av (B,Q) → Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,W,S) |
+| 17 | 325 | 0.21% | 0.52% | 1-seat | True | 0m | Kings Hwy (B,Q) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 18 | 320 | 0.21% | 0.51% | 1-seat | True | 0m | 7 Av (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 19 | 317 | 0.21% | 0.51% | 1-seat | True | 0m | Sheepshead Bay (B,Q) → DeKalb Av (B,Q,R) |
 | 20 | 310 | 0.20% | 0.50% | 1-seat | False | 565m | Bay Pkwy (D) → Grand St (B,D) |
-| 21 | 310 | 0.20% | -- | xfer | True | 0m | 86 St (R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
-| 22 | 306 | 0.20% | 0.49% | 1-seat | True | 0m | 8 Av (N) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
-| 23 | 306 | 0.20% | 0.49% | 1-seat | True | 191m | Kings Hwy (B,Q) → Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
+| 21 | 310 | 0.20% | -- | xfer | True | 0m | 86 St (R) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
+| 22 | 306 | 0.20% | 0.49% | 1-seat | True | 0m | 8 Av (N) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
+| 23 | 306 | 0.20% | 0.49% | 1-seat | True | 191m | Kings Hwy (B,Q) → Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,W,S) |
 | 24 | 304 | 0.20% | 0.49% | 1-seat | True | 0m | 36 St (D,N,R) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 25 | 304 | 0.20% | 0.49% | 1-seat | False | 867m | Prospect Park (B,Q,S) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 
@@ -65,16 +65,16 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 62,425/we
 | Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
 | 9,376 | 83.5% | 12.55% | 100% | 0m | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 8,565 | 78.5% | 10.77% | 100% | 0m | Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 8,565 | 78.5% | 10.77% | 100% | 0m | Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 6,250 | 73.0% | 7.30% | 0% | 867m | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 | 5,768 | 76.1% | 7.03% | 0% | 518m | Canal St (6,J,Z,N,Q,R,W) |
-| 6,000 | 71.9% | 6.91% | 100% | 191m | Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
+| 6,000 | 71.9% | 6.91% | 100% | 191m | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,W,S) |
 | 5,521 | 64.3% | 5.69% | 0% | 565m | Grand St (B,D) |
 | 5,513 | 55.2% | 4.87% | 100% | 0m | DeKalb Av (B,Q,R) |
 | 4,179 | 65.7% | 4.40% | 100% | 274m | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
 | 3,476 | 69.4% | 3.86% | 100% | 191m | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
 | 2,167 | 81.3% | 2.82% | 100% | 217m | 57 St-7 Av (N,Q,R,W) |
-| 3,612 | 44.6% | 2.58% | 100% | 0m | Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) |
+| 3,612 | 44.6% | 2.58% | 100% | 0m | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) |
 | 2,413 | 65.9% | 2.55% | 100% | 166m | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
 | 3,283 | 48.3% | 2.54% | 100% | 0m | Jay St-MetroTech (A,C,F,R) |
 | 2,444 | 60.5% | 2.37% | 0% | 699m | W 4 St-Wash Sq (A,C,E,B,D,F,M) |
@@ -110,28 +110,28 @@ Deinterlining scenario: 4 Av express served by B,D; Brighton served by N,Q (each
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 722 | 0.47% | 1.37% | 1-seat | -- | -- | Kings Hwy (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 2 | 548 | 0.36% | 1.04% | 1-seat | -- | -- | 36 St (D,N,R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 2 | 548 | 0.36% | 1.04% | 1-seat | -- | -- | 36 St (D,N,R) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 3 | 530 | 0.35% | 1.01% | 1-seat | -- | -- | 7 Av (B,Q) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 | 4 | 471 | 0.31% | 0.89% | 1-seat | -- | -- | Church Av (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 5 | 444 | 0.29% | 0.84% | 1-seat | -- | -- | Church Av (B,Q) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 5 | 444 | 0.29% | 0.84% | 1-seat | -- | -- | Church Av (B,Q) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 6 | 439 | 0.29% | 0.83% | 1-seat | -- | -- | Kings Hwy (B,Q) → DeKalb Av (B,Q,R) |
 | 7 | 429 | 0.28% | -- | xfer | False | 518m | 8 Av (N) → Canal St (6,J,Z,N,Q,R,W) |
 | 8 | 409 | 0.27% | 0.77% | 1-seat | -- | -- | Sheepshead Bay (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 9 | 400 | 0.26% | 0.76% | 1-seat | -- | -- | 59 St (N,R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 9 | 400 | 0.26% | 0.76% | 1-seat | -- | -- | 59 St (N,R) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 10 | 392 | 0.26% | -- | xfer | True | 274m | Kings Hwy (B,Q) → 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
 | 11 | 390 | 0.26% | 0.74% | 1-seat | -- | -- | Church Av (B,Q) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 | 12 | 382 | 0.25% | 0.73% | 1-seat | -- | -- | Church Av (B,Q) → DeKalb Av (B,Q,R) |
 | 13 | 347 | 0.23% | -- | xfer | True | 191m | Kings Hwy (B,Q) → 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
 | 14 | 332 | 0.22% | 0.63% | 1-seat | -- | -- | Newkirk Plaza (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 15 | 330 | 0.22% | 0.63% | 1-seat | -- | -- | 79 St (D) → Grand St (B,D) |
-| 16 | 328 | 0.21% | 0.62% | 1-seat | -- | -- | Church Av (B,Q) → Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
-| 17 | 325 | 0.21% | 0.62% | 1-seat | -- | -- | Kings Hwy (B,Q) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 16 | 328 | 0.21% | 0.62% | 1-seat | -- | -- | Church Av (B,Q) → Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,W,S) |
+| 17 | 325 | 0.21% | 0.62% | 1-seat | -- | -- | Kings Hwy (B,Q) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 18 | 320 | 0.21% | 0.61% | 1-seat | -- | -- | 7 Av (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 19 | 317 | 0.21% | 0.60% | 1-seat | -- | -- | Sheepshead Bay (B,Q) → DeKalb Av (B,Q,R) |
 | 20 | 310 | 0.20% | 0.59% | 1-seat | -- | -- | Bay Pkwy (D) → Grand St (B,D) |
-| 21 | 310 | 0.20% | -- | xfer | True | 0m | 86 St (R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
-| 22 | 306 | 0.20% | 0.58% | 1-seat | -- | -- | 8 Av (N) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
-| 23 | 306 | 0.20% | 0.58% | 1-seat | -- | -- | Kings Hwy (B,Q) → Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
+| 21 | 310 | 0.20% | -- | xfer | True | 0m | 86 St (R) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
+| 22 | 306 | 0.20% | 0.58% | 1-seat | -- | -- | 8 Av (N) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
+| 23 | 306 | 0.20% | 0.58% | 1-seat | -- | -- | Kings Hwy (B,Q) → Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,W,S) |
 | 24 | 304 | 0.20% | 0.58% | 1-seat | -- | -- | 36 St (D,N,R) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 25 | 304 | 0.20% | 0.58% | 1-seat | -- | -- | Prospect Park (B,Q,S) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 
@@ -142,13 +142,13 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 52,723/we
 | Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
 | 9,376 | 83.5% | 14.86% | 100% | 0m | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 8,565 | 78.5% | 12.76% | 100% | 0m | Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 8,565 | 78.5% | 12.76% | 100% | 0m | Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 5,513 | 77.2% | 8.07% | 100% | 0m | DeKalb Av (B,Q,R) |
 | 5,521 | 62.6% | 6.56% | 0% | 606m | Grand St (B,D) |
 | 6,250 | 52.1% | 6.17% | 58% | 361m | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
-| 6,000 | 48.3% | 5.50% | 100% | 86m | Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
+| 6,000 | 48.3% | 5.50% | 100% | 86m | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,W,S) |
 | 5,768 | 37.9% | 4.15% | 36% | 333m | Canal St (6,J,Z,N,Q,R,W) |
-| 3,612 | 44.6% | 3.06% | 0% | 1044m | Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) |
+| 3,612 | 44.6% | 3.06% | 0% | 1044m | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) |
 | 3,283 | 48.3% | 3.01% | 0% | 387m | Jay St-MetroTech (A,C,F,R) |
 | 4,179 | 34.1% | 2.70% | 100% | 274m | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
 | 3,476 | 38.7% | 2.55% | 100% | 191m | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
@@ -187,28 +187,28 @@ Deinterlining scenario: 4 Av express served by N,Q; Brighton served by B,D (each
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 722 | 0.47% | 1.47% | 1-seat | -- | -- | Kings Hwy (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 2 | 548 | 0.36% | 1.11% | 1-seat | -- | -- | 36 St (D,N,R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 2 | 548 | 0.36% | 1.11% | 1-seat | -- | -- | 36 St (D,N,R) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 3 | 530 | 0.35% | -- | xfer | False | 867m | 7 Av (B,Q) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 | 4 | 471 | 0.31% | 0.96% | 1-seat | -- | -- | Church Av (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 5 | 444 | 0.29% | 0.90% | 1-seat | -- | -- | Church Av (B,Q) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 5 | 444 | 0.29% | 0.90% | 1-seat | -- | -- | Church Av (B,Q) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 6 | 439 | 0.29% | 0.89% | 1-seat | -- | -- | Kings Hwy (B,Q) → DeKalb Av (B,Q,R) |
 | 7 | 429 | 0.28% | 0.87% | 1-seat | -- | -- | 8 Av (N) → Canal St (6,J,Z,N,Q,R,W) |
 | 8 | 409 | 0.27% | 0.83% | 1-seat | -- | -- | Sheepshead Bay (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 9 | 400 | 0.26% | 0.81% | 1-seat | -- | -- | 59 St (N,R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 9 | 400 | 0.26% | 0.81% | 1-seat | -- | -- | 59 St (N,R) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 10 | 392 | 0.26% | 0.80% | 1-seat | -- | -- | Kings Hwy (B,Q) → 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
 | 11 | 390 | 0.26% | -- | xfer | False | 867m | Church Av (B,Q) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 | 12 | 382 | 0.25% | 0.78% | 1-seat | -- | -- | Church Av (B,Q) → DeKalb Av (B,Q,R) |
 | 13 | 347 | 0.23% | 0.71% | 1-seat | -- | -- | Kings Hwy (B,Q) → 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
 | 14 | 332 | 0.22% | 0.67% | 1-seat | -- | -- | Newkirk Plaza (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 15 | 330 | 0.22% | -- | xfer | False | 565m | 79 St (D) → Grand St (B,D) |
-| 16 | 328 | 0.21% | -- | xfer | True | 191m | Church Av (B,Q) → Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
-| 17 | 325 | 0.21% | 0.66% | 1-seat | -- | -- | Kings Hwy (B,Q) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 16 | 328 | 0.21% | -- | xfer | True | 191m | Church Av (B,Q) → Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,W,S) |
+| 17 | 325 | 0.21% | 0.66% | 1-seat | -- | -- | Kings Hwy (B,Q) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 18 | 320 | 0.21% | 0.65% | 1-seat | -- | -- | 7 Av (B,Q) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 19 | 317 | 0.21% | 0.64% | 1-seat | -- | -- | Sheepshead Bay (B,Q) → DeKalb Av (B,Q,R) |
 | 20 | 310 | 0.20% | -- | xfer | False | 565m | Bay Pkwy (D) → Grand St (B,D) |
-| 21 | 310 | 0.20% | -- | xfer | True | 0m | 86 St (R) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
-| 22 | 306 | 0.20% | 0.62% | 1-seat | -- | -- | 8 Av (N) → Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
-| 23 | 306 | 0.20% | -- | xfer | True | 191m | Kings Hwy (B,Q) → Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
+| 21 | 310 | 0.20% | -- | xfer | True | 0m | 86 St (R) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
+| 22 | 306 | 0.20% | 0.62% | 1-seat | -- | -- | 8 Av (N) → Atlantic Av (2,3,4,5,B,D,N,Q,R) |
+| 23 | 306 | 0.20% | -- | xfer | True | 191m | Kings Hwy (B,Q) → Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,W,S) |
 | 24 | 304 | 0.20% | 0.62% | 1-seat | -- | -- | 36 St (D,N,R) → 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 25 | 304 | 0.20% | -- | xfer | False | 867m | Prospect Park (B,Q,S) → 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
 
@@ -219,13 +219,13 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 49,180/we
 | Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
 | 9,376 | 83.5% | 15.93% | 100% | 0m | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 8,565 | 78.5% | 13.68% | 100% | 0m | Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) |
+| 8,565 | 78.5% | 13.68% | 100% | 0m | Atlantic Av (2,3,4,5,B,D,N,Q,R) |
 | 5,513 | 77.2% | 8.65% | 100% | 0m | DeKalb Av (B,Q,R) |
 | 5,768 | 48.4% | 5.67% | 30% | 362m | Canal St (6,J,Z,N,Q,R,W) |
 | 4,179 | 50.4% | 4.29% | 100% | 274m | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
-| 6,000 | 34.7% | 4.24% | 100% | 131m | Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) |
+| 6,000 | 34.7% | 4.24% | 100% | 131m | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,W,S) |
 | 6,250 | 29.7% | 3.78% | 29% | 617m | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
-| 3,612 | 44.6% | 3.28% | 0% | 1104m | Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) |
+| 3,612 | 44.6% | 3.28% | 0% | 1104m | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) |
 | 3,476 | 46.1% | 3.26% | 100% | 191m | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
 | 3,283 | 48.3% | 3.22% | 0% | 387m | Jay St-MetroTech (A,C,F,R) |
 | 5,521 | 27.0% | 3.03% | 0% | 586m | Grand St (B,D) |
