@@ -11,7 +11,7 @@ class Region:
     contains: Callable[[Station], bool]
 
 
-def borough_region(name: str, boroughs: set[str]) -> Region:
+def borough_region(name: str, boroughs: frozenset[str]) -> Region:
     return Region(name=name, contains=lambda s: s.borough in boroughs)
 
 
@@ -72,12 +72,12 @@ class RegionPreset(StrEnum):
 
 # Borough codes as given by the source data (stations_complexes.csv/
 # stations_individual.csv's `borough` column).
-PRESET_BOROUGH_CODES: dict[RegionPreset, set[str]] = {
-    RegionPreset.MANHATTAN: {"M"},
-    RegionPreset.BROOKLYN: {"Bk"},
-    RegionPreset.QUEENS: {"Q"},
-    RegionPreset.BRONX: {"Bx"},
-    RegionPreset.STATEN_ISLAND: {"SI"},
+PRESET_BOROUGH_CODES: dict[RegionPreset, frozenset[str]] = {
+    RegionPreset.MANHATTAN: frozenset({"M"}),
+    RegionPreset.BROOKLYN: frozenset({"Bk"}),
+    RegionPreset.QUEENS: frozenset({"Q"}),
+    RegionPreset.BRONX: frozenset({"Bx"}),
+    RegionPreset.STATEN_ISLAND: frozenset({"SI"}),
 }
 
 PRESET_LABELS: dict[RegionPreset, str] = {
