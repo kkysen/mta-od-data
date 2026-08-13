@@ -75,7 +75,7 @@ deinterlining scenarios entirely (different junction, different trunk
 pairs) — run `--help` for the full list, or see the module docstring for
 worked examples.
 
-### `mta-od-data analyze region-flow`
+### `mta-od-data analyze regional-flow`
 
 A more general question than `one-seat-rides`: for any region, what share of
 riders enter it from outside, leave it for outside, stay entirely within it,
@@ -86,7 +86,7 @@ region, using `--region`/`--region-borough`/`--region-bbox` (see
 [How regions are defined](#how-regions-are-defined) below).
 
 ```
-uv run mta-od-data analyze region-flow --region cbd
+uv run mta-od-data analyze regional-flow --region cbd
 ```
 
 Defaults to `cbd`: Manhattan's Congestion Relief Zone, i.e. "Lower
@@ -125,7 +125,7 @@ St). Same `--csv-out`/`--markdown-out` options as `one-seat-rides`.
 
 ## How regions are defined
 
-`region-flow`'s `Region` abstraction (`src/mta_od_data/analyze/regions.py`)
+`regional-flow`'s `Region` abstraction (`src/mta_od_data/analyze/regions.py`)
 is just a name plus a predicate over a station, so its containment test can
 be backed by whatever's available for a given region — currently:
 

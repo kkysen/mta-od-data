@@ -38,7 +38,7 @@ class FlowRow:
 
 
 @dataclass(slots=True)
-class RegionFlowResult:
+class RegionalFlowResult:
     region_name: str
     total_riders: float
     in_in: float
@@ -51,7 +51,7 @@ class RegionFlowResult:
         return 100 * riders / self.total_riders if self.total_riders else float("nan")
 
     def print_headline(self, *, day_type: DayType) -> None:
-        print(f"\n=== Region flow: {self.region_name} ===")
+        print(f"\n=== Regional flow: {self.region_name} ===")
         print(f"Average {day_type} ridership: {self.total_riders:,.0f}")
         print(
             f"Outside -> Inside  (entering the region):   "
@@ -126,6 +126,7 @@ def resolve_region(
     region_borough: str | None,
     region_bbox: str | None,
     region_label: str | None,
+    valid_boroughs: set[str],
 ) -> Region:
     if region_borough is not None and region_bbox is not None:
         print(
@@ -135,6 +136,14 @@ def resolve_region(
         raise SystemExit(1)
     if region_borough is not None:
         boroughs = {b.strip() for b in region_borough.split(",") if b.strip()}
+        unknown = boroughs - valid_boroughs
+        if unknown:
+            print(
+                f"error: --region-borough has unknown code(s) {sorted(unknown)} -- "
+                f"valid codes are {sorted(valid_boroughs)}",
+                file=sys.stderr,
+            )
+            raise SystemExit(1)
         label = (
             region_label or f"custom region (boroughs: {','.join(sorted(boroughs))})"
         )
@@ -158,8 +167,8 @@ def write_csv(path: Path, rows: list[FlowRow]) -> None:
     print(f"\nWrote {len(rows):,} rows to {path}")
 
 
-@app.command(name="region-flow")
-def region_flow(
+@app.command(name="regional-flow")
+def regional_flow(
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
     stations: Annotated[Path, Option()] = DATA / "stations_complexes.csv",
     day_type: Annotated[DayType, Option()] = DayType.WEEKDAY,
@@ -220,35 +229,45 @@ def region_flow(
     \b
     Examples:
         # Default: Lower Manhattan (below 60th St / Congestion Relief Zone)
-        mta-od-data analyze region-flow
+        mta-od-data analyze regional-flow
 
     \b
         # A whole borough instead
-        mta-od-data analyze region-flow --region brooklyn
+        mta-od-data analyze regional-flow --region brooklyn
 
     \b
         # A custom region: two boroughs at once
-        mta-od-data analyze region-flow --region-borough M,Bk \\
+        mta-od-data analyze regional-flow --region-borough M,Bk \\
             --region-label "Manhattan + Brooklyn"
 
     \b
         # A custom lat/lon bounding box (e.g. roughly Midtown Manhattan)
-        mta-od-data analyze region-flow \\
+        mta-od-data analyze regional-flow \\
             --region-bbox 40.744,-74.005,40.771,-73.968 \\
             --region-label "Midtown Manhattan"
     """
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
     )
+    stations_by_id = Station.load_complexes(stations)
+    valid_boroughs = {s.borough for s in stations_by_id.values()}
     region_def = resolve_region(
         preset=region,
         region_borough=region_borough,
         region_bbox=region_bbox,
         region_label=region_label,
+        valid_boroughs=valid_boroughs,
     )
 
-    stations_by_id = Station.load_complexes(stations)
     n_inside = sum(1 for s in stations_by_id.values() if region_def.contains(s))
+    if n_inside == 0:
+        print(
+            f"error: region {region_def.name!r} matches 0 of "
+            f"{len(stations_by_id)} stations -- check "
+            "--region/--region-borough/--region-bbox",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
     print(f"Region: {region_def.name} ({n_inside} of {len(stations_by_id)} stations)")
     print(f"Day filter: {days_list if days_list else 'all days'}")
 
@@ -320,19 +339,23 @@ def region_flow(
         else:
             out_out += riders
 
+        # Bare names, not `display()` -- the route(s) a rider actually used
+        # aren't knowable here the way `one_seat_rides` narrows them (there's
+        # no route universe to narrow against), so showing a merged complex's
+        # full route list would just be noise for a region-boundary question.
         rows.append(
             FlowRow(
                 origin_id=origin_id,
-                origin_name=origin.display(),
+                origin_name=origin.name,
                 dest_id=dest_id,
-                dest_name=dest.display(),
+                dest_name=dest.name,
                 riders=riders,
                 origin_in=origin_in,
                 dest_in=dest_in,
             )
         )
 
-    result = RegionFlowResult(
+    result = RegionalFlowResult(
         region_name=region_def.name,
         total_riders=total_riders,
         in_in=in_in,
@@ -349,7 +372,7 @@ def region_flow(
     if markdown_out:
         produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
         preamble_lines = [
-            f"# Region flow: {result.region_name}",
+            f"# Regional flow: {result.region_name}",
             "",
             f"Scenario: average {day_type} ridership ({n_distinct_days} distinct "
             f"days in the data), every origin/destination pair classified by "
