@@ -98,32 +98,23 @@ class RegionalFlowResult:
         lines.append("")
         lines.append(f"Total: {self.total_riders:,.0f} riders/{day_type}")
         lines.append("")
-        lines.append("| Flow | Description | Riders | % Total |")
-        lines.append("| --- | --- | --- | --- |")
+        lines.append("| Flow | Riders | % Total |")
+        lines.append("| --- | --- | --- |")
         lines.append(
-            f"| Outside -> Inside | Entering the region | {self.out_in:,.0f} | "
-            f"{self.pct(self.out_in):.1f}% |"
+            f"| Outside -> Inside | {self.out_in:,.0f} | {self.pct(self.out_in):.1f}% |"
         )
         lines.append(
-            f"| Inside -> Outside | Leaving the region | {self.in_out:,.0f} | "
-            f"{self.pct(self.in_out):.1f}% |"
+            f"| Inside -> Outside | {self.in_out:,.0f} | {self.pct(self.in_out):.1f}% |"
         )
         lines.append(
-            f"| Inside -> Inside | Internal to the region | {self.in_in:,.0f} | "
-            f"{self.pct(self.in_in):.1f}% |"
+            f"| Inside -> Inside | {self.in_in:,.0f} | {self.pct(self.in_in):.1f}% |"
         )
         lines.append(
-            f"| Outside -> Outside | Never touches the region | "
-            f"{self.out_out:,.0f} | {self.pct(self.out_out):.1f}% |"
+            f"| Outside -> Outside | {self.out_out:,.0f} | "
+            f"{self.pct(self.out_out):.1f}% |"
         )
-        lines.append(
-            f"| **Inter** | Crosses the boundary, either direction | "
-            f"{self.inter:,.0f} | {self.pct(self.inter):.1f}% |"
-        )
-        lines.append(
-            f"| **Intra** | Same side throughout, either side | "
-            f"{self.intra:,.0f} | {self.pct(self.intra):.1f}% |"
-        )
+        lines.append(f"| **Inter** | {self.inter:,.0f} | {self.pct(self.inter):.1f}% |")
+        lines.append(f"| **Intra** | {self.intra:,.0f} | {self.pct(self.intra):.1f}% |")
         lines.append("")
 
         lines.append(f"## Top {top_n} origin/destination pairs")
