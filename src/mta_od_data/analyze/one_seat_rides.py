@@ -4,6 +4,7 @@ import sys
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from datetime import date
+from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -13,7 +14,6 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
-    Coord,
     DayType,
     Station,
     haversine_m,
@@ -406,6 +406,7 @@ def run_scenario(
     routes_set: set[str],
     primary_routes_set: set[str],
     min_dist_to_corridor: Callable[[Station, set[str]], tuple[float, Station]],
+    cached_display: Callable[[Station, set[str]], str],
     origin_express_partners: dict[int, set[str]],
     close_threshold_m: float,
     origin_corridor_a_routes_set: set[str],
@@ -558,13 +559,13 @@ def run_scenario(
             # since almost every destination has some xfer riders).
             ridden_routes = prefer_primary(shared, primary_routes_set)
             dest_route_union.setdefault(dest_id, set()).update(ridden_routes)
-            dest_name = dest.display(ridden_routes)
-            origin_name = origin.display(ridden_routes)
+            dest_name = cached_display(dest, ridden_routes)
+            origin_name = cached_display(origin, ridden_routes)
         elif xfer_applicable_routes:
             dest_route_union.setdefault(dest_id, set()).update(xfer_applicable_routes)
-            dest_name = dest.display(xfer_applicable_routes)
-            origin_name = origin.display(
-                effective_origin_routes[origin_id] & routes_set
+            dest_name = cached_display(dest, xfer_applicable_routes)
+            origin_name = cached_display(
+                origin, effective_origin_routes[origin_id] & routes_set
             )
         else:
             # No specific same-complex route to assume (see `dist_m == 0.0`
@@ -580,15 +581,15 @@ def run_scenario(
             # would be just as much noise as the 2,3,4,5 at Atlantic Av
             # (never part of --routes, so never a route any of these trips
             # could have used).
-            dest_name = dest.display(
-                prefer_primary(dest.routes & routes_set, primary_routes_set)
+            dest_name = cached_display(
+                dest, prefer_primary(dest.routes & routes_set, primary_routes_set)
             )
-            origin_name = origin.display(
-                effective_origin_routes[origin_id] & routes_set
+            origin_name = cached_display(
+                origin, effective_origin_routes[origin_id] & routes_set
             )
 
         near_station_name = (
-            near_station.display(near_station.routes & routes_set)
+            cached_display(near_station, near_station.routes & routes_set)
             if near_station
             else None
         )
@@ -626,7 +627,9 @@ def run_scenario(
         dest_station = stations_by_id[r.dest_id]
         arrival_routes = dest_route_union.get(r.dest_id)
         dest_display_name = (
-            dest_station.display(arrival_routes) if arrival_routes else r.dest_name
+            cached_display(dest_station, arrival_routes)
+            if arrival_routes
+            else r.dest_name
         )
         d = dest_stats.setdefault(r.dest_id, DestStats(name=dest_display_name))
         d.total += r.riders
@@ -1188,22 +1191,20 @@ def one_seat_rides(
     # already seen. But two different (dest, routes) combinations can still
     # share individual point pairs (e.g. their candidate stations overlap
     # even though the route sets differ), which `min_dist_cache` alone
-    # doesn't catch -- `haversine_cache` catches that layer too. Measured on
-    # the default DeKalb scenario: 2.19M raw haversine calls collapse to
-    # ~240K sweep-level cache misses, which collapse further to the ~39K
-    # individual point pairs actually distinct -- a combined ~56x reduction
-    # in real distance computations, with results unchanged since the
-    # underlying math is identical either way.
+    # doesn't catch -- `cached_haversine` below catches that layer too.
+    # Measured on the default DeKalb scenario: 2.19M raw haversine calls
+    # collapse to ~240K sweep-level cache misses, which collapse further to
+    # the ~39K individual point pairs actually distinct -- a combined ~56x
+    # reduction in real distance computations, with results unchanged since
+    # the underlying math is identical either way.
     min_dist_cache: dict[tuple[int, frozenset[str]], tuple[float, Station]] = {}
-    haversine_cache: dict[tuple[Coord, Coord], float] = {}
-
-    def cached_haversine(c1: Coord, c2: Coord) -> float:
-        key = (c1, c2)
-        dist_m = haversine_cache.get(key)
-        if dist_m is None:
-            dist_m = haversine_m(c1, c2)
-            haversine_cache[key] = dist_m
-        return dist_m
+    # `Coord` (unlike `Station`, whose `routes: set[str]` field keeps it
+    # unhashable even though frozen) has no unhashable fields, so its two
+    # arguments need no normalizing before caching -- a plain `lru_cache`
+    # applies directly, and measured slightly faster than an equivalent
+    # manual dict (the C-implemented cache lookup beats the same logic
+    # written in Python bytecode).
+    cached_haversine = lru_cache(maxsize=None)(haversine_m)
 
     def min_dist_to_corridor(
         dest: Station, assigned_routes: set[str]
@@ -1234,6 +1235,31 @@ def one_seat_rides(
         min_dist_cache[cache_key] = best
         return best
 
+    # Same redundancy pattern as the distance search, worse: every row needs
+    # up to three of these (origin/dest/near-station names), and the same
+    # station with the same route set recurs constantly -- a handful of busy
+    # destinations (Grand Central, Times Sq, ...) account for a large share
+    # of all rows. Measured on the default DeKalb scenario: 138K calls
+    # collapse to ~640 distinct (station, routes) combinations, a ~216x
+    # reduction. Keyed on (name, routes), exactly `display()`'s own inputs
+    # -- not `complex_id` (which `min_dist_cache` above uses safely, but
+    # `display()` doesn't take a complex as input, it takes a name: a
+    # complex and one of its own individual per-platform stations share a
+    # `complex_id` but can have different `name`s, e.g. the merged complex
+    # "Chambers St/WTC/Park Pl/Cortlandt St" versus its own "Cortlandt St"
+    # platform, so keying on `complex_id` would wrongly conflate their two
+    # different display strings).
+    display_cache: dict[tuple[str, frozenset[str]], str] = {}
+
+    def cached_display(station: Station, routes: set[str] | None = None) -> str:
+        shown_routes = station.routes if routes is None else routes
+        key = (station.name, frozenset(shown_routes))
+        cached = display_cache.get(key)
+        if cached is None:
+            cached = station.display(routes)
+            display_cache[key] = cached
+        return cached
+
     results: list[ScenarioResult] = []
     for sdef in scenario_defs:
         result = run_scenario(
@@ -1245,6 +1271,7 @@ def one_seat_rides(
             routes_set=routes_set,
             primary_routes_set=primary_routes_set,
             min_dist_to_corridor=min_dist_to_corridor,
+            cached_display=cached_display,
             origin_express_partners=origin_express_partners,
             close_threshold_m=close_threshold_m,
             origin_corridor_a_routes_set=origin_corridor_a_routes_set,
