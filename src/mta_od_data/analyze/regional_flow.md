@@ -1,6 +1,6 @@
 # Regional flow: Lower Manhattan (below 60th St / Congestion Relief Zone)
 
-Scenario: average weekday ridership (35 distinct days in the data), every origin/destination pair classified by whether each end falls inside Lower Manhattan (below 60th St / Congestion Relief Zone).
+Scenario: average weekday ridership (35 distinct days in the data, 2024-01-08 to 2024-07-12), every origin/destination pair classified by whether each end falls inside Lower Manhattan (below 60th St / Congestion Relief Zone).
 
 Produced by `mta-od-data analyze regional-flow --markdown-out src/mta_od_data/analyze/regional_flow.md`.
 
