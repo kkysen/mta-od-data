@@ -134,13 +134,8 @@ class DestStats:
     name: str
     total: float = 0.0
     one_seat: float = 0.0
-    # Close/dist tracked separately per row `Type`, since the two mean
-    # different things (close to the *other* trunk for `1-seat` rows, close
-    # to the origin's *own* routes/assigned trunk for `xfer` rows) and a
-    # destination can have rows of both types.
-    one_seat_classified: float = 0.0
-    one_seat_close: float = 0.0
-    one_seat_dist_weighted: float = 0.0
+    # `1-seat` rows are always close/0m by construction (see `run_scenario`),
+    # so only `xfer` rows carry any real close/dist signal worth tracking.
     many_seat_classified: float = 0.0
     many_seat_close: float = 0.0
     many_seat_dist_weighted: float = 0.0
@@ -148,22 +143,6 @@ class DestStats:
     @property
     def one_seat_pct(self) -> float:
         return 100 * self.one_seat / self.total
-
-    @property
-    def one_seat_close_pct(self) -> float | None:
-        return (
-            100 * self.one_seat_close / self.one_seat_classified
-            if self.one_seat_classified
-            else None
-        )
-
-    @property
-    def one_seat_avg_dist_m(self) -> float | None:
-        return (
-            self.one_seat_dist_weighted / self.one_seat_classified
-            if self.one_seat_classified
-            else None
-        )
 
     @property
     def many_seat_close_pct(self) -> float | None:
@@ -189,8 +168,6 @@ class ScenarioResult:
     corridor_scenario_note: str | None
     total_riders: float
     one_seat_riders: float
-    classified_one_seat_riders: float
-    close_riders: float
     classified_many_seat_riders: float
     close_one_seat_riders: float
     effective_one_seat_riders: float
@@ -230,8 +207,6 @@ class ScenarioResult:
         show_label: bool,
         day_type: DayType,
         dest_side: str,
-        trunk_a_label: str,
-        trunk_b_label: str,
         close_threshold_m: float,
     ) -> None:
         if show_label:
@@ -266,14 +241,6 @@ class ScenarioResult:
                 f"Effective one-seat (direct + close): "
                 f"{self.effective_one_seat_riders:,.0f} "
                 f"({100 * self.effective_one_seat_riders / self.total_riders:.1f}%)"
-            )
-        if not self.corridor_scenario_active and self.classified_one_seat_riders:
-            pct = 100 * self.close_riders / self.classified_one_seat_riders
-            print(
-                f"Close to the other trunk if deinterlined "
-                f"({trunk_a_label} vs {trunk_b_label}): "
-                f"{self.close_riders:,.0f} of "
-                f"{self.classified_one_seat_riders:,.0f} one-seat riders ({pct:.1f}%)"
             )
 
     def print_details(
@@ -366,17 +333,6 @@ class ScenarioResult:
                 f"riders above, i.e. riders who wouldn't feel a materially worse "
                 f"trip{scenario_note}."
             )
-        # Not covered by the comparison table at any point (baseline-only,
-        # and not one of its columns even there), so always shown.
-        if not self.corridor_scenario_active and self.classified_one_seat_riders:
-            close_pct = 100 * self.close_riders / self.classified_one_seat_riders
-            headline.append(
-                f"- **Close to the other trunk if deinterlined: {close_pct:.1f}%** of "
-                f"one-seat riders ({self.close_riders:,.0f} of "
-                f"{self.classified_one_seat_riders:,.0f}) -- i.e. wouldn't need a "
-                f"materially longer walk/transfer even if the two trunks stopped "
-                f"interlining at the junction."
-            )
         if headline:
             lines.append(f"{h2} Headline numbers")
             lines.append("")
@@ -440,22 +396,13 @@ class ScenarioResult:
                 if self.one_seat_riders
                 else float("nan")
             )
-            # This table is scoped to one-seat ridership (see the sort/caption
-            # above), so its "Close?"/"Dist" columns stay scoped to one-seat
-            # pairs in baseline mode and many-seat pairs in scenario mode,
-            # matching whichever population `Type` can actually be non-`--`
-            # for in the per-pair table above.
-            close_pct = (
-                d.many_seat_close_pct
-                if self.corridor_scenario_active
-                else d.one_seat_close_pct
-            )
+            # `1-seat` rows are always close/0m by construction, so this
+            # table's "Close?"/"Dist" only carry a real signal from `xfer`
+            # rows -- scoped to that destination's classified `xfer` pairs,
+            # matching the per-pair table above.
+            close_pct = d.many_seat_close_pct
             close_str = "--" if close_pct is None else f"{close_pct:.0f}%"
-            avg_dist = (
-                d.many_seat_avg_dist_m
-                if self.corridor_scenario_active
-                else d.one_seat_avg_dist_m
-            )
+            avg_dist = d.many_seat_avg_dist_m
             dist_str = "--" if avg_dist is None else f"{avg_dist:.0f}m"
             lines.append(
                 f"| {d.total:,.0f} | {d.one_seat_pct:.1f}% | {pct_all_one_seat:.2f}% | "
@@ -553,10 +500,6 @@ def run_scenario(
     origin_ids: list[int],
     routes_set: set[str],
     primary_routes_set: set[str],
-    trunk_a_set: set[str],
-    trunk_b_set: set[str],
-    trunk_a_points: list[Coord],
-    trunk_b_points: list[Coord],
     assigned_points: Callable[[set[str]], list[Coord]],
     dest_points: Callable[[Station], list[Coord]],
     min_dist_to_points: Callable[[list[Coord], list[Coord]], float | None],
@@ -619,8 +562,6 @@ def run_scenario(
             )
 
     one_seat_riders = 0.0
-    classified_one_seat_riders = 0.0
-    close_riders = 0.0
     classified_many_seat_riders = 0.0
     close_one_seat_riders = 0.0
 
@@ -688,53 +629,18 @@ def run_scenario(
                 classified_many_seat_riders += riders
                 if close:
                     close_one_seat_riders += riders
-        elif is_one_seat and dest and corridor_scenario_active:
+        elif is_one_seat and dest:
             # The destination is a Complex ID in the source data, not a
             # specific platform -- so we have no way to tell which platform
-            # of a merged complex a rider actually used. `is_one_seat` here
-            # already means the scenario's assigned route stops somewhere in
-            # this same complex, which is the rider's real historical
+            # of a merged complex a rider actually used. `is_one_seat` means
+            # the origin's effective route (real routes in baseline, the
+            # scenario's assigned routes otherwise) already stops somewhere
+            # in this same complex, which is the rider's real historical
             # destination either way -- trivially close, no walk to model.
+            # Same calculation in every mode: unlike the `xfer` branch above,
+            # there's no candidate-point search to run, since a one-seat
+            # classification already proves the distance is 0.
             close, dist_m = True, 0.0
-        elif is_one_seat and dest:
-            # Baseline-only: of TODAY's one-seat riders, how many would stay
-            # close to the trunk they *don't* currently use if the junction
-            # were deinterlined generically -- a different question from the
-            # scenario-specific one above, so it doesn't apply once a
-            # specific corridor scenario is active.
-            if not (shared & primary_routes_set):
-                # This one-seat connection doesn't use any route that
-                # actually crosses the boundary junction (e.g. it's via R,
-                # which reaches Manhattan through the Montague St Tunnel and
-                # never goes near DeKalb/Atlantic). Deinterlining the
-                # junction can't affect a trip that never uses it, so this
-                # rider needs no extra walk/transfer either way -- trivially
-                # close.
-                close, dist_m = True, 0.0
-            else:
-                # Trunk membership is a property of the destination complex
-                # itself (what it's near/at), not of which specific shared
-                # route made this particular pair one-seat.
-                home_a = bool(dest_routes & trunk_a_set)
-                home_b = bool(dest_routes & trunk_b_set)
-                if home_a and home_b:
-                    # The destination already has routes from both groups
-                    # (e.g. a junction complex like Atlantic Av-Barclays Ctr
-                    # or DeKalb Av) -- trivially "at" the other trunk.
-                    close, dist_m = True, 0.0
-                elif home_a:
-                    dist_m = min_dist_to_points(dest_points(dest), trunk_b_points)
-                    close = None if dist_m is None else dist_m <= close_threshold_m
-                elif home_b:
-                    dist_m = min_dist_to_points(dest_points(dest), trunk_a_points)
-                    close = None if dist_m is None else dist_m <= close_threshold_m
-                # close/dist_m stay None only if the destination has neither
-                # trunk's routes at all -- no "other trunk" to speak of.
-
-            if close is not None:
-                classified_one_seat_riders += riders
-                if close:
-                    close_riders += riders
 
         if dest is None:
             dest_name = f"complex {dest_id}"
@@ -823,18 +729,12 @@ def run_scenario(
         d.total += r.riders
         if r.one_seat:
             d.one_seat += r.riders
-        if r.close is not None:
+        elif r.close is not None:
             assert r.dist_m is not None
-            if r.one_seat:
-                d.one_seat_classified += r.riders
-                d.one_seat_dist_weighted += r.riders * r.dist_m
-                if r.close:
-                    d.one_seat_close += r.riders
-            else:
-                d.many_seat_classified += r.riders
-                d.many_seat_dist_weighted += r.riders * r.dist_m
-                if r.close:
-                    d.many_seat_close += r.riders
+            d.many_seat_classified += r.riders
+            d.many_seat_dist_weighted += r.riders * r.dist_m
+            if r.close:
+                d.many_seat_close += r.riders
 
     corridor_scenario_note = None
     if corridor_scenario_active:
@@ -858,8 +758,6 @@ def run_scenario(
         corridor_scenario_note=corridor_scenario_note,
         total_riders=total_riders,
         one_seat_riders=one_seat_riders,
-        classified_one_seat_riders=classified_one_seat_riders,
-        close_riders=close_riders,
         classified_many_seat_riders=classified_many_seat_riders,
         close_one_seat_riders=close_one_seat_riders,
         effective_one_seat_riders=effective_one_seat_riders,
@@ -906,70 +804,29 @@ def render_scenario_comparison(results: list[ScenarioResult], day_type: DayType)
     return "\n".join(lines)
 
 
-def render_notes(
-    results: list[ScenarioResult],
-    *,
-    trunk_a_label: str,
-    trunk_b_label: str,
-    close_threshold_m: float,
-) -> str:
-    baseline_results = [r for r in results if not r.corridor_scenario_active]
-    scenario_results = [r for r in results if r.corridor_scenario_active]
-    both = bool(baseline_results) and bool(scenario_results)
-    lines: list[str] = ["## Notes on reading these tables", ""]
-    if baseline_results:
-        if both:
-            (baseline,) = baseline_results
-            lines.append(f'**"{baseline.label}"** (today\'s actual routing):')
-            lines.append("")
-        lines.append(
-            f'- "Close?"/"Dist" mean different things depending on `Type`. For '
-            f"`1-seat` rows: distance from the destination to the nearest "
-            f"station on the trunk *not* used to reach it one-seat "
-            f"({trunk_a_label} vs {trunk_b_label}) -- i.e. how exposed that "
-            f"one-seat ride is to a generic future deinterlining; `close`/`0m` "
-            f"covers destinations already served by both trunks, and one-seat "
-            f"connections that never actually cross the junction (via a route "
-            f"in the universe but not in `--primary-routes`) -- those can't be "
-            f"affected by deinterlining either way. For `xfer` rows (riders "
-            f"without a direct one-seat ride): distance to the nearest station "
-            f"on one of the origin's own routes -- a close `xfer` row is a "
-            f"*close one-seat ride*: no train change, just a short walk to the "
-            f"actual destination. Both thresholded at {close_threshold_m:.0f}m."
-        )
-        lines.append(
-            '- In the per-destination table, "Close?"/"Dist" cover only that '
-            "destination's classified *one-seat* pairs (ridership-weighted), "
-            "matching the table's one-seat focus -- see the CSV or the "
-            "per-pair table above for the `xfer` close/dist data."
-        )
-        lines.append("")
-    if scenario_results:
-        if both:
-            labels = " / ".join(f'"{r.label}"' for r in scenario_results)
-            lines.append(f"**{labels}** (deinterlining scenarios):")
-            lines.append("")
-        lines.append(
+def render_notes(*, close_threshold_m: float) -> str:
+    return "\n".join(
+        [
+            "## Notes on reading these tables",
+            "",
             '- "Close?"/"Dist" describe distance from the destination to the '
-            "nearest station on the trunk the origin's *own* corridor got "
-            f"assigned in that scenario, thresholded at {close_threshold_m:.0f}m, "
-            "for `xfer` rows -- riders without a direct one-seat ride under "
-            "the scenario. A close `xfer` row is a *close one-seat ride*: no "
-            "train change, just a short walk to the actual destination. "
-            "`1-seat` rows are always `close`/`0m`: the destination is a "
-            "Complex ID in the source data, not a specific platform, so "
-            "there's no way to tell which platform a rider actually used -- "
-            "the scenario's assigned route already stops somewhere in that "
-            "same complex, the rider's real historical destination either "
-            "way."
-        )
-        lines.append(
+            "nearest station on the origin's own effective corridor (real "
+            "routes in baseline, the scenario's assigned routes otherwise), "
+            f"thresholded at {close_threshold_m:.0f}m, for `xfer` rows -- "
+            "riders without a direct one-seat ride. A close `xfer` row is a "
+            "*close one-seat ride*: no train change, just a short walk to "
+            "the actual destination. `1-seat` rows are always `close`/`0m`: "
+            "the destination is a Complex ID in the source data, not a "
+            "specific platform, so there's no way to tell which platform a "
+            "rider actually used -- the effective route already stops "
+            "somewhere in that same complex, the rider's real historical "
+            "destination either way.",
             '- In the per-destination table, "Close?"/"Dist" are '
             "ridership-weighted across that destination's classified "
-            "many-seat pairs."
-        )
-        lines.append("")
-    return "\n".join(lines)
+            "`xfer` pairs.",
+            "",
+        ]
+    )
 
 
 @app.command()
@@ -1199,10 +1056,9 @@ def one_seat_rides(
     )
     if all_corridor_scenarios:
         # Only primary routes actually interline at the junction, so only
-        # they're swappable between corridors -- a non-primary route on
-        # --trunk-a/--trunk-b (e.g. R via --trunk-b for the baseline
-        # "close to the other trunk" metric) never moves and shouldn't be
-        # named in the swap label.
+        # they're swappable between corridors -- a non-primary route given
+        # on --trunk-a/--trunk-b never moves and shouldn't be named in the
+        # swap label.
         trunk_a_primary_set = trunk_a_set & primary_routes_set
         trunk_b_primary_set = trunk_b_set & primary_routes_set
         scenario_defs = [
@@ -1367,17 +1223,6 @@ def one_seat_rides(
         for cid in origin_ids
     }
 
-    # Candidate points for the nearest-other-trunk search, system-wide (not
-    # restricted to any borough): straight-line distance is already the
-    # approximation this whole script uses for "close" everywhere else, so
-    # there's no reason to special-case borough boundaries here too.
-    trunk_a_points = [
-        Coord(s.lat, s.lon) for s in individual_stations if s.routes & trunk_a_set
-    ]
-    trunk_b_points = [
-        Coord(s.lat, s.lon) for s in individual_stations if s.routes & trunk_b_set
-    ]
-
     # Under a corridor scenario, "close" is about walking to whichever trunk
     # an origin's own corridor got assigned -- not to trunk_a/trunk_b as a
     # fixed pair -- so cache point sets per distinct assigned-route-set
@@ -1413,10 +1258,6 @@ def one_seat_rides(
             origin_ids=origin_ids,
             routes_set=routes_set,
             primary_routes_set=primary_routes_set,
-            trunk_a_set=trunk_a_set,
-            trunk_b_set=trunk_b_set,
-            trunk_a_points=trunk_a_points,
-            trunk_b_points=trunk_b_points,
             assigned_points=assigned_points,
             dest_points=dest_points,
             min_dist_to_points=min_dist_to_points,
@@ -1435,8 +1276,6 @@ def one_seat_rides(
             show_label=show_label,
             day_type=day_type,
             dest_side=dest_side,
-            trunk_a_label=trunk_a_label,
-            trunk_b_label=trunk_b_label,
             close_threshold_m=close_threshold_m,
         )
         if not show_label:
@@ -1489,12 +1328,7 @@ def one_seat_rides(
                 )
                 for result, path in zip(results, csv_paths, strict=True)
             ),
-            render_notes(
-                results,
-                trunk_a_label=trunk_a_label,
-                trunk_b_label=trunk_b_label,
-                close_threshold_m=close_threshold_m,
-            ),
+            render_notes(close_threshold_m=close_threshold_m),
         ]
         markdown_out.write_text("\n---\n\n".join(sections))
         print(f"\nWrote markdown report to {markdown_out}")

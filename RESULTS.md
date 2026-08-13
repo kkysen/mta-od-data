@@ -20,39 +20,35 @@ Average weekday ridership is the same 152,882/weekday across every scenario belo
 
 ## D,N on 4 Av express, B,Q on Brighton
 
-### Headline numbers
-
-- **Close to the other trunk if deinterlined: 64.1%** of one-seat riders (39,995 of 62,425) -- i.e. wouldn't need a materially longer walk/transfer even if the two trunks stopped interlining at the junction.
-
 ### Top 25 origin/destination pairs
 
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 722 | 0.47% | 1.16% | 1-seat | close | 0m | Kings Hwy (B,Q) → 34 St-Herald Sq (B,Q) |
 | 2 | 548 | 0.36% | 0.88% | 1-seat | close | 0m | 36 St (D,N) → Atlantic Av (D,N) |
-| 3 | 530 | 0.35% | 0.85% | 1-seat | far | 867m | 7 Av (Q) → 14 St-Union Sq (Q) |
+| 3 | 530 | 0.35% | 0.85% | 1-seat | close | 0m | 7 Av (Q) → 14 St-Union Sq (Q) |
 | 4 | 471 | 0.31% | 0.75% | 1-seat | close | 0m | Church Av (B,Q) → 34 St-Herald Sq (B,Q) |
 | 5 | 444 | 0.29% | 0.71% | 1-seat | close | 0m | Church Av (B,Q) → Atlantic Av (B,Q) |
 | 6 | 439 | 0.29% | 0.70% | 1-seat | close | 0m | Kings Hwy (B,Q) → DeKalb Av (B,Q) |
-| 7 | 429 | 0.28% | 0.69% | 1-seat | far | 518m | 8 Av (N) → Canal St (N) |
+| 7 | 429 | 0.28% | 0.69% | 1-seat | close | 0m | 8 Av (N) → Canal St (N) |
 | 8 | 409 | 0.27% | 0.65% | 1-seat | close | 0m | Sheepshead Bay (B,Q) → 34 St-Herald Sq (B,Q) |
 | 9 | 400 | 0.26% | 0.64% | 1-seat | close | 0m | 59 St (N) → Atlantic Av (N) |
-| 10 | 392 | 0.26% | 0.63% | 1-seat | close | 274m | Kings Hwy (B) → 47-50 Sts-Rockefeller Ctr (B) |
-| 11 | 390 | 0.26% | 0.63% | 1-seat | far | 867m | Church Av (Q) → 14 St-Union Sq (Q) |
+| 10 | 392 | 0.26% | 0.63% | 1-seat | close | 0m | Kings Hwy (B) → 47-50 Sts-Rockefeller Ctr (B) |
+| 11 | 390 | 0.26% | 0.63% | 1-seat | close | 0m | Church Av (Q) → 14 St-Union Sq (Q) |
 | 12 | 382 | 0.25% | 0.61% | 1-seat | close | 0m | Church Av (B,Q) → DeKalb Av (B,Q) |
-| 13 | 347 | 0.23% | 0.56% | 1-seat | close | 191m | Kings Hwy (B) → 42 St-Bryant Pk/5 Av (B) |
+| 13 | 347 | 0.23% | 0.56% | 1-seat | close | 0m | Kings Hwy (B) → 42 St-Bryant Pk/5 Av (B) |
 | 14 | 332 | 0.22% | 0.53% | 1-seat | close | 0m | Newkirk Plaza (B,Q) → 34 St-Herald Sq (B,Q) |
-| 15 | 330 | 0.22% | 0.53% | 1-seat | far | 565m | 79 St (D) → Grand St (D) |
-| 16 | 328 | 0.21% | 0.53% | 1-seat | close | 191m | Church Av (Q) → Times Sq-42 St/PABT (Q) |
+| 15 | 330 | 0.22% | 0.53% | 1-seat | close | 0m | 79 St (D) → Grand St (D) |
+| 16 | 328 | 0.21% | 0.53% | 1-seat | close | 0m | Church Av (Q) → Times Sq-42 St/PABT (Q) |
 | 17 | 325 | 0.21% | 0.52% | 1-seat | close | 0m | Kings Hwy (B,Q) → Atlantic Av (B,Q) |
 | 18 | 320 | 0.21% | 0.51% | 1-seat | close | 0m | 7 Av (B,Q) → 34 St-Herald Sq (B,Q) |
 | 19 | 317 | 0.21% | 0.51% | 1-seat | close | 0m | Sheepshead Bay (B,Q) → DeKalb Av (B,Q) |
-| 20 | 310 | 0.20% | 0.50% | 1-seat | far | 565m | Bay Pkwy (D) → Grand St (D) |
+| 20 | 310 | 0.20% | 0.50% | 1-seat | close | 0m | Bay Pkwy (D) → Grand St (D) |
 | 21 | 310 | 0.20% | -- | xfer | close | 0m | 86 St (R) → Atlantic Av (D,N) |
 | 22 | 306 | 0.20% | 0.49% | 1-seat | close | 0m | 8 Av (N) → Atlantic Av (N) |
-| 23 | 306 | 0.20% | 0.49% | 1-seat | close | 191m | Kings Hwy (Q) → Times Sq-42 St/PABT (Q) |
+| 23 | 306 | 0.20% | 0.49% | 1-seat | close | 0m | Kings Hwy (Q) → Times Sq-42 St/PABT (Q) |
 | 24 | 304 | 0.20% | 0.49% | 1-seat | close | 0m | 36 St (D,N) → 34 St-Herald Sq (D,N) |
-| 25 | 304 | 0.20% | 0.49% | 1-seat | far | 867m | Prospect Park (Q) → 14 St-Union Sq (Q) |
+| 25 | 304 | 0.20% | 0.49% | 1-seat | close | 0m | Prospect Park (Q) → 14 St-Union Sq (Q) |
 
 ### Top 25 destination stations, summed across all origins
 
@@ -62,29 +58,29 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 62,425/we
 | --- | --- | --- | --- | --- | --- |
 | 9,376 | 83.5% | 12.55% | 100% | 0m | 34 St-Herald Sq (B,D,N,Q) |
 | 8,565 | 78.5% | 10.77% | 100% | 0m | Atlantic Av (B,D,N,Q) |
-| 6,250 | 73.0% | 7.30% | 0% | 867m | 14 St-Union Sq (N,Q) |
-| 5,768 | 76.1% | 7.03% | 0% | 518m | Canal St (N,Q) |
-| 6,000 | 71.9% | 6.91% | 100% | 191m | Times Sq-42 St/PABT (N,Q) |
-| 5,521 | 64.3% | 5.69% | 0% | 565m | Grand St (B,D) |
-| 5,513 | 55.2% | 4.87% | 100% | 0m | DeKalb Av (B,Q) |
-| 4,179 | 65.7% | 4.40% | 100% | 274m | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 6,250 | 73.0% | 7.30% | 75% | 217m | 14 St-Union Sq (N,Q) |
+| 5,768 | 76.1% | 7.03% | 65% | 180m | Canal St (N,Q) |
+| 6,000 | 71.9% | 6.91% | 100% | 53m | Times Sq-42 St/PABT (N,Q) |
+| 5,521 | 64.3% | 5.69% | 0% | 608m | Grand St (B,D) |
+| 5,513 | 55.2% | 4.87% | 64% | 291m | DeKalb Av (B,Q) |
+| 4,179 | 65.7% | 4.40% | 69% | 386m | 47-50 Sts-Rockefeller Ctr (B,D) |
 | 3,476 | 69.4% | 3.86% | 100% | 191m | 42 St-Bryant Pk/5 Av (B,D) |
-| 2,167 | 81.3% | 2.82% | 100% | 217m | 57 St-7 Av (N,Q) |
-| 3,612 | 44.6% | 2.58% | 100% | 0m | Chambers St/WTC/Park Pl/Cortlandt St (R) |
-| 2,413 | 65.9% | 2.55% | 100% | 166m | Broadway-Lafayette St/Bleecker St (B,D) |
-| 3,283 | 48.3% | 2.54% | 100% | 0m | Jay St-MetroTech (R) |
-| 2,444 | 60.5% | 2.37% | 0% | 699m | W 4 St-Wash Sq (B,D) |
+| 2,167 | 81.3% | 2.82% | 100% | 32m | 57 St-7 Av (N,Q) |
+| 3,612 | 44.6% | 2.58% | 0% | 942m | Chambers St/WTC/Park Pl/Cortlandt St (R) |
+| 2,413 | 65.9% | 2.55% | 61% | 431m | Broadway-Lafayette St/Bleecker St (B,D) |
+| 3,283 | 48.3% | 2.54% | 0% | 763m | Jay St-MetroTech (R) |
+| 2,444 | 60.5% | 2.37% | 0% | 778m | W 4 St-Wash Sq (B,D) |
 | 2,210 | 63.8% | 2.26% | 0% | 413m | 59 St-Columbus Circle (B,D) |
-| 2,191 | 61.2% | 2.15% | 0% | 1693m | 72 St (Q) |
-| 2,542 | 40.6% | 1.65% | 100% | 0m | Borough Hall/Court St (R) |
-| 1,988 | 46.0% | 1.46% | 100% | 0m | Whitehall St-South Ferry (R) |
-| 982 | 73.7% | 1.16% | 0% | 1322m | Lexington Av/63 St (Q) |
+| 2,191 | 61.2% | 2.15% | 0% | 1246m | 72 St (Q) |
+| 2,542 | 40.6% | 1.65% | 0% | 975m | Borough Hall/Court St (R) |
+| 1,988 | 46.0% | 1.46% | 0% | 2068m | Whitehall St-South Ferry (R) |
+| 982 | 73.7% | 1.16% | 69% | 570m | Lexington Av/63 St (Q) |
 | 898 | 73.3% | 1.05% | 100% | 217m | 7 Av (B,D) |
-| 1,126 | 57.7% | 1.04% | 0% | 1693m | 86 St (Q) |
-| 1,002 | 63.5% | 1.02% | 0% | 1687m | 96 St (Q) |
-| 1,351 | 39.5% | 0.85% | 100% | 274m | 49 St (N) |
-| 1,447 | 34.7% | 0.80% | 0% | 1152m | Lexington Av/59 St (N) |
-| 957 | 51.6% | 0.79% | 100% | 0m | City Hall (R) |
+| 1,126 | 57.7% | 1.04% | 0% | 2272m | 86 St (Q) |
+| 1,002 | 63.5% | 1.02% | 0% | 2943m | 96 St (Q) |
+| 1,351 | 39.5% | 0.85% | 81% | 208m | 49 St (N) |
+| 1,447 | 34.7% | 0.80% | 83% | 307m | Lexington Av/59 St (N) |
+| 957 | 51.6% | 0.79% | 0% | 899m | City Hall (R) |
 
 _Full row-level detail (every origin/destination pair, not just the top 25): `data/dekalb_weekday_pairs_actual.csv`._
 
@@ -232,12 +228,5 @@ _Full row-level detail (every origin/destination pair, not just the top 25): `da
 
 ## Notes on reading these tables
 
-**"D,N on 4 Av express, B,Q on Brighton"** (today's actual routing):
-
-- "Close?"/"Dist" mean different things depending on `Type`. For `1-seat` rows: distance from the destination to the nearest station on the trunk *not* used to reach it one-seat (6 Av express vs Broadway express) -- i.e. how exposed that one-seat ride is to a generic future deinterlining; `close`/`0m` covers destinations already served by both trunks, and one-seat connections that never actually cross the junction (via a route in the universe but not in `--primary-routes`) -- those can't be affected by deinterlining either way. For `xfer` rows (riders without a direct one-seat ride): distance to the nearest station on one of the origin's own routes -- a close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination. Both thresholded at 300m.
-- In the per-destination table, "Close?"/"Dist" cover only that destination's classified *one-seat* pairs (ridership-weighted), matching the table's one-seat focus -- see the CSV or the per-pair table above for the `xfer` close/dist data.
-
-**"B,D on 4 Av express, N,Q on Brighton" / "N,Q on 4 Av express, B,D on Brighton"** (deinterlining scenarios):
-
-- "Close?"/"Dist" describe distance from the destination to the nearest station on the trunk the origin's *own* corridor got assigned in that scenario, thresholded at 300m, for `xfer` rows -- riders without a direct one-seat ride under the scenario. A close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination. `1-seat` rows are always `close`/`0m`: the destination is a Complex ID in the source data, not a specific platform, so there's no way to tell which platform a rider actually used -- the scenario's assigned route already stops somewhere in that same complex, the rider's real historical destination either way.
-- In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified many-seat pairs.
+- "Close?"/"Dist" describe distance from the destination to the nearest station on the origin's own effective corridor (real routes in baseline, the scenario's assigned routes otherwise), thresholded at 300m, for `xfer` rows -- riders without a direct one-seat ride. A close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination. `1-seat` rows are always `close`/`0m`: the destination is a Complex ID in the source data, not a specific platform, so there's no way to tell which platform a rider actually used -- the effective route already stops somewhere in that same complex, the rider's real historical destination either way.
+- In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified `xfer` pairs.
