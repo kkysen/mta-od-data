@@ -50,7 +50,7 @@ Fetches the station reference CSVs and converts the OD CSV(s) into Parquet
 extracts are released — point `--csv` at the new file(s) (globs work) and/or
 `--out` at a new Parquet path. Run `--help` for all options.
 
-```
+```sh
 uv run mta-od-data prepare
 ```
 
@@ -64,7 +64,7 @@ plus per-origin and per-destination breakdowns, can dump full row-level
 detail with `--csv-out`, and can write a markdown report with
 `--markdown-out`.
 
-```
+```sh
 uv run mta-od-data analyze one-seat-rides --routes B,D,N,Q,R \
     --primary-routes B,D,N,Q --trunk-b N,Q,R \
     --csv-out data/dekalb_weekday_pairs.csv \
@@ -87,7 +87,7 @@ classifies each pair by whether its origin/destination fall inside the
 region, using `--region`/`--region-borough`/`--region-bbox` (see
 [How regions are defined](#how-regions-are-defined) below).
 
-```
+```sh
 uv run mta-od-data analyze regional-flow --region cbd
 ```
 
@@ -155,7 +155,7 @@ file to build and test it against.
 
 ## Development
 
-```
+```sh
 uv run pre-commit install
 ```
 
