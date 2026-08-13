@@ -1,6 +1,7 @@
 import csv
 from dataclasses import dataclass
 from enum import StrEnum
+from functools import cache
 from math import asin, cos, radians, sin, sqrt
 from pathlib import Path
 from typing import Self
@@ -66,6 +67,18 @@ class Station:
     # only -- empty for a complex, which can span several lines.
     line: str = ""
 
+    # Cached at the method itself, not just at call sites that happen to
+    # want it: `Station` is frozen and every field (including `routes`, a
+    # `frozenset[str]`) is hashable, so this is a pure function of
+    # `(self, routes)` -- there's no invocation-specific state involved (a
+    # `Station` is a fixed value once loaded, unlike e.g. `assigned_points`
+    # in `one_seat_rides.py`, which closes over per-invocation station-file
+    # data and so stays scoped to that invocation instead).
+    # noqa justification: B019 warns that caching a method can keep `self`
+    # alive forever, but every `Station` here is already held for the whole
+    # process's life by `Station.load_complexes`/`load_individuals`'s own
+    # dict/list -- the cache isn't extending anything's lifetime.
+    @cache  # noqa: B019
     def display(self, routes: frozenset[str] | None = None) -> str:
         shown_routes = self.routes if routes is None else routes
         return f"{self.name} ({','.join(sorted(shown_routes))})"
@@ -114,6 +127,10 @@ class Station:
             return [cls.load_individual(row) for row in csv.DictReader(f)]
 
 
+# Pure function of two `Coord`s (both frozen and hashable), so this is safe
+# to cache for the process's lifetime -- unlike `one_seat_rides.py`'s other
+# caches, nothing here depends on which invocation is asking.
+@cache
 def haversine_m(c1: Coord, c2: Coord) -> float:
     r = 6_371_000.0
     p1, p2 = radians(c1.lat), radians(c2.lat)
