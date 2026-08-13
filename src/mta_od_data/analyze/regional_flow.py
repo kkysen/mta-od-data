@@ -9,7 +9,7 @@ import duckdb
 from typer import Option, Typer
 
 from mta_od_data import DATA
-from mta_od_data.analyze import DAY_TYPE_PRESETS, DayType, Station
+from mta_od_data.analyze.common import DAY_TYPE_PRESETS, DayType, Station
 from mta_od_data.analyze.regions import (
     Region,
     RegionPreset,
