@@ -242,7 +242,7 @@ def regional_flow(
     ] = None,
     markdown_out: Annotated[
         Path | None,
-        Option(help="Optional: write a RESULTS.md-style markdown report here"),
+        Option(help="Optional: write a markdown report here"),
     ] = None,
     top_n: Annotated[
         int, Option(help="Row count for the markdown top-pairs table")
