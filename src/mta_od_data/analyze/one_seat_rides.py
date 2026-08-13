@@ -864,7 +864,7 @@ def one_seat_rides(
     ] = None,
     markdown_out: Annotated[
         Path | None,
-        Option(help="Optional: write a RESULTS.md-style markdown report here"),
+        Option(help="Optional: write a markdown report here"),
     ] = None,
     top_n: Annotated[
         int, Option(help="Row count for the markdown top-pairs/top-destinations tables")
@@ -894,10 +894,12 @@ def one_seat_rides(
         mta-od-data analyze one-seat-rides --parquet data/mta_od_2025.parquet
 
     \b
-        # Write RESULTS.md automatically instead of transcribing output by hand
+        # Write the RESULTS.md-style snapshot report automatically instead of
+        # transcribing output by hand
         mta-od-data analyze one-seat-rides --routes B,D,N,Q,R \\
             --primary-routes B,D,N,Q --trunk-b N,Q,R \\
-            --csv-out data/dekalb_weekday_pairs.csv --markdown-out RESULTS.md
+            --csv-out data/dekalb_weekday_pairs.csv \\
+            --markdown-out src/mta_od_data/analyze/one_seat_rides.md
 
     \b
         # A different junction/trunk pair, e.g. hypothetically Rogers Jct area
@@ -916,7 +918,8 @@ def one_seat_rides(
         # Today's actual routing plus both full B,D/N,Q corridor swaps, in
         # one invocation
         mta-od-data analyze one-seat-rides \\
-            --all-corridor-scenarios --markdown-out RESULTS.md
+            --all-corridor-scenarios \\
+            --markdown-out src/mta_od_data/analyze/one_seat_rides.md
     """
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
