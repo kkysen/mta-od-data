@@ -40,7 +40,7 @@ sync—see [Development](#development).
 
 `src/mta_od_data/` is an installable package (`duckdb`/`typer` as its only
 runtime dependencies); `uv sync` installs it and its `mta-od-data` entry
-point into the project's `.venv`. Two commands:
+point into the project's `.venv`. Three commands:
 
 ### `mta-od-data prepare`
 
@@ -75,6 +75,24 @@ deinterlining scenarios entirely (different junction, different trunk
 pairs) — run `--help` for the full list, or see the module docstring for
 worked examples.
 
+### `mta-od-data analyze region-flow`
+
+A more general question than `one-seat-rides`: for any region, what share of
+riders enter it from outside, leave it for outside, stay entirely within it,
+or never touch it at all? Unlike `one-seat-rides` this is system-wide (every
+origin/destination pair, no route filter or side-of-junction split) and
+classifies each pair by whether its origin/destination fall inside the
+region, using `--region`/`--region-borough`/`--region-bbox` (see
+[How regions are defined](#how-regions-are-defined) below).
+
+```
+uv run mta-od-data analyze region-flow --region cbd
+```
+
+Defaults to `cbd`: Manhattan's Congestion Relief Zone, i.e. "Lower
+Manhattan" in the congestion-pricing/Hub Bound Report sense (below 60th
+St). Same `--csv-out`/`--markdown-out` options as `one-seat-rides`.
+
 ## How the classification works
 
 - **Origin set**: stations served by at least one route in `--routes`, on
@@ -104,6 +122,34 @@ worked examples.
   coordinates, against every station on the other trunk system-wide, and
   flagged close within `--close-threshold-m` (default 300m, roughly one
   long Manhattan avenue block).
+
+## How regions are defined
+
+`region-flow`'s `Region` abstraction (`src/mta_od_data/analyze/regions.py`)
+is just a name plus a predicate over a station, so its containment test can
+be backed by whatever's available for a given region — currently:
+
+- **`--region cbd`** (the default): the source station data's own curated
+  `cbd` flag, i.e. Manhattan's real Congestion Relief Zone boundary — not a
+  latitude cut. Manhattan's grid is rotated relative to true north, so no
+  single latitude cleanly separates "below 60th St," and a latitude cut
+  would also wrongly include Roosevelt Island (south of 60th St by
+  latitude, but not part of the zone), which `cbd` correctly excludes.
+- **`--region manhattan`/`brooklyn`/`queens`/`bronx`/`staten-island`**: the
+  station data's `borough` column.
+- **`--region-borough M,Bk`**: a custom combination of boroughs (overrides
+  `--region`), for regions like "Manhattan + Brooklyn."
+- **`--region-bbox MIN_LAT,MIN_LON,MAX_LAT,MAX_LON`**: a lat/lon bounding
+  box (overrides `--region`), for an ad hoc region like a rough Midtown
+  Manhattan.
+
+Neighborhood-level regions (Midtown, Downtown Brooklyn, etc.) aren't built
+in yet — there's no authoritative boundary data for them bundled here, only
+the crude `--region-bbox` approximation above. A geojson-polygon backend
+(point-in-polygon against a real neighborhood boundary dataset, e.g. NYC's
+Neighborhood Tabulation Areas) would slot into the same `Region`
+abstraction without changing the CLI shape, once there's a real geojson
+file to build and test it against.
 
 ## Development
 
