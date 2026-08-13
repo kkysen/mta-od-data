@@ -30,7 +30,7 @@ def prefer_primary(routes: set[str], primary_routes: set[str]) -> set[str]:
     return (routes & primary_routes) or routes
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class PairRow:
     origin_id: int
     origin_name: str
@@ -80,7 +80,7 @@ class DestStats:
         )
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class ScenarioResult:
     label: str
     corridor_scenario_active: bool
@@ -339,7 +339,7 @@ class ScenarioResult:
         return "\n".join(lines)
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class ScenarioDef:
     label: str
     corridor_a_assigned_set: set[str]
@@ -1195,10 +1195,10 @@ def one_seat_rides(
     # in real distance computations, with results unchanged since the
     # underlying math is identical either way.
     min_dist_cache: dict[tuple[int, frozenset[str]], tuple[float, Station]] = {}
-    haversine_cache: dict[tuple[float, float, float, float], float] = {}
+    haversine_cache: dict[tuple[Coord, Coord], float] = {}
 
     def cached_haversine(c1: Coord, c2: Coord) -> float:
-        key = (c1.lat, c1.lon, c2.lat, c2.lon)
+        key = (c1, c2)
         dist_m = haversine_cache.get(key)
         if dist_m is None:
             dist_m = haversine_m(c1, c2)

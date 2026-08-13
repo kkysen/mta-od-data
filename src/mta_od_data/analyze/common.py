@@ -38,13 +38,13 @@ def abbreviate_name(name: str) -> str:
     return name
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class Coord:
     lat: float
     lon: float
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class Station:
     complex_id: int
     # Base name, without a route list baked in -- callers wanting one call
