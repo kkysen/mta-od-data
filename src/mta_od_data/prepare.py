@@ -42,6 +42,17 @@ def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> No
         """
         COPY (
             SELECT * FROM read_csv($csv_patterns, union_by_name=true, thousands=',')
+            -- Sorted so every `analyze` query's row-group statistics (zonemaps)
+            -- can actually skip data instead of scanning the whole file: "Day
+            -- of Week" is the one filter every current and (presumably) future
+            -- analysis scopes by, and "Origin Station Complex ID" is the other
+            -- natural scoping dimension (a specific corridor/station set) --
+            -- together they're a superset of every query shape seen so far, and
+            -- sorting by them is never worse than leaving the file in its
+            -- original date/hour-ordered form, even for a query that filters by
+            -- neither (it also shrinks the file: better run-length/dictionary
+            -- compression on sorted columns).
+            ORDER BY "Day of Week", "Origin Station Complex ID"
         ) TO $out (FORMAT parquet)
         """,
         {"csv_patterns": resolved, "out": str(out)},
