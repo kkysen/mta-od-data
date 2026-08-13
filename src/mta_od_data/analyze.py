@@ -366,13 +366,13 @@ class ScenarioResult:
                 if self.total_riders
                 else float("nan")
             )
-            pct_one_seat_str = "--"
+            pct_one_seat_str = ""
             if r.one_seat and self.one_seat_riders:
                 pct_one_seat_str = f"{100 * r.riders / self.one_seat_riders:.2f}%"
             type_str = "1-seat" if r.one_seat else "xfer"
-            close_str = "--" if r.close is None else ("close" if r.close else "far")
-            dist_str = "--" if r.dist_m is None else f"{r.dist_m:.0f}m"
-            near_station_str = r.near_station if r.near_station else "--"
+            close_str = "" if r.close is None else ("close" if r.close else "far")
+            dist_str = "" if r.dist_m is None else f"{r.dist_m:.0f}m"
+            near_station_str = r.near_station if r.near_station else ""
             lines.append(
                 f"| {i} | {r.riders:,.0f} | {pct_total:.2f}% | {pct_one_seat_str} | "
                 f"{type_str} | {close_str} | {dist_str} | "
@@ -411,9 +411,9 @@ class ScenarioResult:
             # rows -- scoped to that destination's classified `xfer` pairs,
             # matching the per-pair table above.
             close_pct = d.many_seat_close_pct
-            close_str = "--" if close_pct is None else f"{close_pct:.0f}%"
+            close_str = "" if close_pct is None else f"{close_pct:.0f}%"
             avg_dist = d.many_seat_avg_dist_m
-            dist_str = "--" if avg_dist is None else f"{avg_dist:.0f}m"
+            dist_str = "" if avg_dist is None else f"{avg_dist:.0f}m"
             lines.append(
                 f"| {d.total:,.0f} | {d.one_seat_pct:.1f}% | {pct_all_one_seat:.2f}% | "
                 f"{close_str} | {dist_str} | {d.name} |"
@@ -840,7 +840,7 @@ def render_notes(*, close_threshold_m: float) -> str:
             "the specific station `dist_m` was measured to for a `xfer` "
             "row: the nearest station on the origin's own effective "
             "corridor -- i.e. what the destination would have had to be "
-            "for this row to be a `1-seat` ride instead. `--` for `1-seat` "
+            "for this row to be a `1-seat` ride instead. Empty for `1-seat` "
             "rows (already true of the actual destination) and omitted "
             "from the per-destination table (an average across many pairs, "
             "not a single station).",
