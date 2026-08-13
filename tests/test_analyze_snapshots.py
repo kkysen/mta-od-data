@@ -52,6 +52,11 @@ SNAPSHOTS = [
         ],
         path=ANALYZE_DIR / "one_seat_rides.md",
     ),
+    Snapshot(
+        name="regional-flow",
+        cmd=["mta-od-data", "analyze", "regional-flow"],
+        path=ANALYZE_DIR / "regional_flow.md",
+    ),
 ]
 
 
