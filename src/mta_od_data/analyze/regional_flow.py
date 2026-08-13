@@ -23,7 +23,7 @@ from mta_od_data.analyze.regions import (
 app = Typer()
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class FlowRow:
     origin_id: int
     origin_name: str
@@ -38,7 +38,7 @@ class FlowRow:
         return f"{'in' if self.origin_in else 'out'}→{'in' if self.dest_in else 'out'}"
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class RegionalFlowResult:
     region_name: str
     total_riders: float

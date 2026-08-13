@@ -5,7 +5,7 @@ from enum import StrEnum
 from mta_od_data.analyze.common import Station
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class Region:
     name: str
     contains: Callable[[Station], bool]
@@ -29,7 +29,7 @@ def cbd_region() -> Region:
     )
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class BoundingBox:
     min_lat: float
     max_lat: float
