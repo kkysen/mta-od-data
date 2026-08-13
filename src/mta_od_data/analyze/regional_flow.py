@@ -96,32 +96,33 @@ class RegionalFlowResult:
         lines: list[str] = []
         lines.append("## Headline numbers")
         lines.append("")
-        lines.append(f"- **Total: {self.total_riders:,.0f} riders/{day_type}**")
+        lines.append(f"Total: {self.total_riders:,.0f} riders/{day_type}")
+        lines.append("")
+        lines.append("| Flow | Description | Riders | % Total |")
+        lines.append("| --- | --- | --- | --- |")
         lines.append(
-            f"- **Outside -> Inside (entering the region): "
-            f"{self.pct(self.out_in):.1f}%** ({self.out_in:,.0f}/{day_type})"
+            f"| Outside -> Inside | Entering the region | {self.out_in:,.0f} | "
+            f"{self.pct(self.out_in):.1f}% |"
         )
         lines.append(
-            f"- **Inside -> Outside (leaving the region): "
-            f"{self.pct(self.in_out):.1f}%** ({self.in_out:,.0f}/{day_type})"
+            f"| Inside -> Outside | Leaving the region | {self.in_out:,.0f} | "
+            f"{self.pct(self.in_out):.1f}% |"
         )
         lines.append(
-            f"- **Inside -> Inside (internal to the region): "
-            f"{self.pct(self.in_in):.1f}%** ({self.in_in:,.0f}/{day_type})"
+            f"| Inside -> Inside | Internal to the region | {self.in_in:,.0f} | "
+            f"{self.pct(self.in_in):.1f}% |"
         )
         lines.append(
-            f"- **Outside -> Outside (never touches the region): "
-            f"{self.pct(self.out_out):.1f}%** ({self.out_out:,.0f}/{day_type})"
+            f"| Outside -> Outside | Never touches the region | "
+            f"{self.out_out:,.0f} | {self.pct(self.out_out):.1f}% |"
         )
         lines.append(
-            f"- **Inter (crosses the boundary, either direction): "
-            f"{self.pct(self.inter):.1f}%** ({self.inter:,.0f}/{day_type}) "
-            f"-- Inside -> Outside plus Outside -> Inside"
+            f"| **Inter** | Crosses the boundary, either direction | "
+            f"{self.inter:,.0f} | {self.pct(self.inter):.1f}% |"
         )
         lines.append(
-            f"- **Intra (same side throughout, either side): "
-            f"{self.pct(self.intra):.1f}%** ({self.intra:,.0f}/{day_type}) "
-            f"-- Inside -> Inside plus Outside -> Outside"
+            f"| **Intra** | Same side throughout, either side | "
+            f"{self.intra:,.0f} | {self.pct(self.intra):.1f}% |"
         )
         lines.append("")
 
