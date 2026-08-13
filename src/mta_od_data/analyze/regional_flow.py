@@ -2,6 +2,7 @@ import csv
 import shlex
 import sys
 from dataclasses import asdict, dataclass, fields
+from datetime import date
 from pathlib import Path
 from typing import Annotated
 
@@ -302,15 +303,17 @@ def regional_flow(
     )
 
     n_days_query = f"""
-        SELECT COUNT(DISTINCT CAST(Timestamp AS DATE))
+        SELECT COUNT(DISTINCT CAST(Timestamp AS DATE)),
+               MIN(CAST(Timestamp AS DATE)),
+               MAX(CAST(Timestamp AS DATE))
         FROM read_parquet(?)
         WHERE {day_filter_sql}
     """
-    n_days_result: tuple[int] | None = con.execute(
+    n_days_result: tuple[int, date, date] | None = con.execute(
         n_days_query, [str(parquet), *day_params]
     ).fetchone()
     assert n_days_result is not None, "aggregate query always returns exactly one row"
-    (n_distinct_days,) = n_days_result
+    n_distinct_days, min_date, max_date = n_days_result
 
     # "riders" throughout is average weekday (or whichever day-type) ridership,
     # i.e. the sum over all matching days divided by the number of distinct
@@ -330,7 +333,8 @@ def regional_flow(
     ).fetchall()
     print(
         f"\n{len(pairs):,} distinct origin/destination pairs, averaged over "
-        f"{n_distinct_days} distinct days matching the day filter"
+        f"{n_distinct_days} distinct days matching the day filter "
+        f"({min_date} to {max_date})"
     )
 
     rows: list[FlowRow] = []
@@ -397,8 +401,9 @@ def regional_flow(
             f"# Regional flow: {result.region_name}",
             "",
             f"Scenario: average {day_type} ridership ({n_distinct_days} distinct "
-            f"days in the data), every origin/destination pair classified by "
-            f"whether each end falls inside {result.region_name}.",
+            f"days in the data, {min_date} to {max_date}), every "
+            f"origin/destination pair classified by whether each end falls "
+            f"inside {result.region_name}.",
             "",
             f"Produced by `{produced_by}`.",
             "",

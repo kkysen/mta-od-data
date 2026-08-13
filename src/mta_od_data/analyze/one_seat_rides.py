@@ -3,6 +3,7 @@ import shlex
 import sys
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
+from datetime import date
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -1089,15 +1090,17 @@ def one_seat_rides(
     )
 
     n_days_query = f"""
-        SELECT COUNT(DISTINCT CAST(Timestamp AS DATE))
+        SELECT COUNT(DISTINCT CAST(Timestamp AS DATE)),
+               MIN(CAST(Timestamp AS DATE)),
+               MAX(CAST(Timestamp AS DATE))
         FROM read_parquet(?)
         WHERE {day_filter_sql}
     """
-    n_days_result: tuple[int] | None = con.execute(
+    n_days_result: tuple[int, date, date] | None = con.execute(
         n_days_query, [str(parquet), *day_params]
     ).fetchone()
     assert n_days_result is not None, "aggregate query always returns exactly one row"
-    (n_distinct_days,) = n_days_result
+    n_distinct_days, min_date, max_date = n_days_result
 
     # "riders" throughout is average weekday (or whichever day-type) ridership,
     # i.e. the sum over all matching days divided by the number of distinct
@@ -1115,7 +1118,8 @@ def one_seat_rides(
     ).fetchall()
     print(
         f"\n{len(pairs):,} distinct origin/destination pairs, averaged over "
-        f"{n_distinct_days} distinct days matching the day filter"
+        f"{n_distinct_days} distinct days matching the day filter "
+        f"({min_date} to {max_date})"
     )
 
     # Scope to trips that actually cross the boundary (dest on the far side,
@@ -1263,10 +1267,10 @@ def one_seat_rides(
             f"results at {boundary_name}",
             "",
             f"Scenario: average {day_type} ridership ({n_distinct_days} distinct "
-            f"days in the data) on trains originating at stations served by "
-            f"{','.join(sorted(routes_set))}, {origin_side} of {boundary_name}, "
-            f"with destinations {dest_side} of it (i.e. trips that cross the "
-            f"junction).",
+            f"days in the data, {min_date} to {max_date}) on trains originating "
+            f"at stations served by {','.join(sorted(routes_set))}, "
+            f"{origin_side} of {boundary_name}, with destinations {dest_side} "
+            f"of it (i.e. trips that cross the junction).",
             "",
             f"Produced by `{produced_by}`.",
             "",
