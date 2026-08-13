@@ -22,11 +22,11 @@ sync—see [Development](#development).
 ## Data
 
 - **OD ridership**: MTA's "Subway Origin-Destination Ridership Estimate"
-  extract (not committed here, see `.gitignore` — it's a 13GB CSV). Each row
+  extract (not committed here, see `.gitignore` — it's a 27GB CSV). Each row
   is an (origin station complex, destination station complex, date, hour)
   with an estimated rider count. Get it from
   [data.ny.gov](https://data.ny.gov/Transportation/MTA-Subway-Origin-Destination-Ridership-Estimate-2/jsu2-fbtj)
-  (2024 vintage used here; there's a separate dataset per year) and drop the
+  (2025 vintage used here; there's a separate dataset per year) and drop the
   CSV (or its `.xz`) in `data/`.
 - **Station reference data**: fetched automatically from `data.ny.gov` —
   the "Subway Stations and Complexes" dataset (resource `5f5g-n3cz`, one row

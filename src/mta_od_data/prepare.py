@@ -9,7 +9,7 @@ from mta_od_data import DATA, ROOT
 
 app = Typer()
 
-DEFAULT_CSV_GLOB = "data/MTA_Subway_Origin-Destination_Ridership_Estimate_*.csv"
+DEFAULT_CSV_GLOB = "data/MTA_Subway_Origin-Destination_Ridership_Estimate__2025_*.csv"
 DEFAULT_PARQUET = DATA / "mta_od.parquet"
 DEFAULT_STATIONS_CSV = DATA / "stations_complexes.csv"
 DEFAULT_STATIONS_INDIVIDUAL_CSV = DATA / "stations_individual.csv"
@@ -40,8 +40,9 @@ def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> No
     con = duckdb.connect()
     con.execute(
         """
-        COPY (SELECT * FROM read_csv_auto($csv_patterns, union_by_name=true))
-        TO $out (FORMAT parquet)
+        COPY (
+            SELECT * FROM read_csv($csv_patterns, union_by_name=true, thousands=',')
+        ) TO $out (FORMAT parquet)
         """,
         {"csv_patterns": resolved, "out": str(out)},
     )
@@ -93,8 +94,8 @@ def prepare(
     Examples:
         mta-od-data prepare
         mta-od-data prepare \\
-            --csv 'data/MTA_Subway_Origin-Destination_Ridership_Estimate__2025_*.csv' \\
-            --out data/mta_od_2025.parquet
+            --csv 'data/MTA_Subway_Origin-Destination_Ridership_Estimate__2024_*.csv' \\
+            --out data/mta_od_2024.parquet
         mta-od-data prepare --force-stations
     """
     DATA.mkdir(exist_ok=True)
