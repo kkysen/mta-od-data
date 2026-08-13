@@ -1,6 +1,6 @@
 # 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av (B,D,N,Q,R)
 
-Scenario: average weekday ridership (35 distinct days in the data, 2024-01-08 to 2024-07-12) on trains originating at stations served by B,D,N,Q,R, south of Atlantic Av (B,D,N,Q,R), with destinations north of it (i.e. trips that cross the junction).
+Scenario: average weekday ridership (60 distinct days in the data, 2025-01-06 to 2025-12-12) on trains originating at stations served by B,D,N,Q,R, south of Atlantic Av (B,D,N,Q,R), with destinations north of it (i.e. trips that cross the junction).
 
 Produced by `mta-od-data analyze one-seat-rides --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out src/mta_od_data/analyze/one_seat_rides.md`.
 
@@ -8,13 +8,13 @@ Produced by `mta-od-data analyze one-seat-rides --routes B,D,N,Q,R --primary-rou
 
 ## Scenario comparison
 
-Average weekday ridership is the same 152,882/weekday across every scenario below -- only how many of those riders get a one-seat ride changes.
+Average weekday ridership is the same 163,203/weekday across every scenario below -- only how many of those riders get a one-seat ride changes.
 
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | --- | --- | --- | --- |
-| D,N on 4 Av express, B,Q on Brighton | 152,882 | 62,425 (40.8%) | 16,805 (18.6%) | 79,230 (51.8%) |
-| B,D on 4 Av express, N,Q on Brighton | 152,882 | 52,723 (34.5%) | 22,410 (22.4%) | 75,132 (49.1%) |
-| N,Q on 4 Av express, B,D on Brighton | 152,882 | 49,180 (32.2%) | 21,813 (21.0%) | 70,993 (46.4%) |
+| D,N on 4 Av express, B,Q on Brighton | 163,203 | 65,384 (40.1%) | 18,468 (18.9%) | 83,852 (51.4%) |
+| B,D on 4 Av express, N,Q on Brighton | 163,203 | 55,794 (34.2%) | 24,215 (22.5%) | 80,009 (49.0%) |
+| N,Q on 4 Av express, B,D on Brighton | 163,203 | 51,623 (31.6%) | 23,794 (21.3%) | 75,417 (46.2%) |
 
 ---
 
@@ -24,63 +24,63 @@ Average weekday ridership is the same 152,882/weekday across every scenario belo
 
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 722 | 0.47% | 1.16% | 1-seat | close | 0m | Kings Hwy (B,Q) → 34 St-Herald Sq (B,Q) |  |
-| 2 | 548 | 0.36% | 0.88% | 1-seat | close | 0m | 36 St (D,N) → Atlantic Av (D,N) |  |
-| 3 | 530 | 0.35% | 0.85% | 1-seat | close | 0m | 7 Av (Q) → 14 St-Union Sq (Q) |  |
-| 4 | 471 | 0.31% | 0.75% | 1-seat | close | 0m | Church Av (B,Q) → 34 St-Herald Sq (B,Q) |  |
-| 5 | 444 | 0.29% | 0.71% | 1-seat | close | 0m | Church Av (B,Q) → Atlantic Av (B,Q) |  |
-| 6 | 439 | 0.29% | 0.70% | 1-seat | close | 0m | Kings Hwy (B,Q) → DeKalb Av (B,Q) |  |
-| 7 | 429 | 0.28% | 0.69% | 1-seat | close | 0m | 8 Av (N) → Canal St (N) |  |
-| 8 | 409 | 0.27% | 0.65% | 1-seat | close | 0m | Sheepshead Bay (B,Q) → 34 St-Herald Sq (B,Q) |  |
-| 9 | 400 | 0.26% | 0.64% | 1-seat | close | 0m | 59 St (N) → Atlantic Av (N) |  |
-| 10 | 392 | 0.26% | 0.63% | 1-seat | close | 0m | Kings Hwy (B) → 47-50 Sts-Rockefeller Ctr (B) |  |
-| 11 | 390 | 0.26% | 0.63% | 1-seat | close | 0m | Church Av (Q) → 14 St-Union Sq (Q) |  |
-| 12 | 382 | 0.25% | 0.61% | 1-seat | close | 0m | Church Av (B,Q) → DeKalb Av (B,Q) |  |
-| 13 | 347 | 0.23% | 0.56% | 1-seat | close | 0m | Kings Hwy (B) → 42 St-Bryant Pk/5 Av (B) |  |
-| 14 | 332 | 0.22% | 0.53% | 1-seat | close | 0m | Newkirk Plaza (B,Q) → 34 St-Herald Sq (B,Q) |  |
-| 15 | 330 | 0.22% | 0.53% | 1-seat | close | 0m | 79 St (D) → Grand St (D) |  |
-| 16 | 328 | 0.21% | 0.53% | 1-seat | close | 0m | Church Av (Q) → Times Sq-42 St/PABT (Q) |  |
-| 17 | 325 | 0.21% | 0.52% | 1-seat | close | 0m | Kings Hwy (B,Q) → Atlantic Av (B,Q) |  |
-| 18 | 320 | 0.21% | 0.51% | 1-seat | close | 0m | 7 Av (B,Q) → 34 St-Herald Sq (B,Q) |  |
-| 19 | 317 | 0.21% | 0.51% | 1-seat | close | 0m | Sheepshead Bay (B,Q) → DeKalb Av (B,Q) |  |
-| 20 | 310 | 0.20% | 0.50% | 1-seat | close | 0m | Bay Pkwy (D) → Grand St (D) |  |
-| 21 | 310 | 0.20% |  | xfer | close | 0m | 86 St (R) → Atlantic Av (D,N) | Atlantic Av (D,N,R) |
-| 22 | 306 | 0.20% | 0.49% | 1-seat | close | 0m | 8 Av (N) → Atlantic Av (N) |  |
-| 23 | 306 | 0.20% | 0.49% | 1-seat | close | 0m | Kings Hwy (Q) → Times Sq-42 St/PABT (Q) |  |
-| 24 | 304 | 0.20% | 0.49% | 1-seat | close | 0m | 36 St (D,N) → 34 St-Herald Sq (D,N) |  |
-| 25 | 304 | 0.20% | 0.49% | 1-seat | close | 0m | Prospect Park (Q) → 14 St-Union Sq (Q) |  |
+| 1 | 727 | 0.45% | 1.11% | 1-seat | close | 0m | Kings Hwy (B,Q) → 34 St-Herald Sq (B,Q) |  |
+| 2 | 621 | 0.38% | 0.95% | 1-seat | close | 0m | 36 St (D,N) → Atlantic Av (D,N) |  |
+| 3 | 583 | 0.36% | 0.89% | 1-seat | close | 0m | 7 Av (Q) → 14 St-Union Sq (Q) |  |
+| 4 | 471 | 0.29% | 0.72% | 1-seat | close | 0m | Kings Hwy (B,Q) → DeKalb Av (B,Q) |  |
+| 5 | 455 | 0.28% | 0.70% | 1-seat | close | 0m | 8 Av (N) → Canal St (N) |  |
+| 6 | 449 | 0.28% | 0.69% | 1-seat | close | 0m | 59 St (N) → Atlantic Av (N) |  |
+| 7 | 416 | 0.25% | 0.64% | 1-seat | close | 0m | Church Av (B,Q) → 34 St-Herald Sq (B,Q) |  |
+| 8 | 403 | 0.25% | 0.62% | 1-seat | close | 0m | Sheepshead Bay (B,Q) → 34 St-Herald Sq (B,Q) |  |
+| 9 | 396 | 0.24% | 0.61% | 1-seat | close | 0m | Church Av (B,Q) → Atlantic Av (B,Q) |  |
+| 10 | 396 | 0.24% | 0.61% | 1-seat | close | 0m | Kings Hwy (B) → 47-50 Sts-Rockefeller Ctr (B) |  |
+| 11 | 363 | 0.22% | 0.55% | 1-seat | close | 0m | Kings Hwy (B,Q) → Atlantic Av (B,Q) |  |
+| 12 | 356 | 0.22% | 0.54% | 1-seat | close | 0m | Church Av (Q) → 14 St-Union Sq (Q) |  |
+| 13 | 346 | 0.21% | 0.53% | 1-seat | close | 0m | 36 St (D,N) → 34 St-Herald Sq (D,N) |  |
+| 14 | 343 | 0.21% | 0.52% | 1-seat | close | 0m | 59 St (N) → 34 St-Herald Sq (N) |  |
+| 15 | 338 | 0.21% | 0.52% | 1-seat | close | 0m | Kings Hwy (Q) → Times Sq-42 St/PABT (Q) |  |
+| 16 | 338 | 0.21% | 0.52% | 1-seat | close | 0m | Prospect Park (B,Q) → 34 St-Herald Sq (B,Q) |  |
+| 17 | 334 | 0.20% | 0.51% | 1-seat | close | 0m | Prospect Park (Q) → 14 St-Union Sq (Q) |  |
+| 18 | 330 | 0.20% | 0.51% | 1-seat | close | 0m | Newkirk Plaza (B,Q) → 34 St-Herald Sq (B,Q) |  |
+| 19 | 329 | 0.20% |  | xfer | close | 0m | 86 St (R) → Atlantic Av (D,N) | Atlantic Av (D,N,R) |
+| 20 | 328 | 0.20% | 0.50% | 1-seat | close | 0m | 8 Av (N) → Atlantic Av (N) |  |
+| 21 | 325 | 0.20% | 0.50% | 1-seat | close | 0m | Church Av (B,Q) → DeKalb Av (B,Q) |  |
+| 22 | 321 | 0.20% | 0.49% | 1-seat | close | 0m | Kings Hwy (B) → 42 St-Bryant Pk/5 Av (B) |  |
+| 23 | 321 | 0.20% | 0.49% | 1-seat | close | 0m | 7 Av (B,Q) → 34 St-Herald Sq (B,Q) |  |
+| 24 | 320 | 0.20% | 0.49% | 1-seat | close | 0m | Parkside Av (Q) → 14 St-Union Sq (Q) |  |
+| 25 | 309 | 0.19% | 0.47% | 1-seat | close | 0m | Sheepshead Bay (B,Q) → DeKalb Av (B,Q) |  |
 
 ### Top 25 destination stations, summed across all origins
 
-Sorted by each destination's one-seat ridership (i.e. its share of the 62,425/weekday one-seat total).
+Sorted by each destination's one-seat ridership (i.e. its share of the 65,384/weekday one-seat total).
 
 | Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
-| 9,376 | 83.5% | 12.55% | 100% | 0m | 34 St-Herald Sq (B,D,N,Q) |
-| 8,565 | 78.5% | 10.77% | 100% | 0m | Atlantic Av (B,D,N,Q) |
-| 6,250 | 73.0% | 7.30% | 75% | 217m | 14 St-Union Sq (N,Q) |
-| 5,768 | 76.1% | 7.03% | 65% | 180m | Canal St (N,Q) |
-| 6,000 | 71.9% | 6.91% | 100% | 53m | Times Sq-42 St/PABT (N,Q) |
-| 5,521 | 64.3% | 5.69% | 0% | 608m | Grand St (B,D) |
-| 5,513 | 55.2% | 4.87% | 64% | 291m | DeKalb Av (B,Q) |
-| 4,179 | 65.7% | 4.40% | 69% | 386m | 47-50 Sts-Rockefeller Ctr (B,D) |
-| 3,476 | 69.4% | 3.86% | 100% | 191m | 42 St-Bryant Pk/5 Av (B,D) |
-| 2,167 | 81.3% | 2.82% | 100% | 32m | 57 St-7 Av (N,Q) |
-| 3,612 | 44.6% | 2.58% | 0% | 942m | Chambers St/WTC/Park Pl/Cortlandt St (R) |
-| 2,413 | 65.9% | 2.55% | 61% | 431m | Broadway-Lafayette St/Bleecker St (B,D) |
-| 3,283 | 48.3% | 2.54% | 0% | 763m | Jay St-MetroTech (R) |
-| 2,444 | 60.5% | 2.37% | 0% | 778m | W 4 St-Wash Sq (B,D) |
-| 2,210 | 63.8% | 2.26% | 0% | 413m | 59 St-Columbus Circle (B,D) |
-| 2,191 | 61.2% | 2.15% | 0% | 1246m | 72 St (Q) |
-| 2,542 | 40.6% | 1.65% | 0% | 975m | Borough Hall/Court St (R) |
-| 1,988 | 46.0% | 1.46% | 0% | 2068m | Whitehall St-South Ferry (R) |
-| 982 | 73.7% | 1.16% | 69% | 570m | Lexington Av/63 St (Q) |
-| 898 | 73.3% | 1.05% | 100% | 217m | 7 Av (B,D) |
-| 1,126 | 57.7% | 1.04% | 0% | 2272m | 86 St (Q) |
-| 1,002 | 63.5% | 1.02% | 0% | 2943m | 96 St (Q) |
-| 1,351 | 39.5% | 0.85% | 81% | 208m | 49 St (N) |
-| 1,447 | 34.7% | 0.80% | 83% | 307m | Lexington Av/59 St (N) |
-| 957 | 51.6% | 0.79% | 0% | 899m | City Hall (R) |
+| 9,882 | 83.0% | 12.54% | 100% | 0m | 34 St-Herald Sq (B,D,N,Q) |
+| 9,334 | 78.3% | 11.18% | 100% | 0m | Atlantic Av (B,D,N,Q) |
+| 6,795 | 73.2% | 7.60% | 76% | 211m | 14 St-Union Sq (N,Q) |
+| 6,365 | 72.2% | 7.03% | 100% | 51m | Times Sq-42 St/PABT (N,Q) |
+| 5,982 | 75.8% | 6.94% | 67% | 170m | Canal St (N,Q) |
+| 5,402 | 62.4% | 5.16% | 0% | 609m | Grand St (B,D) |
+| 5,881 | 54.5% | 4.90% | 65% | 282m | DeKalb Av (B,Q) |
+| 4,413 | 64.0% | 4.32% | 68% | 391m | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 3,583 | 66.8% | 3.66% | 100% | 191m | 42 St-Bryant Pk/5 Av (B,D) |
+| 2,340 | 81.2% | 2.91% | 100% | 34m | 57 St-7 Av (N,Q) |
+| 3,941 | 45.5% | 2.74% | 0% | 943m | Chambers St/WTC/Park Pl/Cortlandt St (R) |
+| 2,636 | 64.0% | 2.58% | 57% | 457m | Broadway-Lafayette St/Bleecker St (B,D) |
+| 3,441 | 48.4% | 2.55% | 0% | 764m | Jay St-MetroTech (R) |
+| 2,685 | 57.6% | 2.36% | 0% | 782m | W 4 St-Wash Sq (B,D) |
+| 2,268 | 62.1% | 2.15% | 0% | 413m | 59 St-Columbus Circle (B,D) |
+| 2,271 | 60.9% | 2.12% | 0% | 1236m | 72 St (Q) |
+| 2,603 | 41.0% | 1.63% | 0% | 982m | Borough Hall/Court St (R) |
+| 2,032 | 46.6% | 1.45% | 0% | 2065m | Whitehall St-South Ferry (R) |
+| 1,069 | 70.6% | 1.15% | 66% | 607m | Lexington Av/63 St (Q) |
+| 1,235 | 56.7% | 1.07% | 0% | 2270m | 86 St (Q) |
+| 1,107 | 62.3% | 1.05% | 0% | 2943m | 96 St (Q) |
+| 927 | 71.6% | 1.02% | 100% | 217m | 7 Av (B,D) |
+| 1,576 | 39.5% | 0.95% | 81% | 211m | 49 St (N) |
+| 1,201 | 43.3% | 0.80% | 0% | 663m | 23 St (R) |
+| 1,509 | 34.1% | 0.79% | 83% | 301m | Lexington Av/59 St (N) |
 
 _Full row-level detail (every origin/destination pair, not just the top 25): `data/dekalb_weekday_pairs_actual.csv`._
 
@@ -94,63 +94,63 @@ Deinterlining scenario: 4 Av express served by B,D; Brighton served by N,Q (each
 
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 722 | 0.47% | 1.37% | 1-seat | close | 0m | Kings Hwy (N,Q) → 34 St-Herald Sq (N,Q) |  |
-| 2 | 548 | 0.36% | 1.04% | 1-seat | close | 0m | 36 St (B,D) → Atlantic Av (B,D) |  |
-| 3 | 530 | 0.35% | 1.01% | 1-seat | close | 0m | 7 Av (N,Q) → 14 St-Union Sq (N,Q) |  |
-| 4 | 471 | 0.31% | 0.89% | 1-seat | close | 0m | Church Av (N,Q) → 34 St-Herald Sq (N,Q) |  |
-| 5 | 444 | 0.29% | 0.84% | 1-seat | close | 0m | Church Av (N,Q) → Atlantic Av (N,Q) |  |
-| 6 | 439 | 0.29% | 0.83% | 1-seat | close | 0m | Kings Hwy (Q) → DeKalb Av (Q) |  |
-| 7 | 429 | 0.28% |  | xfer | far | 518m | 8 Av (B,D) → Canal St (N,Q) | Grand St (B,D) |
-| 8 | 409 | 0.27% | 0.77% | 1-seat | close | 0m | Sheepshead Bay (N,Q) → 34 St-Herald Sq (N,Q) |  |
-| 9 | 400 | 0.26% | 0.76% | 1-seat | close | 0m | 59 St (B,D) → Atlantic Av (B,D) |  |
-| 10 | 392 | 0.26% |  | xfer | close | 274m | Kings Hwy (N,Q) → 47-50 Sts-Rockefeller Ctr (B,D) | 49 St (N,R) |
-| 11 | 390 | 0.26% | 0.74% | 1-seat | close | 0m | Church Av (N,Q) → 14 St-Union Sq (N,Q) |  |
-| 12 | 382 | 0.25% | 0.73% | 1-seat | close | 0m | Church Av (Q) → DeKalb Av (Q) |  |
-| 13 | 347 | 0.23% |  | xfer | close | 191m | Kings Hwy (N,Q) → 42 St-Bryant Pk/5 Av (B,D) | Times Sq-42 St (N,Q,R) |
-| 14 | 332 | 0.22% | 0.63% | 1-seat | close | 0m | Newkirk Plaza (N,Q) → 34 St-Herald Sq (N,Q) |  |
-| 15 | 330 | 0.22% | 0.63% | 1-seat | close | 0m | 79 St (B,D) → Grand St (B,D) |  |
-| 16 | 328 | 0.21% | 0.62% | 1-seat | close | 0m | Church Av (N,Q) → Times Sq-42 St/PABT (N,Q) |  |
-| 17 | 325 | 0.21% | 0.62% | 1-seat | close | 0m | Kings Hwy (N,Q) → Atlantic Av (N,Q) |  |
-| 18 | 320 | 0.21% | 0.61% | 1-seat | close | 0m | 7 Av (N,Q) → 34 St-Herald Sq (N,Q) |  |
-| 19 | 317 | 0.21% | 0.60% | 1-seat | close | 0m | Sheepshead Bay (Q) → DeKalb Av (Q) |  |
-| 20 | 310 | 0.20% | 0.59% | 1-seat | close | 0m | Bay Pkwy (B,D) → Grand St (B,D) |  |
-| 21 | 310 | 0.20% |  | xfer | close | 0m | 86 St (R) → Atlantic Av (D,N) | Atlantic Av (D,N,R) |
-| 22 | 306 | 0.20% | 0.58% | 1-seat | close | 0m | 8 Av (B,D) → Atlantic Av (B,D) |  |
-| 23 | 306 | 0.20% | 0.58% | 1-seat | close | 0m | Kings Hwy (N,Q) → Times Sq-42 St/PABT (N,Q) |  |
-| 24 | 304 | 0.20% | 0.58% | 1-seat | close | 0m | 36 St (B,D) → 34 St-Herald Sq (B,D) |  |
-| 25 | 304 | 0.20% | 0.58% | 1-seat | close | 0m | Prospect Park (N,Q) → 14 St-Union Sq (N,Q) |  |
+| 1 | 727 | 0.45% | 1.30% | 1-seat | close | 0m | Kings Hwy (N,Q) → 34 St-Herald Sq (N,Q) |  |
+| 2 | 621 | 0.38% | 1.11% | 1-seat | close | 0m | 36 St (B,D) → Atlantic Av (B,D) |  |
+| 3 | 583 | 0.36% | 1.05% | 1-seat | close | 0m | 7 Av (N,Q) → 14 St-Union Sq (N,Q) |  |
+| 4 | 471 | 0.29% | 0.84% | 1-seat | close | 0m | Kings Hwy (Q) → DeKalb Av (Q) |  |
+| 5 | 455 | 0.28% |  | xfer | far | 518m | 8 Av (B,D) → Canal St (N,Q) | Grand St (B,D) |
+| 6 | 449 | 0.28% | 0.80% | 1-seat | close | 0m | 59 St (B,D) → Atlantic Av (B,D) |  |
+| 7 | 416 | 0.25% | 0.75% | 1-seat | close | 0m | Church Av (N,Q) → 34 St-Herald Sq (N,Q) |  |
+| 8 | 403 | 0.25% | 0.72% | 1-seat | close | 0m | Sheepshead Bay (N,Q) → 34 St-Herald Sq (N,Q) |  |
+| 9 | 396 | 0.24% | 0.71% | 1-seat | close | 0m | Church Av (N,Q) → Atlantic Av (N,Q) |  |
+| 10 | 396 | 0.24% |  | xfer | close | 274m | Kings Hwy (N,Q) → 47-50 Sts-Rockefeller Ctr (B,D) | 49 St (N,R) |
+| 11 | 363 | 0.22% | 0.65% | 1-seat | close | 0m | Kings Hwy (N,Q) → Atlantic Av (N,Q) |  |
+| 12 | 356 | 0.22% | 0.64% | 1-seat | close | 0m | Church Av (N,Q) → 14 St-Union Sq (N,Q) |  |
+| 13 | 346 | 0.21% | 0.62% | 1-seat | close | 0m | 36 St (B,D) → 34 St-Herald Sq (B,D) |  |
+| 14 | 343 | 0.21% | 0.61% | 1-seat | close | 0m | 59 St (B,D) → 34 St-Herald Sq (B,D) |  |
+| 15 | 338 | 0.21% | 0.61% | 1-seat | close | 0m | Kings Hwy (N,Q) → Times Sq-42 St/PABT (N,Q) |  |
+| 16 | 338 | 0.21% | 0.61% | 1-seat | close | 0m | Prospect Park (N,Q) → 34 St-Herald Sq (N,Q) |  |
+| 17 | 334 | 0.20% | 0.60% | 1-seat | close | 0m | Prospect Park (N,Q) → 14 St-Union Sq (N,Q) |  |
+| 18 | 330 | 0.20% | 0.59% | 1-seat | close | 0m | Newkirk Plaza (N,Q) → 34 St-Herald Sq (N,Q) |  |
+| 19 | 329 | 0.20% |  | xfer | close | 0m | 86 St (R) → Atlantic Av (D,N) | Atlantic Av (D,N,R) |
+| 20 | 328 | 0.20% | 0.59% | 1-seat | close | 0m | 8 Av (B,D) → Atlantic Av (B,D) |  |
+| 21 | 325 | 0.20% | 0.58% | 1-seat | close | 0m | Church Av (Q) → DeKalb Av (Q) |  |
+| 22 | 321 | 0.20% |  | xfer | close | 191m | Kings Hwy (N,Q) → 42 St-Bryant Pk/5 Av (B,D) | Times Sq-42 St (N,Q,R) |
+| 23 | 321 | 0.20% | 0.58% | 1-seat | close | 0m | 7 Av (N,Q) → 34 St-Herald Sq (N,Q) |  |
+| 24 | 320 | 0.20% | 0.57% | 1-seat | close | 0m | Parkside Av (N,Q) → 14 St-Union Sq (N,Q) |  |
+| 25 | 309 | 0.19% | 0.55% | 1-seat | close | 0m | Sheepshead Bay (Q) → DeKalb Av (Q) |  |
 
 ### Top 25 destination stations, summed across all origins
 
-Sorted by each destination's one-seat ridership (i.e. its share of the 52,723/weekday one-seat total).
+Sorted by each destination's one-seat ridership (i.e. its share of the 55,794/weekday one-seat total).
 
 | Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
-| 9,376 | 83.5% | 14.86% | 100% | 0m | 34 St-Herald Sq (B,D,N,Q) |
-| 8,565 | 78.5% | 12.76% | 100% | 0m | Atlantic Av (B,D,N,Q) |
-| 5,513 | 77.2% | 8.07% | 100% | 0m | DeKalb Av (B,Q) |
-| 5,521 | 62.6% | 6.56% | 0% | 606m | Grand St (B,D) |
-| 6,250 | 52.1% | 6.17% | 58% | 361m | 14 St-Union Sq (N,Q) |
-| 6,000 | 48.3% | 5.50% | 100% | 86m | Times Sq-42 St/PABT (N,Q) |
-| 5,768 | 37.9% | 4.15% | 36% | 333m | Canal St (N,Q) |
-| 3,612 | 44.6% | 3.06% | 0% | 1044m | Chambers St/WTC/Park Pl/Cortlandt St (R) |
-| 3,283 | 48.3% | 3.01% | 0% | 387m | Jay St-MetroTech (R) |
-| 4,179 | 34.1% | 2.70% | 100% | 274m | 47-50 Sts-Rockefeller Ctr (B,D) |
-| 3,476 | 38.7% | 2.55% | 100% | 191m | 42 St-Bryant Pk/5 Av (B,D) |
-| 2,191 | 61.2% | 2.54% | 0% | 1365m | 72 St (Q) |
-| 2,167 | 59.9% | 2.46% | 100% | 97m | 57 St-7 Av (N,Q) |
-| 2,542 | 40.6% | 1.96% | 0% | 729m | Borough Hall/Court St (R) |
-| 1,988 | 46.0% | 1.73% | 0% | 2141m | Whitehall St-South Ferry (R) |
-| 2,444 | 36.5% | 1.69% | 0% | 841m | W 4 St-Wash Sq (B,D) |
-| 2,413 | 34.8% | 1.59% | 29% | 653m | Broadway-Lafayette St/Bleecker St (B,D) |
-| 2,210 | 36.9% | 1.55% | 0% | 413m | 59 St-Columbus Circle (B,D) |
-| 982 | 73.7% | 1.37% | 49% | 796m | Lexington Av/63 St (Q) |
-| 1,126 | 57.7% | 1.23% | 0% | 1851m | 86 St (Q) |
-| 1,002 | 63.5% | 1.21% | 0% | 2165m | 96 St (Q) |
-| 957 | 51.6% | 0.94% | 0% | 1018m | City Hall (R) |
-| 1,110 | 44.3% | 0.93% | 0% | 744m | 23 St (R) |
-| 1,447 | 31.5% | 0.86% | 51% | 565m | Lexington Av/59 St (N) |
-| 1,351 | 31.1% | 0.80% | 100% | 117m | 49 St (N) |
+| 9,882 | 83.0% | 14.70% | 100% | 0m | 34 St-Herald Sq (B,D,N,Q) |
+| 9,334 | 78.3% | 13.10% | 100% | 0m | Atlantic Av (B,D,N,Q) |
+| 5,881 | 76.6% | 8.07% | 100% | 0m | DeKalb Av (B,Q) |
+| 6,795 | 52.1% | 6.35% | 60% | 349m | 14 St-Union Sq (N,Q) |
+| 5,402 | 62.2% | 6.03% | 0% | 608m | Grand St (B,D) |
+| 6,365 | 48.3% | 5.50% | 100% | 83m | Times Sq-42 St/PABT (N,Q) |
+| 5,982 | 38.8% | 4.16% | 38% | 322m | Canal St (N,Q) |
+| 3,941 | 45.5% | 3.22% | 0% | 1044m | Chambers St/WTC/Park Pl/Cortlandt St (R) |
+| 3,441 | 48.4% | 2.99% | 0% | 387m | Jay St-MetroTech (R) |
+| 4,413 | 34.4% | 2.72% | 100% | 274m | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 3,583 | 39.8% | 2.55% | 100% | 191m | 42 St-Bryant Pk/5 Av (B,D) |
+| 2,340 | 60.9% | 2.55% | 100% | 94m | 57 St-7 Av (N,Q) |
+| 2,271 | 60.9% | 2.48% | 0% | 1353m | 72 St (Q) |
+| 2,603 | 41.0% | 1.91% | 0% | 729m | Borough Hall/Court St (R) |
+| 2,685 | 37.3% | 1.80% | 0% | 837m | W 4 St-Wash Sq (B,D) |
+| 2,636 | 36.1% | 1.71% | 29% | 653m | Broadway-Lafayette St/Bleecker St (B,D) |
+| 2,032 | 46.6% | 1.70% | 0% | 2140m | Whitehall St-South Ferry (R) |
+| 2,268 | 37.6% | 1.53% | 0% | 413m | 59 St-Columbus Circle (B,D) |
+| 1,069 | 70.6% | 1.35% | 47% | 814m | Lexington Av/63 St (Q) |
+| 1,235 | 56.7% | 1.26% | 0% | 1854m | 86 St (Q) |
+| 1,107 | 62.3% | 1.24% | 0% | 2156m | 96 St (Q) |
+| 1,201 | 43.3% | 0.93% | 0% | 744m | 23 St (R) |
+| 949 | 52.2% | 0.89% | 0% | 1012m | City Hall (R) |
+| 1,576 | 30.5% | 0.86% | 100% | 120m | 49 St (N) |
+| 1,509 | 30.9% | 0.84% | 51% | 559m | Lexington Av/59 St (N) |
 
 _Full row-level detail (every origin/destination pair, not just the top 25): `data/dekalb_weekday_pairs_a.csv`._
 
@@ -164,63 +164,63 @@ Deinterlining scenario: 4 Av express served by N,Q; Brighton served by B,D (each
 
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 722 | 0.47% | 1.47% | 1-seat | close | 0m | Kings Hwy (B,D) → 34 St-Herald Sq (B,D) |  |
-| 2 | 548 | 0.36% | 1.11% | 1-seat | close | 0m | 36 St (N,Q) → Atlantic Av (N,Q) |  |
-| 3 | 530 | 0.35% |  | xfer | far | 867m | 7 Av (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
-| 4 | 471 | 0.31% | 0.96% | 1-seat | close | 0m | Church Av (B,D) → 34 St-Herald Sq (B,D) |  |
-| 5 | 444 | 0.29% | 0.90% | 1-seat | close | 0m | Church Av (B,D) → Atlantic Av (B,D) |  |
-| 6 | 439 | 0.29% | 0.89% | 1-seat | close | 0m | Kings Hwy (B) → DeKalb Av (B) |  |
-| 7 | 429 | 0.28% | 0.87% | 1-seat | close | 0m | 8 Av (N,Q) → Canal St (N,Q) |  |
-| 8 | 409 | 0.27% | 0.83% | 1-seat | close | 0m | Sheepshead Bay (B,D) → 34 St-Herald Sq (B,D) |  |
-| 9 | 400 | 0.26% | 0.81% | 1-seat | close | 0m | 59 St (N,Q) → Atlantic Av (N,Q) |  |
-| 10 | 392 | 0.26% | 0.80% | 1-seat | close | 0m | Kings Hwy (B,D) → 47-50 Sts-Rockefeller Ctr (B,D) |  |
-| 11 | 390 | 0.26% |  | xfer | far | 867m | Church Av (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
-| 12 | 382 | 0.25% | 0.78% | 1-seat | close | 0m | Church Av (B) → DeKalb Av (B) |  |
-| 13 | 347 | 0.23% | 0.71% | 1-seat | close | 0m | Kings Hwy (B,D) → 42 St-Bryant Pk/5 Av (B,D) |  |
-| 14 | 332 | 0.22% | 0.67% | 1-seat | close | 0m | Newkirk Plaza (B,D) → 34 St-Herald Sq (B,D) |  |
-| 15 | 330 | 0.22% |  | xfer | far | 565m | 79 St (N,Q) → Grand St (B,D) | Canal St (N,Q) |
-| 16 | 328 | 0.21% |  | xfer | close | 191m | Church Av (B,D) → Times Sq-42 St/PABT (N,Q) | 42 St-Bryant Pk (B,D) |
-| 17 | 325 | 0.21% | 0.66% | 1-seat | close | 0m | Kings Hwy (B,D) → Atlantic Av (B,D) |  |
-| 18 | 320 | 0.21% | 0.65% | 1-seat | close | 0m | 7 Av (B,D) → 34 St-Herald Sq (B,D) |  |
-| 19 | 317 | 0.21% | 0.64% | 1-seat | close | 0m | Sheepshead Bay (B) → DeKalb Av (B) |  |
-| 20 | 310 | 0.20% |  | xfer | far | 565m | Bay Pkwy (N,Q) → Grand St (B,D) | Canal St (N,Q) |
-| 21 | 310 | 0.20% |  | xfer | close | 0m | 86 St (R) → Atlantic Av (D,N) | Atlantic Av (D,N,R) |
-| 22 | 306 | 0.20% | 0.62% | 1-seat | close | 0m | 8 Av (N,Q) → Atlantic Av (N,Q) |  |
-| 23 | 306 | 0.20% |  | xfer | close | 191m | Kings Hwy (B,D) → Times Sq-42 St/PABT (N,Q) | 42 St-Bryant Pk (B,D) |
-| 24 | 304 | 0.20% | 0.62% | 1-seat | close | 0m | 36 St (N,Q) → 34 St-Herald Sq (N,Q) |  |
-| 25 | 304 | 0.20% |  | xfer | far | 867m | Prospect Park (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
+| 1 | 727 | 0.45% | 1.41% | 1-seat | close | 0m | Kings Hwy (B,D) → 34 St-Herald Sq (B,D) |  |
+| 2 | 621 | 0.38% | 1.20% | 1-seat | close | 0m | 36 St (N,Q) → Atlantic Av (N,Q) |  |
+| 3 | 583 | 0.36% |  | xfer | far | 867m | 7 Av (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
+| 4 | 471 | 0.29% | 0.91% | 1-seat | close | 0m | Kings Hwy (B) → DeKalb Av (B) |  |
+| 5 | 455 | 0.28% | 0.88% | 1-seat | close | 0m | 8 Av (N,Q) → Canal St (N,Q) |  |
+| 6 | 449 | 0.28% | 0.87% | 1-seat | close | 0m | 59 St (N,Q) → Atlantic Av (N,Q) |  |
+| 7 | 416 | 0.25% | 0.81% | 1-seat | close | 0m | Church Av (B,D) → 34 St-Herald Sq (B,D) |  |
+| 8 | 403 | 0.25% | 0.78% | 1-seat | close | 0m | Sheepshead Bay (B,D) → 34 St-Herald Sq (B,D) |  |
+| 9 | 396 | 0.24% | 0.77% | 1-seat | close | 0m | Church Av (B,D) → Atlantic Av (B,D) |  |
+| 10 | 396 | 0.24% | 0.77% | 1-seat | close | 0m | Kings Hwy (B,D) → 47-50 Sts-Rockefeller Ctr (B,D) |  |
+| 11 | 363 | 0.22% | 0.70% | 1-seat | close | 0m | Kings Hwy (B,D) → Atlantic Av (B,D) |  |
+| 12 | 356 | 0.22% |  | xfer | far | 867m | Church Av (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
+| 13 | 346 | 0.21% | 0.67% | 1-seat | close | 0m | 36 St (N,Q) → 34 St-Herald Sq (N,Q) |  |
+| 14 | 343 | 0.21% | 0.66% | 1-seat | close | 0m | 59 St (N,Q) → 34 St-Herald Sq (N,Q) |  |
+| 15 | 338 | 0.21% |  | xfer | close | 191m | Kings Hwy (B,D) → Times Sq-42 St/PABT (N,Q) | 42 St-Bryant Pk (B,D) |
+| 16 | 338 | 0.21% | 0.65% | 1-seat | close | 0m | Prospect Park (B,D) → 34 St-Herald Sq (B,D) |  |
+| 17 | 334 | 0.20% |  | xfer | far | 867m | Prospect Park (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
+| 18 | 330 | 0.20% | 0.64% | 1-seat | close | 0m | Newkirk Plaza (B,D) → 34 St-Herald Sq (B,D) |  |
+| 19 | 329 | 0.20% |  | xfer | close | 0m | 86 St (R) → Atlantic Av (D,N) | Atlantic Av (D,N,R) |
+| 20 | 328 | 0.20% | 0.64% | 1-seat | close | 0m | 8 Av (N,Q) → Atlantic Av (N,Q) |  |
+| 21 | 325 | 0.20% | 0.63% | 1-seat | close | 0m | Church Av (B) → DeKalb Av (B) |  |
+| 22 | 321 | 0.20% | 0.62% | 1-seat | close | 0m | Kings Hwy (B,D) → 42 St-Bryant Pk/5 Av (B,D) |  |
+| 23 | 321 | 0.20% | 0.62% | 1-seat | close | 0m | 7 Av (B,D) → 34 St-Herald Sq (B,D) |  |
+| 24 | 320 | 0.20% |  | xfer | far | 867m | Parkside Av (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
+| 25 | 309 | 0.19% | 0.60% | 1-seat | close | 0m | Sheepshead Bay (B) → DeKalb Av (B) |  |
 
 ### Top 25 destination stations, summed across all origins
 
-Sorted by each destination's one-seat ridership (i.e. its share of the 49,180/weekday one-seat total).
+Sorted by each destination's one-seat ridership (i.e. its share of the 51,623/weekday one-seat total).
 
 | Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
-| 9,376 | 83.5% | 15.93% | 100% | 0m | 34 St-Herald Sq (B,D,N,Q) |
-| 8,565 | 78.5% | 13.68% | 100% | 0m | Atlantic Av (B,D,N,Q) |
-| 5,513 | 77.2% | 8.65% | 100% | 0m | DeKalb Av (B,Q) |
-| 5,768 | 48.4% | 5.67% | 30% | 362m | Canal St (N,Q) |
-| 4,179 | 50.4% | 4.29% | 100% | 274m | 47-50 Sts-Rockefeller Ctr (B,D) |
-| 6,000 | 34.7% | 4.24% | 100% | 131m | Times Sq-42 St/PABT (N,Q) |
-| 6,250 | 29.7% | 3.78% | 29% | 617m | 14 St-Union Sq (N,Q) |
-| 3,612 | 44.6% | 3.28% | 0% | 1104m | Chambers St/WTC/Park Pl/Cortlandt St (R) |
-| 3,476 | 46.1% | 3.26% | 100% | 191m | 42 St-Bryant Pk/5 Av (B,D) |
-| 3,283 | 48.3% | 3.22% | 0% | 387m | Jay St-MetroTech (R) |
-| 5,521 | 27.0% | 3.03% | 0% | 586m | Grand St (B,D) |
-| 2,413 | 48.3% | 2.37% | 50% | 507m | Broadway-Lafayette St/Bleecker St (B,D) |
-| 2,444 | 42.8% | 2.13% | 0% | 800m | W 4 St-Wash Sq (B,D) |
-| 2,542 | 40.6% | 2.10% | 0% | 729m | Borough Hall/Court St (R) |
-| 2,210 | 46.3% | 2.08% | 0% | 413m | 59 St-Columbus Circle (B,D) |
-| 1,988 | 46.0% | 1.86% | 0% | 2186m | Whitehall St-South Ferry (R) |
-| 1,447 | 46.1% | 1.36% | 47% | 614m | Lexington Av/59 St (N) |
-| 1,351 | 43.7% | 1.20% | 100% | 137m | 49 St (N) |
-| 2,191 | 26.4% | 1.18% | 0% | 1560m | 72 St (Q) |
-| 2,167 | 26.1% | 1.15% | 100% | 170m | 57 St-7 Av (N,Q) |
-| 957 | 51.6% | 1.00% | 0% | 1001m | City Hall (R) |
-| 1,110 | 44.3% | 1.00% | 0% | 816m | 23 St (R) |
-| 898 | 50.4% | 0.92% | 100% | 217m | 7 Av (B,D) |
-| 720 | 52.7% | 0.77% | 0% | 631m | 8 St-NYU (R) |
-| 810 | 44.7% | 0.74% | 45% | 399m | 5 Av/59 St (N) |
+| 9,882 | 83.0% | 15.89% | 100% | 0m | 34 St-Herald Sq (B,D,N,Q) |
+| 9,334 | 78.3% | 14.15% | 100% | 0m | Atlantic Av (B,D,N,Q) |
+| 5,881 | 76.6% | 8.72% | 100% | 0m | DeKalb Av (B,Q) |
+| 5,982 | 46.9% | 5.43% | 31% | 359m | Canal St (N,Q) |
+| 4,413 | 49.9% | 4.26% | 100% | 274m | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 6,365 | 34.5% | 4.26% | 100% | 131m | Times Sq-42 St/PABT (N,Q) |
+| 6,795 | 29.5% | 3.89% | 29% | 617m | 14 St-Union Sq (N,Q) |
+| 3,941 | 45.5% | 3.48% | 0% | 1103m | Chambers St/WTC/Park Pl/Cortlandt St (R) |
+| 3,441 | 48.4% | 3.23% | 0% | 387m | Jay St-MetroTech (R) |
+| 3,583 | 44.0% | 3.05% | 100% | 191m | 42 St-Bryant Pk/5 Av (B,D) |
+| 5,402 | 26.6% | 2.79% | 0% | 588m | Grand St (B,D) |
+| 2,636 | 47.3% | 2.42% | 49% | 511m | Broadway-Lafayette St/Bleecker St (B,D) |
+| 2,685 | 41.2% | 2.15% | 0% | 800m | W 4 St-Wash Sq (B,D) |
+| 2,603 | 41.0% | 2.07% | 0% | 729m | Borough Hall/Court St (R) |
+| 2,268 | 45.3% | 1.99% | 0% | 413m | 59 St-Columbus Circle (B,D) |
+| 2,032 | 46.6% | 1.84% | 0% | 2188m | Whitehall St-South Ferry (R) |
+| 1,576 | 44.7% | 1.37% | 100% | 137m | 49 St (N) |
+| 1,509 | 45.5% | 1.33% | 48% | 594m | Lexington Av/59 St (N) |
+| 2,271 | 26.4% | 1.16% | 0% | 1555m | 72 St (Q) |
+| 2,340 | 25.3% | 1.15% | 100% | 171m | 57 St-7 Av (N,Q) |
+| 1,201 | 43.3% | 1.01% | 0% | 819m | 23 St (R) |
+| 949 | 52.2% | 0.96% | 0% | 1009m | City Hall (R) |
+| 927 | 46.8% | 0.84% | 100% | 217m | 7 Av (B,D) |
+| 821 | 52.4% | 0.83% | 0% | 631m | 8 St-NYU (R) |
+| 1,235 | 30.0% | 0.72% | 0% | 1793m | 86 St (Q) |
 
 _Full row-level detail (every origin/destination pair, not just the top 25): `data/dekalb_weekday_pairs_b.csv`._
 
