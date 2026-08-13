@@ -352,9 +352,9 @@ class ScenarioResult:
         lines.append("")
         lines.append(
             "| # | Riders | % Total | % 1-Seat | Type | Close? | Dist "
-            "| Origin → Destination |"
+            "| Origin → Destination | 1-Seat Destination |"
         )
-        lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+        lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
 
         def pair_riders(r: PairRow) -> float:
             return r.riders
@@ -371,16 +371,12 @@ class ScenarioResult:
                 pct_one_seat_str = f"{100 * r.riders / self.one_seat_riders:.2f}%"
             type_str = "1-seat" if r.one_seat else "xfer"
             close_str = "--" if r.close is None else ("close" if r.close else "far")
-            dist_str = (
-                "--"
-                if r.dist_m is None
-                else f"{r.dist_m:.0f}m"
-                + (f" ({r.near_station})" if r.near_station else "")
-            )
+            dist_str = "--" if r.dist_m is None else f"{r.dist_m:.0f}m"
+            near_station_str = r.near_station if r.near_station else "--"
             lines.append(
                 f"| {i} | {r.riders:,.0f} | {pct_total:.2f}% | {pct_one_seat_str} | "
                 f"{type_str} | {close_str} | {dist_str} | "
-                f"{r.origin_name} → {r.dest_name} |"
+                f"{r.origin_name} → {r.dest_name} | {near_station_str} |"
             )
         lines.append("")
 
@@ -840,12 +836,13 @@ def render_notes(*, close_threshold_m: float) -> str:
             "rider actually used -- the effective route already stops "
             "somewhere in that same complex, the rider's real historical "
             "destination either way.",
-            '- In the per-pair table (and CSV), a `xfer` row\'s "Dist" also '
-            "names the specific station `dist_m` was measured to, e.g. "
-            '"387m (Nostrand Av)" -- the nearest station on the origin\'s '
-            "own effective corridor, i.e. the one a rider would actually "
-            "walk to. Not shown for `1-seat` rows (nothing to walk to) or "
-            "in the per-destination table (an average across many pairs, "
+            '- In the per-pair table (and CSV), "1-Seat Destination" names '
+            "the specific station `dist_m` was measured to for a `xfer` "
+            "row: the nearest station on the origin's own effective "
+            "corridor -- i.e. what the destination would have had to be "
+            "for this row to be a `1-seat` ride instead. `--` for `1-seat` "
+            "rows (already true of the actual destination) and omitted "
+            "from the per-destination table (an average across many pairs, "
             "not a single station).",
             '- In the per-destination table, "Close?"/"Dist" are '
             "ridership-weighted across that destination's classified "
