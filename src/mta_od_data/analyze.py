@@ -130,11 +130,11 @@ class PairRow:
     dest_routes: str
     riders: float
     one_seat: bool
-    close: bool | None
-    dist_m: float | None
+    close: bool
+    dist_m: float
     # The specific station `dist_m` was measured to (on the origin's own
-    # effective corridor) -- None for `1-seat` rows (no walk to measure) or
-    # when `dist_m` itself is None (no candidate station at all).
+    # effective corridor) -- None for `1-seat` rows: there's no walk to
+    # name, since the classification already proves `dist_m` is 0.
     near_station: str | None
 
 
@@ -370,8 +370,8 @@ class ScenarioResult:
             if r.one_seat and self.one_seat_riders:
                 pct_one_seat_str = f"{100 * r.riders / self.one_seat_riders:.2f}%"
             type_str = "1-seat" if r.one_seat else "xfer"
-            close_str = "" if r.close is None else ("close" if r.close else "far")
-            dist_str = "" if r.dist_m is None else f"{r.dist_m:.0f}m"
+            close_str = "close" if r.close else "far"
+            dist_str = f"{r.dist_m:.0f}m"
             near_station_str = r.near_station if r.near_station else ""
             lines.append(
                 f"| {i} | {r.riders:,.0f} | {pct_total:.2f}% | {pct_one_seat_str} | "
@@ -506,9 +506,7 @@ def run_scenario(
     primary_routes_set: set[str],
     assigned_points: Callable[[set[str]], list[Station]],
     dest_points: Callable[[Station], list[Coord]],
-    min_dist_to_points: Callable[
-        [list[Coord], list[Station]], tuple[float, Station] | None
-    ],
+    min_dist_to_points: Callable[[list[Coord], list[Station]], tuple[float, Station]],
     origin_express_partners: dict[int, set[str]],
     close_threshold_m: float,
     origin_corridor_a_routes_set: set[str],
@@ -581,8 +579,11 @@ def run_scenario(
     dest_route_union: dict[int, set[str]] = {}
     for origin_id, dest_id, riders in scoped:
         origin = stations_by_id[origin_id]
-        dest = stations_by_id.get(dest_id)
-        dest_routes = dest.routes if dest else set()
+        # Guaranteed present: `scoped` only ever contains destinations that
+        # resolved against `stations_by_id` (see its construction above,
+        # which errors out immediately otherwise).
+        dest = stations_by_id[dest_id]
+        dest_routes = dest.routes
         is_one_seat, shared = classify_one_seat(
             effective_origin_routes[origin_id],
             dest_routes,
@@ -592,11 +593,9 @@ def run_scenario(
         if is_one_seat:
             one_seat_riders += riders
 
-        close = None
-        dist_m = None
         near_station: Station | None = None
         xfer_applicable_routes: set[str] | None = None
-        if not is_one_seat and dest:
+        if not is_one_seat:
             # is_one_seat already reflects this scenario's effective routing
             # (real current routes in baseline mode, the scenario's assigned
             # routes otherwise), so a one-seat rider here already has a
@@ -607,7 +606,7 @@ def run_scenario(
             # assigned routes)? If it's close, that's a "close one-seat ride"
             # (get off/board a short walk away, no train change), not a
             # transfer.
-            nearest = min_dist_to_points(
+            dist_m, near_station = min_dist_to_points(
                 dest_points(dest),
                 # Scoped to --routes: effective_origin_routes can carry real
                 # routes far outside this analysis (e.g. a station's F/G
@@ -616,9 +615,7 @@ def run_scenario(
                 # the junction being analyzed.
                 assigned_points(effective_origin_routes[origin_id] & routes_set),
             )
-            if nearest is not None:
-                dist_m, near_station = nearest
-            close = None if dist_m is None else dist_m <= close_threshold_m
+            close = dist_m <= close_threshold_m
             if dist_m == 0.0:
                 # The origin's own assigned route stops right at this
                 # destination (not just nearby), so there's no real transfer
@@ -634,11 +631,10 @@ def run_scenario(
                 xfer_applicable_routes = (
                     origin_express_partners.get(origin_id, set()) & dest_routes
                 )
-            if close is not None:
-                classified_many_seat_riders += riders
-                if close:
-                    close_one_seat_riders += riders
-        elif is_one_seat and dest:
+            classified_many_seat_riders += riders
+            if close:
+                close_one_seat_riders += riders
+        else:
             # The destination is a Complex ID in the source data, not a
             # specific platform -- so we have no way to tell which platform
             # of a merged complex a rider actually used. `is_one_seat` means
@@ -651,12 +647,7 @@ def run_scenario(
             # classification already proves the distance is 0.
             close, dist_m = True, 0.0
 
-        if dest is None:
-            dest_name = f"complex {dest_id}"
-            origin_name = origin.display(
-                effective_origin_routes[origin_id] & routes_set
-            )
-        elif is_one_seat:
+        if is_one_seat:
             # A one-seat ride's `shared` route(s) are the one(s) actually
             # ridden, so they pin down which physical platform of a merged
             # complex the rider lands on -- show just that, not every route
@@ -733,19 +724,16 @@ def run_scenario(
         # Summed across all origins, so unlike a single row's `dest_name`
         # this shows every route observed as an arrival route across all of
         # them -- not just the route(s) accounting for the last row seen.
-        dest_station = stations_by_id.get(r.dest_id)
+        dest_station = stations_by_id[r.dest_id]
         arrival_routes = dest_route_union.get(r.dest_id)
         dest_display_name = (
-            dest_station.display(arrival_routes)
-            if dest_station and arrival_routes
-            else r.dest_name
+            dest_station.display(arrival_routes) if arrival_routes else r.dest_name
         )
         d = dest_stats.setdefault(r.dest_id, DestStats(name=dest_display_name))
         d.total += r.riders
         if r.one_seat:
             d.one_seat += r.riders
-        elif r.close is not None:
-            assert r.dist_m is not None
+        else:
             d.many_seat_classified += r.riders
             d.many_seat_dist_weighted += r.riders * r.dist_m
             if r.close:
@@ -1298,13 +1286,19 @@ def one_seat_rides(
 
     def min_dist_to_points(
         points: list[Coord], candidates: list[Station]
-    ) -> tuple[float, Station] | None:
+    ) -> tuple[float, Station]:
+        # `candidates` empty would mean some route in the effective set has
+        # no individual station anywhere -- the CLI-level checks above rule
+        # out an empty *route set*, but not a gap in stations_individual.csv
+        # itself, so this stays a real (if unlikely) assertion, not dead code.
+        assert candidates, "no individual station serves this route set"
         best: tuple[float, Station] | None = None
         for p in points:
             for c in candidates:
                 dist_m = haversine_m(p, c.loc)
                 if best is None or dist_m < best[0]:
                     best = (dist_m, c)
+        assert best is not None
         return best
 
     results: list[ScenarioResult] = []
