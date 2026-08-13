@@ -22,7 +22,9 @@ from mta_od_data.analyze.common import (
 app = Typer()
 
 
-def prefer_primary(routes: set[str], primary_routes: set[str]) -> set[str]:
+def prefer_primary(
+    routes: frozenset[str], primary_routes: frozenset[str]
+) -> frozenset[str]:
     """A primary/express route beats a non-primary/local one (e.g. R)
     when both are available: a rider with the choice just takes the express,
     so a merely-present local isn't worth listing alongside it.
@@ -342,8 +344,8 @@ class ScenarioResult:
 @dataclass(slots=True, frozen=True)
 class ScenarioDef:
     label: str
-    corridor_a_assigned_set: set[str]
-    corridor_b_assigned_set: set[str]
+    corridor_a_assigned_set: frozenset[str]
+    corridor_b_assigned_set: frozenset[str]
     active: bool
     # Filename suffix for per-scenario CSV output; None means "write to the
     # given path unchanged" (only used when there's exactly one scenario, so
@@ -351,16 +353,16 @@ class ScenarioDef:
     suffix: str | None
 
 
-def parse_route_set(s: str) -> set[str]:
-    return {r.strip() for r in s.split(",") if r.strip()}
+def parse_route_set(s: str) -> frozenset[str]:
+    return frozenset(r.strip() for r in s.split(",") if r.strip())
 
 
 def classify_one_seat(
-    origin_routes: set[str],
-    dest_routes: set[str],
-    routes: set[str],
-    primary_routes: set[str],
-) -> tuple[bool, set[str]]:
+    origin_routes: frozenset[str],
+    dest_routes: frozenset[str],
+    routes: frozenset[str],
+    primary_routes: frozenset[str],
+) -> tuple[bool, frozenset[str]]:
     """A trip is one-seat if some shared route actually crosses the boundary
     junction (a primary route), or if the destination isn't served by any
     primary route anyway (so the non-primary connection, e.g. R, isn't
@@ -373,8 +375,8 @@ def classify_one_seat(
 
 
 def corridor_swap_label(
-    corridor_a_routes: set[str],
-    corridor_b_routes: set[str],
+    corridor_a_routes: frozenset[str],
+    corridor_b_routes: frozenset[str],
     origin_corridor_a_label: str,
     origin_corridor_b_label: str,
 ) -> str:
@@ -403,18 +405,18 @@ def run_scenario(
     total_riders: float,
     stations_by_id: dict[int, Station],
     origin_ids: list[int],
-    routes_set: set[str],
-    primary_routes_set: set[str],
-    min_dist_to_corridor: Callable[[Station, set[str]], tuple[float, Station]],
-    cached_display: Callable[[Station, set[str]], str],
-    origin_express_partners: dict[int, set[str]],
+    routes_set: frozenset[str],
+    primary_routes_set: frozenset[str],
+    min_dist_to_corridor: Callable[[Station, frozenset[str]], tuple[float, Station]],
+    cached_display: Callable[[Station, frozenset[str]], str],
+    origin_express_partners: dict[int, frozenset[str]],
     close_threshold_m: float,
-    origin_corridor_a_routes_set: set[str],
-    origin_corridor_b_routes_set: set[str],
+    origin_corridor_a_routes_set: frozenset[str],
+    origin_corridor_b_routes_set: frozenset[str],
     origin_corridor_a_label: str,
     origin_corridor_b_label: str,
-    corridor_a_assigned_set: set[str],
-    corridor_b_assigned_set: set[str],
+    corridor_a_assigned_set: frozenset[str],
+    corridor_b_assigned_set: frozenset[str],
     corridor_scenario_active: bool,
     verbose: bool,
 ) -> ScenarioResult:
@@ -428,7 +430,7 @@ def run_scenario(
     # that *doesn't* interline (e.g. R, which never crosses DeKalb) is kept
     # as-is regardless of scenario -- deinterlining the junction can't move a
     # route that never used it.
-    effective_origin_routes: dict[int, set[str]] = {}
+    effective_origin_routes: dict[int, frozenset[str]] = {}
     if verbose:
         print(f"\nCorridor assignment (scenario active: {corridor_scenario_active}):")
     for cid in origin_ids:
@@ -494,7 +496,7 @@ def run_scenario(
             one_seat_riders += riders
 
         near_station: Station | None = None
-        xfer_applicable_routes: set[str] | None = None
+        xfer_applicable_routes: frozenset[str] | None = None
         if not is_one_seat:
             # is_one_seat already reflects this scenario's effective routing
             # (real current routes in baseline mode, the scenario's assigned
@@ -529,7 +531,7 @@ def run_scenario(
                 # transfer to a *different* nearby station instead -- see
                 # the fallback below, which covers that case generically.
                 xfer_applicable_routes = (
-                    origin_express_partners.get(origin_id, set()) & dest_routes
+                    origin_express_partners.get(origin_id, frozenset()) & dest_routes
                 )
             classified_many_seat_riders += riders
             if close:
@@ -627,7 +629,7 @@ def run_scenario(
         dest_station = stations_by_id[r.dest_id]
         arrival_routes = dest_route_union.get(r.dest_id)
         dest_display_name = (
-            cached_display(dest_station, arrival_routes)
+            cached_display(dest_station, frozenset(arrival_routes))
             if arrival_routes
             else r.dest_name
         )
@@ -952,10 +954,10 @@ def one_seat_rides(
         raise SystemExit(1)
     corridor_scenario_active = corridor_a_assigned is not None
     corridor_a_assigned_set = (
-        parse_route_set(corridor_a_assigned) if corridor_a_assigned else set()
+        parse_route_set(corridor_a_assigned) if corridor_a_assigned else frozenset()
     )
     corridor_b_assigned_set = (
-        parse_route_set(corridor_b_assigned) if corridor_b_assigned else set()
+        parse_route_set(corridor_b_assigned) if corridor_b_assigned else frozenset()
     )
 
     # Today's actual routing isn't a single corridor->trunk assignment the way
@@ -978,7 +980,9 @@ def one_seat_rides(
         trunk_a_primary_set = trunk_a_set & primary_routes_set
         trunk_b_primary_set = trunk_b_set & primary_routes_set
         scenario_defs = [
-            ScenarioDef(actual_routing_label, set(), set(), False, "actual"),
+            ScenarioDef(
+                actual_routing_label, frozenset(), frozenset(), False, "actual"
+            ),
             ScenarioDef(
                 corridor_swap_label(
                     trunk_a_primary_set,
@@ -1164,12 +1168,12 @@ def one_seat_rides(
     # rider whose real service is slower than that is assumed to have
     # already ridden the faster one instead, wherever it also reaches the
     # destination -- see its use for close `xfer` rows below.
-    origin_express_partners: dict[int, set[str]] = {
-        cid: {
+    origin_express_partners: dict[int, frozenset[str]] = {
+        cid: frozenset(
             route
             for s in platforms_by_complex.get(cid, [])
             for route in routes_by_line.get(s.line, set()) & primary_routes_set
-        }
+        )
         for cid in origin_ids
     }
 
@@ -1207,7 +1211,7 @@ def one_seat_rides(
     cached_haversine = lru_cache(maxsize=None)(haversine_m)
 
     def min_dist_to_corridor(
-        dest: Station, assigned_routes: set[str]
+        dest: Station, assigned_routes: frozenset[str]
     ) -> tuple[float, Station]:
         routes_key = frozenset(assigned_routes)
         cache_key = (dest.complex_id, routes_key)
@@ -1251,7 +1255,7 @@ def one_seat_rides(
     # different display strings).
     display_cache: dict[tuple[str, frozenset[str]], str] = {}
 
-    def cached_display(station: Station, routes: set[str] | None = None) -> str:
+    def cached_display(station: Station, routes: frozenset[str] | None = None) -> str:
         shown_routes = station.routes if routes is None else routes
         key = (station.name, frozenset(shown_routes))
         cached = display_cache.get(key)
