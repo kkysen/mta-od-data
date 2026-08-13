@@ -4,7 +4,7 @@ import sys
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from datetime import date
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -1177,52 +1177,48 @@ def one_seat_rides(
         for cid in origin_ids
     }
 
+    # `Coord`/`Station` are both hashable now (frozen, and every field --
+    # including `Station.routes`, a `frozenset[str]` -- is itself hashable),
+    # so every cache below is a plain `functools.cache` keyed on the real
+    # objects involved, no manual key-building required. That's not just
+    # simpler: keying on the actual `Station` is also more precise than the
+    # `complex_id`-based key an earlier version of this used, which caused a
+    # real bug -- a merged complex and one of its own individual per-platform
+    # stations can share a `complex_id` but have a different `name` (e.g.
+    # "Chambers St/WTC/Park Pl/Cortlandt St" versus its own "Cortlandt St"
+    # platform), and dataclass equality on the whole `Station` already tells
+    # those apart correctly, with no extra field-picking to get right.
+    cached_haversine = cache(haversine_m)
+
     # Under a corridor scenario, "close" is about walking to whichever trunk
     # an origin's own corridor got assigned -- not to trunk_a/trunk_b as a
     # fixed pair -- so cache candidate-point sets per distinct assigned-route
     # set instead of hardcoding just two. Shared across scenarios: route sets
     # repeat (e.g. corridor A's assignment in one scenario is corridor B's in
     # the other), so the cache pays off across scenario runs too.
-    assigned_points_cache: dict[frozenset[str], list[Station]] = {}
+    @cache
+    def assigned_points(assigned_routes: frozenset[str]) -> list[Station]:
+        return [s for s in individual_stations if s.routes & assigned_routes]
 
-    # Two memoization layers, since they catch different kinds of repeat
-    # work. (destination complex, assigned route set) is the entire input to
-    # a distance search, and it repeats constantly across rows -- many
-    # origins share the same effective routes within a scenario, the same
-    # destination shows up under many different origins, and scenarios often
-    # reuse each other's route assignments -- so `min_dist_cache` skips
-    # re-running the whole points x candidates sweep for a combination
-    # already seen. But two different (dest, routes) combinations can still
-    # share individual point pairs (e.g. their candidate stations overlap
-    # even though the route sets differ), which `min_dist_cache` alone
-    # doesn't catch -- `cached_haversine` below catches that layer too.
-    # Measured on the default DeKalb scenario: 2.19M raw haversine calls
-    # collapse to ~240K sweep-level cache misses, which collapse further to
-    # the ~39K individual point pairs actually distinct -- a combined ~56x
-    # reduction in real distance computations, with results unchanged since
-    # the underlying math is identical either way.
-    min_dist_cache: dict[tuple[int, frozenset[str]], tuple[float, Station]] = {}
-    # `Coord` (unlike `Station`, whose `routes: set[str]` field keeps it
-    # unhashable even though frozen) has no unhashable fields, so its two
-    # arguments need no normalizing before caching -- a plain `lru_cache`
-    # applies directly, and measured slightly faster than an equivalent
-    # manual dict (the C-implemented cache lookup beats the same logic
-    # written in Python bytecode).
-    cached_haversine = lru_cache(maxsize=None)(haversine_m)
-
+    # (destination, assigned route set) is the entire input to a distance
+    # search, and it repeats constantly across rows -- many origins share the
+    # same effective routes within a scenario, the same destination shows up
+    # under many different origins, and scenarios often reuse each other's
+    # route assignments -- so caching here skips re-running the whole points
+    # x candidates sweep for a combination already seen. But two different
+    # (dest, routes) combinations can still share individual point pairs
+    # (e.g. their candidate stations overlap even though the route sets
+    # differ), which this alone doesn't catch -- `cached_haversine` above
+    # catches that layer too. Measured on the default DeKalb scenario: 2.19M
+    # raw haversine calls collapse to ~240K sweep-level cache misses, which
+    # collapse further to the ~39K individual point pairs actually distinct
+    # -- a combined ~56x reduction in real distance computations, with
+    # results unchanged since the underlying math is identical either way.
+    @cache
     def min_dist_to_corridor(
         dest: Station, assigned_routes: frozenset[str]
     ) -> tuple[float, Station]:
-        routes_key = frozenset(assigned_routes)
-        cache_key = (dest.complex_id, routes_key)
-        cached = min_dist_cache.get(cache_key)
-        if cached is not None:
-            return cached
-        if routes_key not in assigned_points_cache:
-            assigned_points_cache[routes_key] = [
-                s for s in individual_stations if s.routes & assigned_routes
-            ]
-        candidates = assigned_points_cache[routes_key]
+        candidates = assigned_points(assigned_routes)
         # `candidates` empty would mean some route in the effective set has
         # no individual station anywhere -- the CLI-level checks above rule
         # out an empty *route set*, but not a gap in stations_individual.csv
@@ -1236,7 +1232,6 @@ def one_seat_rides(
                 if best is None or dist_m < best[0]:
                     best = (dist_m, c)
         assert best is not None
-        min_dist_cache[cache_key] = best
         return best
 
     # Same redundancy pattern as the distance search, worse: every row needs
@@ -1245,24 +1240,8 @@ def one_seat_rides(
     # destinations (Grand Central, Times Sq, ...) account for a large share
     # of all rows. Measured on the default DeKalb scenario: 138K calls
     # collapse to ~640 distinct (station, routes) combinations, a ~216x
-    # reduction. Keyed on (name, routes), exactly `display()`'s own inputs
-    # -- not `complex_id` (which `min_dist_cache` above uses safely, but
-    # `display()` doesn't take a complex as input, it takes a name: a
-    # complex and one of its own individual per-platform stations share a
-    # `complex_id` but can have different `name`s, e.g. the merged complex
-    # "Chambers St/WTC/Park Pl/Cortlandt St" versus its own "Cortlandt St"
-    # platform, so keying on `complex_id` would wrongly conflate their two
-    # different display strings).
-    display_cache: dict[tuple[str, frozenset[str]], str] = {}
-
-    def cached_display(station: Station, routes: frozenset[str] | None = None) -> str:
-        shown_routes = station.routes if routes is None else routes
-        key = (station.name, frozenset(shown_routes))
-        cached = display_cache.get(key)
-        if cached is None:
-            cached = station.display(routes)
-            display_cache[key] = cached
-        return cached
+    # reduction.
+    cached_display = cache(Station.display)
 
     results: list[ScenarioResult] = []
     for sdef in scenario_defs:
