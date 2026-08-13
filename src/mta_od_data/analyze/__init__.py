@@ -127,7 +127,7 @@ def haversine_m(c1: Coord, c2: Coord) -> float:
 
 app = Typer()
 
-from mta_od_data.analyze import one_seat_rides, region_flow  # noqa: E402
+from mta_od_data.analyze import one_seat_rides, regional_flow  # noqa: E402
 
 app.add_typer(one_seat_rides.app)
-app.add_typer(region_flow.app)
+app.add_typer(regional_flow.app)
