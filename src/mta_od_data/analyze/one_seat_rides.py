@@ -10,7 +10,7 @@ import duckdb
 from typer import Option, Typer
 
 from mta_od_data import DATA
-from mta_od_data.analyze import (
+from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
     Coord,
     DayType,
