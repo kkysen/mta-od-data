@@ -56,6 +56,12 @@ DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {
 
 
 @dataclass(slots=True)
+class Coord:
+    lat: float
+    lon: float
+
+
+@dataclass(slots=True)
 class Station:
     complex_id: int
     # Base name, without a route list baked in -- callers wanting one call
@@ -65,8 +71,7 @@ class Station:
     # several physical platforms).
     name: str
     routes: set[str]
-    lat: float
-    lon: float
+    loc: Coord
     # Physical line name (e.g. "4th Av"), individual per-platform stations
     # only -- empty for a complex, which can span several lines.
     line: str = ""
@@ -82,8 +87,7 @@ class Station:
             complex_id=cid,
             name=abbreviate_name(row["stop_name"]),
             routes=set(row["daytime_routes"].split()),
-            lat=float(row["latitude"]),
-            lon=float(row["longitude"]),
+            loc=Coord(lat=float(row["latitude"]), lon=float(row["longitude"])),
         )
 
     @classmethod
@@ -104,8 +108,9 @@ class Station:
             complex_id=int(row["complex_id"]),
             name=abbreviate_name(row["stop_name"]),
             routes=set(row["daytime_routes"].split()),
-            lat=float(row["gtfs_latitude"]),
-            lon=float(row["gtfs_longitude"]),
+            loc=Coord(
+                lat=float(row["gtfs_latitude"]), lon=float(row["gtfs_longitude"])
+            ),
             line=row["line"],
         )
 
@@ -438,12 +443,6 @@ class ScenarioDef:
     # given path unchanged" (only used when there's exactly one scenario, so
     # single-scenario invocations keep their exact historical filenames).
     suffix: str | None
-
-
-@dataclass(slots=True)
-class Coord:
-    lat: float
-    lon: float
 
 
 def haversine_m(c1: Coord, c2: Coord) -> float:
@@ -1138,7 +1137,7 @@ def one_seat_rides(
     show_label = len(scenario_defs) > 1
 
     stations_by_id = Station.load_complexes(stations)
-    boundary_lat = stations_by_id[boundary_complex_id].lat
+    boundary_lat = stations_by_id[boundary_complex_id].loc.lat
     boundary_station = stations_by_id[boundary_complex_id]
     boundary_name = boundary_station.display(boundary_station.routes & routes_set)
     print(
@@ -1155,7 +1154,7 @@ def one_seat_rides(
     origin_ids = [
         s.complex_id
         for s in stations_by_id.values()
-        if (s.routes & routes_set) and side_ok(s.lat, origin_side)
+        if (s.routes & routes_set) and side_ok(s.loc.lat, origin_side)
     ]
     origin_ids.sort()
     print(f"\nOrigin stations ({len(origin_ids)}):")
@@ -1213,7 +1212,7 @@ def one_seat_rides(
         if dest is None:
             continue
         at_boundary = dest_id == boundary_complex_id and not exclude_boundary_dest
-        if not at_boundary and not side_ok(dest.lat, dest_side):
+        if not at_boundary and not side_ok(dest.loc.lat, dest_side):
             continue
         scoped.append((origin_id, dest_id, riders))
 
@@ -1225,10 +1224,7 @@ def one_seat_rides(
         platforms_by_complex.setdefault(s.complex_id, []).append(s)
 
     def dest_points(dest: Station) -> list[Coord]:
-        return [
-            Coord(s.lat, s.lon)
-            for s in platforms_by_complex.get(dest.complex_id, [dest])
-        ]
+        return [s.loc for s in platforms_by_complex.get(dest.complex_id, [dest])]
 
     routes_by_line: dict[str, set[str]] = {}
     for s in individual_stations:
@@ -1272,7 +1268,7 @@ def one_seat_rides(
         best: tuple[float, Station] | None = None
         for p in points:
             for c in candidates:
-                dist_m = haversine_m(p, Coord(c.lat, c.lon))
+                dist_m = haversine_m(p, c.loc)
                 if best is None or dist_m < best[0]:
                     best = (dist_m, c)
         return best
