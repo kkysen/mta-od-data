@@ -149,7 +149,7 @@ def resolve_region(
     region_borough: str | None,
     region_bbox: str | None,
     region_label: str | None,
-    valid_boroughs: set[str],
+    valid_boroughs: frozenset[str],
 ) -> Region:
     if region_borough is not None and region_bbox is not None:
         print(
@@ -158,7 +158,7 @@ def resolve_region(
         )
         raise SystemExit(1)
     if region_borough is not None:
-        boroughs = {b.strip() for b in region_borough.split(",") if b.strip()}
+        boroughs = frozenset(b.strip() for b in region_borough.split(",") if b.strip())
         unknown = boroughs - valid_boroughs
         if unknown:
             print(
@@ -273,7 +273,7 @@ def regional_flow(
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
     )
     stations_by_id = Station.load_complexes(stations)
-    valid_boroughs = {s.borough for s in stations_by_id.values()}
+    valid_boroughs = frozenset(s.borough for s in stations_by_id.values())
     region_def = resolve_region(
         preset=region,
         region_borough=region_borough,

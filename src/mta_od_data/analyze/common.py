@@ -53,7 +53,7 @@ class Station:
     # actually used, for a merged complex where those stop at only one of
     # several physical platforms).
     name: str
-    routes: set[str]
+    routes: frozenset[str]
     loc: Coord
     # "M"/"Bk"/"Bx"/"Q"/"SI", as given by the source data.
     borough: str
@@ -66,7 +66,7 @@ class Station:
     # only -- empty for a complex, which can span several lines.
     line: str = ""
 
-    def display(self, routes: set[str] | None = None) -> str:
+    def display(self, routes: frozenset[str] | None = None) -> str:
         shown_routes = self.routes if routes is None else routes
         return f"{self.name} ({','.join(sorted(shown_routes))})"
 
@@ -76,7 +76,7 @@ class Station:
         return cls(
             complex_id=cid,
             name=abbreviate_name(row["stop_name"]),
-            routes=set(row["daytime_routes"].split()),
+            routes=frozenset(row["daytime_routes"].split()),
             loc=Coord(lat=float(row["latitude"]), lon=float(row["longitude"])),
             borough=row["borough"],
             cbd=row["cbd"] == "true",
@@ -99,7 +99,7 @@ class Station:
         return cls(
             complex_id=int(row["complex_id"]),
             name=abbreviate_name(row["stop_name"]),
-            routes=set(row["daytime_routes"].split()),
+            routes=frozenset(row["daytime_routes"].split()),
             loc=Coord(
                 lat=float(row["gtfs_latitude"]), lon=float(row["gtfs_longitude"])
             ),
