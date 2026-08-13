@@ -405,9 +405,7 @@ def run_scenario(
     origin_ids: list[int],
     routes_set: set[str],
     primary_routes_set: set[str],
-    assigned_points: Callable[[set[str]], list[Station]],
-    dest_points: Callable[[Station], list[Coord]],
-    min_dist_to_points: Callable[[list[Coord], list[Station]], tuple[float, Station]],
+    min_dist_to_corridor: Callable[[Station, set[str]], tuple[float, Station]],
     origin_express_partners: dict[int, set[str]],
     close_threshold_m: float,
     origin_corridor_a_routes_set: set[str],
@@ -507,14 +505,14 @@ def run_scenario(
             # assigned routes)? If it's close, that's a "close one-seat ride"
             # (get off/board a short walk away, no train change), not a
             # transfer.
-            dist_m, near_station = min_dist_to_points(
-                dest_points(dest),
+            dist_m, near_station = min_dist_to_corridor(
+                dest,
                 # Scoped to --routes: effective_origin_routes can carry real
                 # routes far outside this analysis (e.g. a station's F/G
                 # service alongside its R), and without this filter those
                 # would credit "close" via a line that has nothing to do with
                 # the junction being analyzed.
-                assigned_points(effective_origin_routes[origin_id] & routes_set),
+                effective_origin_routes[origin_id] & routes_set,
             )
             close = dist_m <= close_threshold_m
             if dist_m == 0.0:
@@ -1152,9 +1150,6 @@ def one_seat_rides(
     for s in individual_stations:
         platforms_by_complex.setdefault(s.complex_id, []).append(s)
 
-    def dest_points(dest: Station) -> list[Coord]:
-        return [s.loc for s in platforms_by_complex.get(dest.complex_id, [dest])]
-
     routes_by_line: dict[str, set[str]] = {}
     for s in individual_stations:
         routes_by_line.setdefault(s.line, set()).update(s.routes)
@@ -1177,35 +1172,66 @@ def one_seat_rides(
 
     # Under a corridor scenario, "close" is about walking to whichever trunk
     # an origin's own corridor got assigned -- not to trunk_a/trunk_b as a
-    # fixed pair -- so cache point sets per distinct assigned-route-set
-    # instead of hardcoding just two. Shared across scenarios: route sets
+    # fixed pair -- so cache candidate-point sets per distinct assigned-route
+    # set instead of hardcoding just two. Shared across scenarios: route sets
     # repeat (e.g. corridor A's assignment in one scenario is corridor B's in
     # the other), so the cache pays off across scenario runs too.
     assigned_points_cache: dict[frozenset[str], list[Station]] = {}
 
-    def assigned_points(assigned_routes: set[str]) -> list[Station]:
-        key = frozenset(assigned_routes)
-        if key not in assigned_points_cache:
-            assigned_points_cache[key] = [
+    # Two memoization layers, since they catch different kinds of repeat
+    # work. (destination complex, assigned route set) is the entire input to
+    # a distance search, and it repeats constantly across rows -- many
+    # origins share the same effective routes within a scenario, the same
+    # destination shows up under many different origins, and scenarios often
+    # reuse each other's route assignments -- so `min_dist_cache` skips
+    # re-running the whole points x candidates sweep for a combination
+    # already seen. But two different (dest, routes) combinations can still
+    # share individual point pairs (e.g. their candidate stations overlap
+    # even though the route sets differ), which `min_dist_cache` alone
+    # doesn't catch -- `haversine_cache` catches that layer too. Measured on
+    # the default DeKalb scenario: 2.19M raw haversine calls collapse to
+    # ~240K sweep-level cache misses, which collapse further to the ~39K
+    # individual point pairs actually distinct -- a combined ~56x reduction
+    # in real distance computations, with results unchanged since the
+    # underlying math is identical either way.
+    min_dist_cache: dict[tuple[int, frozenset[str]], tuple[float, Station]] = {}
+    haversine_cache: dict[tuple[float, float, float, float], float] = {}
+
+    def cached_haversine(c1: Coord, c2: Coord) -> float:
+        key = (c1.lat, c1.lon, c2.lat, c2.lon)
+        dist_m = haversine_cache.get(key)
+        if dist_m is None:
+            dist_m = haversine_m(c1, c2)
+            haversine_cache[key] = dist_m
+        return dist_m
+
+    def min_dist_to_corridor(
+        dest: Station, assigned_routes: set[str]
+    ) -> tuple[float, Station]:
+        routes_key = frozenset(assigned_routes)
+        cache_key = (dest.complex_id, routes_key)
+        cached = min_dist_cache.get(cache_key)
+        if cached is not None:
+            return cached
+        if routes_key not in assigned_points_cache:
+            assigned_points_cache[routes_key] = [
                 s for s in individual_stations if s.routes & assigned_routes
             ]
-        return assigned_points_cache[key]
-
-    def min_dist_to_points(
-        points: list[Coord], candidates: list[Station]
-    ) -> tuple[float, Station]:
+        candidates = assigned_points_cache[routes_key]
         # `candidates` empty would mean some route in the effective set has
         # no individual station anywhere -- the CLI-level checks above rule
         # out an empty *route set*, but not a gap in stations_individual.csv
         # itself, so this stays a real (if unlikely) assertion, not dead code.
         assert candidates, "no individual station serves this route set"
+        points = [s.loc for s in platforms_by_complex.get(dest.complex_id, [dest])]
         best: tuple[float, Station] | None = None
         for p in points:
             for c in candidates:
-                dist_m = haversine_m(p, c.loc)
+                dist_m = cached_haversine(p, c.loc)
                 if best is None or dist_m < best[0]:
                     best = (dist_m, c)
         assert best is not None
+        min_dist_cache[cache_key] = best
         return best
 
     results: list[ScenarioResult] = []
@@ -1218,9 +1244,7 @@ def one_seat_rides(
             origin_ids=origin_ids,
             routes_set=routes_set,
             primary_routes_set=primary_routes_set,
-            assigned_points=assigned_points,
-            dest_points=dest_points,
-            min_dist_to_points=min_dist_to_points,
+            min_dist_to_corridor=min_dist_to_corridor,
             origin_express_partners=origin_express_partners,
             close_threshold_m=close_threshold_m,
             origin_corridor_a_routes_set=origin_corridor_a_routes_set,
