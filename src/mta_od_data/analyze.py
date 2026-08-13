@@ -127,6 +127,10 @@ class PairRow:
     one_seat: bool
     close: bool | None
     dist_m: float | None
+    # The specific station `dist_m` was measured to (on the origin's own
+    # effective corridor) -- None for `1-seat` rows (no walk to measure) or
+    # when `dist_m` itself is None (no candidate station at all).
+    near_station: str | None
 
 
 @dataclass(slots=True)
@@ -362,7 +366,12 @@ class ScenarioResult:
                 pct_one_seat_str = f"{100 * r.riders / self.one_seat_riders:.2f}%"
             type_str = "1-seat" if r.one_seat else "xfer"
             close_str = "--" if r.close is None else ("close" if r.close else "far")
-            dist_str = "--" if r.dist_m is None else f"{r.dist_m:.0f}m"
+            dist_str = (
+                "--"
+                if r.dist_m is None
+                else f"{r.dist_m:.0f}m"
+                + (f" ({r.near_station})" if r.near_station else "")
+            )
             lines.append(
                 f"| {i} | {r.riders:,.0f} | {pct_total:.2f}% | {pct_one_seat_str} | "
                 f"{type_str} | {close_str} | {dist_str} | "
@@ -500,9 +509,11 @@ def run_scenario(
     origin_ids: list[int],
     routes_set: set[str],
     primary_routes_set: set[str],
-    assigned_points: Callable[[set[str]], list[Coord]],
+    assigned_points: Callable[[set[str]], list[Station]],
     dest_points: Callable[[Station], list[Coord]],
-    min_dist_to_points: Callable[[list[Coord], list[Coord]], float | None],
+    min_dist_to_points: Callable[
+        [list[Coord], list[Station]], tuple[float, Station] | None
+    ],
     origin_express_partners: dict[int, set[str]],
     close_threshold_m: float,
     origin_corridor_a_routes_set: set[str],
@@ -588,6 +599,7 @@ def run_scenario(
 
         close = None
         dist_m = None
+        near_station: Station | None = None
         xfer_applicable_routes: set[str] | None = None
         if not is_one_seat and dest:
             # is_one_seat already reflects this scenario's effective routing
@@ -600,7 +612,7 @@ def run_scenario(
             # assigned routes)? If it's close, that's a "close one-seat ride"
             # (get off/board a short walk away, no train change), not a
             # transfer.
-            dist_m = min_dist_to_points(
+            nearest = min_dist_to_points(
                 dest_points(dest),
                 # Scoped to --routes: effective_origin_routes can carry real
                 # routes far outside this analysis (e.g. a station's F/G
@@ -609,6 +621,8 @@ def run_scenario(
                 # the junction being analyzed.
                 assigned_points(effective_origin_routes[origin_id] & routes_set),
             )
+            if nearest is not None:
+                dist_m, near_station = nearest
             close = None if dist_m is None else dist_m <= close_threshold_m
             if dist_m == 0.0:
                 # The origin's own assigned route stops right at this
@@ -688,6 +702,11 @@ def run_scenario(
                 effective_origin_routes[origin_id] & routes_set
             )
 
+        near_station_name = (
+            near_station.display(near_station.routes & routes_set)
+            if near_station
+            else None
+        )
         rows.append(
             PairRow(
                 origin_id=origin_id,
@@ -700,6 +719,7 @@ def run_scenario(
                 one_seat=is_one_seat,
                 close=close,
                 dist_m=dist_m,
+                near_station=near_station_name,
             )
         )
 
@@ -821,6 +841,13 @@ def render_notes(*, close_threshold_m: float) -> str:
             "rider actually used -- the effective route already stops "
             "somewhere in that same complex, the rider's real historical "
             "destination either way.",
+            '- In the per-pair table (and CSV), a `xfer` row\'s "Dist" also '
+            "names the specific station `dist_m` was measured to, e.g. "
+            '"387m (Nostrand Av)" -- the nearest station on the origin\'s '
+            "own effective corridor, i.e. the one a rider would actually "
+            "walk to. Not shown for `1-seat` rows (nothing to walk to) or "
+            "in the per-destination table (an average across many pairs, "
+            "not a single station).",
             '- In the per-destination table, "Close?"/"Dist" are '
             "ridership-weighted across that destination's classified "
             "`xfer` pairs.",
@@ -1229,24 +1256,26 @@ def one_seat_rides(
     # instead of hardcoding just two. Shared across scenarios: route sets
     # repeat (e.g. corridor A's assignment in one scenario is corridor B's in
     # the other), so the cache pays off across scenario runs too.
-    assigned_points_cache: dict[frozenset[str], list[Coord]] = {}
+    assigned_points_cache: dict[frozenset[str], list[Station]] = {}
 
-    def assigned_points(assigned_routes: set[str]) -> list[Coord]:
+    def assigned_points(assigned_routes: set[str]) -> list[Station]:
         key = frozenset(assigned_routes)
         if key not in assigned_points_cache:
             assigned_points_cache[key] = [
-                Coord(s.lat, s.lon)
-                for s in individual_stations
-                if s.routes & assigned_routes
+                s for s in individual_stations if s.routes & assigned_routes
             ]
         return assigned_points_cache[key]
 
     def min_dist_to_points(
-        points: list[Coord], candidates: list[Coord]
-    ) -> float | None:
-        if not candidates:
-            return None
-        return min(haversine_m(p, c) for p in points for c in candidates)
+        points: list[Coord], candidates: list[Station]
+    ) -> tuple[float, Station] | None:
+        best: tuple[float, Station] | None = None
+        for p in points:
+            for c in candidates:
+                dist_m = haversine_m(p, Coord(c.lat, c.lon))
+                if best is None or dist_m < best[0]:
+                    best = (dist_m, c)
+        return best
 
     results: list[ScenarioResult] = []
     for sdef in scenario_defs:
