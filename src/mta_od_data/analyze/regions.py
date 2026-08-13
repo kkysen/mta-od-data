@@ -2,7 +2,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 
-from mta_od_data.analyze import Station
+from mta_od_data.analyze.common import Station
 
 
 @dataclass(slots=True)
