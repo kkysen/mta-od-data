@@ -47,6 +47,18 @@ class RegionalFlowResult:
     out_out: float
     rows: list[FlowRow]
 
+    @property
+    def inter(self) -> float:
+        """Interregional: riders whose trip crosses the region boundary,
+        either direction."""
+        return self.in_out + self.out_in
+
+    @property
+    def intra(self) -> float:
+        """Intraregional: riders whose trip never crosses the region
+        boundary, on either side of it -- the complement of `inter`."""
+        return self.in_in + self.out_out
+
     def pct(self, riders: float) -> float:
         return 100 * riders / self.total_riders if self.total_riders else float("nan")
 
@@ -68,6 +80,14 @@ class RegionalFlowResult:
         print(
             f"Outside -> Outside (never touches the region): "
             f"{self.out_out:>12,.0f} ({self.pct(self.out_out):5.1f}%)"
+        )
+        print(
+            f"  Inter (crosses the boundary, either direction): "
+            f"{self.inter:>12,.0f} ({self.pct(self.inter):5.1f}%)"
+        )
+        print(
+            f"  Intra (same side throughout, either side):      "
+            f"{self.intra:>12,.0f} ({self.pct(self.intra):5.1f}%)"
         )
 
     def render_markdown(
@@ -92,6 +112,16 @@ class RegionalFlowResult:
         lines.append(
             f"- **Outside -> Outside (never touches the region): "
             f"{self.pct(self.out_out):.1f}%** ({self.out_out:,.0f}/{day_type})"
+        )
+        lines.append(
+            f"- **Inter (crosses the boundary, either direction): "
+            f"{self.pct(self.inter):.1f}%** ({self.inter:,.0f}/{day_type}) "
+            f"-- Inside -> Outside plus Outside -> Inside"
+        )
+        lines.append(
+            f"- **Intra (same side throughout, either side): "
+            f"{self.pct(self.intra):.1f}%** ({self.intra:,.0f}/{day_type}) "
+            f"-- Inside -> Inside plus Outside -> Outside"
         )
         lines.append("")
 
