@@ -10,14 +10,14 @@ Produced by `mta-od-data analyze regional-flow --markdown-out src/mta_od_data/an
 
 Total: 3,622,680 riders/weekday
 
-| Flow | Description | Riders | % Total |
-| --- | --- | --- | --- |
-| Outside -> Inside | Entering the region | 873,734 | 24.1% |
-| Inside -> Outside | Leaving the region | 830,377 | 22.9% |
-| Inside -> Inside | Internal to the region | 673,037 | 18.6% |
-| Outside -> Outside | Never touches the region | 1,245,532 | 34.4% |
-| **Inter** | Crosses the boundary, either direction | 1,704,111 | 47.0% |
-| **Intra** | Same side throughout, either side | 1,918,569 | 53.0% |
+| Flow | Riders | % Total |
+| --- | --- | --- |
+| Outside -> Inside | 873,734 | 24.1% |
+| Inside -> Outside | 830,377 | 22.9% |
+| Inside -> Inside | 673,037 | 18.6% |
+| Outside -> Outside | 1,245,532 | 34.4% |
+| **Inter** | 1,704,111 | 47.0% |
+| **Intra** | 1,918,569 | 53.0% |
 
 ## Top 25 origin/destination pairs
 
