@@ -1133,6 +1133,33 @@ def one_seat_rides(
         ]
     show_label = len(scenario_defs) > 1
 
+    # An origin's own routes can be entirely primary (e.g. a B/D/N/Q-only
+    # station), in which case its effective routing under an active scenario
+    # is *only* whatever this corridor got assigned that's also primary --
+    # if that's empty, there's no station anywhere to measure a walk to for
+    # such an origin. Only reachable via a CLI misconfiguration (a corridor
+    # assigned routes entirely outside --primary-routes/--routes), so check
+    # it here, once, instead of discovering it deep in a per-row loop.
+    for sdef in scenario_defs:
+        if not sdef.active:
+            continue
+        for corridor_letter, assigned_set in (
+            ("A", sdef.corridor_a_assigned_set),
+            ("B", sdef.corridor_b_assigned_set),
+        ):
+            if assigned_set & primary_routes_set & routes_set:
+                continue
+            print(
+                f"error: scenario {sdef.label!r} assigns corridor "
+                f"{corridor_letter} {sorted(assigned_set)}, none of which is "
+                f"in both --routes {sorted(routes_set)} and --primary-routes "
+                f"{sorted(primary_routes_set)} -- an origin with only "
+                "primary routes of its own would have no station on this "
+                "corridor to measure a walk to",
+                file=sys.stderr,
+            )
+            raise SystemExit(1)
+
     stations_by_id = Station.load_complexes(stations)
     boundary_lat = stations_by_id[boundary_complex_id].loc.lat
     boundary_station = stations_by_id[boundary_complex_id]
@@ -1207,7 +1234,17 @@ def one_seat_rides(
     for origin_id, dest_id, riders in pairs:
         dest = stations_by_id.get(dest_id)
         if dest is None:
-            continue
+            # The OD data references a station complex the station
+            # reference CSV doesn't have -- almost certainly a stale
+            # --stations file against a newer OD extract, not something to
+            # silently drop and undercount.
+            print(
+                f"error: destination complex {dest_id} not found in "
+                f"{stations} -- refetch station reference data with "
+                "`mta-od-data prepare --force-stations`",
+                file=sys.stderr,
+            )
+            raise SystemExit(1)
         at_boundary = dest_id == boundary_complex_id and not exclude_boundary_dest
         if not at_boundary and not side_ok(dest.loc.lat, dest_side):
             continue
