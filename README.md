@@ -27,7 +27,7 @@ sync—see [Development](#development).
   with an estimated rider count. Get it from
   [data.ny.gov](https://data.ny.gov/Transportation/MTA-Subway-Origin-Destination-Ridership-Estimate-2/jsu2-fbtj)
   (2024 vintage used here; there's a separate dataset per year) and drop the
-  CSV (or its `.xz`) in the project root.
+  CSV (or its `.xz`) in `data/`.
 - **Station reference data**: fetched automatically from `data.ny.gov` —
   the "Subway Stations and Complexes" dataset (resource `5f5g-n3cz`, one row
   per station complex: borough, routes served, lat/long) and the
