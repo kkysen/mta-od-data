@@ -88,6 +88,19 @@ class DestStats:
 
 
 @dataclass(slots=True, frozen=True)
+class RouteDelta:
+    """A scenario's change to one station's real routes, as an explicit
+    add/remove pair rather than a full replacement list -- so a scenario
+    author only has to say what actually changes (e.g. "the B stops
+    running here"), not re-derive and spell out every route that's
+    unaffected. `effective_routes` applies `remove` before `add`, so
+    listing a route in both is equivalent to just `add`."""
+
+    add: frozenset[str]
+    remove: frozenset[str]
+
+
+@dataclass(slots=True, frozen=True)
 class Scenario:
     """A deinterlining scenario: real routes overridden only for the
     specific stations it actually changes. `effective_routes` falls back
@@ -109,7 +122,7 @@ class Scenario:
     description: str
     category: str | None
     slug: str
-    overrides: dict[int, frozenset[str]]
+    overrides: dict[int, RouteDelta]
 
     @classmethod
     def load(cls, path: Path, stations_by_id: dict[int, Station]) -> Scenario:
@@ -125,15 +138,18 @@ class Scenario:
             raise ScenarioError(f'scenario {path} is missing a required "name" field')
         description = data.get("description", name)
         category = data.get("category")
-        overrides: dict[int, frozenset[str]] = {}
-        for complex_id_str, routes in data["overrides"].items():
+        overrides: dict[int, RouteDelta] = {}
+        for complex_id_str, delta_data in data["overrides"].items():
             complex_id = int(complex_id_str)
             if complex_id not in stations_by_id:
                 raise ScenarioError(
                     f"scenario {path} overrides complex {complex_id}, not found "
                     f"in the station reference data"
                 )
-            overrides[complex_id] = frozenset(routes)
+            overrides[complex_id] = RouteDelta(
+                add=frozenset(delta_data.get("add", [])),
+                remove=frozenset(delta_data.get("remove", [])),
+            )
         return cls(
             name=name,
             description=description,
@@ -143,7 +159,10 @@ class Scenario:
         )
 
     def effective_routes(self, station: Station) -> frozenset[str]:
-        return self.overrides.get(station.complex_id, station.routes)
+        delta = self.overrides.get(station.complex_id)
+        if delta is None:
+            return station.routes
+        return (station.routes - delta.remove) | delta.add
 
     def classify(
         self,
@@ -464,13 +483,14 @@ def deinterlining(
             "--scenario-file",
             help=(
                 "JSON file: {'name': str, 'description': str, 'category': str, "
-                "'overrides': {complex_id: [route, ...]}}. Repeatable -- "
-                "classifies every scenario "
-                "given (plus today's real routing, and any --scenario/"
-                "--category selections) against the same fetched OD pairs "
-                "in one run. "
-                "Only the listed complex IDs' routes change; every other "
-                "station keeps its real current routes. Trailing commas are "
+                "'overrides': {complex_id: {'add': [route, ...], "
+                "'remove': [route, ...]}}}. Repeatable -- classifies every "
+                "scenario given (plus today's real routing, and any "
+                "--scenario/--category selections) against the same fetched "
+                "OD pairs in one run. Only the listed complex IDs' routes "
+                "change (by adding/removing just the given routes from each "
+                "one's real current routes); every other station keeps its "
+                "real current routes untouched. Trailing commas are "
                 "tolerated."
             ),
         ),
