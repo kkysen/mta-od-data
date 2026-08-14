@@ -2,7 +2,7 @@
 
 Scenario: average weekday ridership (60 distinct days in the data, 2025-01-06 to 2025-12-12) on trains originating at stations served by B,D,N,Q,R, south of Atlantic Av (B,D,N,Q,R), with destinations north of it (i.e. trips that cross the junction).
 
-Produced by `mta-od-data analyze one-seat-rides --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out src/mta_od_data/analyze/one_seat_rides.md`.
+Produced by `mta-od-data analyze one-seat-rides --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R --all-corridor-scenarios --csv-out data/dekalb_weekday_pairs.csv --markdown-out src/mta_od_data/analyze/dekalb_one_seat_rides.md`.
 
 ---
 
