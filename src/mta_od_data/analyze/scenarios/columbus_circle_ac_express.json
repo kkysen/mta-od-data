@@ -1,6 +1,7 @@
 {
   "name": "Columbus A/C Express",
   "label": "Columbus Circle: A,C express / B,D local on Central Park West",
+  "category": "Columbus Circle",
   "overrides": {
     "160": ["B", "D"],
     "159": ["B", "D"],
