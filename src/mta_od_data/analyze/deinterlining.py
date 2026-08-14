@@ -2,10 +2,10 @@
 
 See `deinterlining_design.md` (next to this file) for the design this
 implements. Deliberately kept independent of `one_seat_rides.py` --
-duplicates a couple of small helpers (`parse_route_set`, `write_csv`,
-nearest-station search) rather than importing them, since the user doesn't
-want that module touched until this one is proven out; reconcile the
-duplication if/when the two get merged.
+duplicates a couple of small helpers (`parse_route_set`, the CSV/markdown
+rendering shape, nearest-station search) rather than importing them, since
+the user doesn't want that module touched until this one is proven out;
+reconcile the duplication if/when the two get merged.
 
 Unlike `one_seat_rides.py` (one latitude boundary, two named corridors
 converging into two named trunks, origin-side reassignment only), this
@@ -47,51 +47,6 @@ def parse_route_set(s: str) -> frozenset[str]:
 
 
 @dataclass(slots=True, frozen=True)
-class Scenario:
-    """A deinterlining scenario: real routes overridden only for the
-    specific stations it actually changes. `effective_routes` falls back
-    to a station's real current routes for every complex ID absent from
-    `overrides` -- see `deinterlining_design.md` for why this replaces
-    `one_seat_rides.py`'s corridor-A/corridor-B machinery instead of
-    extending it. `slug` names this scenario's own suffixed CSV file when
-    multiple scenarios are compared in one run (see `suffixed_path`)."""
-
-    label: str
-    slug: str
-    overrides: dict[int, frozenset[str]]
-
-    def effective_routes(self, station: Station) -> frozenset[str]:
-        return self.overrides.get(station.complex_id, station.routes)
-
-
-# Today's real routing, expressed the same way any other scenario is: no
-# overrides, so `effective_routes` always falls through to a station's own
-# real `Station.routes`. Classified through the same `classify_scenario`
-# as every loaded scenario -- there's no separate "current" code path to
-# keep in sync with the general one.
-CURRENT_SCENARIO = Scenario(
-    label="Current (today's real routing)", slug="current", overrides={}
-)
-
-
-def load_scenario(path: Path, stations_by_id: dict[int, Station]) -> Scenario:
-    data = json.loads(path.read_text())
-    label = data.get("label", path.stem)
-    overrides: dict[int, frozenset[str]] = {}
-    for complex_id_str, routes in data["overrides"].items():
-        complex_id = int(complex_id_str)
-        if complex_id not in stations_by_id:
-            print(
-                f"error: scenario {path} overrides complex {complex_id}, not found "
-                f"in the station reference data",
-                file=sys.stderr,
-            )
-            raise SystemExit(1)
-        overrides[complex_id] = frozenset(routes)
-    return Scenario(label=label, slug=path.stem, overrides=overrides)
-
-
-@dataclass(slots=True, frozen=True)
 class ODPair:
     origin_id: int
     origin_name: str
@@ -116,6 +71,136 @@ class DestStats:
 
 
 @dataclass(slots=True, frozen=True)
+class Scenario:
+    """A deinterlining scenario: real routes overridden only for the
+    specific stations it actually changes. `effective_routes` falls back
+    to a station's real current routes for every complex ID absent from
+    `overrides` -- see `deinterlining_design.md` for why this replaces
+    `one_seat_rides.py`'s corridor-A/corridor-B machinery instead of
+    extending it. `slug` names this scenario's own suffixed CSV file when
+    multiple scenarios are compared in one run (see `suffixed_path`)."""
+
+    label: str
+    slug: str
+    overrides: dict[int, frozenset[str]]
+
+    @classmethod
+    def load(cls, path: Path, stations_by_id: dict[int, Station]) -> Scenario:
+        data = json.loads(path.read_text())
+        label = data.get("label", path.stem)
+        overrides: dict[int, frozenset[str]] = {}
+        for complex_id_str, routes in data["overrides"].items():
+            complex_id = int(complex_id_str)
+            if complex_id not in stations_by_id:
+                print(
+                    f"error: scenario {path} overrides complex {complex_id}, not "
+                    f"found in the station reference data",
+                    file=sys.stderr,
+                )
+                raise SystemExit(1)
+            overrides[complex_id] = frozenset(routes)
+        return cls(label=label, slug=path.stem, overrides=overrides)
+
+    def effective_routes(self, station: Station) -> frozenset[str]:
+        return self.overrides.get(station.complex_id, station.routes)
+
+    def classify(
+        self,
+        *,
+        pairs: list[tuple[int, int, float]],
+        stations_by_id: dict[int, Station],
+        stations_path: Path,
+        routes_set: frozenset[str],
+        close_lookup: Callable[
+            [Station, frozenset[str]], tuple[bool, float, str | None]
+        ],
+    ) -> ScenarioResult:
+        rows: list[ODPair] = []
+        total_riders = 0.0
+        one_seat_riders = 0.0
+        close_riders = 0.0
+        dest_stats: dict[int, DestStats] = {}
+        for origin_id, dest_id, riders in pairs:
+            origin = stations_by_id.get(origin_id)
+            dest = stations_by_id.get(dest_id)
+            if origin is None or dest is None:
+                missing_id = origin_id if origin is None else dest_id
+                print(
+                    f"error: station complex {missing_id} not found in "
+                    f"{stations_path} -- refetch station reference data with "
+                    "`mta-od-data prepare --force-stations`",
+                    file=sys.stderr,
+                )
+                raise SystemExit(1)
+
+            effective_origin_routes = self.effective_routes(origin) & routes_set
+            effective_dest_routes = self.effective_routes(dest) & routes_set
+            one_seat = bool(effective_origin_routes & effective_dest_routes)
+
+            total_riders += riders
+            # A `False`/`0.0`/`None` no-op result when the pair is already
+            # one-seat (no walk to evaluate) matches `one_seat_rides.py`'s
+            # `close, dist_m = True, 0.0` convention for that case, just
+            # inverted here since `close` at 1-seat distance 0 isn't a
+            # meaningful "close transfer".
+            if one_seat:
+                one_seat_riders += riders
+                close, dist_m, near_station_name = False, 0.0, None
+            else:
+                close, dist_m, near_station_name = close_lookup(
+                    dest, effective_origin_routes
+                )
+                if close:
+                    close_riders += riders
+
+            rows.append(
+                ODPair(
+                    origin_id=origin_id,
+                    origin_name=origin.display(effective_origin_routes),
+                    dest_id=dest_id,
+                    dest_name=dest.display(effective_dest_routes),
+                    riders=riders,
+                    one_seat=one_seat,
+                    close=close,
+                    dist_m=dist_m,
+                    near_station=near_station_name,
+                )
+            )
+
+            d = dest_stats.setdefault(
+                dest_id, DestStats(name=dest.display(dest.routes))
+            )
+            d.total += riders
+            if one_seat:
+                d.one_seat += riders
+            elif close:
+                d.close += riders
+
+        return ScenarioResult(
+            scenario=self,
+            total_riders=total_riders,
+            one_seat_riders=one_seat_riders,
+            close_riders=close_riders,
+            rows=rows,
+            dest_stats=dest_stats,
+        )
+
+
+# Today's real routing, expressed the same way any other scenario is: no
+# overrides, so `effective_routes` always falls through to a station's own
+# real `Station.routes`. Classified through the same `Scenario.classify`
+# as every loaded scenario -- there's no separate "current" code path to
+# keep in sync with the general one.
+CURRENT_SCENARIO = Scenario(
+    label="Current (today's real routing)", slug="current", overrides={}
+)
+
+
+def suffixed_path(path: Path, suffix: str) -> Path:
+    return path.with_name(f"{path.stem}_{suffix}{path.suffix}")
+
+
+@dataclass(slots=True, frozen=True)
 class ScenarioResult:
     scenario: Scenario
     total_riders: float
@@ -131,113 +216,101 @@ class ScenarioResult:
     def pct(self, riders: float) -> float:
         return 100 * riders / self.total_riders if self.total_riders else float("nan")
 
+    def write_csv(self, path: Path) -> None:
+        with path.open("w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=[fld.name for fld in fields(ODPair)])
+            writer.writeheader()
+            writer.writerows(asdict(r) for r in self.rows)
+        print(f"\nWrote {len(self.rows):,} rows to {path}")
 
-def classify_scenario(
-    scenario: Scenario,
-    *,
-    pairs: list[tuple[int, int, float]],
-    stations_by_id: dict[int, Station],
-    stations_path: Path,
-    routes_set: frozenset[str],
-    close_lookup: Callable[[Station, frozenset[str]], tuple[bool, float, str | None]],
-) -> ScenarioResult:
-    rows: list[ODPair] = []
-    total_riders = 0.0
-    one_seat_riders = 0.0
-    close_riders = 0.0
-    dest_stats: dict[int, DestStats] = {}
-    for origin_id, dest_id, riders in pairs:
-        origin = stations_by_id.get(origin_id)
-        dest = stations_by_id.get(dest_id)
-        if origin is None or dest is None:
-            missing_id = origin_id if origin is None else dest_id
-            print(
-                f"error: station complex {missing_id} not found in "
-                f"{stations_path} -- refetch station reference data with "
-                "`mta-od-data prepare --force-stations`",
-                file=sys.stderr,
-            )
-            raise SystemExit(1)
-
-        effective_origin_routes = scenario.effective_routes(origin) & routes_set
-        effective_dest_routes = scenario.effective_routes(dest) & routes_set
-        one_seat = bool(effective_origin_routes & effective_dest_routes)
-
-        total_riders += riders
-        # A `False`/`0.0`/`None` no-op result when the pair is already
-        # one-seat (no walk to evaluate) matches `one_seat_rides.py`'s
-        # `close, dist_m = True, 0.0` convention for that case, just
-        # inverted here since `close` at 1-seat distance 0 isn't a
-        # meaningful "close transfer".
-        if one_seat:
-            one_seat_riders += riders
-            close, dist_m, near_station_name = False, 0.0, None
-        else:
-            close, dist_m, near_station_name = close_lookup(
-                dest, effective_origin_routes
-            )
-            if close:
-                close_riders += riders
-
-        rows.append(
-            ODPair(
-                origin_id=origin_id,
-                origin_name=origin.display(effective_origin_routes),
-                dest_id=dest_id,
-                dest_name=dest.display(effective_dest_routes),
-                riders=riders,
-                one_seat=one_seat,
-                close=close,
-                dist_m=dist_m,
-                near_station=near_station_name,
-            )
+    def print_headline(self, *, close_threshold_m: float) -> None:
+        print(f"\n=== Scenario: {self.scenario.label} ===")
+        print(f"Total riders: {self.total_riders:,.0f}")
+        print(
+            f"One-seat:              {self.one_seat_riders:>12,.0f} "
+            f"({self.pct(self.one_seat_riders):5.1f}%)"
+        )
+        print(
+            f"Close one-seat (within {close_threshold_m:.0f}m): "
+            f"{self.close_riders:>12,.0f} ({self.pct(self.close_riders):5.1f}%)"
+        )
+        print(
+            f"Effective one-seat:    {self.effective_riders:>12,.0f} "
+            f"({self.pct(self.effective_riders):5.1f}%)"
         )
 
-        d = dest_stats.setdefault(dest_id, DestStats(name=dest.display(dest.routes)))
-        d.total += riders
-        if one_seat:
-            d.one_seat += riders
-        elif close:
-            d.close += riders
+    def render_markdown(
+        self,
+        *,
+        show_label: bool,
+        close_threshold_m: float,
+        top_n: int,
+        csv_out: Path | None,
+    ) -> str:
+        h2 = "###" if show_label else "##"
+        lines: list[str] = [f"## {self.scenario.label}", ""] if show_label else []
 
-    return ScenarioResult(
-        scenario=scenario,
-        total_riders=total_riders,
-        one_seat_riders=one_seat_riders,
-        close_riders=close_riders,
-        rows=rows,
-        dest_stats=dest_stats,
-    )
+        lines += [
+            f"{h2} Headline numbers",
+            "",
+            f"- **Total: {self.total_riders:,.0f} riders**",
+            f"- **One-seat: {self.pct(self.one_seat_riders):.1f}%** "
+            f"({self.one_seat_riders:,.0f})",
+            f"- **Close one-seat: {self.pct(self.close_riders):.1f}%** "
+            f"({self.close_riders:,.0f}) -- within {close_threshold_m:.0f}m of a "
+            f"station on the scenario-effective origin corridor",
+            f"- **Effective one-seat: {self.pct(self.effective_riders):.1f}%** "
+            f"({self.effective_riders:,.0f})",
+            "",
+            f"{h2} Top {top_n} origin/destination pairs",
+            "",
+            "| # | Riders | % Total | Type | Close? | Dist | Origin → Destination |",
+            "| --- | --- | --- | --- | --- | --- | --- |",
+        ]
 
+        def pair_riders(pair: ODPair) -> float:
+            return pair.riders
 
-def suffixed_path(path: Path, suffix: str) -> Path:
-    return path.with_name(f"{path.stem}_{suffix}{path.suffix}")
+        top_pairs = sorted(self.rows, key=pair_riders, reverse=True)[:top_n]
+        for i, pr in enumerate(top_pairs, 1):
+            type_str = "1-seat" if pr.one_seat else "xfer"
+            close_str = "" if pr.one_seat else ("close" if pr.close else "far")
+            dist_str = "" if pr.one_seat else f"{pr.dist_m:.0f}m"
+            lines.append(
+                f"| {i} | {pr.riders:,.0f} | {self.pct(pr.riders):.2f}% | "
+                f"{type_str} | {close_str} | {dist_str} | "
+                f"{pr.origin_name} → {pr.dest_name} |"
+            )
+        lines.append("")
 
+        lines.append(
+            f"{h2} Top {top_n} destination stations, summed across all origins"
+        )
+        lines.append("")
+        lines.append("| Riders | 1-Seat % | Effective % | Destination |")
+        lines.append("| --- | --- | --- | --- |")
 
-def write_csv(path: Path, rows: list[ODPair]) -> None:
-    with path.open("w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=[fld.name for fld in fields(ODPair)])
-        writer.writeheader()
-        writer.writerows(asdict(r) for r in rows)
-    print(f"\nWrote {len(rows):,} rows to {path}")
+        def dest_total(d: DestStats) -> float:
+            return d.total
 
+        for d in sorted(self.dest_stats.values(), key=dest_total, reverse=True)[:top_n]:
+            one_seat_pct = 100 * d.one_seat / d.total if d.total else float("nan")
+            effective_pct = (
+                100 * (d.one_seat + d.close) / d.total if d.total else float("nan")
+            )
+            lines.append(
+                f"| {d.total:,.0f} | {one_seat_pct:.1f}% | {effective_pct:.1f}% | "
+                f"{d.name} |"
+            )
+        lines.append("")
 
-def print_headline(result: ScenarioResult, *, close_threshold_m: float) -> None:
-    r = result
-    print(f"\n=== Scenario: {r.scenario.label} ===")
-    print(f"Total riders: {r.total_riders:,.0f}")
-    print(
-        f"One-seat:              {r.one_seat_riders:>12,.0f} "
-        f"({r.pct(r.one_seat_riders):5.1f}%)"
-    )
-    print(
-        f"Close one-seat (within {close_threshold_m:.0f}m): "
-        f"{r.close_riders:>12,.0f} ({r.pct(r.close_riders):5.1f}%)"
-    )
-    print(
-        f"Effective one-seat:    {r.effective_riders:>12,.0f} "
-        f"({r.pct(r.effective_riders):5.1f}%)"
-    )
+        if csv_out:
+            lines.append(
+                f"_Full row-level detail (every origin/destination pair, not "
+                f"just the top {top_n}): `{csv_out}`._"
+            )
+            lines.append("")
+        return "\n".join(lines)
 
 
 def print_comparison(results: list[ScenarioResult]) -> None:
@@ -270,76 +343,6 @@ def render_comparison_markdown(results: list[ScenarioResult]) -> str:
             f"{r.effective_riders:,.0f} ({r.pct(r.effective_riders):.1f}%) |"
         )
     lines.append("")
-    return "\n".join(lines)
-
-
-def render_scenario_markdown(
-    result: ScenarioResult,
-    *,
-    show_label: bool,
-    close_threshold_m: float,
-    top_n: int,
-    csv_out: Path | None,
-) -> str:
-    r = result
-    h2 = "###" if show_label else "##"
-    lines: list[str] = [f"## {r.scenario.label}", ""] if show_label else []
-
-    lines += [
-        f"{h2} Headline numbers",
-        "",
-        f"- **Total: {r.total_riders:,.0f} riders**",
-        f"- **One-seat: {r.pct(r.one_seat_riders):.1f}%** ({r.one_seat_riders:,.0f})",
-        f"- **Close one-seat: {r.pct(r.close_riders):.1f}%** "
-        f"({r.close_riders:,.0f}) -- within {close_threshold_m:.0f}m of a "
-        f"station on the scenario-effective origin corridor",
-        f"- **Effective one-seat: {r.pct(r.effective_riders):.1f}%** "
-        f"({r.effective_riders:,.0f})",
-        "",
-        f"{h2} Top {top_n} origin/destination pairs",
-        "",
-        "| # | Riders | % Total | Type | Close? | Dist | Origin → Destination |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
-    ]
-
-    def pair_riders(pair: ODPair) -> float:
-        return pair.riders
-
-    for i, pr in enumerate(sorted(r.rows, key=pair_riders, reverse=True)[:top_n], 1):
-        type_str = "1-seat" if pr.one_seat else "xfer"
-        close_str = "" if pr.one_seat else ("close" if pr.close else "far")
-        dist_str = "" if pr.one_seat else f"{pr.dist_m:.0f}m"
-        lines.append(
-            f"| {i} | {pr.riders:,.0f} | {r.pct(pr.riders):.2f}% | {type_str} | "
-            f"{close_str} | {dist_str} | {pr.origin_name} → {pr.dest_name} |"
-        )
-    lines.append("")
-
-    lines.append(f"{h2} Top {top_n} destination stations, summed across all origins")
-    lines.append("")
-    lines.append("| Riders | 1-Seat % | Effective % | Destination |")
-    lines.append("| --- | --- | --- | --- |")
-
-    def dest_total(d: DestStats) -> float:
-        return d.total
-
-    for d in sorted(r.dest_stats.values(), key=dest_total, reverse=True)[:top_n]:
-        one_seat_pct = 100 * d.one_seat / d.total if d.total else float("nan")
-        effective_pct = (
-            100 * (d.one_seat + d.close) / d.total if d.total else float("nan")
-        )
-        lines.append(
-            f"| {d.total:,.0f} | {one_seat_pct:.1f}% | {effective_pct:.1f}% | "
-            f"{d.name} |"
-        )
-    lines.append("")
-
-    if csv_out:
-        lines.append(
-            f"_Full row-level detail (every origin/destination pair, not just "
-            f"the top {top_n}): `{csv_out}`._"
-        )
-        lines.append("")
     return "\n".join(lines)
 
 
@@ -442,7 +445,7 @@ def deinterlining(
     stations_by_id = Station.load_complexes(stations)
     scenarios = [
         CURRENT_SCENARIO,
-        *(load_scenario(f, stations_by_id) for f in scenario_files),
+        *(Scenario.load(f, stations_by_id) for f in scenario_files),
     ]
     show_label = len(scenarios) > 1
     for s in scenarios:
@@ -513,7 +516,7 @@ def deinterlining(
     # `min_dist_to_corridor` -- local rather than cached at their own
     # definition since both close over `individual_stations`/
     # `platforms_by_complex`, loaded fresh per invocation. Shared across
-    # every scenario's `classify_scenario` call (including
+    # every scenario's `Scenario.classify` call (including
     # `CURRENT_SCENARIO`'s), since cache keys are (dest, effective routes)
     # pairs, not scenario-specific.
     @cache
@@ -554,8 +557,7 @@ def deinterlining(
         return close, dist_m, near_station_name
 
     results = [
-        classify_scenario(
-            s,
+        s.classify(
             pairs=pairs,
             stations_by_id=stations_by_id,
             stations_path=stations,
@@ -566,7 +568,7 @@ def deinterlining(
     ]
 
     for result in results:
-        print_headline(result, close_threshold_m=close_threshold_m)
+        result.print_headline(close_threshold_m=close_threshold_m)
     if show_label:
         print_comparison(results)
 
@@ -579,7 +581,7 @@ def deinterlining(
     if csv_out:
         for path, result in zip(csv_paths, results, strict=True):
             assert path is not None
-            write_csv(path, result.rows)
+            result.write_csv(path)
 
     if markdown_out:
         produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
@@ -598,8 +600,7 @@ def deinterlining(
             "\n".join(preamble_lines),
             *([render_comparison_markdown(results)] if show_label else []),
             *(
-                render_scenario_markdown(
-                    result,
+                result.render_markdown(
                     show_label=show_label,
                     close_threshold_m=close_threshold_m,
                     top_n=top_n,
