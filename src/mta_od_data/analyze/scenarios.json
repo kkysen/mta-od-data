@@ -2,7 +2,7 @@
   {
     "name": "Current",
     "description": "Today's real routing, no overrides.",
-    "overrides": []
+    "overrides": [],
   },
   {
     "name": "Columbus A/C Express",
@@ -21,10 +21,10 @@
           "103 St",
           "Cathedral Pkwy (110 St)",
           "116 St",
-          "135 St"
-        ]
-      }
-    ]
+          "135 St",
+        ],
+      },
+    ],
   },
   {
     "name": "Columbus B/D Express",
@@ -43,9 +43,9 @@
           "103 St",
           "Cathedral Pkwy (110 St)",
           "116 St",
-          "135 St"
-        ]
-      }
-    ]
-  }
+          "135 St",
+        ],
+      },
+    ],
+  },
 ]
