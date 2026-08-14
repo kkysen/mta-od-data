@@ -15,10 +15,10 @@ same shape as `regional_flow.py`'s unfiltered OD-pairs query -- comparing
 one-seat-ride share across today's real routes and any number of
 scenarios' route overrides.
 
-"Today" is not a special case: it's `CURRENT_SCENARIO`, a `Scenario` with
-no overrides, classified through the exact same code path as every other
-scenario. Passing multiple `--scenario-file`s classifies all of them (plus
-`CURRENT_SCENARIO`) against the *same* fetched OD pairs in one run, so
+"Today" is not a special case: it's `scenarios/current.json`, a `Scenario`
+with no overrides, classified through the exact same code path as every
+other scenario. Passing multiple `--scenario-file`s classifies all of them
+(plus `current.json`) against the *same* fetched OD pairs in one run, so
 comparing several proposals doesn't reclassify "today" once per proposal.
 """
 
@@ -162,7 +162,7 @@ class Scenario:
     (e.g. "Columbus A/C Express"); `description` is the longer explanatory
     text. `category` groups related scenarios for `--category` (e.g. every
     Columbus Circle swap direction), and is `None` for a scenario that
-    doesn't belong to one (`CURRENT_SCENARIO`). `slug` names this
+    doesn't belong to one (`current.json`). `slug` names this
     scenario's own suffixed CSV file when multiple scenarios are compared
     in one run (see `suffixed_path`) -- derived from `name`, not a
     separate thing to keep in sync."""
@@ -293,20 +293,6 @@ class Scenario:
             rows=rows,
             dest_stats=dest_stats,
         )
-
-
-# Today's real routing, expressed the same way any other scenario is: no
-# overrides, so `effective_routes` always falls through to a station's own
-# real `Station.routes`. Classified through the same `Scenario.classify`
-# as every loaded scenario -- there's no separate "current" code path to
-# keep in sync with the general one.
-CURRENT_SCENARIO = Scenario(
-    name="Current",
-    description="Today's real routing, no overrides.",
-    category=None,
-    slug="current",
-    overrides={},
-)
 
 
 def suffixed_path(path: Path, suffix: str) -> Path:
@@ -467,14 +453,23 @@ def resolve_scenarios(
     scenarios_dir: Path,
     station_index: StationIndex,
 ) -> list[Scenario]:
-    """`CURRENT_SCENARIO`, plus every scenario selected via `--scenario-file`
-    (by path), `--scenario` (by exact `name`, looked up in `scenarios_dir`),
-    and `--category` (every scenario in `scenarios_dir` with that
-    `category`) -- deduplicated by `name`, preserving that order. Raises
+    """`scenarios_dir/current.json` (today's real routing, no overrides),
+    plus every scenario selected via `--scenario-file` (by path),
+    `--scenario` (by exact `name`, looked up in `scenarios_dir`), and
+    `--category` (every scenario in `scenarios_dir` with that `category`)
+    -- deduplicated by `name`, preserving that order. Raises
     `ScenarioError` (not `SystemExit`) for an unknown `--scenario`/
-    `--category`; only `deinterlining()` itself exits."""
+    `--category`, or a missing `current.json`; only `deinterlining()`
+    itself exits."""
+    current_path = scenarios_dir / "current.json"
+    try:
+        current = Scenario.load(current_path, station_index)
+    except FileNotFoundError as e:
+        raise ScenarioError(
+            f'missing required {current_path} (the "Current" scenario, no overrides)'
+        ) from e
     scenarios = [
-        CURRENT_SCENARIO,
+        current,
         *(Scenario.load(f, station_index) for f in scenario_files),
     ]
 
@@ -518,7 +513,7 @@ def resolve_scenarios(
 def deinterlining(
     # Required (no default): only `routes` has no sensible default, so it
     # comes first -- every other parameter (including `scenario_files`,
-    # which defaults to comparing `CURRENT_SCENARIO` alone) has one.
+    # which defaults to comparing `current.json` alone) has one.
     routes: Annotated[
         str,
         Option(
@@ -740,9 +735,9 @@ def deinterlining(
     # `min_dist_to_corridor` -- local rather than cached at their own
     # definition since both close over `individual_stations`/
     # `platforms_by_complex`, loaded fresh per invocation. Shared across
-    # every scenario's `Scenario.classify` call (including
-    # `CURRENT_SCENARIO`'s), since cache keys are (dest, effective routes)
-    # pairs, not scenario-specific.
+    # every scenario's `Scenario.classify` call (including the "Current"
+    # scenario's), since cache keys are (dest, effective routes) pairs,
+    # not scenario-specific.
     @cache
     def assigned_points(assigned_routes: frozenset[str]) -> list[Station]:
         return [s for s in individual_stations if s.routes & assigned_routes]
