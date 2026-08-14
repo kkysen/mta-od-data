@@ -1,4 +1,4 @@
-# 6 Av express/Broadway express deinterlining: one-seat-ride results at Atlantic Av (B,D,N,Q,R)
+# One Seat Ride Analysis for Deinterlining 6 Av express/Broadway express at Atlantic Av (B,D,N,Q,R)
 
 Scenario: average weekday ridership (60 distinct days in the data, 2025-01-06 to 2025-12-12) on trains originating at stations served by B,D,N,Q,R, south of Atlantic Av (B,D,N,Q,R), with destinations north of it (i.e. trips that cross the junction).
 
