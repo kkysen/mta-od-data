@@ -73,7 +73,7 @@ def load_scenario(path: Path, stations_by_id: dict[int, Station]) -> Scenario:
 
 
 @dataclass(slots=True, frozen=True)
-class PairRow:
+class ODPair:
     origin_id: int
     origin_name: str
     dest_id: int
@@ -106,9 +106,9 @@ class DestStats:
     close_scenario: float = 0.0
 
 
-def write_csv(path: Path, rows: list[PairRow]) -> None:
+def write_csv(path: Path, rows: list[ODPair]) -> None:
     with path.open("w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=[fld.name for fld in fields(PairRow)])
+        writer = csv.DictWriter(f, fieldnames=[fld.name for fld in fields(ODPair)])
         writer.writeheader()
         writer.writerows(asdict(r) for r in rows)
     print(f"\nWrote {len(rows):,} rows to {path}")
@@ -303,7 +303,7 @@ def deinterlining(
         near_station_name = near_station.display(near_station.routes & routes_set)
         return close, dist_m, near_station_name
 
-    rows: list[PairRow] = []
+    rows: list[ODPair] = []
     total_riders = 0.0
     one_seat_current_riders = 0.0
     one_seat_scenario_riders = 0.0
@@ -332,7 +332,7 @@ def deinterlining(
         total_riders += riders
 
         # Computed symmetrically for both today and the scenario -- see
-        # `PairRow.close_current`'s docstring comment for why. A `False`/
+        # `ODPair.close_current`'s docstring comment for why. A `False`/
         # `0.0`/`None` no-op result when the pair is already one-seat (no
         # walk to evaluate) matches `one_seat_rides.py`'s `close, dist_m =
         # True, 0.0` convention for that case, just inverted here since
@@ -366,7 +366,7 @@ def deinterlining(
                 close_scenario_riders += riders
 
         rows.append(
-            PairRow(
+            ODPair(
                 origin_id=origin_id,
                 origin_name=origin.display(origin.routes & routes_set),
                 dest_id=dest_id,
@@ -467,7 +467,7 @@ def deinterlining(
             "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
         ]
 
-        def pair_riders(r: PairRow) -> float:
+        def pair_riders(r: ODPair) -> float:
             return r.riders
 
         for i, r in enumerate(sorted(rows, key=pair_riders, reverse=True)[:top_n], 1):
