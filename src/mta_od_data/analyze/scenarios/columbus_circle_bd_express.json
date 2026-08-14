@@ -3,11 +3,11 @@
   "description": "B,D run express and A,C run local on Central Park West, between 59 St-Columbus Circle and 145 St.",
   "category": "Columbus Circle",
   "overrides": {
-    "160": { "add": ["A"], "remove": ["B"] },
-    "159": { "add": ["A"], "remove": ["B"] },
-    "158": { "add": ["A"], "remove": ["B"] },
-    "157": { "add": ["A"], "remove": ["B"] },
-    "156": { "add": ["A"], "remove": ["B"] },
-    "155": { "add": ["A"], "remove": ["B"] }
+    "72 St": { "line": "8th Av - Fulton St", "add": ["A"], "remove": ["B"] },
+    "81 St-Museum of Natural History": { "add": ["A"], "remove": ["B"] },
+    "86 St": { "line": "8th Av - Fulton St", "add": ["A"], "remove": ["B"] },
+    "96 St": { "line": "8th Av - Fulton St", "add": ["A"], "remove": ["B"] },
+    "103 St": { "line": "8th Av - Fulton St", "add": ["A"], "remove": ["B"] },
+    "Cathedral Pkwy (110 St)": { "line": "8th Av - Fulton St", "add": ["A"], "remove": ["B"] }
   }
 }
