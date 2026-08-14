@@ -23,6 +23,7 @@ comparing several proposals doesn't reclassify "today" once per proposal.
 """
 
 import csv
+import re
 import shlex
 import sys
 from collections.abc import Callable
@@ -36,10 +37,12 @@ import duckdb
 import json5
 from typer import Option, Typer
 
-from mta_od_data import DATA
+from mta_od_data import DATA, ROOT
 from mta_od_data.analyze.common import DAY_TYPE_PRESETS, DayType, Station, haversine_m
 
 app = Typer()
+
+SCENARIOS_DIR = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios"
 
 
 class ScenarioError(Exception):
@@ -51,6 +54,13 @@ class ScenarioError(Exception):
 
 def parse_route_set(s: str) -> frozenset[str]:
     return frozenset(r.strip() for r in s.split(",") if r.strip())
+
+
+def slugify(name: str) -> str:
+    """A scenario's `name` (e.g. "Columbus A/C Express") isn't safe as a
+    filename suffix (spaces, `/`) -- this derives one that is, for
+    `suffixed_path`."""
+    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_") or "scenario"
 
 
 @dataclass(slots=True, frozen=True)
@@ -84,9 +94,15 @@ class Scenario:
     to a station's real current routes for every complex ID absent from
     `overrides` -- see `deinterlining_design.md` for why this replaces
     `one_seat_rides.py`'s corridor-A/corridor-B machinery instead of
-    extending it. `slug` names this scenario's own suffixed CSV file when
-    multiple scenarios are compared in one run (see `suffixed_path`)."""
+    extending it.
 
+    `name` is the short, exact-match identifier `--scenario` selects by
+    (e.g. "Columbus A/C Express"). `slug` names this scenario's own
+    suffixed CSV file when multiple scenarios are compared in one run (see
+    `suffixed_path`) -- derived from `name`, not a separate thing to keep
+    in sync."""
+
+    name: str
     label: str
     slug: str
     overrides: dict[int, frozenset[str]]
@@ -100,7 +116,10 @@ class Scenario:
             data = json5.loads(path.read_text())
         except ValueError as e:
             raise ScenarioError(f"scenario {path} isn't valid JSON: {e}") from e
-        label = data.get("label", path.stem)
+        name = data.get("name")
+        if not name:
+            raise ScenarioError(f'scenario {path} is missing a required "name" field')
+        label = data.get("label", name)
         overrides: dict[int, frozenset[str]] = {}
         for complex_id_str, routes in data["overrides"].items():
             complex_id = int(complex_id_str)
@@ -110,7 +129,7 @@ class Scenario:
                     f"in the station reference data"
                 )
             overrides[complex_id] = frozenset(routes)
-        return cls(label=label, slug=path.stem, overrides=overrides)
+        return cls(name=name, label=label, slug=slugify(name), overrides=overrides)
 
     def effective_routes(self, station: Station) -> frozenset[str]:
         return self.overrides.get(station.complex_id, station.routes)
@@ -201,7 +220,10 @@ class Scenario:
 # as every loaded scenario -- there's no separate "current" code path to
 # keep in sync with the general one.
 CURRENT_SCENARIO = Scenario(
-    label="Current (today's real routing)", slug="current", overrides={}
+    name="Current",
+    label="Current (today's real routing)",
+    slug="current",
+    overrides={},
 )
 
 
@@ -233,7 +255,7 @@ class ScenarioResult:
         print(f"\nWrote {len(self.rows):,} rows to {path}")
 
     def print_headline(self, *, close_threshold_m: float) -> None:
-        print(f"\n=== Scenario: {self.scenario.label} ===")
+        print(f"\n=== Scenario: {self.scenario.name} ===")
         print(f"Total riders: {self.total_riders:,.0f}")
         print(
             f"One-seat:              {self.one_seat_riders:>12,.0f} "
@@ -257,7 +279,7 @@ class ScenarioResult:
         csv_out: Path | None,
     ) -> str:
         h2 = "###" if show_label else "##"
-        lines: list[str] = [f"## {self.scenario.label}", ""] if show_label else []
+        lines: list[str] = [f"## {self.scenario.name}", ""] if show_label else []
 
         lines += [
             f"{h2} Headline numbers",
@@ -326,7 +348,7 @@ def print_comparison(results: list[ScenarioResult]) -> None:
     print("\n=== Scenario comparison ===")
     for r in results:
         print(
-            f"  {r.scenario.label:<55} total={r.total_riders:>9,.0f}  "
+            f"  {r.scenario.name:<55} total={r.total_riders:>9,.0f}  "
             f"direct={r.one_seat_riders:>8,.0f} ({r.pct(r.one_seat_riders):5.1f}%)  "
             f"close={r.close_riders:>7,.0f}  "
             f"effective={r.effective_riders:>8,.0f} ({r.pct(r.effective_riders):5.1f}%)"
@@ -346,13 +368,54 @@ def render_comparison_markdown(results: list[ScenarioResult]) -> str:
     ]
     for r in results:
         lines.append(
-            f"| {r.scenario.label} | {r.total_riders:,.0f} | "
+            f"| {r.scenario.name} | {r.total_riders:,.0f} | "
             f"{r.one_seat_riders:,.0f} ({r.pct(r.one_seat_riders):.1f}%) | "
             f"{r.close_riders:,.0f} ({r.pct(r.close_riders):.1f}%) | "
             f"{r.effective_riders:,.0f} ({r.pct(r.effective_riders):.1f}%) |"
         )
     lines.append("")
     return "\n".join(lines)
+
+
+def resolve_scenarios(
+    *,
+    scenario_files: list[Path],
+    scenario_names: list[str],
+    scenarios_dir: Path,
+    stations_by_id: dict[int, Station],
+) -> list[Scenario]:
+    """`CURRENT_SCENARIO`, plus every scenario selected via `--scenario-file`
+    (by path) and `--scenario` (by exact `name`, looked up in
+    `scenarios_dir`) -- deduplicated by `name`, preserving that order.
+    Raises `ScenarioError` (not `SystemExit`) for an unknown `--scenario`;
+    only `deinterlining()` itself exits."""
+    scenarios = [
+        CURRENT_SCENARIO,
+        *(Scenario.load(f, stations_by_id) for f in scenario_files),
+    ]
+
+    if scenario_names:
+        available = [
+            Scenario.load(p, stations_by_id)
+            for p in sorted(scenarios_dir.glob("*.json"))
+        ]
+        by_name = {s.name: s for s in available}
+        for name in scenario_names:
+            if name not in by_name:
+                raise ScenarioError(
+                    f"no scenario named {name!r} in {scenarios_dir} (available: "
+                    f"{', '.join(sorted(by_name)) or 'none'})"
+                )
+            scenarios.append(by_name[name])
+
+    seen: set[str] = set()
+    deduped: list[Scenario] = []
+    for s in scenarios:
+        if s.name in seen:
+            continue
+        seen.add(s.name)
+        deduped.append(s)
+    return deduped
 
 
 @app.command()
@@ -376,13 +439,28 @@ def deinterlining(
             help=(
                 "JSON file: {'label': str, 'overrides': {complex_id: "
                 "[route, ...]}}. Repeatable -- classifies every scenario "
-                "given (plus today's real routing) against the same fetched "
-                "OD pairs in one run. Only the listed complex IDs' routes "
-                "change; every other station keeps its real current routes. "
-                "Trailing commas are tolerated."
+                "given (plus today's real routing, and any --scenario "
+                "selections) against the same fetched OD pairs in one run. "
+                "Only the listed complex IDs' routes change; every other "
+                "station keeps its real current routes. Trailing commas are "
+                "tolerated."
             ),
         ),
     ] = [],  # noqa: B006 -- never mutated; Typer replaces this with parsed CLI values
+    scenario_names: Annotated[
+        list[str],
+        Option(
+            "--scenario",
+            help=(
+                "Select a scenario by its exact `name`, from every JSON file "
+                "in --scenarios-dir. Repeatable; combines with --scenario-file."
+            ),
+        ),
+    ] = [],  # noqa: B006 -- never mutated; Typer replaces this with parsed CLI values
+    scenarios_dir: Annotated[
+        Path,
+        Option(help="Directory of scenario JSON files, for --scenario lookup"),
+    ] = SCENARIOS_DIR,
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
     stations: Annotated[Path, Option()] = DATA / "stations_complexes.csv",
     stations_individual: Annotated[
@@ -421,9 +499,10 @@ def deinterlining(
     """Systemwide deinterlining scenario comparator: classify every
     origin/destination pair whose origin could plausibly use one of
     `--routes` as one-seat or transfer, under today's real routing and any
-    number of `--scenario-file` route-override scenarios -- all classified
-    in one pass over the same fetched OD pairs, so comparing several
-    proposals doesn't reclassify "today" once per proposal.
+    number of route-override scenarios -- selected by `--scenario-file`
+    (path) or `--scenario` (exact name, looked up in `--scenarios-dir`) --
+    all classified in one pass over the same fetched OD pairs, so comparing
+    several proposals doesn't reclassify "today" once per proposal.
 
     Unlike `one-seat-rides`, there's no latitude boundary and no
     origin-side-only corridor restriction -- a scenario can reassign which
@@ -436,13 +515,19 @@ def deinterlining(
 
     \b
     Examples:
-        # Columbus Circle: both proposed swap directions vs. today, in one run
+        # Columbus Circle: both proposed swap directions vs. today, in one run,
+        # by path
         mta-od-data analyze deinterlining --routes A,B,C,D \\
             --scenario-file \\
             src/mta_od_data/analyze/scenarios/columbus_circle_ac_express.json \\
             --scenario-file \\
             src/mta_od_data/analyze/scenarios/columbus_circle_bd_express.json \\
             --markdown-out src/mta_od_data/analyze/deinterlining_columbus_circle.md
+
+    \b
+        # Same, by name
+        mta-od-data analyze deinterlining --routes A,B,C,D \\
+            --scenario "Columbus A/C Express" --scenario "Columbus B/D Express"
     """
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
@@ -454,16 +539,18 @@ def deinterlining(
 
     stations_by_id = Station.load_complexes(stations)
     try:
-        scenarios = [
-            CURRENT_SCENARIO,
-            *(Scenario.load(f, stations_by_id) for f in scenario_files),
-        ]
+        scenarios = resolve_scenarios(
+            scenario_files=scenario_files,
+            scenario_names=scenario_names,
+            scenarios_dir=scenarios_dir,
+            stations_by_id=stations_by_id,
+        )
     except ScenarioError as e:
         print(f"error: {e}", file=sys.stderr)
         raise SystemExit(1) from e
     show_label = len(scenarios) > 1
     for s in scenarios:
-        print(f"Scenario: {s.label} ({len(s.overrides)} stations overridden)")
+        print(f"Scenario: {s.name} ({len(s.overrides)} stations overridden)")
     print(f"Route universe: {sorted(routes_set)}")
     print(f"Day filter: {days_list if days_list else 'all days'} ({day_type_label})")
 
