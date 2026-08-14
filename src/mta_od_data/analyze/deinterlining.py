@@ -23,7 +23,6 @@ comparing several proposals doesn't reclassify "today" once per proposal.
 """
 
 import csv
-import json
 import shlex
 import sys
 from collections.abc import Callable
@@ -34,6 +33,7 @@ from pathlib import Path
 from typing import Annotated
 
 import duckdb
+import json5
 from typer import Option, Typer
 
 from mta_od_data import DATA
@@ -93,7 +93,13 @@ class Scenario:
 
     @classmethod
     def load(cls, path: Path, stations_by_id: dict[int, Station]) -> Scenario:
-        data = json.loads(path.read_text())
+        # JSON5 (a strict superset of JSON): tolerates a trailing comma
+        # before a closing `}`/`]`, an easy slip when hand-editing scenario
+        # files -- plain `json.loads` would reject it outright.
+        try:
+            data = json5.loads(path.read_text())
+        except ValueError as e:
+            raise ScenarioError(f"scenario {path} isn't valid JSON: {e}") from e
         label = data.get("label", path.stem)
         overrides: dict[int, frozenset[str]] = {}
         for complex_id_str, routes in data["overrides"].items():
@@ -372,7 +378,8 @@ def deinterlining(
                 "[route, ...]}}. Repeatable -- classifies every scenario "
                 "given (plus today's real routing) against the same fetched "
                 "OD pairs in one run. Only the listed complex IDs' routes "
-                "change; every other station keeps its real current routes."
+                "change; every other station keeps its real current routes. "
+                "Trailing commas are tolerated."
             ),
         ),
     ] = [],  # noqa: B006 -- never mutated; Typer replaces this with parsed CLI values
