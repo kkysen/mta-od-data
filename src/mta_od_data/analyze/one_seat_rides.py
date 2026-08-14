@@ -1165,9 +1165,20 @@ def one_seat_rides(
     for s in individual_stations:
         platforms_by_complex.setdefault(s.complex_id, []).append(s)
 
-    routes_by_line: dict[str, set[str]] = {}
+    # Keyed by (line, borough), not just `line`: several `line` labels are
+    # composite trunk names spanning physically distinct segments in
+    # different boroughs -- e.g. "6th Av - Culver" covers both the Manhattan
+    # 6th Av trunk (B,D,F,M) and the unrelated Brooklyn Culver local (F,G
+    # only; B,D never reach it). Unioning by `line` alone would credit a
+    # Culver-only platform with B,D as "express partners" it can't actually
+    # reach without a real transfer. Borough is a coarse split (a composite
+    # `line` can still span more than one physical branch within one
+    # borough, e.g. Brooklyn's "Broadway - Brighton" also picks up a Culver
+    # connection at Church Av/Prospect Park), but it's cheap and fixes the
+    # cross-borough conflation, which is the case that actually shows up.
+    routes_by_line: dict[tuple[str, str], set[str]] = {}
     for s in individual_stations:
-        routes_by_line.setdefault(s.line, set()).update(s.routes)
+        routes_by_line.setdefault((s.line, s.borough), set()).update(s.routes)
 
     # For an origin with no primary route of its own (e.g. an R-only
     # station), which primary routes are assumed reachable anyway: whichever
@@ -1180,7 +1191,8 @@ def one_seat_rides(
         cid: frozenset(
             route
             for s in platforms_by_complex.get(cid, [])
-            for route in routes_by_line.get(s.line, set()) & primary_routes_set
+            for route in routes_by_line.get((s.line, s.borough), set())
+            & primary_routes_set
         )
         for cid in origin_ids
     }
