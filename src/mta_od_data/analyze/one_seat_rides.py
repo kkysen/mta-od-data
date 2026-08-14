@@ -93,7 +93,10 @@ class ScenarioResult:
     close_one_seat_riders: float
     effective_one_seat_riders: float
     rows: list[PairRow]
-    dest_stats: dict[int, DestStats]
+    # Keyed by (dest complex ID, physical platform label) -- see
+    # `dest_platform_key` -- not just the complex ID, since a complex can
+    # merge several physically separate platforms.
+    dest_stats: dict[tuple[int, str], DestStats]
     per_origin: dict[int, list[float]]
 
     @property
@@ -382,6 +385,50 @@ def classify_one_seat(
     return is_one_seat, shared
 
 
+def dest_platform_key(
+    platforms_by_complex: dict[int, list[Station]],
+    dest_id: int,
+    shown_routes: frozenset[str],
+) -> str:
+    """Which physical platform within a merged complex `shown_routes`
+    belongs to, so the per-destination summary table doesn't union riders
+    who arrived at genuinely different physical stations that just happen to
+    share a complex ID -- e.g. Atlantic Av's 4th Av platform (D,N,R) is a
+    different physical station from its Broadway-Brighton platform (B,Q).
+    Returns `""` when the complex has at most one physical platform in the
+    reference data (or none at all) -- nothing to split, so every row for
+    this destination lands in the same bucket, as before this existed.
+
+    When `shown_routes` fits entirely within one platform's own routes,
+    that platform (its `line` label) is the key, merging rows that show
+    different subsets of the same real platform (e.g. a `Q`-only row and a
+    `B,Q` row both land on Atlantic Av's one real Brighton platform).
+
+    But a single row's `shown_routes` can straddle more than one platform:
+    a real Brooklyn D,N origin reaches 34 St-Herald Sq on two physically
+    different platforms (D via 6th Av, N via Broadway), even though at
+    Atlantic Av those same two routes share one platform (4th Av) -- the
+    same route pair doesn't always mean the same physical split. In that
+    case the key is the exact route combination itself (e.g. `"D,N"`, kept
+    separate from `"D,N,Q"`), not "whichever platform overlaps most" --
+    that would silently mix routes into a single-platform bucket the row
+    doesn't fully belong to. Returns `"?"` when `shown_routes` doesn't
+    overlap any platform's own routes at all."""
+    platform_routes: dict[str, set[str]] = {}
+    for s in platforms_by_complex.get(dest_id, []):
+        platform_routes.setdefault(s.line, set()).update(s.routes)
+    if len(platform_routes) <= 1:
+        return ""
+    touched = [
+        line for line, routes in platform_routes.items() if shown_routes & routes
+    ]
+    if len(touched) == 1:
+        return touched[0]
+    if not touched:
+        return "?"
+    return ",".join(sorted(shown_routes))
+
+
 def corridor_swap_label(
     corridor_a_routes: frozenset[str],
     corridor_b_routes: frozenset[str],
@@ -417,6 +464,7 @@ def run_scenario(
     primary_routes_set: frozenset[str],
     min_dist_to_corridor: Callable[[Station, frozenset[str]], tuple[float, Station]],
     origin_express_partners: dict[int, frozenset[str]],
+    platforms_by_complex: dict[int, list[Station]],
     close_threshold_m: float,
     origin_corridor_a_routes_set: frozenset[str],
     origin_corridor_b_routes_set: frozenset[str],
@@ -479,13 +527,21 @@ def run_scenario(
     close_one_seat_riders = 0.0
 
     rows: list[PairRow] = []
+    per_origin: dict[int, list[float]] = {cid: [0.0, 0.0] for cid in origin_ids}
     # Which of a destination's routes were actually applicable across all
-    # origins, for the aggregate per-destination table -- the same per-row
-    # narrowing as `dest_name` (a `1-seat` row's `shared` route(s), or a
-    # close `xfer` row's assumed express transfer), unioned. A destination
-    # with no such rows at all is left out here and falls back to its full
-    # route list when the table is built below.
-    dest_route_union: dict[int, set[str]] = {}
+    # origins landing at the same physical platform, for the aggregate
+    # per-destination table -- the same per-row narrowing as `dest_name` (a
+    # `1-seat` row's `shared` route(s), a close `xfer` row's assumed express
+    # transfer, or a genuine cross-corridor `xfer` row's preferred-primary
+    # guess), unioned. Keyed by (dest complex ID, platform label) rather than
+    # just the complex ID -- see `dest_platform_key` -- since summing by
+    # complex ID alone would union riders who landed at genuinely different
+    # physical platforms into one reported destination (e.g. 34 St-Herald
+    # Sq's 6th Av platform, B,D,F,M, vs its Broadway platform, N,Q,R,W). A
+    # destination with no such rows at all is left out here and falls back
+    # to its full route list when the table is built below.
+    dest_route_union: dict[tuple[int, str], set[str]] = {}
+    dest_stats: dict[tuple[int, str], DestStats] = {}
     for origin_id, dest_id, riders in scoped:
         origin = stations_by_id[origin_id]
         # Guaranteed present: `scoped` only ever contains destinations that
@@ -567,13 +623,10 @@ def run_scenario(
             # the data at all, so it contributes no evidence either way (not
             # even the full list -- that would swamp the one-seat signal,
             # since almost every destination has some xfer riders).
-            ridden_routes = prefer_primary(shared, primary_routes_set)
-            dest_route_union.setdefault(dest_id, set()).update(ridden_routes)
-            dest_name = dest.display(ridden_routes)
-            origin_name = origin.display(ridden_routes)
+            shown_dest_routes = prefer_primary(shared, primary_routes_set)
+            origin_name = origin.display(shown_dest_routes)
         elif xfer_applicable_routes:
-            dest_route_union.setdefault(dest_id, set()).update(xfer_applicable_routes)
-            dest_name = dest.display(xfer_applicable_routes)
+            shown_dest_routes = xfer_applicable_routes
             origin_name = origin.display(
                 effective_origin_routes[origin_id] & routes_set
             )
@@ -591,12 +644,19 @@ def run_scenario(
             # would be just as much noise as the 2,3,4,5 at Atlantic Av
             # (never part of --routes, so never a route any of these trips
             # could have used).
-            dest_name = dest.display(
-                prefer_primary(dest.routes & routes_set, primary_routes_set)
+            shown_dest_routes = prefer_primary(
+                dest.routes & routes_set, primary_routes_set
             )
             origin_name = origin.display(
                 effective_origin_routes[origin_id] & routes_set
             )
+        dest_name = dest.display(shown_dest_routes)
+        platform_key = dest_platform_key(
+            platforms_by_complex, dest_id, shown_dest_routes
+        )
+        dest_route_union.setdefault((dest_id, platform_key), set()).update(
+            shown_dest_routes
+        )
 
         near_station_name = (
             near_station.display(near_station.routes & routes_set)
@@ -619,37 +679,34 @@ def run_scenario(
             )
         )
 
+        per_origin[origin_id][0] += riders
+        if is_one_seat:
+            per_origin[origin_id][1] += riders
+        # This row's own `dest_name` names only the platform key computed
+        # above -- fine as a per-row label, but the aggregate table's name
+        # is finalized below from `dest_route_union`, which additionally
+        # accumulates every other row landing at the same platform (not just
+        # the route(s) accounting for the last row seen).
+        d = dest_stats.setdefault((dest_id, platform_key), DestStats(name=dest_name))
+        d.total += riders
+        if is_one_seat:
+            d.one_seat += riders
+        else:
+            d.many_seat_classified += riders
+            d.many_seat_dist_weighted += riders * dist_m
+            if close:
+                d.many_seat_close += riders
+
     # Riders with either a direct one-seat ride, or a close one-seat ride
     # instead (short walk, no train change). Only meaningful under a
     # corridor scenario -- close_one_seat_riders is always 0 otherwise, so
     # this trivially equals one_seat_riders in baseline mode.
     effective_one_seat_riders = one_seat_riders + close_one_seat_riders
 
-    per_origin: dict[int, list[float]] = {cid: [0.0, 0.0] for cid in origin_ids}
-    dest_stats: dict[int, DestStats] = {}
-    for r in rows:
-        per_origin[r.origin_id][0] += r.riders
-        if r.one_seat:
-            per_origin[r.origin_id][1] += r.riders
-        # Summed across all origins, so unlike a single row's `dest_name`
-        # this shows every route observed as an arrival route across all of
-        # them -- not just the route(s) accounting for the last row seen.
-        dest_station = stations_by_id[r.dest_id]
-        arrival_routes = dest_route_union.get(r.dest_id)
-        dest_display_name = (
-            dest_station.display(frozenset(arrival_routes))
-            if arrival_routes
-            else r.dest_name
-        )
-        d = dest_stats.setdefault(r.dest_id, DestStats(name=dest_display_name))
-        d.total += r.riders
-        if r.one_seat:
-            d.one_seat += r.riders
-        else:
-            d.many_seat_classified += r.riders
-            d.many_seat_dist_weighted += r.riders * r.dist_m
-            if r.close:
-                d.many_seat_close += r.riders
+    for key, d in dest_stats.items():
+        arrival_routes = dest_route_union.get(key)
+        if arrival_routes:
+            d.name = stations_by_id[key[0]].display(frozenset(arrival_routes))
 
     corridor_scenario_note = None
     if corridor_scenario_active:
@@ -1265,6 +1322,7 @@ def one_seat_rides(
             primary_routes_set=primary_routes_set,
             min_dist_to_corridor=min_dist_to_corridor,
             origin_express_partners=origin_express_partners,
+            platforms_by_complex=platforms_by_complex,
             close_threshold_m=close_threshold_m,
             origin_corridor_a_routes_set=origin_corridor_a_routes_set,
             origin_corridor_b_routes_set=origin_corridor_b_routes_set,
