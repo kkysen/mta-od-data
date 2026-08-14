@@ -213,14 +213,15 @@ class Scenario:
         description = data.get("description", name)
         category = data.get("category")
         overrides: dict[Station, RouteDelta] = {}
-        for station_name, delta_data in data.get("overrides", {}).items():
-            station = station_index.resolve(
-                station_name, delta_data.get("line"), path=path
+        for group in data.get("overrides", []):
+            delta = RouteDelta(
+                add=frozenset(group.get("add", [])),
+                remove=frozenset(group.get("remove", [])),
             )
-            overrides[station] = RouteDelta(
-                add=frozenset(delta_data.get("add", [])),
-                remove=frozenset(delta_data.get("remove", [])),
-            )
+            line = group.get("line")
+            for station_name in group["stations"]:
+                station = station_index.resolve(station_name, line, path=path)
+                overrides[station] = delta
         return cls(
             name=name,
             description=description,
@@ -557,12 +558,16 @@ def deinterlining(
             "--scenario-file",
             help=(
                 "JSON file, a JSON array of {'name': str, 'description': str, "
-                "'category': str, 'overrides': {station_name: {'line': str, "
-                "'add': [route, ...], 'remove': [route, ...]}}}. 'line' is "
-                "only required when station_name is ambiguous (shared by "
-                "multiple complexes); an ambiguous name without it is a load "
-                "error. Repeatable -- classifies every scenario given (plus "
-                "today's real routing, and any --scenario/--category "
+                "'category': str, 'overrides': [{'line': str, 'add': "
+                "[route, ...], 'remove': [route, ...], 'stations': "
+                "[station_name, ...]}, ...]}. Each override group applies "
+                "the same add/remove to every listed station -- the usual "
+                "case, since a deinterlining change typically affects "
+                "several stations on one line the same way. 'line' is only "
+                "required when a station_name is ambiguous (shared by "
+                "multiple complexes); an ambiguous name without it is a "
+                "load error. Repeatable -- classifies every scenario given "
+                "(plus today's real routing, and any --scenario/--category "
                 "selections) against the same fetched OD pairs in one run. "
                 "Only the named stations' routes change (by adding/removing "
                 "just the given routes from each one's real current routes); "
