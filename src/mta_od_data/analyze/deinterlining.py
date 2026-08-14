@@ -113,14 +113,18 @@ class OverrideGroup(BaseModel):
     """One override group in a scenario file's `overrides` array: an
     add/remove pair shared by every station in `stations` -- the usual
     case, since a deinterlining change typically affects several stations
-    on one line the same way. `line` disambiguates a `stations` entry
-    whose bare name is shared by more than one real complex elsewhere in
-    the system (see `StationIndex.resolve`); leave it out when every name
-    given here is already unique on its own."""
+    on one line the same way. `line` (e.g. "8th Av - Fulton St", from the
+    individual-station reference data) is required on every group: it
+    disambiguates a `stations` entry whose bare name is shared by more
+    than one real complex elsewhere in the system (see
+    `StationIndex.resolve`), and lets a reader tell which physical line a
+    group's `add`/`remove` applies to without cross-referencing
+    `stations_individual.csv`, even when every name here happens to
+    already be unique on its own."""
 
     model_config = ConfigDict(extra="forbid")
 
-    line: str | None = None
+    line: str = Field(min_length=1)
     add: list[str] = Field(default_factory=list)
     remove: list[str] = Field(default_factory=list)
     stations: list[str] = Field(min_length=1)
@@ -632,16 +636,18 @@ def deinterlining(
                 "[station_name, ...]}, ...]}. Each override group applies "
                 "the same add/remove to every listed station -- the usual "
                 "case, since a deinterlining change typically affects "
-                "several stations on one line the same way. 'line' is only "
-                "required when a station_name is ambiguous (shared by "
-                "multiple complexes); an ambiguous name without it is a "
-                "load error. Repeatable -- classifies every scenario given "
-                "(plus today's real routing, and any --scenario/--category "
-                "selections) against the same fetched OD pairs in one run. "
-                "Only the named stations' routes change (by adding/removing "
-                "just the given routes from each one's real current routes); "
-                "every other station keeps its real current routes "
-                "untouched. Trailing commas are tolerated."
+                "several stations on one line the same way. 'line' (e.g. "
+                "'8th Av - Fulton St') is required on every group: besides "
+                "disambiguating a station_name shared by multiple complexes "
+                "elsewhere in the system, it states which physical line a "
+                "group applies to without cross-referencing station "
+                "reference data. Repeatable -- classifies every scenario "
+                "given (plus today's real routing, and any --scenario/"
+                "--category selections) against the same fetched OD pairs "
+                "in one run. Only the named stations' routes change (by "
+                "adding/removing just the given routes from each one's real "
+                "current routes); every other station keeps its real "
+                "current routes untouched. Trailing commas are tolerated."
             ),
         ),
     ] = [],  # noqa: B006 -- never mutated; Typer replaces this with parsed CLI values
