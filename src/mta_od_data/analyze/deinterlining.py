@@ -101,6 +101,55 @@ class RouteDelta:
 
 
 @dataclass(slots=True, frozen=True)
+class StationIndex:
+    """Resolves a scenario override's (station name, line) to a `Station`
+    -- station names alone aren't unique (e.g. "72 St" is three different
+    real complexes: CPW, Broadway-7 Av, and 2 Av), so a scenario file
+    specifies `line` (e.g. "8th Av - Fulton St", from the individual-station
+    reference data) only when the name alone is ambiguous. Built once per
+    invocation from the same station reference data used everywhere else,
+    not a separate lookup source."""
+
+    by_name: dict[str, frozenset[Station]]
+    by_name_line: dict[tuple[str, str], Station]
+
+    @classmethod
+    def build(
+        cls,
+        stations_by_id: dict[int, Station],
+        individual_stations: list[Station],
+    ) -> StationIndex:
+        by_name: dict[str, set[Station]] = {}
+        for station in stations_by_id.values():
+            by_name.setdefault(station.name, set()).add(station)
+        by_name_line = {
+            (s.name, s.line): stations_by_id[s.complex_id] for s in individual_stations
+        }
+        return cls(
+            by_name={name: frozenset(stations) for name, stations in by_name.items()},
+            by_name_line=by_name_line,
+        )
+
+    def resolve(self, name: str, line: str | None, *, path: Path) -> Station:
+        if line is not None:
+            key = (name, line)
+            if key not in self.by_name_line:
+                raise ScenarioError(
+                    f'scenario {path}: no station named "{name}" on line "{line}"'
+                )
+            return self.by_name_line[key]
+        matches = self.by_name.get(name, frozenset())
+        if not matches:
+            raise ScenarioError(f'scenario {path}: no station named "{name}"')
+        if len(matches) > 1:
+            raise ScenarioError(
+                f'scenario {path}: "{name}" is ambiguous ({len(matches)} stations '
+                f'share this name) -- add "line" to disambiguate'
+            )
+        return next(iter(matches))
+
+
+@dataclass(slots=True, frozen=True)
 class Scenario:
     """A deinterlining scenario: real routes overridden only for the
     specific stations it actually changes. `effective_routes` falls back
@@ -130,7 +179,7 @@ class Scenario:
     overrides: dict[Station, RouteDelta]
 
     @classmethod
-    def load(cls, path: Path, stations_by_id: dict[int, Station]) -> Scenario:
+    def load(cls, path: Path, station_index: StationIndex) -> Scenario:
         # JSON5 (a strict superset of JSON): tolerates a trailing comma
         # before a closing `}`/`]`, an easy slip when hand-editing scenario
         # files -- plain `json.loads` would reject it outright.
@@ -144,14 +193,10 @@ class Scenario:
         description = data.get("description", name)
         category = data.get("category")
         overrides: dict[Station, RouteDelta] = {}
-        for complex_id_str, delta_data in data["overrides"].items():
-            complex_id = int(complex_id_str)
-            station = stations_by_id.get(complex_id)
-            if station is None:
-                raise ScenarioError(
-                    f"scenario {path} overrides complex {complex_id}, not found "
-                    f"in the station reference data"
-                )
+        for station_name, delta_data in data["overrides"].items():
+            station = station_index.resolve(
+                station_name, delta_data.get("line"), path=path
+            )
             overrides[station] = RouteDelta(
                 add=frozenset(delta_data.get("add", [])),
                 remove=frozenset(delta_data.get("remove", [])),
@@ -420,7 +465,7 @@ def resolve_scenarios(
     scenario_names: list[str],
     categories: list[str],
     scenarios_dir: Path,
-    stations_by_id: dict[int, Station],
+    station_index: StationIndex,
 ) -> list[Scenario]:
     """`CURRENT_SCENARIO`, plus every scenario selected via `--scenario-file`
     (by path), `--scenario` (by exact `name`, looked up in `scenarios_dir`),
@@ -430,12 +475,12 @@ def resolve_scenarios(
     `--category`; only `deinterlining()` itself exits."""
     scenarios = [
         CURRENT_SCENARIO,
-        *(Scenario.load(f, stations_by_id) for f in scenario_files),
+        *(Scenario.load(f, station_index) for f in scenario_files),
     ]
 
     if scenario_names or categories:
         available = [
-            Scenario.load(p, stations_by_id)
+            Scenario.load(p, station_index)
             for p in sorted(scenarios_dir.glob("*.json"))
         ]
         by_name = {s.name: s for s in available}
@@ -489,15 +534,17 @@ def deinterlining(
             "--scenario-file",
             help=(
                 "JSON file: {'name': str, 'description': str, 'category': str, "
-                "'overrides': {complex_id: {'add': [route, ...], "
-                "'remove': [route, ...]}}}. Repeatable -- classifies every "
-                "scenario given (plus today's real routing, and any "
-                "--scenario/--category selections) against the same fetched "
-                "OD pairs in one run. Only the listed complex IDs' routes "
-                "change (by adding/removing just the given routes from each "
-                "one's real current routes); every other station keeps its "
-                "real current routes untouched. Trailing commas are "
-                "tolerated."
+                "'overrides': {station_name: {'line': str, 'add': [route, ...], "
+                "'remove': [route, ...]}}}. 'line' is only required when "
+                "station_name is ambiguous (shared by multiple complexes); "
+                "an ambiguous name without it is a load error. Repeatable -- "
+                "classifies every scenario given (plus today's real routing, "
+                "and any --scenario/--category selections) against the same "
+                "fetched OD pairs in one run. Only the named stations' "
+                "routes change (by adding/removing just the given routes "
+                "from each one's real current routes); every other station "
+                "keeps its real current routes untouched. Trailing commas "
+                "are tolerated."
             ),
         ),
     ] = [],  # noqa: B006 -- never mutated; Typer replaces this with parsed CLI values
@@ -612,13 +659,15 @@ def deinterlining(
     routes_set = parse_route_set(routes)
 
     stations_by_id = Station.load_complexes(stations)
+    individual_stations = Station.load_individuals(stations_individual)
+    station_index = StationIndex.build(stations_by_id, individual_stations)
     try:
         scenarios = resolve_scenarios(
             scenario_files=scenario_files,
             scenario_names=scenario_names,
             categories=categories,
             scenarios_dir=scenarios_dir,
-            stations_by_id=stations_by_id,
+            station_index=station_index,
         )
     except ScenarioError as e:
         print(f"error: {e}", file=sys.stderr)
@@ -683,7 +732,6 @@ def deinterlining(
         f"({min_date} to {max_date})"
     )
 
-    individual_stations = Station.load_individuals(stations_individual)
     platforms_by_complex: dict[int, list[Station]] = {}
     for s in individual_stations:
         platforms_by_complex.setdefault(s.complex_id, []).append(s)
