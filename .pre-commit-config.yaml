@@ -15,7 +15,8 @@ repos:
     rev: "1.2.0"
     hooks:
       - id: pyrefly-check
-        additional_dependencies: ["duckdb>=1.5.5", "typer>=0.27.1", "pytest>=9.1.1"]
+        additional_dependencies:
+          ["duckdb>=1.5.5", "json5>=0.15.0", "typer>=0.27.1", "pytest>=9.1.1"]
 
   - repo: local
     hooks:
