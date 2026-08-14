@@ -362,14 +362,22 @@ def classify_one_seat(
     dest_routes: frozenset[str],
     routes: frozenset[str],
     primary_routes: frozenset[str],
+    origin_reachable_primary_routes: frozenset[str],
 ) -> tuple[bool, frozenset[str]]:
     """A trip is one-seat if some shared route actually crosses the boundary
-    junction (a primary route), or if the destination isn't served by any
-    primary route anyway (so the non-primary connection, e.g. R, isn't
-    standing in for a junction crossing that never really happens)."""
+    junction (a primary route), or if no primary route the origin could
+    actually reach without a transfer (its own physical line's express
+    partners, e.g. D/N for an R rider) serves the destination either --
+    riding the non-primary connection (e.g. R) the whole way isn't standing
+    in for a junction crossing that never really happens, since switching to
+    the assumed express and back wouldn't have been faster. A primary route
+    that serves the destination only via some *other* transfer doesn't
+    count: e.g. DeKalb Av (B,Q,R) has no D/N, so an R-only origin has no
+    real express alternative there, and this is one-seat via R."""
     shared = origin_routes & dest_routes & routes
     is_one_seat = bool(shared) and (
-        bool(shared & primary_routes) or not (dest_routes & primary_routes)
+        bool(shared & primary_routes)
+        or not (dest_routes & origin_reachable_primary_routes)
     )
     return is_one_seat, shared
 
@@ -490,6 +498,7 @@ def run_scenario(
             dest_routes,
             routes_set,
             primary_routes_set,
+            origin_express_partners[origin_id],
         )
         if is_one_seat:
             one_seat_riders += riders
