@@ -122,7 +122,12 @@ class Scenario:
     description: str
     category: str | None
     slug: str
-    overrides: dict[int, RouteDelta]
+    # Keyed by `Station` itself, not `complex_id` -- `Station` is frozen
+    # (so hashable) and every consumer here resolves stations from the
+    # same `stations_by_id` loaded once per invocation, so `effective_routes`
+    # can look a station up directly instead of needing an indirection
+    # through its id.
+    overrides: dict[Station, RouteDelta]
 
     @classmethod
     def load(cls, path: Path, stations_by_id: dict[int, Station]) -> Scenario:
@@ -138,15 +143,16 @@ class Scenario:
             raise ScenarioError(f'scenario {path} is missing a required "name" field')
         description = data.get("description", name)
         category = data.get("category")
-        overrides: dict[int, RouteDelta] = {}
+        overrides: dict[Station, RouteDelta] = {}
         for complex_id_str, delta_data in data["overrides"].items():
             complex_id = int(complex_id_str)
-            if complex_id not in stations_by_id:
+            station = stations_by_id.get(complex_id)
+            if station is None:
                 raise ScenarioError(
                     f"scenario {path} overrides complex {complex_id}, not found "
                     f"in the station reference data"
                 )
-            overrides[complex_id] = RouteDelta(
+            overrides[station] = RouteDelta(
                 add=frozenset(delta_data.get("add", [])),
                 remove=frozenset(delta_data.get("remove", [])),
             )
@@ -159,7 +165,7 @@ class Scenario:
         )
 
     def effective_routes(self, station: Station) -> frozenset[str]:
-        delta = self.overrides.get(station.complex_id)
+        delta = self.overrides.get(station)
         if delta is None:
             return station.routes
         return (station.routes - delta.remove) | delta.add
