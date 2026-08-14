@@ -44,6 +44,12 @@ app = Typer()
 
 SCENARIOS_DIR = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios"
 
+# A set of route letters (e.g. `{"A", "C"}`), not a single station's or
+# pair's routes specifically -- named for what it holds, not where it's
+# used, since it shows up as a station's actual routes, a scenario's
+# effective routes, and the `--routes` universe alike.
+type Routes = frozenset[str]
+
 
 class ScenarioError(Exception):
     """Raised for a scenario/CLI-input problem that only `deinterlining()`
@@ -52,7 +58,7 @@ class ScenarioError(Exception):
     it stays usable as a library function."""
 
 
-def parse_route_set(s: str) -> frozenset[str]:
+def parse_route_set(s: str) -> Routes:
     return frozenset(r.strip() for r in s.split(",") if r.strip())
 
 
@@ -96,8 +102,8 @@ class RouteDelta:
     unaffected. `effective_routes` applies `remove` before `add`, so
     listing a route in both is equivalent to just `add`."""
 
-    add: frozenset[str]
-    remove: frozenset[str]
+    add: Routes
+    remove: Routes
 
 
 @dataclass(slots=True, frozen=True)
@@ -209,7 +215,7 @@ class Scenario:
             overrides=overrides,
         )
 
-    def effective_routes(self, station: Station) -> frozenset[str]:
+    def effective_routes(self, station: Station) -> Routes:
         delta = self.overrides.get(station)
         if delta is None:
             return station.routes
@@ -221,10 +227,8 @@ class Scenario:
         pairs: list[tuple[int, int, float]],
         stations_by_id: dict[int, Station],
         stations_path: Path,
-        routes_set: frozenset[str],
-        close_lookup: Callable[
-            [Station, frozenset[str]], tuple[bool, float, str | None]
-        ],
+        routes_set: Routes,
+        close_lookup: Callable[[Station, Routes], tuple[bool, float, str | None]],
     ) -> ScenarioResult:
         rows: list[ODPair] = []
         total_riders = 0.0
@@ -749,12 +753,12 @@ def deinterlining(
     # scenario's), since cache keys are (dest, effective routes) pairs,
     # not scenario-specific.
     @cache
-    def assigned_points(assigned_routes: frozenset[str]) -> list[Station]:
+    def assigned_points(assigned_routes: Routes) -> list[Station]:
         return [s for s in individual_stations if s.routes & assigned_routes]
 
     @cache
     def min_dist_to_corridor(
-        dest: Station, assigned_routes: frozenset[str]
+        dest: Station, assigned_routes: Routes
     ) -> tuple[float, Station] | None:
         candidates = assigned_points(assigned_routes)
         if not candidates:
@@ -775,7 +779,7 @@ def deinterlining(
         return best
 
     def close_lookup(
-        dest: Station, effective_origin_routes: frozenset[str]
+        dest: Station, effective_origin_routes: Routes
     ) -> tuple[bool, float, str | None]:
         best = min_dist_to_corridor(dest, effective_origin_routes)
         if best is None:
