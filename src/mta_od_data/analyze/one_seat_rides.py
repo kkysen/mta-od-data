@@ -126,7 +126,7 @@ class ScenarioResult:
         self,
         *,
         show_label: bool,
-        day_type: DayType,
+        day_type_label: str,
         dest_side: str,
         close_threshold_m: float,
     ) -> None:
@@ -135,9 +135,9 @@ class ScenarioResult:
         else:
             print(
                 f"\n=== Scope: origin in {{south of boundary}}, destination "
-                f"{dest_side} of boundary, day-type={day_type} ==="
+                f"{dest_side} of boundary, day-type={day_type_label} ==="
             )
-        print(f"Average {day_type} ridership: {self.total_riders:,.0f}")
+        print(f"Average {day_type_label} ridership: {self.total_riders:,.0f}")
         if self.total_riders:
             print(
                 f"One-seat (no transfer): {self.one_seat_riders:,.0f} "
@@ -192,7 +192,7 @@ class ScenarioResult:
         self,
         *,
         show_label: bool,
-        day_type: DayType,
+        day_type_label: str,
         close_threshold_m: float,
         top_n: int,
         csv_out: Path | None,
@@ -216,12 +216,14 @@ class ScenarioResult:
         # refer back to.
         headline: list[str] = []
         if not show_label:
-            headline.append(f"- **Total: {self.total_riders:,.0f} riders/{day_type}**")
+            headline.append(
+                f"- **Total: {self.total_riders:,.0f} riders/{day_type_label}**"
+            )
             if self.total_riders:
                 one_seat_pct = 100 * self.one_seat_riders / self.total_riders
                 headline.append(
                     f"- **One-seat rides (no transfer): {one_seat_pct:.1f}%** "
-                    f"({self.one_seat_riders:,.0f}/{day_type})"
+                    f"({self.one_seat_riders:,.0f}/{day_type_label})"
                 )
         if not show_label and self.classified_many_seat_riders:
             close_pct = (
@@ -250,7 +252,7 @@ class ScenarioResult:
             headline.append(
                 f"- **Effective one-seat rides (direct + close): "
                 f"{effective_pct:.1f}%** ({self.effective_one_seat_riders:,.0f}/"
-                f"{day_type}) -- direct one-seat riders plus the close one-seat "
+                f"{day_type_label}) -- direct one-seat riders plus the close one-seat "
                 f"riders above, i.e. riders who wouldn't feel a materially worse "
                 f"trip{scenario_note}."
             )
@@ -298,7 +300,7 @@ class ScenarioResult:
         lines.append("")
         lines.append(
             "Sorted by each destination's one-seat ridership (i.e. its share of the "
-            f"{self.one_seat_riders:,.0f}/{day_type} one-seat total)."
+            f"{self.one_seat_riders:,.0f}/{day_type_label} one-seat total)."
         )
         lines.append("")
         lines.append(
@@ -682,8 +684,10 @@ def run_scenario(
     )
 
 
-def print_scenario_comparison(results: list[ScenarioResult], day_type: DayType) -> None:
-    print(f"\n=== Scenario comparison (avg {day_type} riders) ===")
+def print_scenario_comparison(
+    results: list[ScenarioResult], day_type_label: str
+) -> None:
+    print(f"\n=== Scenario comparison (avg {day_type_label} riders) ===")
     for r in results:
         print(
             f"  {r.label:<55} total={r.total_riders:>9,.0f}  "
@@ -694,14 +698,16 @@ def print_scenario_comparison(results: list[ScenarioResult], day_type: DayType) 
         )
 
 
-def render_scenario_comparison(results: list[ScenarioResult], day_type: DayType) -> str:
+def render_scenario_comparison(
+    results: list[ScenarioResult], day_type_label: str
+) -> str:
     lines: list[str] = []
     lines.append("## Scenario comparison")
     lines.append("")
     lines.append(
-        f"Average {day_type} ridership is the same {results[0].total_riders:,.0f}/"
-        f"{day_type} across every scenario below -- only how many of those "
-        f"riders get a one-seat ride changes."
+        f"Average {day_type_label} ridership is the same "
+        f"{results[0].total_riders:,.0f}/{day_type_label} across every scenario "
+        f"below -- only how many of those riders get a one-seat ride changes."
     )
     lines.append("")
     lines.append(
@@ -945,6 +951,13 @@ def one_seat_rides(
     """
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
+    )
+    # `--days` overrides `--day-type` entirely (see `days_list` above), so the
+    # display label has to reflect whichever one actually took effect --
+    # `day_type` alone would keep printing its default/given value even when
+    # `--days` picked a completely different, possibly multi-day, filter.
+    day_type_label = (
+        "/".join(d.strip() for d in days.split(",")) if days else str(day_type)
     )
     routes_set = parse_route_set(routes)
     primary_routes_set = (
@@ -1287,7 +1300,7 @@ def one_seat_rides(
         )
         result.print_headline(
             show_label=show_label,
-            day_type=day_type,
+            day_type_label=day_type_label,
             dest_side=dest_side,
             close_threshold_m=close_threshold_m,
         )
@@ -1296,7 +1309,7 @@ def one_seat_rides(
         results.append(result)
 
     if show_label:
-        print_scenario_comparison(results, day_type)
+        print_scenario_comparison(results, day_type_label)
 
     csv_paths: list[Path | None] = [
         None
@@ -1319,9 +1332,9 @@ def one_seat_rides(
             "# One Seat Ride Analysis for Deinterlining "
             f"{trunk_a_label}/{trunk_b_label} at {boundary_name}",
             "",
-            f"Scenario: average {day_type} ridership ({n_distinct_days} distinct "
-            f"days in the data, {min_date} to {max_date}) on trains originating "
-            f"at stations served by {','.join(sorted(routes_set))}, "
+            f"Scenario: average {day_type_label} ridership ({n_distinct_days} "
+            f"distinct days in the data, {min_date} to {max_date}) on trains "
+            f"originating at stations served by {','.join(sorted(routes_set))}, "
             f"{origin_side} of {boundary_name}, with destinations {dest_side} "
             f"of it (i.e. trips that cross the junction).",
             "",
@@ -1330,11 +1343,15 @@ def one_seat_rides(
         ]
         sections = [
             "\n".join(preamble_lines),
-            *([render_scenario_comparison(results, day_type)] if show_label else []),
+            *(
+                [render_scenario_comparison(results, day_type_label)]
+                if show_label
+                else []
+            ),
             *(
                 result.render_markdown(
                     show_label=show_label,
-                    day_type=day_type,
+                    day_type_label=day_type_label,
                     close_threshold_m=close_threshold_m,
                     top_n=top_n,
                     csv_out=path,
