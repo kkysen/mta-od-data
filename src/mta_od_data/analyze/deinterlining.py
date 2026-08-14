@@ -97,15 +97,16 @@ class Scenario:
     extending it.
 
     `name` is the short, exact-match identifier `--scenario` selects by
-    (e.g. "Columbus A/C Express"). `category` groups related scenarios for
-    `--category` (e.g. every Columbus Circle swap direction), and is
-    `None` for a scenario that doesn't belong to one (`CURRENT_SCENARIO`).
-    `slug` names this scenario's own suffixed CSV file when multiple
-    scenarios are compared in one run (see `suffixed_path`) -- derived
-    from `name`, not a separate thing to keep in sync."""
+    (e.g. "Columbus A/C Express"); `description` is the longer explanatory
+    text. `category` groups related scenarios for `--category` (e.g. every
+    Columbus Circle swap direction), and is `None` for a scenario that
+    doesn't belong to one (`CURRENT_SCENARIO`). `slug` names this
+    scenario's own suffixed CSV file when multiple scenarios are compared
+    in one run (see `suffixed_path`) -- derived from `name`, not a
+    separate thing to keep in sync."""
 
     name: str
-    label: str
+    description: str
     category: str | None
     slug: str
     overrides: dict[int, frozenset[str]]
@@ -122,7 +123,7 @@ class Scenario:
         name = data.get("name")
         if not name:
             raise ScenarioError(f'scenario {path} is missing a required "name" field')
-        label = data.get("label", name)
+        description = data.get("description", name)
         category = data.get("category")
         overrides: dict[int, frozenset[str]] = {}
         for complex_id_str, routes in data["overrides"].items():
@@ -135,7 +136,7 @@ class Scenario:
             overrides[complex_id] = frozenset(routes)
         return cls(
             name=name,
-            label=label,
+            description=description,
             category=category,
             slug=slugify(name),
             overrides=overrides,
@@ -231,7 +232,7 @@ class Scenario:
 # keep in sync with the general one.
 CURRENT_SCENARIO = Scenario(
     name="Current",
-    label="Current (today's real routing)",
+    description="Today's real routing, no overrides.",
     category=None,
     slug="current",
     overrides={},
@@ -462,8 +463,9 @@ def deinterlining(
         Option(
             "--scenario-file",
             help=(
-                "JSON file: {'label': str, 'overrides': {complex_id: "
-                "[route, ...]}}. Repeatable -- classifies every scenario "
+                "JSON file: {'name': str, 'description': str, 'category': str, "
+                "'overrides': {complex_id: [route, ...]}}. Repeatable -- "
+                "classifies every scenario "
                 "given (plus today's real routing, and any --scenario/"
                 "--category selections) against the same fetched OD pairs "
                 "in one run. "

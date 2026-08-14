@@ -1,6 +1,6 @@
 {
   "name": "Columbus A/C Express",
-  "label": "Columbus Circle: A,C express / B,D local on Central Park West",
+  "description": "A,C run express and B,D run local on Central Park West, between 59 St-Columbus Circle and 145 St.",
   "category": "Columbus Circle",
   "overrides": {
     "160": ["B", "D"],
