@@ -1,0 +1,11 @@
+{
+  "label": "Columbus Circle: B,D express / A,C local on Central Park West",
+  "overrides": {
+    "160": ["A", "C"],
+    "159": ["A", "C"],
+    "158": ["A", "C"],
+    "157": ["A", "C"],
+    "156": ["A", "C"],
+    "155": ["A", "C"]
+  }
+}
