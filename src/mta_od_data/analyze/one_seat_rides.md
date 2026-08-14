@@ -56,23 +56,20 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 67,134/we
 
 | Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
+| 9,882 | 83.0% | 12.22% | 100% | 0m | 34 St-Herald Sq (B,D,N,Q) |
+| 9,334 | 78.3% | 10.88% | 100% | 0m | Atlantic Av (B,D,N,Q) |
 | 6,795 | 73.2% | 7.41% | 76% | 211m | 14 St-Union Sq (N,Q) |
 | 5,881 | 84.3% | 7.38% | 0% | 816m | DeKalb Av (B,Q,R) |
 | 6,365 | 72.2% | 6.85% | 100% | 51m | Times Sq-42 St/PABT (N,Q) |
 | 5,982 | 75.8% | 6.75% | 67% | 170m | Canal St (N,Q) |
-| 6,079 | 66.7% | 6.04% | 100% | 0m | Atlantic Av (D,N) |
 | 5,402 | 62.4% | 5.02% | 0% | 609m | Grand St (B,D) |
-| 3,285 | 100.0% | 4.89% |  |  | 34 St-Herald Sq (N,Q) |
-| 2,991 | 100.0% | 4.46% |  |  | Atlantic Av (B,Q) |
 | 4,413 | 64.0% | 4.21% | 68% | 391m | 47-50 Sts-Rockefeller Ctr (B,D) |
-| 2,787 | 100.0% | 4.15% |  |  | 34 St-Herald Sq (B,Q) |
 | 3,583 | 66.8% | 3.57% | 100% | 191m | 42 St-Bryant Pk/5 Av (B,D) |
 | 2,340 | 81.2% | 2.83% | 100% | 34m | 57 St-7 Av (N,Q) |
 | 3,941 | 45.5% | 2.67% | 0% | 943m | Chambers St/WTC/Park Pl/Cortlandt St (R) |
 | 2,636 | 64.0% | 2.51% | 57% | 457m | Broadway-Lafayette St/Bleecker St (B,D) |
 | 3,441 | 48.4% | 2.48% | 0% | 764m | Jay St-MetroTech (R) |
 | 2,685 | 57.6% | 2.30% | 0% | 782m | W 4 St-Wash Sq (B,D) |
-| 1,465 | 100.0% | 2.18% |  |  | 34 St-Herald Sq (D) |
 | 2,268 | 62.1% | 2.10% | 0% | 413m | 59 St-Columbus Circle (B,D) |
 | 2,271 | 60.9% | 2.06% | 0% | 1236m | 72 St (Q) |
 | 2,603 | 41.0% | 1.59% | 0% | 982m | Borough Hall/Court St (R) |
@@ -81,6 +78,9 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 67,134/we
 | 1,235 | 56.7% | 1.04% | 0% | 2270m | 86 St (Q) |
 | 1,107 | 62.3% | 1.03% | 0% | 2943m | 96 St (Q) |
 | 927 | 71.6% | 0.99% | 100% | 217m | 7 Av (B,D) |
+| 1,576 | 39.5% | 0.93% | 81% | 211m | 49 St (N) |
+| 1,201 | 43.3% | 0.77% | 0% | 663m | 23 St (R) |
+| 1,509 | 34.1% | 0.77% | 83% | 301m | Lexington Av/59 St (N) |
 
 _Full row-level detail (every origin/destination pair, not just the top 25): `data/dekalb_weekday_pairs_actual.csv`._
 
@@ -126,14 +126,12 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 57,173/we
 
 | Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
+| 9,882 | 83.0% | 14.34% | 100% | 0m | 34 St-Herald Sq (B,D,N,Q) |
+| 9,334 | 78.3% | 12.78% | 100% | 0m | Atlantic Av (B,D,N,Q) |
 | 5,881 | 100.0% | 10.29% |  |  | DeKalb Av (B,Q,R) |
-| 4,429 | 100.0% | 7.75% |  |  | 34 St-Herald Sq (N,Q) |
-| 4,052 | 100.0% | 7.09% |  |  | Atlantic Av (B,D) |
-| 3,556 | 100.0% | 6.22% |  |  | 34 St-Herald Sq (B,D) |
 | 6,795 | 52.1% | 6.20% | 60% | 349m | 14 St-Union Sq (N,Q) |
 | 5,402 | 62.2% | 5.88% | 0% | 608m | Grand St (B,D) |
 | 6,365 | 48.3% | 5.37% | 100% | 83m | Times Sq-42 St/PABT (N,Q) |
-| 2,991 | 100.0% | 5.23% |  |  | Atlantic Av (N,Q) |
 | 5,982 | 38.8% | 4.06% | 38% | 322m | Canal St (N,Q) |
 | 3,941 | 45.5% | 3.14% | 0% | 1044m | Chambers St/WTC/Park Pl/Cortlandt St (R) |
 | 3,441 | 48.4% | 2.91% | 0% | 387m | Jay St-MetroTech (R) |
@@ -151,6 +149,8 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 57,173/we
 | 1,107 | 62.3% | 1.21% | 0% | 2156m | 96 St (Q) |
 | 1,201 | 43.3% | 0.91% | 0% | 744m | 23 St (R) |
 | 949 | 52.2% | 0.87% | 0% | 1012m | City Hall (R) |
+| 1,576 | 30.5% | 0.84% | 100% | 120m | 49 St (N) |
+| 1,509 | 30.9% | 0.82% | 51% | 559m | Lexington Av/59 St (N) |
 
 _Full row-level detail (every origin/destination pair, not just the top 25): `data/dekalb_weekday_pairs_a.csv`._
 
@@ -196,11 +196,9 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 53,002/we
 
 | Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |
 | --- | --- | --- | --- | --- | --- |
+| 9,882 | 83.0% | 15.47% | 100% | 0m | 34 St-Herald Sq (B,D,N,Q) |
+| 9,334 | 78.3% | 13.79% | 100% | 0m | Atlantic Av (B,D,N,Q) |
 | 5,881 | 100.0% | 11.10% |  |  | DeKalb Av (B,Q,R) |
-| 4,429 | 100.0% | 8.36% |  |  | 34 St-Herald Sq (B,D) |
-| 4,052 | 100.0% | 7.65% |  |  | Atlantic Av (N,Q) |
-| 3,556 | 100.0% | 6.71% |  |  | 34 St-Herald Sq (N,Q) |
-| 2,991 | 100.0% | 5.64% |  |  | Atlantic Av (B,D) |
 | 5,982 | 46.9% | 5.29% | 31% | 359m | Canal St (N,Q) |
 | 4,413 | 49.9% | 4.15% | 100% | 274m | 47-50 Sts-Rockefeller Ctr (B,D) |
 | 6,365 | 34.5% | 4.15% | 100% | 131m | Times Sq-42 St/PABT (N,Q) |
@@ -221,6 +219,8 @@ Sorted by each destination's one-seat ridership (i.e. its share of the 53,002/we
 | 1,201 | 43.3% | 0.98% | 0% | 819m | 23 St (R) |
 | 949 | 52.2% | 0.93% | 0% | 1009m | City Hall (R) |
 | 927 | 46.8% | 0.82% | 100% | 217m | 7 Av (B,D) |
+| 821 | 52.4% | 0.81% | 0% | 631m | 8 St-NYU (R) |
+| 1,235 | 30.0% | 0.70% | 0% | 1793m | 86 St (Q) |
 
 _Full row-level detail (every origin/destination pair, not just the top 25): `data/dekalb_weekday_pairs_b.csv`._
 
