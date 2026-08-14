@@ -24,6 +24,7 @@ pairs in one run, so comparing several proposals doesn't reclassify
 """
 
 import csv
+import json
 import re
 import shlex
 import sys
@@ -144,6 +145,36 @@ class ScenarioFile(BaseModel):
 # Also what `scenarios.schema.json` is generated from -- see
 # `tests/test_scenarios_schema.py`.
 SCENARIO_FILE_ADAPTER = TypeAdapter(list[ScenarioFile])
+
+SCENARIOS_SCHEMA_FILE = (
+    ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.schema.json"
+)
+
+
+def generate_scenario_schema() -> str:
+    """The JSON Schema for a scenario file, generated from
+    `SCENARIO_FILE_ADAPTER` (i.e. from `OverrideGroup`/`ScenarioFile`
+    directly) plus the top-level metadata a standalone schema file needs
+    (`$schema`, `title`). What `scenarios.schema.json` must always equal --
+    see `tests/test_scenarios_schema.py`, which fails with this same
+    regen command if it ever drifts:
+
+        uv run python -c "from mta_od_data.analyze.deinterlining import \\
+            SCENARIOS_SCHEMA_FILE, generate_scenario_schema; \\
+            SCENARIOS_SCHEMA_FILE.write_text(generate_scenario_schema())"
+    """
+    schema = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "Deinterlining scenario file",
+        "description": (
+            "A JSON array of deinterlining scenarios for `mta-od-data analyze "
+            "deinterlining` (--scenario-file, or the scenarios.json catalog). "
+            "See OverrideGroup/ScenarioFile in deinterlining.py for the models "
+            "this is generated from."
+        ),
+        **SCENARIO_FILE_ADAPTER.json_schema(),
+    }
+    return json.dumps(schema, indent=2) + "\n"
 
 
 @dataclass(slots=True, frozen=True)
