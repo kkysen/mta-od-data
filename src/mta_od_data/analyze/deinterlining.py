@@ -15,7 +15,7 @@ same shape as `regional_flow.py`'s unfiltered OD-pairs query -- comparing
 one-seat-ride share across today's real routes and any number of
 scenarios' route overrides.
 
-"Today" is not a special case: it's `scenarios.json`'s `"Current"` entry,
+"Today" is not a special case: it's `scenarios.json5`'s `"Current"` entry,
 a `Scenario` with no overrides, classified through the exact same code
 path as every other scenario. Passing multiple `--scenario-file`s
 classifies all of them (plus `"Current"`) against the *same* fetched OD
@@ -45,7 +45,7 @@ from mta_od_data.analyze.common import DAY_TYPE_PRESETS, DayType, Station, haver
 
 app = Typer()
 
-SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json"
+SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json5"
 
 # A set of route letters (e.g. `{"A", "C"}`), not a single station's or
 # pair's routes specifically -- named for what it holds, not where it's
@@ -168,7 +168,7 @@ def generate_scenario_schema() -> str:
         "title": "Deinterlining scenario file",
         "description": (
             "A JSON array of deinterlining scenarios for `mta-od-data analyze "
-            "deinterlining` (--scenario-file, or the scenarios.json catalog). "
+            "deinterlining` (--scenario-file, or the scenarios.json5 catalog). "
             "See OverrideGroup/ScenarioFile in deinterlining.py for the models "
             "this is generated from."
         ),
@@ -746,7 +746,7 @@ def deinterlining(
         # A scenario not yet in the catalog, by path (its own JSON array,
         # possibly several scenarios at once)
         mta-od-data analyze deinterlining --routes A,B,C,D \\
-            --scenario-file scratch_scenario.json
+            --scenario-file scratch_scenario.json5
     """
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
