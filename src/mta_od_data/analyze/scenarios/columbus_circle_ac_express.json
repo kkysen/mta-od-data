@@ -3,11 +3,11 @@
   "description": "A,C run express and B,D run local on Central Park West, between 59 St-Columbus Circle and 145 St.",
   "category": "Columbus Circle",
   "overrides": {
-    "160": ["B", "D"],
-    "159": ["B", "D"],
-    "158": ["B", "D"],
-    "157": ["B", "D"],
-    "156": ["B", "D"],
-    "155": ["B", "D"]
+    "160": { "add": ["D"], "remove": ["C"] },
+    "159": { "add": ["D"], "remove": ["C"] },
+    "158": { "add": ["D"], "remove": ["C"] },
+    "157": { "add": ["D"], "remove": ["C"] },
+    "156": { "add": ["D"], "remove": ["C"] },
+    "155": { "add": ["D"], "remove": ["C"] }
   }
 }
