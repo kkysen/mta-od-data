@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Deinterlining scenario file",
-  "description": "A JSON array of deinterlining scenarios for `mta-od-data analyze deinterlining` (--scenario-file, or the scenarios.json catalog). See OverrideGroup/ScenarioFile in deinterlining.py for the models this is generated from.",
+  "description": "A JSON array of deinterlining scenarios for `mta-od-data analyze deinterlining` (--scenario-file, or the scenarios.json5 catalog). See OverrideGroup/ScenarioFile in deinterlining.py for the models this is generated from.",
   "$defs": {
     "OverrideGroup": {
       "additionalProperties": false,
