@@ -42,6 +42,13 @@ from mta_od_data.analyze.common import DAY_TYPE_PRESETS, DayType, Station, haver
 app = Typer()
 
 
+class ScenarioError(Exception):
+    """Raised for a scenario/CLI-input problem that only `deinterlining()`
+    (the CLI command) should turn into a printed error and `SystemExit` --
+    every other method here raises this instead of exiting directly, so
+    it stays usable as a library function."""
+
+
 def parse_route_set(s: str) -> frozenset[str]:
     return frozenset(r.strip() for r in s.split(",") if r.strip())
 
@@ -92,12 +99,10 @@ class Scenario:
         for complex_id_str, routes in data["overrides"].items():
             complex_id = int(complex_id_str)
             if complex_id not in stations_by_id:
-                print(
-                    f"error: scenario {path} overrides complex {complex_id}, not "
-                    f"found in the station reference data",
-                    file=sys.stderr,
+                raise ScenarioError(
+                    f"scenario {path} overrides complex {complex_id}, not found "
+                    f"in the station reference data"
                 )
-                raise SystemExit(1)
             overrides[complex_id] = frozenset(routes)
         return cls(label=label, slug=path.stem, overrides=overrides)
 
@@ -125,13 +130,11 @@ class Scenario:
             dest = stations_by_id.get(dest_id)
             if origin is None or dest is None:
                 missing_id = origin_id if origin is None else dest_id
-                print(
-                    f"error: station complex {missing_id} not found in "
-                    f"{stations_path} -- refetch station reference data with "
-                    "`mta-od-data prepare --force-stations`",
-                    file=sys.stderr,
+                raise ScenarioError(
+                    f"station complex {missing_id} not found in {stations_path} -- "
+                    "refetch station reference data with "
+                    "`mta-od-data prepare --force-stations`"
                 )
-                raise SystemExit(1)
 
             effective_origin_routes = self.effective_routes(origin) & routes_set
             effective_dest_routes = self.effective_routes(dest) & routes_set
@@ -443,10 +446,14 @@ def deinterlining(
     routes_set = parse_route_set(routes)
 
     stations_by_id = Station.load_complexes(stations)
-    scenarios = [
-        CURRENT_SCENARIO,
-        *(Scenario.load(f, stations_by_id) for f in scenario_files),
-    ]
+    try:
+        scenarios = [
+            CURRENT_SCENARIO,
+            *(Scenario.load(f, stations_by_id) for f in scenario_files),
+        ]
+    except ScenarioError as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(1) from e
     show_label = len(scenarios) > 1
     for s in scenarios:
         print(f"Scenario: {s.label} ({len(s.overrides)} stations overridden)")
@@ -556,16 +563,20 @@ def deinterlining(
         near_station_name = near_station.display(near_station.routes & routes_set)
         return close, dist_m, near_station_name
 
-    results = [
-        s.classify(
-            pairs=pairs,
-            stations_by_id=stations_by_id,
-            stations_path=stations,
-            routes_set=routes_set,
-            close_lookup=close_lookup,
-        )
-        for s in scenarios
-    ]
+    try:
+        results = [
+            s.classify(
+                pairs=pairs,
+                stations_by_id=stations_by_id,
+                stations_path=stations,
+                routes_set=routes_set,
+                close_lookup=close_lookup,
+            )
+            for s in scenarios
+        ]
+    except ScenarioError as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(1) from e
 
     for result in results:
         result.print_headline(close_threshold_m=close_threshold_m)
