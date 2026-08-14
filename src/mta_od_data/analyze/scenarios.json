@@ -1,0 +1,33 @@
+[
+  {
+    "name": "Current",
+    "description": "Today's real routing, no overrides.",
+    "overrides": {}
+  },
+  {
+    "name": "Columbus A/C Express",
+    "description": "A,C run express and B,D run local on Central Park West, between 59 St-Columbus Circle and 145 St.",
+    "category": "Columbus Circle",
+    "overrides": {
+      "72 St": { "line": "8th Av - Fulton St", "add": ["D"], "remove": ["C"] },
+      "81 St-Museum of Natural History": { "add": ["D"], "remove": ["C"] },
+      "86 St": { "line": "8th Av - Fulton St", "add": ["D"], "remove": ["C"] },
+      "96 St": { "line": "8th Av - Fulton St", "add": ["D"], "remove": ["C"] },
+      "103 St": { "line": "8th Av - Fulton St", "add": ["D"], "remove": ["C"] },
+      "Cathedral Pkwy (110 St)": { "line": "8th Av - Fulton St", "add": ["D"], "remove": ["C"] }
+    }
+  },
+  {
+    "name": "Columbus B/D Express",
+    "description": "B,D run express and A,C run local on Central Park West, between 59 St-Columbus Circle and 145 St.",
+    "category": "Columbus Circle",
+    "overrides": {
+      "72 St": { "line": "8th Av - Fulton St", "add": ["A"], "remove": ["B"] },
+      "81 St-Museum of Natural History": { "add": ["A"], "remove": ["B"] },
+      "86 St": { "line": "8th Av - Fulton St", "add": ["A"], "remove": ["B"] },
+      "96 St": { "line": "8th Av - Fulton St", "add": ["A"], "remove": ["B"] },
+      "103 St": { "line": "8th Av - Fulton St", "add": ["A"], "remove": ["B"] },
+      "Cathedral Pkwy (110 St)": { "line": "8th Av - Fulton St", "add": ["A"], "remove": ["B"] }
+    }
+  }
+]
