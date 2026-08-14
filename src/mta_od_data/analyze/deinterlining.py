@@ -285,6 +285,13 @@ class Scenario:
             elif close:
                 d.close += riders
 
+        if not total_riders:
+            raise ScenarioError(
+                f"scenario {self.name!r}: no ridership among the fetched "
+                f"origin/destination pairs -- nothing to classify (check "
+                f"--routes and the day filter)"
+            )
+
         return ScenarioResult(
             scenario=self,
             total_riders=total_riders,
@@ -313,7 +320,10 @@ class ScenarioResult:
         return self.one_seat_riders + self.close_riders
 
     def pct(self, riders: float) -> float:
-        return 100 * riders / self.total_riders if self.total_riders else float("nan")
+        # `total_riders` is never 0 here: `Scenario.classify` raises
+        # `ScenarioError` before constructing a `ScenarioResult` with one,
+        # rather than let every caller of `pct()` guard against it.
+        return 100 * riders / self.total_riders
 
     def write_csv(self, path: Path) -> None:
         with path.open("w", newline="") as f:
