@@ -911,13 +911,23 @@ def one_seat_rides(
         mta-od-data analyze one-seat-rides --routes B,D,N,Q,R \\
             --primary-routes B,D,N,Q --trunk-b N,Q,R \\
             --csv-out data/dekalb_weekday_pairs.csv \\
-            --markdown-out src/mta_od_data/analyze/one_seat_rides.md
+            --markdown-out src/mta_od_data/analyze/dekalb_one_seat_rides.md
 
     \b
-        # A different junction/trunk pair, e.g. hypothetically Rogers Jct area
-        mta-od-data analyze one-seat-rides --boundary-complex-id <id> \\
-            --routes 2,3,4,5 --trunk-a 4,5 --trunk-a-label "Lexington Av express" \\
-            --trunk-b 2,3 --trunk-b-label "7 Av express"
+        # A different junction/trunk pair: Nostrand/Rogers Jct, where MTA's
+        # planned deinterlining reroutes 2,3 to the Nostrand Av Line and 4,5
+        # to Eastern Pkwy/New Lots (today's actual routing is 2,5/3,4)
+        mta-od-data analyze one-seat-rides --boundary-complex-id 626 \\
+            --routes 2,3,4,5 --primary-routes 2,3,4,5 \\
+            --trunk-a 2,3 --trunk-a-label "7 Av/West Side" \\
+            --trunk-b 4,5 --trunk-b-label "Lexington Av/East Side" \\
+            --origin-corridor-a-routes 2,5 \\
+            --origin-corridor-a-label "Nostrand Av Line" \\
+            --origin-corridor-b-routes 3,4 \\
+            --origin-corridor-b-label "Eastern Pkwy/New Lots Line" \\
+            --all-corridor-scenarios \\
+            --csv-out data/nostrand_weekday_pairs.csv \\
+            --markdown-out src/mta_od_data/analyze/nostrand_one_seat_rides.md
 
     \b
         # Full DeKalb deinterlining: N,Q run the 4 Av express corridor,
@@ -931,7 +941,7 @@ def one_seat_rides(
         # one invocation
         mta-od-data analyze one-seat-rides \\
             --all-corridor-scenarios \\
-            --markdown-out src/mta_od_data/analyze/one_seat_rides.md
+            --markdown-out src/mta_od_data/analyze/dekalb_one_seat_rides.md
     """
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
