@@ -5,6 +5,7 @@ requires-python = ">=3.14"
 dependencies = [
     "duckdb>=1.5.5",
     "json5>=0.15.0",
+    "pydantic>=2.13.4",
     "typer>=0.27.1",
 ]
 

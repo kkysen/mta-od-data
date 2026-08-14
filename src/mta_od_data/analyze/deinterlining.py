@@ -32,10 +32,11 @@ from dataclasses import asdict, dataclass, fields
 from datetime import date
 from functools import cache
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated
 
 import duckdb
 import json5
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
 from typer import Option, Typer
 
 from mta_od_data import DATA, ROOT
@@ -105,6 +106,44 @@ class RouteDelta:
 
     add: Routes
     remove: Routes
+
+
+class OverrideGroup(BaseModel):
+    """One override group in a scenario file's `overrides` array: an
+    add/remove pair shared by every station in `stations` -- the usual
+    case, since a deinterlining change typically affects several stations
+    on one line the same way. `line` disambiguates a `stations` entry
+    whose bare name is shared by more than one real complex elsewhere in
+    the system (see `StationIndex.resolve`); leave it out when every name
+    given here is already unique on its own."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    line: str | None = None
+    add: list[str] = Field(default_factory=list)
+    remove: list[str] = Field(default_factory=list)
+    stations: list[str] = Field(min_length=1)
+
+
+class ScenarioFile(BaseModel):
+    """One scenario in a scenario file's top-level JSON array (see
+    `SCENARIO_FILE_ADAPTER`). `name` is the short, exact-match identifier
+    `--scenario` selects by; `description` defaults to `name` when
+    omitted. `category` groups related scenarios for `--category` -- omit
+    it for a scenario that doesn't belong to one (as `"Current"` does)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(min_length=1)
+    description: str | None = None
+    category: str | None = None
+    overrides: list[OverrideGroup] = Field(default_factory=list)
+
+
+# The root of a scenario file: a JSON array of `ScenarioFile` entries.
+# Also what `scenarios.schema.json` is generated from -- see
+# `tests/test_scenarios_schema.py`.
+SCENARIO_FILE_ADAPTER = TypeAdapter(list[ScenarioFile])
 
 
 @dataclass(slots=True, frozen=True)
@@ -197,36 +236,35 @@ class Scenario:
             data = json5.loads(path.read_text())
         except ValueError as e:
             raise ScenarioError(f"scenario file {path} isn't valid JSON: {e}") from e
-        if not isinstance(data, list):
-            raise ScenarioError(f"scenario file {path} must be a JSON array")
-        return [cls._load_entry(entry, path, station_index) for entry in data]
+        # `ScenarioFile`/`OverrideGroup` (both `pydantic.BaseModel`s) own
+        # the shape validation here -- a required field missing, an unknown
+        # field (`extra="forbid"`), or a wrong type all become one
+        # `ValidationError`, so there's no manual field-by-field checking
+        # to keep in sync with the schema (`scenarios.schema.json`, itself
+        # generated from these same models).
+        try:
+            entries = SCENARIO_FILE_ADAPTER.validate_python(data)
+        except ValidationError as e:
+            raise ScenarioError(
+                f"scenario file {path} doesn't match the expected shape:\n{e}"
+            ) from e
+        return [cls._load_entry(entry, path, station_index) for entry in entries]
 
     @classmethod
     def _load_entry(
-        cls, data: dict[str, Any], path: Path, station_index: StationIndex
+        cls, entry: ScenarioFile, path: Path, station_index: StationIndex
     ) -> Scenario:
-        name: str | None = data.get("name")
-        if not name:
-            raise ScenarioError(
-                f'scenario file {path}: an entry is missing a required "name" field'
-            )
-        description = data.get("description", name)
-        category = data.get("category")
         overrides: dict[Station, RouteDelta] = {}
-        for group in data.get("overrides", []):
-            delta = RouteDelta(
-                add=frozenset(group.get("add", [])),
-                remove=frozenset(group.get("remove", [])),
-            )
-            line = group.get("line")
-            for station_name in group["stations"]:
-                station = station_index.resolve(station_name, line, path=path)
+        for group in entry.overrides:
+            delta = RouteDelta(add=frozenset(group.add), remove=frozenset(group.remove))
+            for station_name in group.stations:
+                station = station_index.resolve(station_name, group.line, path=path)
                 overrides[station] = delta
         return cls(
-            name=name,
-            description=description,
-            category=category,
-            slug=slugify(name),
+            name=entry.name,
+            description=entry.description or entry.name,
+            category=entry.category,
+            slug=slugify(entry.name),
             overrides=overrides,
         )
 
