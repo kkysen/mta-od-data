@@ -5,19 +5,12 @@
   "$defs": {
     "OverrideGroup": {
       "additionalProperties": false,
-      "description": "One override group in a scenario file's `overrides` array: an\nadd/remove pair shared by every station in `stations` -- the usual\ncase, since a deinterlining change typically affects several stations\non one line the same way. `line` disambiguates a `stations` entry\nwhose bare name is shared by more than one real complex elsewhere in\nthe system (see `StationIndex.resolve`); leave it out when every name\ngiven here is already unique on its own.",
+      "description": "One override group in a scenario file's `overrides` array: an\nadd/remove pair shared by every station in `stations` -- the usual\ncase, since a deinterlining change typically affects several stations\non one line the same way. `line` (e.g. \"8th Av - Fulton St\", from the\nindividual-station reference data) is required on every group: it\ndisambiguates a `stations` entry whose bare name is shared by more\nthan one real complex elsewhere in the system (see\n`StationIndex.resolve`), and lets a reader tell which physical line a\ngroup's `add`/`remove` applies to without cross-referencing\n`stations_individual.csv`, even when every name here happens to\nalready be unique on its own.",
       "properties": {
         "line": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Line"
+          "minLength": 1,
+          "title": "Line",
+          "type": "string"
         },
         "add": {
           "items": {
@@ -43,6 +36,7 @@
         }
       },
       "required": [
+        "line",
         "stations"
       ],
       "title": "OverrideGroup",
