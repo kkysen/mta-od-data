@@ -1,4 +1,5 @@
 {
+  "name": "Columbus A/C Express",
   "label": "Columbus Circle: A,C express / B,D local on Central Park West",
   "overrides": {
     "160": ["B", "D"],
