@@ -1285,8 +1285,8 @@ def one_seat_rides(
         # just its basename so this line stays reproducible.
         produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
         preamble_lines = [
-            f"# {trunk_a_label}/{trunk_b_label} deinterlining: one-seat-ride "
-            f"results at {boundary_name}",
+            "# One Seat Ride Analysis for Deinterlining "
+            f"{trunk_a_label}/{trunk_b_label} at {boundary_name}",
             "",
             f"Scenario: average {day_type} ridership ({n_distinct_days} distinct "
             f"days in the data, {min_date} to {max_date}) on trains originating "
