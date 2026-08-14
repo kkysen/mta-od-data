@@ -15,11 +15,12 @@ same shape as `regional_flow.py`'s unfiltered OD-pairs query -- comparing
 one-seat-ride share across today's real routes and any number of
 scenarios' route overrides.
 
-"Today" is not a special case: it's `scenarios/current.json`, a `Scenario`
-with no overrides, classified through the exact same code path as every
-other scenario. Passing multiple `--scenario-file`s classifies all of them
-(plus `current.json`) against the *same* fetched OD pairs in one run, so
-comparing several proposals doesn't reclassify "today" once per proposal.
+"Today" is not a special case: it's `scenarios.json`'s `"Current"` entry,
+a `Scenario` with no overrides, classified through the exact same code
+path as every other scenario. Passing multiple `--scenario-file`s
+classifies all of them (plus `"Current"`) against the *same* fetched OD
+pairs in one run, so comparing several proposals doesn't reclassify
+"today" once per proposal.
 """
 
 import csv
@@ -31,7 +32,7 @@ from dataclasses import asdict, dataclass, fields
 from datetime import date
 from functools import cache
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import duckdb
 import json5
@@ -42,7 +43,7 @@ from mta_od_data.analyze.common import DAY_TYPE_PRESETS, DayType, Station, haver
 
 app = Typer()
 
-SCENARIOS_DIR = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios"
+SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json"
 
 # A set of route letters (e.g. `{"A", "C"}`), not a single station's or
 # pair's routes specifically -- named for what it holds, not where it's
@@ -168,7 +169,7 @@ class Scenario:
     (e.g. "Columbus A/C Express"); `description` is the longer explanatory
     text. `category` groups related scenarios for `--category` (e.g. every
     Columbus Circle swap direction), and is `None` for a scenario that
-    doesn't belong to one (`current.json`). `slug` names this
+    doesn't belong to one (`"Current"`). `slug` names this
     scenario's own suffixed CSV file when multiple scenarios are compared
     in one run (see `suffixed_path`) -- derived from `name`, not a
     separate thing to keep in sync."""
@@ -185,21 +186,34 @@ class Scenario:
     overrides: dict[Station, RouteDelta]
 
     @classmethod
-    def load(cls, path: Path, station_index: StationIndex) -> Scenario:
+    def load_all(cls, path: Path, station_index: StationIndex) -> list[Scenario]:
+        """A scenario file holds a JSON array of scenario objects, not just
+        one -- so a single `--scenario-file` (or the catalog itself) can
+        define several related scenarios together."""
         # JSON5 (a strict superset of JSON): tolerates a trailing comma
         # before a closing `}`/`]`, an easy slip when hand-editing scenario
         # files -- plain `json.loads` would reject it outright.
         try:
             data = json5.loads(path.read_text())
         except ValueError as e:
-            raise ScenarioError(f"scenario {path} isn't valid JSON: {e}") from e
-        name = data.get("name")
+            raise ScenarioError(f"scenario file {path} isn't valid JSON: {e}") from e
+        if not isinstance(data, list):
+            raise ScenarioError(f"scenario file {path} must be a JSON array")
+        return [cls._load_entry(entry, path, station_index) for entry in data]
+
+    @classmethod
+    def _load_entry(
+        cls, data: dict[str, Any], path: Path, station_index: StationIndex
+    ) -> Scenario:
+        name: str | None = data.get("name")
         if not name:
-            raise ScenarioError(f'scenario {path} is missing a required "name" field')
+            raise ScenarioError(
+                f'scenario file {path}: an entry is missing a required "name" field'
+            )
         description = data.get("description", name)
         category = data.get("category")
         overrides: dict[Station, RouteDelta] = {}
-        for station_name, delta_data in data["overrides"].items():
+        for station_name, delta_data in data.get("overrides", {}).items():
             station = station_index.resolve(
                 station_name, delta_data.get("line"), path=path
             )
@@ -464,54 +478,53 @@ def resolve_scenarios(
     scenario_files: list[Path],
     scenario_names: list[str],
     categories: list[str],
-    scenarios_dir: Path,
+    catalog: Path,
     station_index: StationIndex,
 ) -> list[Scenario]:
-    """`scenarios_dir/current.json` (today's real routing, no overrides),
-    plus every scenario selected via `--scenario-file` (by path),
-    `--scenario` (by exact `name`, looked up in `scenarios_dir`), and
-    `--category` (every scenario in `scenarios_dir` with that `category`)
-    -- deduplicated by `name`, preserving that order. Raises
-    `ScenarioError` (not `SystemExit`) for an unknown `--scenario`/
-    `--category`, or a missing `current.json`; only `deinterlining()`
-    itself exits."""
-    current_path = scenarios_dir / "current.json"
+    """The catalog's `"Current"` scenario (today's real routing, no
+    overrides), plus every scenario selected via `--scenario-file` (by
+    path -- itself a JSON array, possibly several scenarios), `--scenario`
+    (by exact `name`, looked up in the catalog), and `--category` (every
+    catalog scenario with that `category`) -- deduplicated by `name`,
+    preserving that order. Raises `ScenarioError` (not `SystemExit`) for a
+    missing/malformed catalog, a catalog with no `"Current"` entry, or an
+    unknown `--scenario`/`--category`; only `deinterlining()` itself
+    exits."""
     try:
-        current = Scenario.load(current_path, station_index)
+        available = Scenario.load_all(catalog, station_index)
     except FileNotFoundError as e:
+        raise ScenarioError(f"missing required scenario catalog {catalog}") from e
+    by_name = {s.name: s for s in available}
+    if "Current" not in by_name:
         raise ScenarioError(
-            f'missing required {current_path} (the "Current" scenario, no overrides)'
-        ) from e
+            f'scenario catalog {catalog} has no "Current" entry (today\'s real '
+            f"routing, no overrides)"
+        )
+
     scenarios = [
-        current,
-        *(Scenario.load(f, station_index) for f in scenario_files),
+        by_name["Current"],
+        *(s for f in scenario_files for s in Scenario.load_all(f, station_index)),
     ]
 
-    if scenario_names or categories:
-        available = [
-            Scenario.load(p, station_index)
-            for p in sorted(scenarios_dir.glob("*.json"))
-        ]
-        by_name = {s.name: s for s in available}
-        for name in scenario_names:
-            if name not in by_name:
-                raise ScenarioError(
-                    f"no scenario named {name!r} in {scenarios_dir} (available: "
-                    f"{', '.join(sorted(by_name)) or 'none'})"
-                )
-            scenarios.append(by_name[name])
-        for category in categories:
-            matches = [s for s in available if s.category == category]
-            if not matches:
-                available_categories = sorted(
-                    {s.category for s in available if s.category is not None}
-                )
-                categories_str = ", ".join(available_categories) or "none"
-                raise ScenarioError(
-                    f"no scenarios in category {category!r} in {scenarios_dir} "
-                    f"(available categories: {categories_str})"
-                )
-            scenarios.extend(matches)
+    for name in scenario_names:
+        if name not in by_name:
+            raise ScenarioError(
+                f"no scenario named {name!r} in {catalog} (available: "
+                f"{', '.join(sorted(by_name)) or 'none'})"
+            )
+        scenarios.append(by_name[name])
+    for category in categories:
+        matches = [s for s in available if s.category == category]
+        if not matches:
+            available_categories = sorted(
+                {s.category for s in available if s.category is not None}
+            )
+            categories_str = ", ".join(available_categories) or "none"
+            raise ScenarioError(
+                f"no scenarios in category {category!r} in {catalog} "
+                f"(available categories: {categories_str})"
+            )
+        scenarios.extend(matches)
 
     seen: set[str] = set()
     deduped: list[Scenario] = []
@@ -527,7 +540,8 @@ def resolve_scenarios(
 def deinterlining(
     # Required (no default): only `routes` has no sensible default, so it
     # comes first -- every other parameter (including `scenario_files`,
-    # which defaults to comparing `current.json` alone) has one.
+    # which defaults to comparing the catalog's "Current" entry alone)
+    # has one.
     routes: Annotated[
         str,
         Option(
@@ -542,18 +556,18 @@ def deinterlining(
         Option(
             "--scenario-file",
             help=(
-                "JSON file: {'name': str, 'description': str, 'category': str, "
-                "'overrides': {station_name: {'line': str, 'add': [route, ...], "
-                "'remove': [route, ...]}}}. 'line' is only required when "
-                "station_name is ambiguous (shared by multiple complexes); "
-                "an ambiguous name without it is a load error. Repeatable -- "
-                "classifies every scenario given (plus today's real routing, "
-                "and any --scenario/--category selections) against the same "
-                "fetched OD pairs in one run. Only the named stations' "
-                "routes change (by adding/removing just the given routes "
-                "from each one's real current routes); every other station "
-                "keeps its real current routes untouched. Trailing commas "
-                "are tolerated."
+                "JSON file, a JSON array of {'name': str, 'description': str, "
+                "'category': str, 'overrides': {station_name: {'line': str, "
+                "'add': [route, ...], 'remove': [route, ...]}}}. 'line' is "
+                "only required when station_name is ambiguous (shared by "
+                "multiple complexes); an ambiguous name without it is a load "
+                "error. Repeatable -- classifies every scenario given (plus "
+                "today's real routing, and any --scenario/--category "
+                "selections) against the same fetched OD pairs in one run. "
+                "Only the named stations' routes change (by adding/removing "
+                "just the given routes from each one's real current routes); "
+                "every other station keeps its real current routes "
+                "untouched. Trailing commas are tolerated."
             ),
         ),
     ] = [],  # noqa: B006 -- never mutated; Typer replaces this with parsed CLI values
@@ -562,9 +576,8 @@ def deinterlining(
         Option(
             "--scenario",
             help=(
-                "Select a scenario by its exact `name`, from every JSON file "
-                "in --scenarios-dir. Repeatable; combines with --scenario-file "
-                "and --category."
+                "Select a scenario by its exact `name`, from --catalog. "
+                "Repeatable; combines with --scenario-file and --category."
             ),
         ),
     ] = [],  # noqa: B006 -- never mutated; Typer replaces this with parsed CLI values
@@ -573,19 +586,23 @@ def deinterlining(
         Option(
             "--category",
             help=(
-                "Select every scenario in --scenarios-dir with this exact "
+                "Select every scenario in --catalog with this exact "
                 "`category` (e.g. running a whole junction's proposed swaps "
                 "at once). Repeatable; combines with --scenario-file and "
                 "--scenario."
             ),
         ),
     ] = [],  # noqa: B006 -- never mutated; Typer replaces this with parsed CLI values
-    scenarios_dir: Annotated[
+    catalog: Annotated[
         Path,
         Option(
-            help="Directory of scenario JSON files, for --scenario/--category lookup"
+            help=(
+                "JSON file (a JSON array of scenarios, same shape as "
+                '--scenario-file) holding the built-in "Current" scenario '
+                "plus every scenario --scenario/--category can select by name"
+            )
         ),
-    ] = SCENARIOS_DIR,
+    ] = SCENARIOS_FILE,
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
     stations: Annotated[Path, Option()] = DATA / "stations_complexes.csv",
     stations_individual: Annotated[
@@ -625,8 +642,8 @@ def deinterlining(
     origin/destination pair whose origin could plausibly use one of
     `--routes` as one-seat or transfer, under today's real routing and any
     number of route-override scenarios -- selected by `--scenario-file`
-    (path), `--scenario` (exact name, looked up in `--scenarios-dir`), or
-    `--category` (every scenario in `--scenarios-dir` with that category) --
+    (path), `--scenario` (exact name, looked up in `--catalog`), or
+    `--category` (every scenario in `--catalog` with that category) --
     all classified in one pass over the same fetched OD pairs, so comparing
     several proposals doesn't reclassify "today" once per proposal.
 
@@ -642,22 +659,20 @@ def deinterlining(
     \b
     Examples:
         # Columbus Circle: both proposed swap directions vs. today, in one run,
-        # by path
+        # by name
         mta-od-data analyze deinterlining --routes A,B,C,D \\
-            --scenario-file \\
-            src/mta_od_data/analyze/scenarios/columbus_circle_ac_express.json \\
-            --scenario-file \\
-            src/mta_od_data/analyze/scenarios/columbus_circle_bd_express.json \\
+            --scenario "Columbus A/C Express" --scenario "Columbus B/D Express" \\
             --markdown-out src/mta_od_data/analyze/deinterlining_columbus_circle.md
-
-    \b
-        # Same, by name
-        mta-od-data analyze deinterlining --routes A,B,C,D \\
-            --scenario "Columbus A/C Express" --scenario "Columbus B/D Express"
 
     \b
         # Same, by category (every scenario in it, in one run)
         mta-od-data analyze deinterlining --routes A,B,C,D --category "Columbus Circle"
+
+    \b
+        # A scenario not yet in the catalog, by path (its own JSON array,
+        # possibly several scenarios at once)
+        mta-od-data analyze deinterlining --routes A,B,C,D \\
+            --scenario-file scratch_scenario.json
     """
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
@@ -675,7 +690,7 @@ def deinterlining(
             scenario_files=scenario_files,
             scenario_names=scenario_names,
             categories=categories,
-            scenarios_dir=scenarios_dir,
+            catalog=catalog,
             station_index=station_index,
         )
     except ScenarioError as e:
