@@ -167,12 +167,14 @@ def generate_scenario_schema(
     values from the station reference data as JSON Schema `enum`s -- an
     editor can then autocomplete (and flag a typo in) an actual line,
     station name, or route directly while editing a scenario file,
-    without cross-referencing the CSVs by hand. These `enum`s are schema-
-    only: `OverrideGroup`/`ScenarioFile` themselves stay plain `str`, so a
-    real load still goes through `StationIndex.resolve`'s own runtime
-    checks (against whichever `--stations`/`--stations-individual` was
-    actually passed, not necessarily these defaults) rather than trusting
-    a baked-in list.
+    without cross-referencing the CSVs by hand. These `enum`s are an
+    editor-time snapshot only: `OverrideGroup`/`ScenarioFile` themselves
+    stay plain `str`, so a real load still goes through
+    `StationIndex.resolve`/`check_routes`'s own runtime checks (against
+    whichever `--stations`/`--stations-individual` was actually passed,
+    not necessarily these defaults) rather than trusting this baked-in
+    list -- the two can disagree (e.g. a rider count run against an older
+    station extract) without either one being wrong for its own purpose.
 
     `stations_path`/`individual_stations_path` aren't committed
     (gitignored, `mta-od-data prepare`-generated) -- see the
@@ -211,16 +213,18 @@ def generate_scenario_schema(
 
 @dataclass(slots=True, frozen=True)
 class StationIndex:
-    """Resolves a scenario override's (station name, line) to a `Station`
-    -- station names alone aren't unique (e.g. "72 St" is three different
-    real complexes: CPW, Broadway-7 Av, and 2 Av), so a scenario file
-    specifies `line` (e.g. "8th Av - Fulton St", from the individual-station
-    reference data) only when the name alone is ambiguous. Built once per
-    invocation from the same station reference data used everywhere else,
-    not a separate lookup source."""
+    """Resolves a scenario override's (station name, line) to a `Station`,
+    and checks an override's `add`/`remove` routes against the real route
+    universe -- station names alone aren't unique (e.g. "72 St" is three
+    different real complexes: CPW, Broadway-7 Av, and 2 Av), so a scenario
+    file specifies `line` (e.g. "8th Av - Fulton St", from the individual-
+    station reference data) only when the name alone is ambiguous. Built
+    once per invocation from the same station reference data used
+    everywhere else, not a separate lookup source."""
 
     by_name: dict[str, frozenset[Station]]
     by_name_line: dict[tuple[str, str], Station]
+    known_routes: frozenset[str]
 
     @classmethod
     def build(
@@ -237,6 +241,9 @@ class StationIndex:
         return cls(
             by_name={name: frozenset(stations) for name, stations in by_name.items()},
             by_name_line=by_name_line,
+            known_routes=frozenset(
+                r for s in stations_by_id.values() for r in s.routes
+            ),
         )
 
     def resolve(self, name: str, line: str | None, *, path: Path) -> Station:
@@ -256,6 +263,14 @@ class StationIndex:
                 f'share this name) -- add "line" to disambiguate'
             )
         return next(iter(matches))
+
+    def check_routes(self, routes: Routes, *, path: Path) -> None:
+        unknown = sorted(routes - self.known_routes)
+        if unknown:
+            raise ScenarioError(
+                f'scenario {path}: unknown route(s) {unknown} in "add"/"remove" '
+                f"(not in the station reference data)"
+            )
 
 
 @dataclass(slots=True, frozen=True)
@@ -319,7 +334,10 @@ class Scenario:
     ) -> Scenario:
         overrides: dict[Station, RouteDelta] = {}
         for group in entry.overrides:
-            delta = RouteDelta(add=frozenset(group.add), remove=frozenset(group.remove))
+            add = frozenset(group.add)
+            remove = frozenset(group.remove)
+            station_index.check_routes(add | remove, path=path)
+            delta = RouteDelta(add=add, remove=remove)
             for station_name in group.stations:
                 station = station_index.resolve(station_name, group.line, path=path)
                 overrides[station] = delta
