@@ -33,7 +33,7 @@ from dataclasses import asdict, dataclass, fields
 from datetime import date
 from functools import cache
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import duckdb
 import json5
@@ -155,19 +155,42 @@ SCENARIOS_SCHEMA_FILE = (
 )
 
 
-def generate_scenario_schema() -> str:
+def generate_scenario_schema(
+    *,
+    stations_path: Path = DATA / "stations_complexes.csv",
+    individual_stations_path: Path = DATA / "stations_individual.csv",
+) -> str:
     """The JSON Schema for a scenario file, generated from
     `SCENARIO_FILE_ADAPTER` (i.e. from `OverrideGroup`/`ScenarioFile`
     directly) plus the top-level metadata a standalone schema file needs
-    (`$schema`, `title`). What `scenarios.schema.json` must always equal --
-    see `tests/test_scenarios_schema.py`, which fails with this same
-    regen command if it ever drifts:
+    (`$schema`, `title`), plus real `line`/`stations`/`add`/`remove`
+    values from the station reference data as JSON Schema `enum`s -- an
+    editor can then autocomplete (and flag a typo in) an actual line,
+    station name, or route directly while editing a scenario file,
+    without cross-referencing the CSVs by hand. These `enum`s are schema-
+    only: `OverrideGroup`/`ScenarioFile` themselves stay plain `str`, so a
+    real load still goes through `StationIndex.resolve`'s own runtime
+    checks (against whichever `--stations`/`--stations-individual` was
+    actually passed, not necessarily these defaults) rather than trusting
+    a baked-in list.
+
+    `stations_path`/`individual_stations_path` aren't committed
+    (gitignored, `mta-od-data prepare`-generated) -- see the
+    `pytest.mark.skipif` in `tests/test_scenarios_schema.py`, which skips
+    rather than fails when they're missing. What `scenarios.schema.json`
+    must always equal when they *are* present -- regenerate it with:
 
         uv run python -c "from mta_od_data.analyze.deinterlining import \\
             SCENARIOS_SCHEMA_FILE, generate_scenario_schema; \\
             SCENARIOS_SCHEMA_FILE.write_text(generate_scenario_schema())"
     """
-    schema = {
+    stations_by_id = Station.load_complexes(stations_path)
+    individual_stations = Station.load_individuals(individual_stations_path)
+    known_lines = sorted({s.line for s in individual_stations if s.line})
+    known_stations = sorted({s.name for s in stations_by_id.values()})
+    known_routes = sorted({r for s in stations_by_id.values() for r in s.routes})
+
+    schema: dict[str, Any] = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "title": "Deinterlining scenario file",
         "description": (
@@ -178,6 +201,11 @@ def generate_scenario_schema() -> str:
         ),
         **SCENARIO_FILE_ADAPTER.json_schema(),
     }
+    override_group = schema["$defs"]["OverrideGroup"]
+    override_group["properties"]["line"]["enum"] = known_lines
+    override_group["properties"]["stations"]["items"]["enum"] = known_stations
+    override_group["properties"]["add"]["items"]["enum"] = known_routes
+    override_group["properties"]["remove"]["items"]["enum"] = known_routes
     return json.dumps(schema, indent=2) + "\n"
 
 
