@@ -191,16 +191,12 @@ def generate_scenario_schema(
     stations_by_id = Station.load_complexes(stations_path)
     individual_stations = Station.load_individuals(individual_stations_path)
     known_lines = sorted({s.line for s in individual_stations if s.line})
-    # A `stations` entry resolves against a complex's own name with no
-    # `line` (`StationIndex.by_name`), or an individual platform's own
-    # name with `line` (`by_name_line`) -- distinct sets for a complex
-    # that merges several differently-named platforms (e.g. "62 St/New
-    # Utrecht Av" merges "62 St" and "New Utrecht Av"), so both belong in
-    # the enum, not just the complex-level name.
-    known_stations = sorted(
-        {s.name for s in stations_by_id.values()}
-        | {s.name for s in individual_stations}
-    )
+    # A `stations` entry always resolves against an individual platform's
+    # own name plus `line` (`StationIndex.by_name_line`), never a
+    # complex's own name -- `line` is required on every `OverrideGroup`,
+    # so the complex-level name (e.g. "62 St/New Utrecht Av", merging
+    # "62 St" and "New Utrecht Av") is never what's actually checked.
+    known_stations = sorted({s.name for s in individual_stations})
     known_routes = sorted({r for s in stations_by_id.values() for r in s.routes})
 
     schema: dict[str, Any] = {
@@ -226,14 +222,16 @@ def generate_scenario_schema(
 class StationIndex:
     """Resolves a scenario override's (station name, line) to a `Station`,
     and checks an override's `add`/`remove` routes against the real route
-    universe -- station names alone aren't unique (e.g. "72 St" is three
-    different real complexes: CPW, Broadway-7 Av, and 2 Av), so a scenario
-    file specifies `line` (e.g. "8th Av - Fulton St", from the individual-
-    station reference data) only when the name alone is ambiguous. Built
-    once per invocation from the same station reference data used
-    everywhere else, not a separate lookup source."""
+    universe. Keyed by (individual platform name, line) rather than a
+    complex's own name -- `line` is required on every `OverrideGroup` (see
+    its docstring), so a bare-name lookup with no line is never actually
+    needed: station names alone aren't unique (e.g. "72 St" is three
+    different real complexes: CPW, Broadway-7 Av, and 2 Av), and `line`
+    (e.g. "8th Av - Fulton St", from the individual-station reference
+    data) always resolves which one is meant instead. Built once per
+    invocation from the same station reference data used everywhere else,
+    not a separate lookup source."""
 
-    by_name: dict[str, frozenset[Station]]
     by_name_line: dict[tuple[str, str], Station]
     known_routes: frozenset[str]
 
@@ -243,37 +241,23 @@ class StationIndex:
         stations_by_id: dict[int, Station],
         individual_stations: list[Station],
     ) -> StationIndex:
-        by_name: dict[str, set[Station]] = {}
-        for station in stations_by_id.values():
-            by_name.setdefault(station.name, set()).add(station)
         by_name_line = {
             (s.name, s.line): stations_by_id[s.complex_id] for s in individual_stations
         }
         return cls(
-            by_name={name: frozenset(stations) for name, stations in by_name.items()},
             by_name_line=by_name_line,
             known_routes=frozenset(
                 r for s in stations_by_id.values() for r in s.routes
             ),
         )
 
-    def resolve(self, name: str, line: str | None, *, path: Path) -> Station:
-        if line is not None:
-            key = (name, line)
-            if key not in self.by_name_line:
-                raise ScenarioError(
-                    f'scenario {path}: no station named "{name}" on line "{line}"'
-                )
-            return self.by_name_line[key]
-        matches = self.by_name.get(name, frozenset())
-        if not matches:
-            raise ScenarioError(f'scenario {path}: no station named "{name}"')
-        if len(matches) > 1:
+    def resolve(self, name: str, line: str, *, path: Path) -> Station:
+        key = (name, line)
+        if key not in self.by_name_line:
             raise ScenarioError(
-                f'scenario {path}: "{name}" is ambiguous ({len(matches)} stations '
-                f'share this name) -- add "line" to disambiguate'
+                f'scenario {path}: no station named "{name}" on line "{line}"'
             )
-        return next(iter(matches))
+        return self.by_name_line[key]
 
     def check_routes(self, routes: Routes, *, path: Path) -> None:
         unknown = sorted(routes - self.known_routes)
