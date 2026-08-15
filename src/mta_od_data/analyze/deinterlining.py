@@ -603,27 +603,21 @@ def resolve_scenarios(
     scenario_file: Path,
     station_index: StationIndex,
 ) -> list[Scenario]:
-    """`--scenario-file`'s `"Current"` scenario (today's real routing, no
-    overrides), plus every scenario selected via `--category` (every
-    scenario in `--scenario-file` with that `category`) -- deduplicated
-    by `name`, preserving that order. Raises `ScenarioError` (not
-    `SystemExit`) for a missing/malformed `--scenario-file`, one with no
-    `"Current"` entry, or an unknown `--category`; only `deinterlining()`
-    itself exits."""
+    """Every scenario in `--scenario-file`'s `"Current"` category (today's
+    real routing, always included, no special-case lookup by scenario
+    name), plus every scenario selected via `--category` (every scenario
+    in `--scenario-file` with that `category`) -- deduplicated by `name`,
+    preserving that order. Raises `ScenarioError` (not `SystemExit`) for a
+    missing/malformed `--scenario-file`, one with no `"Current"`
+    category, or an unknown `--category`; only `deinterlining()` itself
+    exits."""
     try:
         available = Scenario.load_all(scenario_file, station_index)
     except FileNotFoundError as e:
         raise ScenarioError(f"missing required scenario file {scenario_file}") from e
-    by_name = {s.name: s for s in available}
-    if "Current" not in by_name:
-        raise ScenarioError(
-            f'scenario file {scenario_file} has no "Current" entry (today\'s '
-            f"real routing, no overrides)"
-        )
 
-    scenarios = [by_name["Current"]]
-
-    for category in categories:
+    scenarios: list[Scenario] = []
+    for category in ["Current", *categories]:
         matches = [s for s in available if s.category == category]
         if not matches:
             available_categories = sorted({s.category for s in available})
