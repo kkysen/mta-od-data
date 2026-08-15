@@ -57,127 +57,92 @@
     ],
   },
   {
-    "name": "A/C CPW Express, C/D Concourse",
-    "description": "A,C CPW express, B,D CPW local, D Concourse express, C Concourse local",
-    "category": "Columbus",
+    "name": "C/D Concourse",
+    "description": "A St Nicholas express, B St Nicholas local, C Concourse local, D Concourse express",
+    "category": "145 St",
     "overrides": [
+      {
+        "line": "Concourse",
+        "add": [
+          "C"
+        ],
+        "remove": [
+          "B"
+        ],
+        "stations": [
+          "155 St",
+          "161 St-Yankee Stadium",
+          "167 St",
+          "170 St",
+          "174-175 Sts",
+          "Tremont Av",
+          "182-183 Sts",
+          "Fordham Rd",
+          "Kingsbridge Rd",
+          "Bedford Park Blvd",
+          "Norwood-205 St",
+        ],
+      },
+      {
+        "line": "8th Av - Fulton St",
+        "add": [
+          "B"
+        ],
+        "remove": [
+          "C"
+        ],
+        "stations": [
+          "155 St",
+          "163 St-Amsterdam Av",
+          "168 St-Washington Hts",
+        ],
+      },
+    ]
+  },
+  {
+    "name": "A/B Concourse",
+    "description": "A Concourse express, B Concourse local, C St Nicholas local, D St Nicholas express",
+    "category": "145 St",
+    "overrides": [
+      {
+        "line": "Concourse",
+        "add": [
+          "A"
+        ],
+        "remove": [
+          "D"
+        ],
+        "stations": [
+          "155 St",
+          "161 St-Yankee Stadium",
+          "167 St",
+          "170 St",
+          "174-175 Sts",
+          "Tremont Av",
+          "182-183 Sts",
+          "Fordham Rd",
+          "Kingsbridge Rd",
+          "Bedford Park Blvd",
+          "Norwood-205 St",
+        ],
+      },
       {
         "line": "8th Av - Fulton St",
         "add": [
           "D"
         ],
         "remove": [
-          "C"
-        ],
-        "stations": [
-          "72 St",
-          "81 St-Museum of Natural History",
-          "86 St",
-          "96 St",
-          "103 St",
-          "Cathedral Pkwy (110 St)",
-          "116 St",
-          "135 St",
-        ],
-      },
-      {
-        "line": "Concourse",
-        "add": [
-          "C"
-        ],
-        "remove": [
-          "B"
-        ],
-        "stations": [
-          "155 St",
-          "161 St-Yankee Stadium",
-          "167 St",
-          "170 St",
-          "174-175 Sts",
-          "Tremont Av",
-          "182-183 Sts",
-          "Fordham Rd",
-          "Kingsbridge Rd",
-          "Bedford Park Blvd",
-          "Norwood-205 St",
-        ],
-      },
-      {
-        "line": "8th Av - Fulton St",
-        "add": [
-          "B"
-        ],
-        "remove": [
-          "C"
-        ],
-        "stations": [
-          "155 St",
-          "163 St-Amsterdam Av",
-          "168 St-Washington Hts",
-        ],
-      },
-    ],
-  },
-  {
-    "name": "B/D CPW Express, C/D Concourse",
-    "description": "B,D CPW express, A,C CPW local, D Concourse express, C Concourse local",
-    "category": "Columbus",
-    "overrides": [
-      {
-        "line": "8th Av - Fulton St",
-        "add": [
           "A"
         ],
-        "remove": [
-          "B"
-        ],
         "stations": [
-          "72 St",
-          "81 St-Museum of Natural History",
-          "86 St",
-          "96 St",
-          "103 St",
-          "Cathedral Pkwy (110 St)",
-          "116 St",
-          "135 St",
-        ],
-      },
-      {
-        "line": "Concourse",
-        "add": [
-          "C"
-        ],
-        "remove": [
-          "B"
-        ],
-        "stations": [
-          "155 St",
-          "161 St-Yankee Stadium",
-          "167 St",
-          "170 St",
-          "174-175 Sts",
-          "Tremont Av",
-          "182-183 Sts",
-          "Fordham Rd",
-          "Kingsbridge Rd",
-          "Bedford Park Blvd",
-          "Norwood-205 St",
-        ],
-      },
-      {
-        "line": "8th Av - Fulton St",
-        "add": [
-          "B"
-        ],
-        "remove": [
-          "C"
-        ],
-        "stations": [
-          "155 St",
-          "163 St-Amsterdam Av",
           "168 St-Washington Hts",
+          "175 St",
+          "181 St",
+          "190 St",
+          "Dyckman St",
+          "Inwood-207 St",
         ],
       },
-    ],
+    ]
   },
 ]
