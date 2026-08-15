@@ -1,7 +1,8 @@
 [
   {
     "name": "Current",
-    "description": "Today's real routing, no overrides.",
+    "description": "Current routes today",
+    "category": "Current",
     "overrides": [],
   },
   {
