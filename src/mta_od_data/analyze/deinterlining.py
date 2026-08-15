@@ -307,44 +307,6 @@ class Scenario:
     overrides: dict[Station, RouteDelta]
 
     @classmethod
-    def load_all(
-        cls, path: Path, station_index: StationIndex
-    ) -> list[ScenarioCategory]:
-        """A scenario file holds a JSON object of category name to the
-        `ScenarioEntry`s in it, not just one -- `--scenario-file` (the
-        catalog) defines several related scenarios, across several
-        categories, together."""
-        # JSON5 (a strict superset of JSON): tolerates a trailing comma
-        # before a closing `}`/`]`, an easy slip when hand-editing scenario
-        # files -- plain `json.loads` would reject it outright.
-        try:
-            data = json5.loads(path.read_text())
-        except ValueError as e:
-            raise ScenarioError(f"scenario file {path} isn't valid JSON: {e}") from e
-        # `ScenarioEntry`/`OverrideGroup` (both `pydantic.BaseModel`s) own
-        # the shape validation here -- a required field missing, an unknown
-        # field (`extra="forbid"`), or a wrong type all become one
-        # `ValidationError`, so there's no manual field-by-field checking
-        # to keep in sync with the schema (`scenarios.schema.json`, itself
-        # generated from these same models).
-        try:
-            by_category = SCENARIO_FILE_ADAPTER.validate_python(data)
-        except ValidationError as e:
-            raise ScenarioError(
-                f"scenario file {path} doesn't match the expected shape:\n{e}"
-            ) from e
-        return [
-            ScenarioCategory(
-                name=category,
-                scenarios=[
-                    cls._load_entry(entry, category, path, station_index)
-                    for entry in entries
-                ],
-            )
-            for category, entries in by_category.items()
-        ]
-
-    @classmethod
     def _load_entry(
         cls,
         entry: ScenarioEntry,
@@ -494,14 +456,52 @@ class Scenario:
 class ScenarioCategory:
     """Every scenario loaded under one category key in a scenario file's
     top-level JSON object (e.g. "DeKalb", grouping its swap-direction
-    scenarios) -- what `Scenario.load_all` actually returns a list of.
-    `--category` selects by `name`; selecting more than one category at
-    once takes the cartesian product of their `scenarios` (one scenario
-    per selected category per combination), each combination merged into
-    a single scenario by `Scenario.combine` -- see `resolve_scenarios`."""
+    scenarios) -- what `load_all` actually returns a list of. `--category`
+    selects by `name`; selecting more than one category at once takes the
+    cartesian product of their `scenarios` (one scenario per selected
+    category per combination), each combination merged into a single
+    scenario by `Scenario.combine` -- see `resolve_scenarios`."""
 
     name: str
     scenarios: list[Scenario]
+
+    @classmethod
+    def load_all(
+        cls, path: Path, station_index: StationIndex
+    ) -> list[ScenarioCategory]:
+        """A scenario file holds a JSON object of category name to the
+        `ScenarioEntry`s in it, not just one -- `--scenario-file` (the
+        catalog) defines several related scenarios, across several
+        categories, together."""
+        # JSON5 (a strict superset of JSON): tolerates a trailing comma
+        # before a closing `}`/`]`, an easy slip when hand-editing scenario
+        # files -- plain `json.loads` would reject it outright.
+        try:
+            data = json5.loads(path.read_text())
+        except ValueError as e:
+            raise ScenarioError(f"scenario file {path} isn't valid JSON: {e}") from e
+        # `ScenarioEntry`/`OverrideGroup` (both `pydantic.BaseModel`s) own
+        # the shape validation here -- a required field missing, an unknown
+        # field (`extra="forbid"`), or a wrong type all become one
+        # `ValidationError`, so there's no manual field-by-field checking
+        # to keep in sync with the schema (`scenarios.schema.json`, itself
+        # generated from these same models).
+        try:
+            by_category = SCENARIO_FILE_ADAPTER.validate_python(data)
+        except ValidationError as e:
+            raise ScenarioError(
+                f"scenario file {path} doesn't match the expected shape:\n{e}"
+            ) from e
+        return [
+            cls(
+                name=category,
+                scenarios=[
+                    Scenario._load_entry(entry, category, path, station_index)
+                    for entry in entries
+                ],
+            )
+            for category, entries in by_category.items()
+        ]
 
 
 def suffixed_path(path: Path, suffix: str) -> Path:
@@ -676,7 +676,7 @@ def resolve_scenarios(
     unknown `--category`, or a combination with conflicting overrides;
     only `deinterlining()` itself exits."""
     try:
-        available = Scenario.load_all(scenario_file, station_index)
+        available = ScenarioCategory.load_all(scenario_file, station_index)
     except FileNotFoundError as e:
         raise ScenarioError(f"missing required scenario file {scenario_file}") from e
     by_name = {c.name: c for c in available}
