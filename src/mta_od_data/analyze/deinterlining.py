@@ -20,10 +20,14 @@ a `Scenario` with no overrides, classified through the exact same code
 path as every other scenario. Selecting several scenarios via `--category`
 classifies all of them (plus `"Current"`) against the *same* fetched OD
 pairs in one run, so comparing several proposals doesn't reclassify
-"today" once per proposal.
+"today" once per proposal. Selecting more than one category at once
+combines them -- see `Scenario.combine`/`resolve_scenarios` -- for
+comparing compound proposals across independent junctions, not just each
+junction's proposals in isolation.
 """
 
 import csv
+import itertools
 import json
 import re
 import shlex
@@ -146,10 +150,15 @@ class ScenarioEntry(BaseModel):
 
 # The root of a scenario file: a JSON object mapping a category name to
 # the `ScenarioEntry`s in it (e.g. `"Current"` to a single-entry list for
-# today's real routing) -- `--category` selects by this key directly.
+# today's real routing) -- `--category` selects by this key directly. A
+# category's list can't be empty (`min_length=1`): `resolve_scenarios`'s
+# cartesian product over selected categories would otherwise silently
+# produce zero combined scenarios for an empty one, with no error at all.
 # Also what `scenarios.schema.json` is generated from -- see
 # `tests/test_scenarios_schema.py`.
-SCENARIO_FILE_ADAPTER = TypeAdapter(dict[str, list[ScenarioEntry]])
+SCENARIO_FILE_ADAPTER = TypeAdapter(
+    dict[str, Annotated[list[ScenarioEntry], Field(min_length=1)]]
+)
 
 SCENARIOS_SCHEMA_FILE = (
     ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.schema.json"
@@ -298,7 +307,9 @@ class Scenario:
     overrides: dict[Station, RouteDelta]
 
     @classmethod
-    def load_all(cls, path: Path, station_index: StationIndex) -> list[Scenario]:
+    def load_all(
+        cls, path: Path, station_index: StationIndex
+    ) -> list[ScenarioCategory]:
         """A scenario file holds a JSON object of category name to the
         `ScenarioEntry`s in it, not just one -- `--scenario-file` (the
         catalog) defines several related scenarios, across several
@@ -323,9 +334,14 @@ class Scenario:
                 f"scenario file {path} doesn't match the expected shape:\n{e}"
             ) from e
         return [
-            cls._load_entry(entry, category, path, station_index)
+            ScenarioCategory(
+                name=category,
+                scenarios=[
+                    cls._load_entry(entry, category, path, station_index)
+                    for entry in entries
+                ],
+            )
             for category, entries in by_category.items()
-            for entry in entries
         ]
 
     @classmethod
@@ -350,6 +366,36 @@ class Scenario:
             description=entry.description or entry.name,
             category=category,
             slug=slugify(entry.name),
+            overrides=overrides,
+        )
+
+    @classmethod
+    def combine(cls, scenarios: list[Scenario]) -> Scenario:
+        """Merges several scenarios -- one per category in a
+        `resolve_scenarios` cartesian-product combination -- into one:
+        `overrides` is their union, `name`/`description`/`category` are
+        each `" + "`-joined. Raises `ScenarioError` if two scenarios
+        disagree about the same station (a real conflict, not just both
+        touching it the same way). A single-element `scenarios` is
+        returned as-is, nothing to combine."""
+        if len(scenarios) == 1:
+            return scenarios[0]
+        overrides: dict[Station, RouteDelta] = {}
+        for scenario in scenarios:
+            for station, delta in scenario.overrides.items():
+                existing = overrides.get(station)
+                if existing is not None and existing != delta:
+                    raise ScenarioError(
+                        f"can't combine {[s.name for s in scenarios]}: "
+                        f"conflicting overrides for {station.display()}"
+                    )
+                overrides[station] = delta
+        name = " + ".join(s.name for s in scenarios)
+        return cls(
+            name=name,
+            description=" + ".join(s.description for s in scenarios),
+            category=" + ".join(s.category for s in scenarios),
+            slug=slugify(name),
             overrides=overrides,
         )
 
@@ -442,6 +488,20 @@ class Scenario:
             rows=rows,
             dest_stats=dest_stats,
         )
+
+
+@dataclass(slots=True, frozen=True)
+class ScenarioCategory:
+    """Every scenario loaded under one category key in a scenario file's
+    top-level JSON object (e.g. "DeKalb", grouping its swap-direction
+    scenarios) -- what `Scenario.load_all` actually returns a list of.
+    `--category` selects by `name`; selecting more than one category at
+    once takes the cartesian product of their `scenarios` (one scenario
+    per selected category per combination), each combination merged into
+    a single scenario by `Scenario.combine` -- see `resolve_scenarios`."""
+
+    name: str
+    scenarios: list[Scenario]
 
 
 def suffixed_path(path: Path, suffix: str) -> Path:
@@ -604,38 +664,44 @@ def resolve_scenarios(
     station_index: StationIndex,
 ) -> list[Scenario]:
     """Every scenario in `--scenario-file`'s `"Current"` category (today's
-    real routing, always included, no special-case lookup by scenario
-    name), plus every scenario selected via `--category` (every scenario
-    in `--scenario-file` with that `category`) -- deduplicated by `name`,
-    preserving that order. Raises `ScenarioError` (not `SystemExit`) for a
-    missing/malformed `--scenario-file`, one with no `"Current"`
-    category, or an unknown `--category`; only `deinterlining()` itself
-    exits."""
+    real routing, always included as-is, never combined with anything),
+    plus one combined scenario per element of the cartesian product of
+    every `--category`-selected category's scenarios (`Scenario.combine`)
+    -- e.g. two categories with two scenarios each select four combined
+    scenarios, one per pairing. A single selected category just yields
+    its scenarios unchanged (nothing to combine). Duplicate `--category`
+    values are ignored (each category only ever contributes once to the
+    product). Raises `ScenarioError` (not `SystemExit`) for a missing/
+    malformed `--scenario-file`, one with no `"Current"` category, an
+    unknown `--category`, or a combination with conflicting overrides;
+    only `deinterlining()` itself exits."""
     try:
         available = Scenario.load_all(scenario_file, station_index)
     except FileNotFoundError as e:
         raise ScenarioError(f"missing required scenario file {scenario_file}") from e
+    by_name = {c.name: c for c in available}
+    if "Current" not in by_name:
+        raise ScenarioError(
+            f'scenario file {scenario_file} has no "Current" category '
+            f"(today's real routing, no overrides)"
+        )
 
-    scenarios: list[Scenario] = []
-    for category in ["Current", *categories]:
-        matches = [s for s in available if s.category == category]
-        if not matches:
-            available_categories = sorted({s.category for s in available})
-            categories_str = ", ".join(available_categories) or "none"
+    scenarios = list(by_name["Current"].scenarios)
+
+    selected: list[ScenarioCategory] = []
+    for name in dict.fromkeys(categories):
+        if name not in by_name:
+            available_names = ", ".join(sorted(by_name)) or "none"
             raise ScenarioError(
-                f"no scenarios in category {category!r} in {scenario_file} "
-                f"(available categories: {categories_str})"
+                f"no category {name!r} in {scenario_file} "
+                f"(available: {available_names})"
             )
-        scenarios.extend(matches)
+        selected.append(by_name[name])
+    if selected:
+        for combo in itertools.product(*(c.scenarios for c in selected)):
+            scenarios.append(Scenario.combine(list(combo)))
 
-    seen: set[str] = set()
-    deduped: list[Scenario] = []
-    for s in scenarios:
-        if s.name in seen:
-            continue
-        seen.add(s.name)
-        deduped.append(s)
-    return deduped
+    return scenarios
 
 
 @app.command()
@@ -658,10 +724,14 @@ def deinterlining(
         Option(
             "--category",
             help=(
-                "Select every scenario in --scenario-file with this exact "
-                "`category` (e.g. running a whole junction's proposed swaps "
-                "at once) -- the only way to select a scenario besides "
-                'always-included "Current". Repeatable.'
+                "Select a category in --scenario-file (e.g. a junction's "
+                "proposed swap directions) -- the only way to select "
+                'scenarios besides always-included "Current". Repeatable: '
+                "with two or more, every scenario in each selected "
+                "category is combined with one from every other (their "
+                "overrides unioned) into every possible pairing, so two "
+                "categories with two scenarios each run four combined "
+                "scenarios, not just each category's own two."
             ),
         ),
     ] = None,
@@ -726,9 +796,11 @@ def deinterlining(
     origin/destination pair whose origin could plausibly use one of
     `--routes` as one-seat or transfer, under today's real routing and any
     number of route-override scenarios -- selected from `--scenario-file`
-    by `--category` (every scenario in it with that category) -- all
-    classified in one pass over the same fetched OD pairs, so comparing
-    several proposals doesn't reclassify "today" once per proposal.
+    by `--category` (every scenario in it with that category; selecting
+    more than one category combines them into every pairing, see
+    `Scenario.combine`) -- all classified in one pass over the same
+    fetched OD pairs, so comparing several proposals doesn't reclassify
+    "today" once per proposal.
 
     Unlike `one-seat-rides`, there's no latitude boundary and no
     origin-side-only corridor restriction -- a scenario can reassign which
@@ -745,6 +817,13 @@ def deinterlining(
         # (every scenario in the "Columbus" category)
         mta-od-data analyze deinterlining --routes A,B,C,D --category "Columbus" \\
             --markdown-out src/mta_od_data/analyze/deinterlining_columbus_circle.md
+
+    \b
+        # DeKalb and Columbus together: every combination of one DeKalb
+        # swap direction and one Columbus swap direction, each a single
+        # combined scenario with both changes' overrides applied at once
+        mta-od-data analyze deinterlining --routes A,B,C,D,N,Q,R \\
+            --category "DeKalb" --category "Columbus"
 
     \b
         # A draft catalog not yet merged into scenarios.json5 (needs its own
