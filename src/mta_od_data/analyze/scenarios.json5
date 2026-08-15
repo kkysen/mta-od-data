@@ -6,6 +6,64 @@
     "overrides": [],
   },
   {
+    "name": "B/D 4 Av Express",
+    "description": "B,D 4 Av express, B Sea Beach, D West End, N Brighton express, Q Brighton local",
+    "category": "DeKalb",
+    "overrides": [
+      {
+        "line": "4th Av",
+        "add": [
+          "B"
+        ],
+        "remove": [
+          "N"
+        ],
+        "stations": [
+          "36 St",
+          "59 St",
+        ],
+      },
+      {
+        "line": "Sea Beach",
+        "add": [
+          "B"
+        ],
+        "remove": [
+          "N"
+        ],
+        "stations": [
+          "8 Av",
+          "Fort Hamilton Pkwy",
+          "New Utrecht Av-62 St",
+          "18 Av",
+          "20 Av",
+          "Bay Pkwy",
+          "Kings Hwy",
+          "Avenue U",
+          "86 St",
+        ],
+      },
+      {
+        "line": "Brighton",
+        "add": [
+          "N"
+        ],
+        "remove": [
+          "B"
+        ],
+        "stations": [
+          "7 Av",
+          "Prospect Park",
+          "Church Av",
+          "Newkirk Plaza",
+          "Kings Hwy",
+          "Sheepshead Bay",
+          "Brighton Beach",
+        ],
+      },
+    ],
+  },
+  {
     "name": "A/C CPW Express",
     "description": "A,C CPW express, B,D CPW local",
     "category": "Columbus",
