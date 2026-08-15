@@ -34,7 +34,7 @@
         "stations": [
           "8 Av",
           "Fort Hamilton Pkwy",
-          "New Utrecht Av-62 St",
+          "New Utrecht Av",
           "18 Av",
           "20 Av",
           "Bay Pkwy",
@@ -44,7 +44,7 @@
         ],
       },
       {
-        "line": "Brighton",
+        "line": "Broadway - Brighton",
         "add": [
           "N"
         ],
@@ -153,7 +153,7 @@
         "stations": [
           "155 St",
           "163 St-Amsterdam Av",
-          "168 St-Washington Hts",
+          "168 St",
         ],
       },
     ]
@@ -194,7 +194,7 @@
           "A"
         ],
         "stations": [
-          "168 St-Washington Hts",
+          "168 St",
           "175 St",
           "181 St",
           "190 St",
