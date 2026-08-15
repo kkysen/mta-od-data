@@ -37,7 +37,7 @@ from dataclasses import asdict, dataclass, fields
 from datetime import date
 from functools import cache
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, Self
 
 import duckdb
 import json5
@@ -456,19 +456,36 @@ class Scenario:
 class ScenarioCategory:
     """Every scenario loaded under one category key in a scenario file's
     top-level JSON object (e.g. "DeKalb", grouping its swap-direction
-    scenarios) -- what `load_all` actually returns a list of. `--category`
-    selects by `name`; selecting more than one category at once takes the
-    cartesian product of their `scenarios` (one scenario per selected
-    category per combination), each combination merged into a single
-    scenario by `Scenario.combine` -- see `resolve_scenarios`."""
+    scenarios) -- one element of `ScenarioFile.categories`. Selecting more
+    than one category at once takes the cartesian product of their
+    `scenarios` (one scenario per selected category per combination),
+    each combination merged into a single scenario by `Scenario.combine`
+    -- see `ScenarioFile.combine_scenarios`."""
 
     name: str
     scenarios: list[Scenario]
 
+
+@dataclass(slots=True, frozen=True)
+class ScenarioFile:
+    """Every category in one scenario file (`path`, e.g. `scenarios.json5`
+    or an ad-hoc `--scenario-file`) -- what `load` parses the whole file
+    into. `filter` narrows to the named categories (raising
+    `ScenarioError` for any that don't exist), preserving `categories`'
+    own order rather than the order they were requested in.
+    `combine_scenarios` takes the cartesian product of `categories`'
+    `scenarios` and merges each combination via `Scenario.combine` -- a
+    single filtered-down category's own scenarios come back unchanged,
+    since there's nothing to combine them with. `resolve_scenarios`
+    composes these: `"Current"` always included as-is (`filter` to just
+    it, then `combine_scenarios`, which is a no-op for one category), plus
+    every `--category` selection combined together the same way."""
+
+    path: Path
+    categories: list[ScenarioCategory]
+
     @classmethod
-    def load_all(
-        cls, path: Path, station_index: StationIndex
-    ) -> list[ScenarioCategory]:
+    def load(cls, path: Path, station_index: StationIndex) -> ScenarioFile:
         """A scenario file holds a JSON object of category name to the
         `ScenarioEntry`s in it, not just one -- `--scenario-file` (the
         catalog) defines several related scenarios, across several
@@ -492,15 +509,40 @@ class ScenarioCategory:
             raise ScenarioError(
                 f"scenario file {path} doesn't match the expected shape:\n{e}"
             ) from e
-        return [
-            cls(
-                name=category,
-                scenarios=[
-                    Scenario._load_entry(entry, category, path, station_index)
-                    for entry in entries
-                ],
+        return cls(
+            path=path,
+            categories=[
+                ScenarioCategory(
+                    name=category,
+                    scenarios=[
+                        Scenario._load_entry(entry, category, path, station_index)
+                        for entry in entries
+                    ],
+                )
+                for category, entries in by_category.items()
+            ],
+        )
+
+    def filter(self, categories: frozenset[str]) -> Self:
+        by_name = {c.name: c for c in self.categories}
+        missing = categories - by_name.keys()
+        if missing:
+            available = ", ".join(sorted(by_name)) or "none"
+            raise ScenarioError(
+                f"unknown categories {sorted(missing)!r} in {self.path} "
+                f"(available: {available})"
             )
-            for category, entries in by_category.items()
+        return type(self)(
+            path=self.path,
+            categories=[c for c in self.categories if c.name in categories],
+        )
+
+    def combine_scenarios(self) -> list[Scenario]:
+        if not self.categories:
+            return []
+        return [
+            Scenario.combine(list(combo))
+            for combo in itertools.product(*(c.scenarios for c in self.categories))
         ]
 
 
@@ -666,41 +708,22 @@ def resolve_scenarios(
     """Every scenario in `--scenario-file`'s `"Current"` category (today's
     real routing, always included as-is, never combined with anything),
     plus one combined scenario per element of the cartesian product of
-    every `--category`-selected category's scenarios (`Scenario.combine`)
-    -- e.g. two categories with two scenarios each select four combined
-    scenarios, one per pairing. A single selected category just yields
-    its scenarios unchanged (nothing to combine). Duplicate `--category`
-    values are ignored (each category only ever contributes once to the
-    product). Raises `ScenarioError` (not `SystemExit`) for a missing/
-    malformed `--scenario-file`, one with no `"Current"` category, an
-    unknown `--category`, or a combination with conflicting overrides;
-    only `deinterlining()` itself exits."""
+    every `--category`-selected category's scenarios (`Scenario.combine`,
+    via `ScenarioFile.filter`/`combine_scenarios`) -- e.g. two categories
+    with two scenarios each select four combined scenarios, one per
+    pairing. A single selected category just yields its scenarios
+    unchanged (nothing to combine). Raises `ScenarioError` (not
+    `SystemExit`) for a missing/malformed `--scenario-file`, one with no
+    `"Current"` category, an unknown `--category`, or a combination with
+    conflicting overrides; only `deinterlining()` itself exits."""
     try:
-        available = ScenarioCategory.load_all(scenario_file, station_index)
+        file = ScenarioFile.load(scenario_file, station_index)
     except FileNotFoundError as e:
         raise ScenarioError(f"missing required scenario file {scenario_file}") from e
-    by_name = {c.name: c for c in available}
-    if "Current" not in by_name:
-        raise ScenarioError(
-            f'scenario file {scenario_file} has no "Current" category '
-            f"(today's real routing, no overrides)"
-        )
 
-    scenarios = list(by_name["Current"].scenarios)
-
-    selected: list[ScenarioCategory] = []
-    for name in dict.fromkeys(categories):
-        if name not in by_name:
-            available_names = ", ".join(sorted(by_name)) or "none"
-            raise ScenarioError(
-                f"no category {name!r} in {scenario_file} "
-                f"(available: {available_names})"
-            )
-        selected.append(by_name[name])
-    if selected:
-        for combo in itertools.product(*(c.scenarios for c in selected)):
-            scenarios.append(Scenario.combine(list(combo)))
-
+    scenarios = file.filter(frozenset({"Current"})).combine_scenarios()
+    if categories:
+        scenarios += file.filter(frozenset(categories)).combine_scenarios()
     return scenarios
 
 
