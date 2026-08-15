@@ -5,14 +5,18 @@
     "overrides": [],
   },
   {
-    "name": "Columbus A/C Express",
-    "description": "A,C run express and B,D run local on Central Park West, between 59 St-Columbus Circle and 145 St.",
-    "category": "Columbus Circle",
+    "name": "A/C CPW Express",
+    "description": "A,C CPW express, B,D CPW local",
+    "category": "Columbus",
     "overrides": [
       {
         "line": "8th Av - Fulton St",
-        "add": ["D"],
-        "remove": ["C"],
+        "add": [
+          "D"
+        ],
+        "remove": [
+          "C"
+        ],
         "stations": [
           "72 St",
           "81 St-Museum of Natural History",
@@ -27,14 +31,18 @@
     ],
   },
   {
-    "name": "Columbus B/D Express",
-    "description": "B,D run express and A,C run local on Central Park West, between 59 St-Columbus Circle and 145 St.",
-    "category": "Columbus Circle",
+    "name": "B/D CPW Express",
+    "description": "B,D CPW express, A,C CPW local",
+    "category": "Columbus",
     "overrides": [
       {
         "line": "8th Av - Fulton St",
-        "add": ["A"],
-        "remove": ["B"],
+        "add": [
+          "A"
+        ],
+        "remove": [
+          "B"
+        ],
         "stations": [
           "72 St",
           "81 St-Museum of Natural History",
@@ -44,6 +52,130 @@
           "Cathedral Pkwy (110 St)",
           "116 St",
           "135 St",
+        ],
+      },
+    ],
+  },
+  {
+    "name": "A/C CPW Express, C/D Concourse",
+    "description": "A,C CPW express, B,D CPW local, D Concourse express, C Concourse local",
+    "category": "Columbus",
+    "overrides": [
+      {
+        "line": "8th Av - Fulton St",
+        "add": [
+          "D"
+        ],
+        "remove": [
+          "C"
+        ],
+        "stations": [
+          "72 St",
+          "81 St-Museum of Natural History",
+          "86 St",
+          "96 St",
+          "103 St",
+          "Cathedral Pkwy (110 St)",
+          "116 St",
+          "135 St",
+        ],
+      },
+      {
+        "line": "Concourse",
+        "add": [
+          "C"
+        ],
+        "remove": [
+          "B"
+        ],
+        "stations": [
+          "155 St",
+          "161 St-Yankee Stadium",
+          "167 St",
+          "170 St",
+          "174-175 Sts",
+          "Tremont Av",
+          "182-183 Sts",
+          "Fordham Rd",
+          "Kingsbridge Rd",
+          "Bedford Park Blvd",
+          "Norwood-205 St",
+        ],
+      },
+      {
+        "line": "8th Av - Fulton St",
+        "add": [
+          "B"
+        ],
+        "remove": [
+          "C"
+        ],
+        "stations": [
+          "155 St",
+          "163 St-Amsterdam Av",
+          "168 St-Washington Hts",
+        ],
+      },
+    ],
+  },
+  {
+    "name": "B/D CPW Express, C/D Concourse",
+    "description": "B,D CPW express, A,C CPW local, D Concourse express, C Concourse local",
+    "category": "Columbus",
+    "overrides": [
+      {
+        "line": "8th Av - Fulton St",
+        "add": [
+          "A"
+        ],
+        "remove": [
+          "B"
+        ],
+        "stations": [
+          "72 St",
+          "81 St-Museum of Natural History",
+          "86 St",
+          "96 St",
+          "103 St",
+          "Cathedral Pkwy (110 St)",
+          "116 St",
+          "135 St",
+        ],
+      },
+      {
+        "line": "Concourse",
+        "add": [
+          "C"
+        ],
+        "remove": [
+          "B"
+        ],
+        "stations": [
+          "155 St",
+          "161 St-Yankee Stadium",
+          "167 St",
+          "170 St",
+          "174-175 Sts",
+          "Tremont Av",
+          "182-183 Sts",
+          "Fordham Rd",
+          "Kingsbridge Rd",
+          "Bedford Park Blvd",
+          "Norwood-205 St",
+        ],
+      },
+      {
+        "line": "8th Av - Fulton St",
+        "add": [
+          "B"
+        ],
+        "remove": [
+          "C"
+        ],
+        "stations": [
+          "155 St",
+          "163 St-Amsterdam Av",
+          "168 St-Washington Hts",
         ],
       },
     ],
