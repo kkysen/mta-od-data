@@ -672,7 +672,7 @@ def deinterlining(
         ),
     ],
     scenario_files: Annotated[
-        list[Path],
+        list[Path] | None,
         Option(
             "--scenario-file",
             help=(
@@ -696,9 +696,9 @@ def deinterlining(
                 "current routes untouched. Trailing commas are tolerated."
             ),
         ),
-    ] = [],  # noqa: B006 -- never mutated; Typer replaces this with parsed CLI values
+    ] = None,
     scenario_names: Annotated[
-        list[str],
+        list[str] | None,
         Option(
             "--scenario",
             help=(
@@ -706,9 +706,9 @@ def deinterlining(
                 "Repeatable; combines with --scenario-file and --category."
             ),
         ),
-    ] = [],  # noqa: B006 -- never mutated; Typer replaces this with parsed CLI values
+    ] = None,
     categories: Annotated[
-        list[str],
+        list[str] | None,
         Option(
             "--category",
             help=(
@@ -718,7 +718,7 @@ def deinterlining(
                 "--scenario."
             ),
         ),
-    ] = [],  # noqa: B006 -- never mutated; Typer replaces this with parsed CLI values
+    ] = None,
     catalog: Annotated[
         Path,
         Option(
@@ -800,6 +800,10 @@ def deinterlining(
         mta-od-data analyze deinterlining --routes A,B,C,D \\
             --scenario-file scratch_scenario.json5
     """
+    scenario_files = scenario_files or []
+    scenario_names = scenario_names or []
+    categories = categories or []
+
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
     )
