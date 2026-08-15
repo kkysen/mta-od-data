@@ -131,26 +131,25 @@ class OverrideGroup(BaseModel):
 
 
 class ScenarioFile(BaseModel):
-    """One scenario in a scenario file's top-level JSON array (see
-    `SCENARIO_FILE_ADAPTER`). `name` is a short identifier, used for
-    dedup and as this scenario's CSV-suffix/label when several are
-    compared in one run; `description` defaults to `name` when omitted.
-    `category` groups related scenarios for `--category` -- the only way
-    to select a scenario besides always-included `"Current"`, so a
-    scenario without one is otherwise unreachable."""
+    """One scenario in a scenario file's top-level JSON object (see
+    `SCENARIO_FILE_ADAPTER`), grouped under its category's key rather than
+    carrying its own `category` field. `name` is a short identifier, used
+    for dedup and as this scenario's CSV-suffix/label when several are
+    compared in one run; `description` defaults to `name` when omitted."""
 
     model_config = ConfigDict(extra="forbid")
 
     name: str = Field(min_length=1)
     description: str | None = None
-    category: str | None = None
     overrides: list[OverrideGroup] = Field(default_factory=list)
 
 
-# The root of a scenario file: a JSON array of `ScenarioFile` entries.
+# The root of a scenario file: a JSON object mapping a category name to
+# the `ScenarioFile`s in it (e.g. `"Current"` to a single-entry list for
+# today's real routing) -- `--category` selects by this key directly.
 # Also what `scenarios.schema.json` is generated from -- see
 # `tests/test_scenarios_schema.py`.
-SCENARIO_FILE_ADAPTER = TypeAdapter(list[ScenarioFile])
+SCENARIO_FILE_ADAPTER = TypeAdapter(dict[str, list[ScenarioFile]])
 
 SCENARIOS_SCHEMA_FILE = (
     ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.schema.json"
@@ -203,9 +202,10 @@ def generate_scenario_schema(
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "title": "Deinterlining scenario file",
         "description": (
-            "A JSON array of deinterlining scenarios for `mta-od-data analyze "
-            "deinterlining` (--scenario-file, scenarios.json5 by default). "
-            "See OverrideGroup/ScenarioFile in deinterlining.py for the models "
+            "A JSON object mapping category name to the deinterlining "
+            "scenarios in it, for `mta-od-data analyze deinterlining` "
+            "(--scenario-file, scenarios.json5 by default). See "
+            "OverrideGroup/ScenarioFile in deinterlining.py for the models "
             "this is generated from."
         ),
         **SCENARIO_FILE_ADAPTER.json_schema(),
@@ -278,17 +278,17 @@ class Scenario:
     extending it.
 
     `name` is a short identifier (e.g. "A/C CPW Express"); `description`
-    is the longer explanatory text. `category` groups related scenarios
-    for `--category` (e.g. every Columbus Circle swap direction) -- the
-    only way to select a scenario besides always-included `"Current"`,
-    so a scenario without one is otherwise unreachable. `slug` names this
-    scenario's own suffixed CSV file when multiple scenarios are compared
-    in one run (see `suffixed_path`) -- derived from `name`, not a
-    separate thing to keep in sync."""
+    is the longer explanatory text. `category` is the scenario file key
+    this scenario was loaded from (e.g. "Columbus" for every Columbus
+    Circle swap direction) -- `--category` selects by it, the only way to
+    select a scenario besides always-included `"Current"`. `slug` names
+    this scenario's own suffixed CSV file when multiple scenarios are
+    compared in one run (see `suffixed_path`) -- derived from `name`, not
+    a separate thing to keep in sync."""
 
     name: str
     description: str
-    category: str | None
+    category: str
     slug: str
     # Keyed by `Station` itself, not `complex_id` -- `Station` is frozen
     # (so hashable) and every consumer here resolves stations from the
@@ -299,9 +299,10 @@ class Scenario:
 
     @classmethod
     def load_all(cls, path: Path, station_index: StationIndex) -> list[Scenario]:
-        """A scenario file holds a JSON array of scenario objects, not just
-        one -- `--scenario-file` (the catalog) defines several related
-        scenarios together."""
+        """A scenario file holds a JSON object of category name to the
+        `ScenarioFile`s in it, not just one -- `--scenario-file` (the
+        catalog) defines several related scenarios, across several
+        categories, together."""
         # JSON5 (a strict superset of JSON): tolerates a trailing comma
         # before a closing `}`/`]`, an easy slip when hand-editing scenario
         # files -- plain `json.loads` would reject it outright.
@@ -316,16 +317,24 @@ class Scenario:
         # to keep in sync with the schema (`scenarios.schema.json`, itself
         # generated from these same models).
         try:
-            entries = SCENARIO_FILE_ADAPTER.validate_python(data)
+            by_category = SCENARIO_FILE_ADAPTER.validate_python(data)
         except ValidationError as e:
             raise ScenarioError(
                 f"scenario file {path} doesn't match the expected shape:\n{e}"
             ) from e
-        return [cls._load_entry(entry, path, station_index) for entry in entries]
+        return [
+            cls._load_entry(entry, category, path, station_index)
+            for category, entries in by_category.items()
+            for entry in entries
+        ]
 
     @classmethod
     def _load_entry(
-        cls, entry: ScenarioFile, path: Path, station_index: StationIndex
+        cls,
+        entry: ScenarioFile,
+        category: str,
+        path: Path,
+        station_index: StationIndex,
     ) -> Scenario:
         overrides: dict[Station, RouteDelta] = {}
         for group in entry.overrides:
@@ -339,7 +348,7 @@ class Scenario:
         return cls(
             name=entry.name,
             description=entry.description or entry.name,
-            category=entry.category,
+            category=category,
             slug=slugify(entry.name),
             overrides=overrides,
         )
@@ -617,9 +626,7 @@ def resolve_scenarios(
     for category in categories:
         matches = [s for s in available if s.category == category]
         if not matches:
-            available_categories = sorted(
-                {s.category for s in available if s.category is not None}
-            )
+            available_categories = sorted({s.category for s in available})
             categories_str = ", ".join(available_categories) or "none"
             raise ScenarioError(
                 f"no scenarios in category {category!r} in {scenario_file} "
@@ -668,21 +675,21 @@ def deinterlining(
         Path,
         Option(
             help=(
-                "JSON file, a JSON array of {'name': str, 'description': str, "
-                "'category': str, 'overrides': [{'line': str, 'add': "
+                "JSON file, a JSON object of {category: [{'name': str, "
+                "'description': str, 'overrides': [{'line': str, 'add': "
                 "[route, ...], 'remove': [route, ...], 'stations': "
-                "[station_name, ...]}, ...]}. Each override group applies "
-                "the same add/remove to every listed station -- the usual "
-                "case, since a deinterlining change typically affects "
-                "several stations on one line the same way. 'line' (e.g. "
-                "'8th Av - Fulton St') is required on every group: besides "
-                "disambiguating a station_name shared by multiple complexes "
-                "elsewhere in the system, it states which physical line a "
-                "group applies to without cross-referencing station "
-                'reference data. Must have a "Current" entry (today\'s real '
-                "routing, no overrides), always included; --category "
-                "selects any others by category. Trailing commas are "
-                "tolerated."
+                "[station_name, ...]}, ...]}, ...]}. Each override group "
+                "applies the same add/remove to every listed station -- "
+                "the usual case, since a deinterlining change typically "
+                "affects several stations on one line the same way. "
+                "'line' (e.g. '8th Av - Fulton St') is required on every "
+                "group: besides disambiguating a station_name shared by "
+                "multiple complexes elsewhere in the system, it states "
+                "which physical line a group applies to without cross-"
+                "referencing station reference data. Must have a "
+                '"Current" key (today\'s real routing, no overrides), '
+                "always included; --category selects any others by that "
+                "top-level key. Trailing commas are tolerated."
             ),
         ),
     ] = SCENARIOS_FILE,

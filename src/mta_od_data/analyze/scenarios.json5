@@ -1,207 +1,209 @@
-[
-  {
-    "name": "Current",
-    "description": "Current routes today",
-    "category": "Current",
-    "overrides": [],
-  },
-  {
-    "name": "B/D 4 Av Express",
-    "description": "B,D 4 Av express, B Sea Beach, D West End, N Brighton express, Q Brighton local",
-    "category": "DeKalb",
-    "overrides": [
-      {
-        "line": "4th Av",
-        "add": [
-          "B"
-        ],
-        "remove": [
-          "N"
-        ],
-        "stations": [
-          "36 St",
-          "59 St",
-        ],
-      },
-      {
-        "line": "Sea Beach",
-        "add": [
-          "B"
-        ],
-        "remove": [
-          "N"
-        ],
-        "stations": [
-          "8 Av",
-          "Fort Hamilton Pkwy",
-          "New Utrecht Av",
-          "18 Av",
-          "20 Av",
-          "Bay Pkwy",
-          "Kings Hwy",
-          "Avenue U",
-          "86 St",
-        ],
-      },
-      {
-        "line": "Broadway - Brighton",
-        "add": [
-          "N"
-        ],
-        "remove": [
-          "B"
-        ],
-        "stations": [
-          "7 Av",
-          "Prospect Park",
-          "Church Av",
-          "Newkirk Plaza",
-          "Kings Hwy",
-          "Sheepshead Bay",
-          "Brighton Beach",
-        ],
-      },
-    ],
-  },
-  {
-    "name": "A/C CPW Express",
-    "description": "A,C CPW express, B,D CPW local",
-    "category": "Columbus",
-    "overrides": [
-      {
-        "line": "8th Av - Fulton St",
-        "add": [
-          "D"
-        ],
-        "remove": [
-          "C"
-        ],
-        "stations": [
-          "72 St",
-          "81 St-Museum of Natural History",
-          "86 St",
-          "96 St",
-          "103 St",
-          "Cathedral Pkwy (110 St)",
-          "116 St",
-          "135 St",
-        ],
-      },
-    ],
-  },
-  {
-    "name": "B/D CPW Express",
-    "description": "B,D CPW express, A,C CPW local",
-    "category": "Columbus",
-    "overrides": [
-      {
-        "line": "8th Av - Fulton St",
-        "add": [
-          "A"
-        ],
-        "remove": [
-          "B"
-        ],
-        "stations": [
-          "72 St",
-          "81 St-Museum of Natural History",
-          "86 St",
-          "96 St",
-          "103 St",
-          "Cathedral Pkwy (110 St)",
-          "116 St",
-          "135 St",
-        ],
-      },
-    ],
-  },
-  {
-    "name": "C/D Concourse",
-    "description": "A St Nicholas express, B St Nicholas local, C Concourse local, D Concourse express",
-    "category": "145 St",
-    "overrides": [
-      {
-        "line": "Concourse",
-        "add": [
-          "C"
-        ],
-        "remove": [
-          "B"
-        ],
-        "stations": [
-          "155 St",
-          "161 St-Yankee Stadium",
-          "167 St",
-          "170 St",
-          "174-175 Sts",
-          "Tremont Av",
-          "182-183 Sts",
-          "Fordham Rd",
-          "Kingsbridge Rd",
-          "Bedford Park Blvd",
-          "Norwood-205 St",
-        ],
-      },
-      {
-        "line": "8th Av - Fulton St",
-        "add": [
-          "B"
-        ],
-        "remove": [
-          "C"
-        ],
-        "stations": [
-          "155 St",
-          "163 St-Amsterdam Av",
-          "168 St",
-        ],
-      },
-    ]
-  },
-  {
-    "name": "A/B Concourse",
-    "description": "A Concourse express, B Concourse local, C St Nicholas local, D St Nicholas express",
-    "category": "145 St",
-    "overrides": [
-      {
-        "line": "Concourse",
-        "add": [
-          "A"
-        ],
-        "remove": [
-          "D"
-        ],
-        "stations": [
-          "155 St",
-          "161 St-Yankee Stadium",
-          "167 St",
-          "170 St",
-          "174-175 Sts",
-          "Tremont Av",
-          "182-183 Sts",
-          "Fordham Rd",
-          "Kingsbridge Rd",
-          "Bedford Park Blvd",
-          "Norwood-205 St",
-        ],
-      },
-      {
-        "line": "8th Av - Fulton St",
-        "add": [
-          "D"
-        ],
-        "remove": [
-          "A"
-        ],
-        "stations": [
-          "168 St",
-          "175 St",
-          "181 St",
-          "190 St",
-          "Dyckman St",
-          "Inwood-207 St",
-        ],
-      },
-    ]
-  },
-]
+{
+  "Current": [
+    {
+      "name": "Current",
+      "description": "Current routes today",
+      "overrides": [],
+    },
+  ],
+  "DeKalb": [
+    {
+      "name": "B/D 4 Av Express",
+      "description": "B,D 4 Av express, B Sea Beach, D West End, N Brighton express, Q Brighton local",
+      "overrides": [
+        {
+          "line": "4th Av",
+          "add": [
+            "B"
+          ],
+          "remove": [
+            "N"
+          ],
+          "stations": [
+            "36 St",
+            "59 St",
+          ],
+        },
+        {
+          "line": "Sea Beach",
+          "add": [
+            "B"
+          ],
+          "remove": [
+            "N"
+          ],
+          "stations": [
+            "8 Av",
+            "Fort Hamilton Pkwy",
+            "New Utrecht Av",
+            "18 Av",
+            "20 Av",
+            "Bay Pkwy",
+            "Kings Hwy",
+            "Avenue U",
+            "86 St",
+          ],
+        },
+        {
+          "line": "Broadway - Brighton",
+          "add": [
+            "N"
+          ],
+          "remove": [
+            "B"
+          ],
+          "stations": [
+            "7 Av",
+            "Prospect Park",
+            "Church Av",
+            "Newkirk Plaza",
+            "Kings Hwy",
+            "Sheepshead Bay",
+            "Brighton Beach",
+          ],
+        },
+      ],
+    },
+  ],
+  "Columbus": [
+    {
+      "name": "A/C CPW Express",
+      "description": "A,C CPW express, B,D CPW local",
+      "overrides": [
+        {
+          "line": "8th Av - Fulton St",
+          "add": [
+            "D"
+          ],
+          "remove": [
+            "C"
+          ],
+          "stations": [
+            "72 St",
+            "81 St-Museum of Natural History",
+            "86 St",
+            "96 St",
+            "103 St",
+            "Cathedral Pkwy (110 St)",
+            "116 St",
+            "135 St",
+          ],
+        },
+      ],
+    },
+    {
+      "name": "B/D CPW Express",
+      "description": "B,D CPW express, A,C CPW local",
+      "overrides": [
+        {
+          "line": "8th Av - Fulton St",
+          "add": [
+            "A"
+          ],
+          "remove": [
+            "B"
+          ],
+          "stations": [
+            "72 St",
+            "81 St-Museum of Natural History",
+            "86 St",
+            "96 St",
+            "103 St",
+            "Cathedral Pkwy (110 St)",
+            "116 St",
+            "135 St",
+          ],
+        },
+      ],
+    },
+  ],
+  "145 St": [
+    {
+      "name": "C/D Concourse",
+      "description": "A St Nicholas express, B St Nicholas local, C Concourse local, D Concourse express",
+      "overrides": [
+        {
+          "line": "Concourse",
+          "add": [
+            "C"
+          ],
+          "remove": [
+            "B"
+          ],
+          "stations": [
+            "155 St",
+            "161 St-Yankee Stadium",
+            "167 St",
+            "170 St",
+            "174-175 Sts",
+            "Tremont Av",
+            "182-183 Sts",
+            "Fordham Rd",
+            "Kingsbridge Rd",
+            "Bedford Park Blvd",
+            "Norwood-205 St",
+          ],
+        },
+        {
+          "line": "8th Av - Fulton St",
+          "add": [
+            "B"
+          ],
+          "remove": [
+            "C"
+          ],
+          "stations": [
+            "155 St",
+            "163 St-Amsterdam Av",
+            "168 St",
+          ],
+        },
+      ],
+    },
+    {
+      "name": "A/B Concourse",
+      "description": "A Concourse express, B Concourse local, C St Nicholas local, D St Nicholas express",
+      "overrides": [
+        {
+          "line": "Concourse",
+          "add": [
+            "A"
+          ],
+          "remove": [
+            "D"
+          ],
+          "stations": [
+            "155 St",
+            "161 St-Yankee Stadium",
+            "167 St",
+            "170 St",
+            "174-175 Sts",
+            "Tremont Av",
+            "182-183 Sts",
+            "Fordham Rd",
+            "Kingsbridge Rd",
+            "Bedford Park Blvd",
+            "Norwood-205 St",
+          ],
+        },
+        {
+          "line": "8th Av - Fulton St",
+          "add": [
+            "D"
+          ],
+          "remove": [
+            "A"
+          ],
+          "stations": [
+            "168 St",
+            "175 St",
+            "181 St",
+            "190 St",
+            "Dyckman St",
+            "Inwood-207 St",
+          ],
+        },
+      ],
+    },
+  ],
+}
