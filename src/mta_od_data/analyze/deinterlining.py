@@ -112,13 +112,15 @@ class RouteDelta:
     add: Routes
     remove: Routes
 
-    def combine(self, other: RouteDelta) -> RouteDelta:
+    def __or__(self, other: RouteDelta) -> RouteDelta:
         """Two deltas for the same station -- from two override groups in
         one `ScenarioEntry`, or two scenarios being combined -- union
         cleanly: `add`/`remove` are each just sets, so there's no real
         conflict to detect, even when one delta's `add` is another's
         `remove` (`effective_routes`' remove-before-add order already
-        means add wins for a single delta; unioning preserves that)."""
+        means add wins for a single delta; unioning preserves that).
+        `|`, not a named method, since it's exactly `add`/`remove` each
+        unioned with `|` in turn."""
         return RouteDelta(add=self.add | other.add, remove=self.remove | other.remove)
 
 
@@ -332,9 +334,7 @@ class Scenario:
             for station_name in group.stations:
                 station = station_index.resolve(station_name, group.line, path=path)
                 existing = overrides.get(station)
-                overrides[station] = (
-                    delta if existing is None else existing.combine(delta)
-                )
+                overrides[station] = delta if existing is None else existing | delta
         return cls(
             name=entry.name,
             description=entry.description or entry.name,
@@ -348,7 +348,7 @@ class Scenario:
         """Merges several scenarios -- one per category in a
         `resolve_scenarios` cartesian-product combination -- into one:
         `overrides` is their union (two scenarios touching the same
-        station combine via `RouteDelta.combine`, same as two override
+        station combine via `RouteDelta.__or__`, same as two override
         groups within one `ScenarioEntry`), `name`/`description`/
         `category` are each `" + "`-joined. A single-element `scenarios`
         is returned as-is, nothing to combine."""
@@ -358,9 +358,7 @@ class Scenario:
         for scenario in scenarios:
             for station, delta in scenario.overrides.items():
                 existing = overrides.get(station)
-                overrides[station] = (
-                    delta if existing is None else existing.combine(delta)
-                )
+                overrides[station] = delta if existing is None else existing | delta
         name = " + ".join(s.name for s in scenarios)
         return cls(
             name=name,
