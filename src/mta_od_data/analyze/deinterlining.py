@@ -112,6 +112,15 @@ class RouteDelta:
     add: Routes
     remove: Routes
 
+    def combine(self, other: RouteDelta) -> RouteDelta:
+        """Two deltas for the same station -- from two override groups in
+        one `ScenarioEntry`, or two scenarios being combined -- union
+        cleanly: `add`/`remove` are each just sets, so there's no real
+        conflict to detect, even when one delta's `add` is another's
+        `remove` (`effective_routes`' remove-before-add order already
+        means add wins for a single delta; unioning preserves that)."""
+        return RouteDelta(add=self.add | other.add, remove=self.remove | other.remove)
+
 
 class OverrideGroup(BaseModel):
     """One override group in a scenario file's `overrides` array: an
@@ -322,7 +331,10 @@ class Scenario:
             delta = RouteDelta(add=add, remove=remove)
             for station_name in group.stations:
                 station = station_index.resolve(station_name, group.line, path=path)
-                overrides[station] = delta
+                existing = overrides.get(station)
+                overrides[station] = (
+                    delta if existing is None else existing.combine(delta)
+                )
         return cls(
             name=entry.name,
             description=entry.description or entry.name,
@@ -335,23 +347,20 @@ class Scenario:
     def combine(cls, scenarios: list[Scenario]) -> Scenario:
         """Merges several scenarios -- one per category in a
         `resolve_scenarios` cartesian-product combination -- into one:
-        `overrides` is their union, `name`/`description`/`category` are
-        each `" + "`-joined. Raises `ScenarioError` if two scenarios
-        disagree about the same station (a real conflict, not just both
-        touching it the same way). A single-element `scenarios` is
-        returned as-is, nothing to combine."""
+        `overrides` is their union (two scenarios touching the same
+        station combine via `RouteDelta.combine`, same as two override
+        groups within one `ScenarioEntry`), `name`/`description`/
+        `category` are each `" + "`-joined. A single-element `scenarios`
+        is returned as-is, nothing to combine."""
         if len(scenarios) == 1:
             return scenarios[0]
         overrides: dict[Station, RouteDelta] = {}
         for scenario in scenarios:
             for station, delta in scenario.overrides.items():
                 existing = overrides.get(station)
-                if existing is not None and existing != delta:
-                    raise ScenarioError(
-                        f"can't combine {[s.name for s in scenarios]}: "
-                        f"conflicting overrides for {station.display()}"
-                    )
-                overrides[station] = delta
+                overrides[station] = (
+                    delta if existing is None else existing.combine(delta)
+                )
         name = " + ".join(s.name for s in scenarios)
         return cls(
             name=name,
