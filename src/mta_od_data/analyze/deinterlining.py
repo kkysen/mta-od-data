@@ -37,7 +37,7 @@ from dataclasses import asdict, dataclass, fields
 from datetime import date
 from functools import cache
 from pathlib import Path
-from typing import Annotated, Any, Self
+from typing import Annotated, Any
 
 import duckdb
 import json5
@@ -539,7 +539,7 @@ class ScenarioFile:
             ],
         )
 
-    def filter(self, categories: frozenset[str]) -> Self:
+    def filter(self, categories: frozenset[str]) -> ScenarioFile:
         by_name = {c.name: c for c in self.categories}
         missing = categories - by_name.keys()
         if missing:
@@ -548,7 +548,7 @@ class ScenarioFile:
                 f"unknown categories {sorted(missing)!r} in {self.path} "
                 f"(available: {available})"
             )
-        return type(self)(
+        return ScenarioFile(
             path=self.path,
             categories=[c for c in self.categories if c.name in categories],
         )
