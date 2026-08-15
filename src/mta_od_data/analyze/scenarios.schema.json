@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Deinterlining scenario file",
-  "description": "A JSON object mapping category name to the deinterlining scenarios in it, for `mta-od-data analyze deinterlining` (--scenario-file, scenarios.json5 by default). See OverrideGroup/ScenarioFile in deinterlining.py for the models this is generated from.",
+  "description": "A JSON object mapping category name to the deinterlining scenarios in it, for `mta-od-data analyze deinterlining` (--scenario-file, scenarios.json5 by default). See OverrideGroup/ScenarioEntry in deinterlining.py for the models this is generated from.",
   "$defs": {
     "OverrideGroup": {
       "additionalProperties": false,
@@ -509,7 +509,7 @@
       "title": "OverrideGroup",
       "type": "object"
     },
-    "ScenarioFile": {
+    "ScenarioEntry": {
       "additionalProperties": false,
       "description": "One scenario in a scenario file's top-level JSON object (see\n`SCENARIO_FILE_ADAPTER`), grouped under its category's key rather than\ncarrying its own `category` field. `name` is a short identifier, used\nfor dedup and as this scenario's CSV-suffix/label when several are\ncompared in one run; `description` defaults to `name` when omitted.",
       "properties": {
@@ -541,13 +541,13 @@
       "required": [
         "name"
       ],
-      "title": "ScenarioFile",
+      "title": "ScenarioEntry",
       "type": "object"
     }
   },
   "additionalProperties": {
     "items": {
-      "$ref": "#/$defs/ScenarioFile"
+      "$ref": "#/$defs/ScenarioEntry"
     },
     "type": "array"
   },

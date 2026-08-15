@@ -130,7 +130,7 @@ class OverrideGroup(BaseModel):
     stations: list[str] = Field(min_length=1)
 
 
-class ScenarioFile(BaseModel):
+class ScenarioEntry(BaseModel):
     """One scenario in a scenario file's top-level JSON object (see
     `SCENARIO_FILE_ADAPTER`), grouped under its category's key rather than
     carrying its own `category` field. `name` is a short identifier, used
@@ -145,11 +145,11 @@ class ScenarioFile(BaseModel):
 
 
 # The root of a scenario file: a JSON object mapping a category name to
-# the `ScenarioFile`s in it (e.g. `"Current"` to a single-entry list for
+# the `ScenarioEntry`s in it (e.g. `"Current"` to a single-entry list for
 # today's real routing) -- `--category` selects by this key directly.
 # Also what `scenarios.schema.json` is generated from -- see
 # `tests/test_scenarios_schema.py`.
-SCENARIO_FILE_ADAPTER = TypeAdapter(dict[str, list[ScenarioFile]])
+SCENARIO_FILE_ADAPTER = TypeAdapter(dict[str, list[ScenarioEntry]])
 
 SCENARIOS_SCHEMA_FILE = (
     ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.schema.json"
@@ -162,14 +162,14 @@ def generate_scenario_schema(
     individual_stations_path: Path = DATA / "stations_individual.csv",
 ) -> str:
     """The JSON Schema for a scenario file, generated from
-    `SCENARIO_FILE_ADAPTER` (i.e. from `OverrideGroup`/`ScenarioFile`
+    `SCENARIO_FILE_ADAPTER` (i.e. from `OverrideGroup`/`ScenarioEntry`
     directly) plus the top-level metadata a standalone schema file needs
     (`$schema`, `title`), plus real `line`/`stations`/`add`/`remove`
     values from the station reference data as JSON Schema `enum`s -- an
     editor can then autocomplete (and flag a typo in) an actual line,
     station name, or route directly while editing a scenario file,
     without cross-referencing the CSVs by hand. These `enum`s are an
-    editor-time snapshot only: `OverrideGroup`/`ScenarioFile` themselves
+    editor-time snapshot only: `OverrideGroup`/`ScenarioEntry` themselves
     stay plain `str`, so a real load still goes through
     `StationIndex.resolve`/`check_routes`'s own runtime checks (against
     whichever `--stations`/`--stations-individual` was actually passed,
@@ -205,7 +205,7 @@ def generate_scenario_schema(
             "A JSON object mapping category name to the deinterlining "
             "scenarios in it, for `mta-od-data analyze deinterlining` "
             "(--scenario-file, scenarios.json5 by default). See "
-            "OverrideGroup/ScenarioFile in deinterlining.py for the models "
+            "OverrideGroup/ScenarioEntry in deinterlining.py for the models "
             "this is generated from."
         ),
         **SCENARIO_FILE_ADAPTER.json_schema(),
@@ -300,7 +300,7 @@ class Scenario:
     @classmethod
     def load_all(cls, path: Path, station_index: StationIndex) -> list[Scenario]:
         """A scenario file holds a JSON object of category name to the
-        `ScenarioFile`s in it, not just one -- `--scenario-file` (the
+        `ScenarioEntry`s in it, not just one -- `--scenario-file` (the
         catalog) defines several related scenarios, across several
         categories, together."""
         # JSON5 (a strict superset of JSON): tolerates a trailing comma
@@ -310,7 +310,7 @@ class Scenario:
             data = json5.loads(path.read_text())
         except ValueError as e:
             raise ScenarioError(f"scenario file {path} isn't valid JSON: {e}") from e
-        # `ScenarioFile`/`OverrideGroup` (both `pydantic.BaseModel`s) own
+        # `ScenarioEntry`/`OverrideGroup` (both `pydantic.BaseModel`s) own
         # the shape validation here -- a required field missing, an unknown
         # field (`extra="forbid"`), or a wrong type all become one
         # `ValidationError`, so there's no manual field-by-field checking
@@ -331,7 +331,7 @@ class Scenario:
     @classmethod
     def _load_entry(
         cls,
-        entry: ScenarioFile,
+        entry: ScenarioEntry,
         category: str,
         path: Path,
         station_index: StationIndex,
