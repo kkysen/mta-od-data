@@ -106,8 +106,8 @@ class RouteDelta:
     add/remove pair rather than a full replacement list -- so a scenario
     author only has to say what actually changes (e.g. "the B stops
     running here"), not re-derive and spell out every route that's
-    unaffected. `effective_routes` applies `remove` before `add`, so
-    listing a route in both is equivalent to just `add`."""
+    unaffected. `apply` applies `remove` before `add`, so listing a route
+    in both is equivalent to just `add`."""
 
     add: Routes
     remove: Routes
@@ -117,11 +117,14 @@ class RouteDelta:
         one `ScenarioEntry`, or two scenarios being combined -- union
         cleanly: `add`/`remove` are each just sets, so there's no real
         conflict to detect, even when one delta's `add` is another's
-        `remove` (`effective_routes`' remove-before-add order already
-        means add wins for a single delta; unioning preserves that).
-        `|`, not a named method, since it's exactly `add`/`remove` each
-        unioned with `|` in turn."""
+        `remove` (`apply`'s remove-before-add order already means add
+        wins for a single delta; unioning preserves that). `|`, not a
+        named method, since it's exactly `add`/`remove` each unioned with
+        `|` in turn."""
         return RouteDelta(add=self.add | other.add, remove=self.remove | other.remove)
+
+    def apply(self, station: Station) -> Routes:
+        return (station.routes - self.remove) | self.add
 
 
 class OverrideGroup(BaseModel):
@@ -291,11 +294,9 @@ class StationIndex:
 @dataclass(slots=True, frozen=True)
 class Scenario:
     """A deinterlining scenario: real routes overridden only for the
-    specific stations it actually changes. `effective_routes` falls back
-    to a station's real current routes for every complex ID absent from
-    `overrides` -- see `deinterlining_design.md` for why this replaces
-    `one_seat_rides.py`'s corridor-A/corridor-B machinery instead of
-    extending it.
+    specific stations it actually changes -- see `deinterlining_design.md`
+    for why this replaces `one_seat_rides.py`'s corridor-A/corridor-B
+    machinery instead of extending it.
 
     `name` is a short identifier (e.g. "A/C CPW Express"); `description`
     is the longer explanatory text. `category` is the scenario file key
@@ -311,11 +312,19 @@ class Scenario:
     category: str
     slug: str
     # Keyed by `Station` itself, not `complex_id` -- `Station` is frozen
-    # (so hashable) and every consumer here resolves stations from the
-    # same `stations_by_id` loaded once per invocation, so `effective_routes`
-    # can look a station up directly instead of needing an indirection
-    # through its id.
+    # (so hashable), letting every consumer here look a station up
+    # directly instead of needing an indirection through its id.
     overrides: dict[Station, RouteDelta]
+    # A station absent from `overrides` (the overwhelming majority of
+    # them) has no entry here either -- callers fall back to the
+    # station's own real `routes` themselves
+    # (`effective_routes.get(station, station.routes)`), rather than this
+    # dict carrying a redundant real-routes entry for every unaffected
+    # station. Computed once in `load`/`combine`, from `overrides` alone
+    # -- no station population (e.g. `stations_by_id`) needed. Replaces
+    # what used to be a same-named `effective_routes(station)` method
+    # recomputing this on every call.
+    effective_routes: dict[Station, Routes]
 
     @classmethod
     def load(
@@ -341,6 +350,9 @@ class Scenario:
             category=category,
             slug=slugify(entry.name),
             overrides=overrides,
+            effective_routes={
+                station: delta.apply(station) for station, delta in overrides.items()
+            },
         )
 
     @classmethod
@@ -366,13 +378,10 @@ class Scenario:
             category=" + ".join(s.category for s in scenarios),
             slug=slugify(name),
             overrides=overrides,
+            effective_routes={
+                station: delta.apply(station) for station, delta in overrides.items()
+            },
         )
-
-    def effective_routes(self, station: Station) -> Routes:
-        delta = self.overrides.get(station)
-        if delta is None:
-            return station.routes
-        return (station.routes - delta.remove) | delta.add
 
     def classify(
         self,
@@ -399,8 +408,14 @@ class Scenario:
                     "`mta-od-data prepare --force-stations`"
                 )
 
-            effective_origin_routes = self.effective_routes(origin) & routes_set
-            effective_dest_routes = self.effective_routes(dest) & routes_set
+            effective_origin_routes = (
+                self.effective_routes.get(origin, origin.routes) & routes_set
+            )
+            effective_dest_routes = (
+                self.effective_routes.get(dest, dest.routes) & routes_set
+            )
+            origin_name = origin.display(effective_origin_routes)
+            dest_name = dest.display(effective_dest_routes)
             one_seat = bool(effective_origin_routes & effective_dest_routes)
 
             total_riders += riders
@@ -422,9 +437,9 @@ class Scenario:
             rows.append(
                 ODPair(
                     origin_id=origin_id,
-                    origin_name=origin.display(effective_origin_routes),
+                    origin_name=origin_name,
                     dest_id=dest_id,
-                    dest_name=dest.display(effective_dest_routes),
+                    dest_name=dest_name,
                     riders=riders,
                     one_seat=one_seat,
                     close=close,
@@ -908,7 +923,7 @@ def deinterlining(
     origin_ids = [
         s.complex_id
         for s in stations_by_id.values()
-        if any(sc.effective_routes(s) & routes_set for sc in scenarios)
+        if any(sc.effective_routes.get(s, s.routes) & routes_set for sc in scenarios)
     ]
     print(f"Origin stations in scope: {len(origin_ids):,} of {len(stations_by_id):,}")
 
