@@ -189,7 +189,16 @@ def generate_scenario_schema(
     stations_by_id = Station.load_complexes(stations_path)
     individual_stations = Station.load_individuals(individual_stations_path)
     known_lines = sorted({s.line for s in individual_stations if s.line})
-    known_stations = sorted({s.name for s in stations_by_id.values()})
+    # A `stations` entry resolves against a complex's own name with no
+    # `line` (`StationIndex.by_name`), or an individual platform's own
+    # name with `line` (`by_name_line`) -- distinct sets for a complex
+    # that merges several differently-named platforms (e.g. "62 St/New
+    # Utrecht Av" merges "62 St" and "New Utrecht Av"), so both belong in
+    # the enum, not just the complex-level name.
+    known_stations = sorted(
+        {s.name for s in stations_by_id.values()}
+        | {s.name for s in individual_stations}
+    )
     known_routes = sorted({r for s in stations_by_id.values() for r in s.routes})
 
     schema: dict[str, Any] = {
