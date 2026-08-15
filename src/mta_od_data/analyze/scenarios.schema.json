@@ -524,7 +524,7 @@
     },
     "ScenarioFile": {
       "additionalProperties": false,
-      "description": "One scenario in a scenario file's top-level JSON array (see\n`SCENARIO_FILE_ADAPTER`). `name` is the short, exact-match identifier\n`--scenario` selects by; `description` defaults to `name` when\nomitted. `category` groups related scenarios for `--category` -- omit\nit for a scenario that doesn't belong to one (as `\"Current\"` does).",
+      "description": "One scenario in a scenario file's top-level JSON array (see\n`SCENARIO_FILE_ADAPTER`). `name` is a short identifier, used for\ndedup and as this scenario's CSV-suffix/label when several are\ncompared in one run; `description` defaults to `name` when omitted.\n`category` groups related scenarios for `--category` -- the only way\nto select a scenario besides always-included `\"Current\"`, so a\nscenario without one is otherwise unreachable.",
       "properties": {
         "name": {
           "minLength": 1,
