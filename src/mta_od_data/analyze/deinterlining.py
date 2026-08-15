@@ -307,7 +307,7 @@ class Scenario:
     overrides: dict[Station, RouteDelta]
 
     @classmethod
-    def _load_entry(
+    def load(
         cls,
         entry: ScenarioEntry,
         category: str,
@@ -465,6 +465,21 @@ class ScenarioCategory:
     name: str
     scenarios: list[Scenario]
 
+    @classmethod
+    def load(
+        cls,
+        name: str,
+        entries: list[ScenarioEntry],
+        path: Path,
+        station_index: StationIndex,
+    ) -> ScenarioCategory:
+        return cls(
+            name=name,
+            scenarios=[
+                Scenario.load(entry, name, path, station_index) for entry in entries
+            ],
+        )
+
 
 @dataclass(slots=True, frozen=True)
 class ScenarioFile:
@@ -512,13 +527,7 @@ class ScenarioFile:
         return cls(
             path=path,
             categories=[
-                ScenarioCategory(
-                    name=category,
-                    scenarios=[
-                        Scenario._load_entry(entry, category, path, station_index)
-                        for entry in entries
-                    ],
-                )
+                ScenarioCategory.load(category, entries, path, station_index)
                 for category, entries in by_category.items()
             ],
         )
