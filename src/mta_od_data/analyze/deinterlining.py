@@ -480,9 +480,10 @@ class ScenarioCategory:
     top-level JSON object (e.g. "DeKalb", grouping its swap-direction
     scenarios) -- one element of `ScenarioFile.categories`. Selecting more
     than one category at once takes the cartesian product of their
-    `scenarios` (one scenario per selected category per combination),
-    each combination merged into a single scenario by `Scenario.combine`
-    -- see `ScenarioFile.combine_scenarios`."""
+    `scenarios` (one scenario per selected category per combination,
+    "unchanged" -- the `"Current"` category -- being one of the options
+    for every category), each combination merged into a single scenario
+    by `Scenario.combine` -- see `ScenarioFile.combine_scenarios`."""
 
     name: str
     scenarios: list[Scenario]
@@ -511,12 +512,11 @@ class ScenarioFile:
     `ScenarioError` for any that don't exist), preserving `categories`'
     own order rather than the order they were requested in.
     `combine_scenarios` takes the cartesian product of `categories`'
-    `scenarios` and merges each combination via `Scenario.combine` -- a
-    single filtered-down category's own scenarios come back unchanged,
-    since there's nothing to combine them with. `resolve_scenarios`
-    composes these: `"Current"` always included as-is (`filter` to just
-    it, then `combine_scenarios`, which is a no-op for one category), plus
-    every `--category` selection combined together the same way."""
+    `scenarios` (plus the baseline it's passed, as an option for every
+    category) and merges each combination via `Scenario.combine`.
+    `resolve_scenarios` composes these: `filter` to `"Current"` alone for
+    the baseline, then `filter` to the `--category` selection and combine
+    it against that baseline."""
 
     path: Path
     categories: list[ScenarioCategory]
@@ -568,12 +568,23 @@ class ScenarioFile:
             categories=[c for c in self.categories if c.name in categories],
         )
 
-    def combine_scenarios(self) -> list[Scenario]:
+    def combine_scenarios(self, baseline: list[Scenario]) -> list[Scenario]:
+        """`baseline` (the `"Current"` category's scenarios) joins *every*
+        category's own options, rather than standing alone as one more
+        combination: leaving a category unchanged is itself one of the
+        choices for it, so selecting two categories with two scenarios
+        each yields nine combinations (three options per category), not
+        four -- each category's scenarios on their own (the other left at
+        today's routing) included, not just every proposal paired with
+        another proposal. Pass `[]` for a selection that is already the
+        baseline itself, where there's nothing to leave unchanged."""
         if not self.categories:
             return []
         return [
             Scenario.combine(list(combo))
-            for combo in itertools.product(*(c.scenarios for c in self.categories))
+            for combo in itertools.product(
+                *([*baseline, *c.scenarios] for c in self.categories)
+            )
         ]
 
 
@@ -736,14 +747,16 @@ def resolve_scenarios(
     scenario_file: Path,
     station_index: StationIndex,
 ) -> list[Scenario]:
-    """Every scenario in `--scenario-file`'s `"Current"` category (today's
-    real routing, always included as-is, never combined with anything),
-    plus one combined scenario per element of the cartesian product of
-    every `--category`-selected category's scenarios (`Scenario.combine`,
-    via `ScenarioFile.filter`/`combine_scenarios`) -- e.g. two categories
-    with two scenarios each select four combined scenarios, one per
-    pairing. A single selected category just yields its scenarios
-    unchanged (nothing to combine). Raises `ScenarioError` (not
+    """One combined scenario per element of the cartesian product of every
+    `--category`-selected category's scenarios *plus* `--scenario-file`'s
+    `"Current"` category (today's real routing, i.e. the option of leaving
+    that category unchanged) -- `Scenario.combine`, via
+    `ScenarioFile.filter`/`combine_scenarios`. So two categories with two
+    scenarios each select nine combined scenarios: every pairing, each
+    category's scenarios on their own, and `"Current"` throughout as the
+    baseline. A single selected category just yields `"Current"` plus its
+    own scenarios, nothing to combine. With no `--category` at all, only
+    `"Current"` itself. Raises `ScenarioError` (not
     `SystemExit`) for a missing/malformed `--scenario-file`, one with no
     `"Current"` category, an unknown `--category`, or a combination with
     conflicting overrides; only `deinterlining()` itself exits."""
@@ -752,10 +765,10 @@ def resolve_scenarios(
     except FileNotFoundError as e:
         raise ScenarioError(f"missing required scenario file {scenario_file}") from e
 
-    scenarios = file.filter(frozenset({"Current"})).combine_scenarios()
-    if categories:
-        scenarios += file.filter(frozenset(categories)).combine_scenarios()
-    return scenarios
+    current = file.filter(frozenset({"Current"})).combine_scenarios([])
+    if not categories:
+        return current
+    return file.filter(frozenset(categories)).combine_scenarios(current)
 
 
 @app.command()
@@ -783,9 +796,11 @@ def deinterlining(
                 'scenarios besides always-included "Current". Repeatable: '
                 "with two or more, every scenario in each selected "
                 "category is combined with one from every other (their "
-                "overrides unioned) into every possible pairing, so two "
-                "categories with two scenarios each run four combined "
-                "scenarios, not just each category's own two."
+                "overrides unioned), leaving a category unchanged being "
+                "one of the options for it, so two categories with two "
+                "scenarios each run nine combined scenarios -- every "
+                "pairing, each category's two on their own, and today's "
+                "routing throughout."
             ),
         ),
     ] = None,
