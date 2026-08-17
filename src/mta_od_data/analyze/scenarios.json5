@@ -3,6 +3,13 @@
     {
       "name": "B/D 4 Av Express",
       "description": "B,D 4 Av express, B Sea Beach, D West End, N Brighton express, Q Brighton local",
+      "routes": [
+        "B",
+        "D",
+        "N",
+        "Q",
+        "R",
+      ],
       "overrides": [
         {
           "line": "4th Av",
@@ -62,6 +69,12 @@
     {
       "name": "A/C CPW Express",
       "description": "A,C CPW express, B,D CPW local",
+      "routes": [
+        "A",
+        "B",
+        "C",
+        "D",
+      ],
       "overrides": [
         {
           "line": "8th Av - Fulton St",
@@ -87,6 +100,12 @@
     {
       "name": "B/D CPW Express",
       "description": "B,D CPW express, A,C CPW local",
+      "routes": [
+        "A",
+        "B",
+        "C",
+        "D",
+      ],
       "overrides": [
         {
           "line": "8th Av - Fulton St",
@@ -114,6 +133,12 @@
     {
       "name": "C/D Concourse",
       "description": "A St Nicholas express, B St Nicholas local, C Concourse local, D Concourse express",
+      "routes": [
+        "A",
+        "B",
+        "C",
+        "D",
+      ],
       "overrides": [
         {
           "line": "Concourse",
@@ -156,6 +181,12 @@
     {
       "name": "A/B Concourse",
       "description": "A Concourse express, B Concourse local, C St Nicholas local, D St Nicholas express",
+      "routes": [
+        "A",
+        "B",
+        "C",
+        "D",
+      ],
       "overrides": [
         {
           "line": "Concourse",
