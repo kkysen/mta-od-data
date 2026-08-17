@@ -1,0 +1,21 @@
+{
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit"
+        }
+    },
+    "ruff.importStrategy": "fromEnvironment",
+    "files.associations": {
+        "**/*.json5": "jsonc"
+    },
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "/src/mta_od_data/analyze/scenarios.json5",
+            ],
+            "url": "./src/mta_od_data/analyze/scenarios.schema.json"
+        }
+    ]
+}
