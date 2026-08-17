@@ -25,8 +25,8 @@ app = Typer()
 def prefer_primary(
     routes: frozenset[str], primary_routes: frozenset[str]
 ) -> frozenset[str]:
-    """A rider with the choice takes the express, so a merely-present
-    local isn't worth listing alongside it."""
+    """A rider with the choice takes the express,
+    so a merely-present local isn't worth listing alongside it."""
     return (routes & primary_routes) or routes
 
 
@@ -51,8 +51,8 @@ class DestStats:
     name: str
     total: float = 0.0
     one_seat: float = 0.0
-    # Only `xfer` rows carry a close/dist signal, `1-seat` rows being 0m
-    # by construction.
+    # Only `xfer` rows carry a close/dist signal,
+    # `1-seat` rows being 0m by construction.
     many_seat_classified: float = 0.0
     many_seat_close: float = 0.0
     many_seat_dist_weighted: float = 0.0
@@ -102,8 +102,8 @@ class ScenarioResult:
 
     @property
     def close_one_seat_pct(self) -> float:
-        """Of the riders without a direct one-seat ride, not of total
-        ridership."""
+        """Of the riders without a direct one-seat ride,
+        not of total ridership."""
         return (
             100 * self.close_one_seat_riders / self.classified_many_seat_riders
             if self.classified_many_seat_riders
@@ -202,8 +202,9 @@ class ScenarioResult:
             lines.append(self.corridor_scenario_note)
             lines.append("")
 
-        # These are the comparison table's own columns, so they'd just be
-        # repeated under every section when that table is present.
+        # These are the comparison table's own columns,
+        # so they'd just be repeated under every section
+        # when that table is present.
         headline: list[str] = []
         if not show_label:
             headline.append(
@@ -230,8 +231,8 @@ class ScenarioResult:
                 f"without a direct one-seat ride {scope_note}"
                 f"({self.close_one_seat_riders:,.0f} of "
                 f"{self.classified_many_seat_riders:,.0f}) are within "
-                f"{close_threshold_m:.0f}m of a station on {own_routes_desc} -- "
-                f"i.e. no train change, just a short walk at the end to reach "
+                f"{close_threshold_m:.0f}m of a station on {own_routes_desc}: "
+                f"no train change, just a short walk at the end to reach "
                 f"their actual destination."
             )
         if not show_label and self.total_riders:
@@ -242,8 +243,8 @@ class ScenarioResult:
             headline.append(
                 f"- **Effective one-seat rides (direct + close): "
                 f"{effective_pct:.1f}%** ({self.effective_one_seat_riders:,.0f}/"
-                f"{day_type_label}) -- direct one-seat riders plus the close one-seat "
-                f"riders above, i.e. riders who wouldn't feel a materially worse "
+                f"{day_type_label}), direct one-seat riders plus the close "
+                f"one-seat riders above, i.e. riders who wouldn't feel a worse "
                 f"trip{scenario_note}."
             )
         if headline:
@@ -349,16 +350,21 @@ def classify_one_seat(
     primary_routes: frozenset[str],
     origin_reachable_primary_routes: frozenset[str],
 ) -> tuple[bool, frozenset[str]]:
-    """A trip is one-seat if some shared route actually crosses the boundary
-    junction (a primary route), or if no primary route the origin could
-    actually reach without a transfer (its own physical line's express
-    partners, e.g. D/N for an R rider) serves the destination either --
-    riding the non-primary connection (e.g. R) the whole way isn't standing
-    in for a junction crossing that never really happens, since switching to
-    the assumed express and back wouldn't have been faster. A primary route
-    that serves the destination only via some *other* transfer doesn't
-    count: e.g. DeKalb Av (B,Q,R) has no D/N, so an R-only origin has no
-    real express alternative there, and this is one-seat via R."""
+    """A trip is one-seat if some shared route
+    actually crosses the boundary junction (a primary route),
+    or if no primary route the origin could actually reach without a
+    transfer (its own physical line's express partners,
+    e.g. D/N for an R rider) serves the destination either:
+    riding the non-primary connection (e.g. R) the whole way
+    isn't standing in for a junction crossing that never really happens,
+    since switching to the assumed express and back
+    wouldn't have been faster.
+
+    A primary route that serves the destination
+    only via some *other* transfer doesn't count:
+    DeKalb Av (B,Q,R) has no D/N,
+    so an R-only origin has no real express alternative there,
+    and this is one-seat via R."""
     shared = origin_routes & dest_routes & routes
     is_one_seat = bool(shared) and (
         bool(shared & primary_routes)
@@ -412,10 +418,12 @@ def run_scenario(
     corridor_scenario_active: bool,
     verbose: bool,
 ) -> ScenarioResult:
-    # A scenario reassigns only the primary routes, the ones that
-    # actually interline at the junction: deinterlining can't move a route
-    # that never used it (e.g. R, which never crosses DeKalb), and a
-    # station touching both corridors keeps access to both assignments.
+    # A scenario reassigns only the primary routes,
+    # the ones that actually interline at the junction:
+    # deinterlining can't move a route that never used it
+    # (e.g. R, which never crosses DeKalb),
+    # and a station touching both corridors keeps access to both
+    # assignments.
     effective_origin_routes: dict[int, frozenset[str]] = {}
     if verbose:
         print(f"\nCorridor assignment (scenario active: {corridor_scenario_active}):")
@@ -479,23 +487,24 @@ def run_scenario(
         xfer_applicable_routes: frozenset[str] | None = None
         if not is_one_seat:
             # How far a rider without a one-seat ride would have to walk
-            # to reach their own corridor's routes. Close enough, and
-            # that's a "close one-seat ride" -- get off a short walk away,
-            # no train change -- rather than a transfer.
+            # to reach their own corridor's routes.
+            # Close enough, and that's a "close one-seat ride"
+            # (get off a short walk away, no train change)
+            # rather than a transfer.
             dist_m, near_station = min_dist_to_corridor(
                 dest,
-                # Unscoped, a station's unrelated service (e.g. F/G
-                # alongside its R) would credit "close" via a line that has
-                # nothing to do with the junction being analyzed.
+                # Unscoped, a station's unrelated service
+                # (e.g. F/G alongside its R) would credit "close"
+                # via a line unrelated to the junction being analyzed.
                 effective_origin_routes[origin_id] & routes_set,
             )
             close = dist_m <= close_threshold_m
             if dist_m == 0.0:
-                # The origin's own corridor stops right here, so the
-                # rider is exiting rather than changing platforms. A rider
-                # with an express option on their own line (e.g. R's 4th Av
-                # line also carries D and N) is assumed to have ridden that
-                # instead, being faster.
+                # The origin's own corridor stops right here,
+                # so the rider is exiting rather than changing platforms.
+                # A rider with an express option on their own line
+                # (e.g. R's 4th Av line also carries D and N)
+                # is assumed to have ridden that instead, being faster.
                 xfer_applicable_routes = (
                     origin_express_partners.get(origin_id, frozenset()) & dest_routes
                 )
@@ -504,16 +513,16 @@ def run_scenario(
                 close_one_seat_riders += riders
         else:
             # A one-seat ride's own route already stops somewhere in
-            # this complex, so there's no walk to model -- and no way to
-            # tell which platform of a merged complex a rider used anyway,
-            # the source data being per-complex.
+            # this complex, so there's no walk to model,
+            # and no way to tell which platform of a merged complex
+            # a rider used anyway, the source data being per-complex.
             close, dist_m = True, 0.0
 
         if is_one_seat:
-            # The routes actually ridden pin down which platform of a
-            # merged complex the rider lands on, at both ends. An `xfer`
-            # ride's arrival route isn't in the data at all, so it
-            # contributes nothing here rather than its full list.
+            # The routes actually ridden pin down which platform
+            # of a merged complex the rider lands on, at both ends.
+            # An `xfer` ride's arrival route isn't in the data at all,
+            # so it contributes nothing here rather than its full list.
             ridden_routes = prefer_primary(shared, primary_routes_set)
             dest_route_union.setdefault(dest_id, set()).update(ridden_routes)
             dest_name = dest.display(ridden_routes)
@@ -526,9 +535,10 @@ def run_scenario(
             )
         else:
             # A real transfer, to whichever of the destination's own
-            # in-scope routes. None of them can be ones the origin's
-            # corridor already has -- that would have made this a `1-seat`
-            # row -- so this is "the other corridor" without computing it.
+            # in-scope routes.
+            # None of them can be ones the origin's corridor already has,
+            # which would have made this a `1-seat` row,
+            # so this is "the other corridor" without computing it.
             dest_name = dest.display(
                 prefer_primary(dest.routes & routes_set, primary_routes_set)
             )
@@ -557,8 +567,8 @@ def run_scenario(
             )
         )
 
-    # Only meaningful under a corridor scenario: `close_one_seat_riders`
-    # is 0 in baseline mode.
+    # Only meaningful under a corridor scenario:
+    # `close_one_seat_riders` is 0 in baseline mode.
     effective_one_seat_riders = one_seat_riders + close_one_seat_riders
 
     per_origin: dict[int, list[float]] = {cid: [0.0, 0.0] for cid in origin_ids}
@@ -638,7 +648,7 @@ def render_scenario_comparison(
     lines.append(
         f"Average {day_type_label} ridership is the same "
         f"{results[0].total_riders:,.0f}/{day_type_label} across every scenario "
-        f"below -- only how many of those riders get a one-seat ride changes."
+        f"below; only how many of those riders get a one-seat ride changes."
     )
     lines.append("")
     lines.append(
@@ -664,19 +674,19 @@ def render_notes(*, close_threshold_m: float) -> str:
             '- "Close?"/"Dist" describe distance from the destination to the '
             "nearest station on the origin's own effective corridor (real "
             "routes in baseline, the scenario's assigned routes otherwise), "
-            f"thresholded at {close_threshold_m:.0f}m, for `xfer` rows -- "
-            "riders without a direct one-seat ride. A close `xfer` row is a "
+            f"thresholded at {close_threshold_m:.0f}m, for `xfer` rows, "
+            "i.e. riders without a direct one-seat ride. A close `xfer` row is a "
             "*close one-seat ride*: no train change, just a short walk to "
             "the actual destination. `1-seat` rows are always `close`/`0m`: "
             "the destination is a Complex ID in the source data, not a "
             "specific platform, so there's no way to tell which platform a "
-            "rider actually used -- the effective route already stops "
+            "rider actually used; the effective route already stops "
             "somewhere in that same complex, the rider's real historical "
             "destination either way.",
             '- In the per-pair table (and CSV), "1-Seat Destination" names '
             "the specific station `dist_m` was measured to for a `xfer` "
             "row: the nearest station on the origin's own effective "
-            "corridor -- i.e. what the destination would have had to be "
+            "corridor, i.e. what the destination would have had to be "
             "for this row to be a `1-seat` ride instead. Empty for `1-seat` "
             "rows (already true of the actual destination) and omitted "
             "from the per-destination table (an average across many pairs, "
@@ -745,7 +755,7 @@ def one_seat_rides(
                 "Manhattan via the Montague St Tunnel and never passes "
                 "DeKalb/Atlantic) "
                 "only counts a trip as one-seat if the shared route is a primary one, "
-                "or if the destination isn't served by any primary route either -- "
+                "or if the destination isn't served by any primary route either; "
                 "otherwise it's treated as requiring a transfer at the junction, "
                 "matching real rider behavior even though the OD data itself has no "
                 "transfer field."
@@ -821,13 +831,16 @@ def one_seat_rides(
 ) -> None:
     """Analyze one-seat-ride / deinterlining share for trips crossing a subway junction.
 
-    Generalized so the same command can be re-run for other day types, other
-    station criteria, other data extracts, and other deinterlining scenarios
-    (different junction, different trunk-line pairs) just by passing flags.
+    Generalized so the same command can be re-run
+    for other day types, other station criteria, other data extracts,
+    and other deinterlining scenarios
+    (different junction, different trunk-line pairs),
+    just by passing flags.
 
-    Default scenario (the one this was built for): weekday trips on B/D/N/Q
-    originating south of Atlantic Av-Barclays Ctr in Brooklyn, heading toward
-    Manhattan through the DeKalb Av interlining junction.
+    Default scenario, the one this was built for:
+    weekday trips on B/D/N/Q
+    originating south of Atlantic Av-Barclays Ctr in Brooklyn,
+    heading toward Manhattan through the DeKalb Av interlining junction.
 
     \b
     Examples:
@@ -918,10 +931,11 @@ def one_seat_rides(
         parse_route_set(corridor_b_assigned) if corridor_b_assigned else frozenset()
     )
 
-    # Today's routing has no single corridor->trunk assignment to name
-    # it by: interlining lets each corridor reach *both* trunks (4 Av
-    # express gets D to 6 Av and N to Broadway), which is exactly why it
-    # beats either pure swap. Label it by real routes instead.
+    # Today's routing has no single corridor->trunk assignment
+    # to name it by: interlining lets each corridor reach *both* trunks
+    # (4 Av express gets D to 6 Av and N to Broadway),
+    # which is exactly why it beats either pure swap.
+    # Label it by real routes instead.
     actual_routing_label = corridor_swap_label(
         origin_corridor_a_routes_set,
         origin_corridor_b_routes_set,
@@ -929,8 +943,8 @@ def one_seat_rides(
         origin_corridor_b_label,
     )
     if all_corridor_scenarios:
-        # Only primary routes interline, so only they're swappable: a
-        # non-primary one never moves and shouldn't be in the swap label.
+        # Only primary routes interline, so only they're swappable:
+        # a non-primary one never moves and shouldn't be in the swap label.
         trunk_a_primary_set = trunk_a_set & primary_routes_set
         trunk_b_primary_set = trunk_b_set & primary_routes_set
         scenario_defs = [
@@ -984,10 +998,11 @@ def one_seat_rides(
         ]
     show_label = len(scenario_defs) > 1
 
-    # An all-primary origin (e.g. a B/D/N/Q-only station) has nothing
-    # left to measure a walk to if its corridor's assignment has no
-    # primary route in scope. Only reachable by misconfiguring the CLI, so
-    # catch it once here rather than deep in a per-row loop.
+    # An all-primary origin (e.g. a B/D/N/Q-only station)
+    # has nothing left to measure a walk to
+    # if its corridor's assignment has no primary route in scope.
+    # Only reachable by misconfiguring the CLI,
+    # so catch it once here rather than deep in a per-row loop.
     for sdef in scenario_defs:
         if not sdef.active:
             continue
@@ -1001,7 +1016,7 @@ def one_seat_rides(
                 f"error: scenario {sdef.label!r} assigns corridor "
                 f"{corridor_letter} {sorted(assigned_set)}, none of which is "
                 f"in both --routes {sorted(routes_set)} and --primary-routes "
-                f"{sorted(primary_routes_set)} -- an origin with only "
+                f"{sorted(primary_routes_set)}: an origin with only "
                 "primary routes of its own would have no station on this "
                 "corridor to measure a walk to",
                 file=sys.stderr,
@@ -1075,8 +1090,8 @@ def one_seat_rides(
         f"({min_date} to {max_date})"
     )
 
-    # Real geography only, so this is scenario-independent: computed
-    # once and reused across scenarios.
+    # Real geography only, so this is scenario-independent:
+    # computed once and reused across scenarios.
     scoped = []
     for origin_id, dest_id, riders in pairs:
         dest = stations_by_id.get(dest_id)
@@ -1085,7 +1100,7 @@ def one_seat_rides(
             # OD extract; dropping it would silently undercount.
             print(
                 f"error: destination complex {dest_id} not found in "
-                f"{stations} -- refetch station reference data with "
+                f"{stations}; refetch station reference data with "
                 "`mta-od-data prepare --force-stations`",
                 file=sys.stderr,
             )
@@ -1102,19 +1117,23 @@ def one_seat_rides(
     for s in individual_stations:
         platforms_by_complex.setdefault(s.complex_id, []).append(s)
 
-    # Keyed by borough too, since a `line` label can span physically
-    # distinct segments: "6th Av - Culver" covers both the Manhattan 6th
-    # Av trunk (B,D,F,M) and the Brooklyn Culver local (F,G), and by
-    # `line` alone a Culver platform would get B,D as express partners it
-    # can't reach. A coarse split -- one borough can still hold two
-    # branches of a composite line -- but it fixes the case that shows up.
+    # Keyed by borough too,
+    # since a `line` label can span physically distinct segments:
+    # "6th Av - Culver" covers both the Manhattan 6th Av trunk (B,D,F,M)
+    # and the Brooklyn Culver local (F,G),
+    # and by `line` alone a Culver platform would get B,D
+    # as express partners it can't reach.
+    # A coarse split, since one borough can still hold two branches
+    # of a composite line, but it fixes the case that shows up.
     routes_by_line: dict[tuple[str, str], set[str]] = {}
     for s in individual_stations:
         routes_by_line.setdefault((s.line, s.borough), set()).update(s.routes)
 
-    # The primary routes on an origin's own physical line, which a rider
-    # on a slower one (e.g. R, whose 4th Av line also carries D and N) is
-    # assumed to have ridden instead. Used for close `xfer` rows below.
+    # The primary routes on an origin's own physical line,
+    # which a rider on a slower one
+    # (e.g. R, whose 4th Av line also carries D and N)
+    # is assumed to have ridden instead.
+    # Used for close `xfer` rows below.
     origin_express_partners: dict[int, frozenset[str]] = {
         cid: frozenset(
             route
@@ -1125,28 +1144,30 @@ def one_seat_rides(
         for cid in origin_ids
     }
 
-    # Keyed by route set rather than by corridor, since "close" is about
-    # walking to whichever trunk a corridor got assigned, and assignments
-    # repeat across scenarios. Local, not cached at its own definition
-    # like `haversine_m`: it closes over `individual_stations`, loaded per
-    # invocation, so a longer-lived cache could serve another invocation's
-    # data.
+    # Keyed by route set rather than by corridor,
+    # since "close" is about walking to whichever trunk a corridor got
+    # assigned, and assignments repeat across scenarios.
+    # Local, not cached at its own definition like `haversine_m`:
+    # it closes over `individual_stations`, loaded per invocation,
+    # so a longer-lived cache could serve another invocation's data.
     @cache
     def assigned_points(assigned_routes: frozenset[str]) -> list[Station]:
         return [s for s in individual_stations if s.routes & assigned_routes]
 
-    # (dest, route set) repeats constantly across rows, and skipping a
-    # whole sweep beats `haversine_m`'s own per-point-pair cache, which
-    # still catches the overlap between two different sweeps. On the
-    # default DeKalb scenario the two layers together take 2.19M haversine
-    # calls down to ~39K distinct point pairs. Local, as above.
+    # (dest, route set) repeats constantly across rows,
+    # and skipping a whole sweep beats `haversine_m`'s own
+    # per-point-pair cache,
+    # which still catches the overlap between two different sweeps.
+    # On the default DeKalb scenario the two layers together
+    # take 2.19M haversine calls down to ~39K distinct point pairs.
+    # Local, as above.
     @cache
     def min_dist_to_corridor(
         dest: Station, assigned_routes: frozenset[str]
     ) -> tuple[float, Station]:
         candidates = assigned_points(assigned_routes)
-        # The checks above rule out an empty route set, but not a gap in
-        # `stations_individual.csv` itself.
+        # The checks above rule out an empty route set,
+        # but not a gap in `stations_individual.csv` itself.
         assert candidates, "no individual station serves this route set"
         points = [s.loc for s in platforms_by_complex.get(dest.complex_id, [dest])]
         best: tuple[float, Station] | None = None
@@ -1206,8 +1227,8 @@ def one_seat_rides(
             write_csv(path, result.rows)
 
     if markdown_out:
-        # argv[0] is an absolute path into the venv, not reproducible
-        # across checkouts.
+        # argv[0] is an absolute path into the venv,
+        # not reproducible across checkouts.
         produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
         preamble_lines = [
             "# One Seat Ride Analysis for Deinterlining "

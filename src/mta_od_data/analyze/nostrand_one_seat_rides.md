@@ -8,7 +8,7 @@ Produced by `mta-od-data analyze one-seat-rides --boundary-complex-id 626 --orig
 
 ## Scenario comparison
 
-Average weekday ridership is the same 66,992/weekday across every scenario below -- only how many of those riders get a one-seat ride changes.
+Average weekday ridership is the same 66,992/weekday across every scenario below; only how many of those riders get a one-seat ride changes.
 
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | --- | --- | --- | --- |
@@ -228,6 +228,6 @@ _Full row-level detail (every origin/destination pair, not just the top 25): `da
 
 ## Notes on reading these tables
 
-- "Close?"/"Dist" describe distance from the destination to the nearest station on the origin's own effective corridor (real routes in baseline, the scenario's assigned routes otherwise), thresholded at 300m, for `xfer` rows -- riders without a direct one-seat ride. A close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination. `1-seat` rows are always `close`/`0m`: the destination is a Complex ID in the source data, not a specific platform, so there's no way to tell which platform a rider actually used -- the effective route already stops somewhere in that same complex, the rider's real historical destination either way.
-- In the per-pair table (and CSV), "1-Seat Destination" names the specific station `dist_m` was measured to for a `xfer` row: the nearest station on the origin's own effective corridor -- i.e. what the destination would have had to be for this row to be a `1-seat` ride instead. Empty for `1-seat` rows (already true of the actual destination) and omitted from the per-destination table (an average across many pairs, not a single station).
+- "Close?"/"Dist" describe distance from the destination to the nearest station on the origin's own effective corridor (real routes in baseline, the scenario's assigned routes otherwise), thresholded at 300m, for `xfer` rows, i.e. riders without a direct one-seat ride. A close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination. `1-seat` rows are always `close`/`0m`: the destination is a Complex ID in the source data, not a specific platform, so there's no way to tell which platform a rider actually used; the effective route already stops somewhere in that same complex, the rider's real historical destination either way.
+- In the per-pair table (and CSV), "1-Seat Destination" names the specific station `dist_m` was measured to for a `xfer` row: the nearest station on the origin's own effective corridor, i.e. what the destination would have had to be for this row to be a `1-seat` ride instead. Empty for `1-seat` rows (already true of the actual destination) and omitted from the per-destination table (an average across many pairs, not a single station).
 - In the per-destination table, "Close?"/"Dist" are ridership-weighted across that destination's classified `xfer` pairs.

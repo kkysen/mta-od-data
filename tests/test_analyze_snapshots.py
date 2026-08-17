@@ -1,14 +1,12 @@
-"""Snapshot tests: each `analyze` subcommand's committed `.md` report, kept
-alongside its module under `src/mta_od_data/analyze/`, must match a fresh
-run of the same command.
+"""Each `analyze` subcommand's committed `.md` report
+must match a fresh run of the same command.
 
-Runs the real installed CLI as a subprocess (not an in-process call) so the
-`Produced by` line it embeds reflects the actual invocation, the same way a
-human regenerating the file by hand would see it.
+Runs the real installed CLI as a subprocess, not an in-process call,
+so the `Produced by` line it embeds reflects the actual invocation,
+the same way a human regenerating the file by hand would see it.
 
-Skipped when `data/mta_od.parquet` is missing: it's gitignored (1.1GB, not
-committed) and only exists locally after `mta-od-data prepare`, so this
-can't run in CI.
+Skipped when `data/mta_od.parquet` is missing:
+it's gitignored, so this can't run in CI.
 """
 
 import subprocess
@@ -27,8 +25,7 @@ ANALYZE_DIR = ROOT / "src" / "mta_od_data" / "analyze"
 class Snapshot:
     # Also the pytest ID for this case (see `ids=` below).
     name: str
-    # Canonical invocation, keep in sync with the snapshot file's own
-    # "Produced by" line.
+    # Keep in sync with the snapshot file's own "Produced by" line.
     cmd: list[str]
     path: Path
 
@@ -113,9 +110,9 @@ def test_snapshot_matches_fresh_run(snapshot: Snapshot, tmp_path: Path) -> None:
     )
     assert result.returncode == 0, result.stdout + result.stderr
 
-    # The snapshot embeds its own producing argv, so undo the substitution of
-    # the real path for this scratch one -- otherwise this always reports a
-    # spurious diff on that line alone.
+    # The snapshot embeds its own producing argv,
+    # so undo the substitution of the real path for this scratch one,
+    # which would otherwise be a spurious diff on that line alone.
     rel_path = snapshot.path.relative_to(ROOT)
     fresh = tmp_out.read_text().replace(str(tmp_out), str(rel_path))
     committed = snapshot.path.read_text()

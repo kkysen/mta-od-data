@@ -158,8 +158,8 @@ def resolve_region(
         unknown = boroughs - valid_boroughs
         if unknown:
             print(
-                f"error: --region-borough has unknown code(s) {sorted(unknown)} -- "
-                f"valid codes are {sorted(valid_boroughs)}",
+                f"error: --region-borough has unknown code(s) "
+                f"{sorted(unknown)}; valid codes are {sorted(valid_boroughs)}",
                 file=sys.stderr,
             )
             raise SystemExit(1)
@@ -241,9 +241,10 @@ def regional_flow(
     riders go from outside the region into it, from inside out, stay inside
     it, or never touch it at all.
 
-    Unlike `one-seat-rides`, this is system-wide (no route filter, no side
-    of a single junction) -- every origin/destination pair in the data is
-    classified by whether each end falls inside the given region.
+    Unlike `one-seat-rides`, this is system-wide
+    (no route filter, no side of a single junction):
+    every origin/destination pair in the data
+    is classified by whether each end falls inside the given region.
 
     \b
     Examples:
@@ -282,7 +283,7 @@ def regional_flow(
     if n_inside == 0:
         print(
             f"error: region {region_def.name!r} matches 0 of "
-            f"{len(stations_by_id)} stations -- check "
+            f"{len(stations_by_id)} stations; check "
             "--region/--region-borough/--region-bbox",
             file=sys.stderr,
         )
@@ -340,7 +341,7 @@ def regional_flow(
             missing_id = origin_id if origin is None else dest_id
             print(
                 f"error: station complex {missing_id} not found in "
-                f"{stations} -- refetch station reference data with "
+                f"{stations}; refetch station reference data with "
                 "`mta-od-data prepare --force-stations`",
                 file=sys.stderr,
             )
@@ -358,8 +359,9 @@ def regional_flow(
         else:
             out_out += riders
 
-        # Bare names, not `display()`: with no route universe to narrow
-        # against, a merged complex's full route list would just be noise.
+        # Bare names, not `display()`:
+        # with no route universe to narrow against,
+        # a merged complex's full route list would just be noise.
         rows.append(
             FlowRow(
                 origin_id=origin_id,
