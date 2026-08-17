@@ -623,6 +623,27 @@ class ScenarioComparison:
     routes: Routes
     scenarios: list[Scenario]
 
+    def classify(
+        self,
+        *,
+        pairs: list[tuple[int, int, float]],
+        stations_by_id: dict[int, Station],
+        stations_path: Path,
+        close_lookup: Callable[[Station, Routes], tuple[bool, float, str | None]],
+    ) -> ScenarioComparisonResult:
+        return ScenarioComparisonResult(
+            comparison=self,
+            results=[
+                scenario.classify(
+                    pairs=pairs,
+                    stations_by_id=stations_by_id,
+                    stations_path=stations_path,
+                    close_lookup=close_lookup,
+                )
+                for scenario in self.scenarios
+            ],
+        )
+
 
 @dataclass(slots=True, frozen=True)
 class ScenarioComparisonResult:
@@ -631,29 +652,6 @@ class ScenarioComparisonResult:
 
     comparison: ScenarioComparison
     results: list[ScenarioResult]
-
-    @classmethod
-    def classify(
-        cls,
-        comparison: ScenarioComparison,
-        *,
-        pairs: list[tuple[int, int, float]],
-        stations_by_id: dict[int, Station],
-        stations_path: Path,
-        close_lookup: Callable[[Station, Routes], tuple[bool, float, str | None]],
-    ) -> ScenarioComparisonResult:
-        return cls(
-            comparison=comparison,
-            results=[
-                scenario.classify(
-                    pairs=pairs,
-                    stations_by_id=stations_by_id,
-                    stations_path=stations_path,
-                    close_lookup=close_lookup,
-                )
-                for scenario in comparison.scenarios
-            ],
-        )
 
     @property
     def labelled(self) -> bool:
@@ -996,8 +994,7 @@ def deinterlining(
         return close, dist_m, near_station_name
 
     try:
-        result = ScenarioComparisonResult.classify(
-            comparison,
+        result = comparison.classify(
             pairs=pairs,
             stations_by_id=stations_by_id,
             stations_path=stations,
