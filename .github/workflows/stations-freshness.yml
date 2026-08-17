@@ -1,0 +1,84 @@
+name: Station data freshness
+
+# The station reference CSVs are checked in, so they go stale silently
+# when the MTA edits a station upstream. Refetch them on a schedule
+# and open an issue when they've drifted, rather than failing every PR's
+# CI on an unrelated upstream edit (or on `data.ny.gov` being down).
+on:
+  schedule:
+    # Mondays at 12:00 UTC.
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+
+      # Through `prepare.fetch_csv` so the URLs stay defined in one place.
+      - name: refetch station reference data
+        run: |
+          uv run python -c '
+          from mta_od_data.prepare import (
+              DEFAULT_STATIONS_CSV,
+              DEFAULT_STATIONS_INDIVIDUAL_CSV,
+              STATIONS_URL,
+              STATIONS_INDIVIDUAL_URL,
+              fetch_csv,
+          )
+
+          fetch_csv(STATIONS_URL, DEFAULT_STATIONS_CSV, True)
+          fetch_csv(STATIONS_INDIVIDUAL_URL, DEFAULT_STATIONS_INDIVIDUAL_CSV, True)
+          '
+
+      - name: diff against what's checked in
+        id: diff
+        run: |
+          if git diff --quiet -- data/; then
+            echo "station reference data is up to date"
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            {
+              echo 'diff<<EOF'
+              git diff --stat -- data/
+              echo
+              git diff -- data/ | head -200
+              echo EOF
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: run the tests against the fresh data
+        if: steps.diff.outputs.stale == 'true'
+        continue-on-error: true
+        id: tests
+        run: uv run pytest
+
+      - name: open an issue
+        if: steps.diff.outputs.stale == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DIFF: ${{ steps.diff.outputs.diff }}
+          TESTS: ${{ steps.tests.outcome }}
+        run: |
+          existing="$(gh issue list --state open --label station-data \
+            --json number --jq '.[0].number')"
+          body="$(printf '%s\n\n%s\n\n```diff\n%s\n```\n' \
+            "\`data.ny.gov\` has edited the station reference data since it was checked in." \
+            "\`pytest\` against the fresh data: **$TESTS**. Refresh with \`mta-od-data prepare --force-stations\` and commit \`data/stations_*.csv\`." \
+            "$DIFF")"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "Station reference data is stale" \
+              --label station-data --body "$body"
+          fi
