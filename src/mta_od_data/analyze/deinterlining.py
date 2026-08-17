@@ -17,7 +17,7 @@ number of scenarios' route overrides. Those routes come from the
 scenarios themselves (each declares its own, unioned across the run --
 see `ScenarioRun`), not from the command line.
 
-"Today" is not a special case: it's `Scenario.current()`, a `Scenario`
+"Today" is not a special case: it's the `CURRENT` scenario, a `Scenario`
 with no overrides, classified through the exact same code path as every
 other scenario. Selecting several scenarios via `--category`
 classifies all of them (plus `Current`) against the *same* fetched OD
@@ -52,11 +52,6 @@ from mta_od_data.analyze.common import DAY_TYPE_PRESETS, DayType, Station, haver
 app = Typer()
 
 SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json5"
-
-# Today's real routing, `Scenario.current()`'s name and category alike.
-# Reserved: a scenario file can't define a category by this name (see
-# `ScenarioFile.load`), since it isn't authored in a file at all.
-CURRENT = "Current"
 
 # A set of route letters (e.g. `{"A", "C"}`), not a single station's or
 # pair's routes specifically -- named for what it holds, not where it's
@@ -362,29 +357,6 @@ class Scenario:
         return self.effective_routes.get(station, station.routes & self.routes)
 
     @classmethod
-    def current(cls) -> Scenario:
-        """Today's real routing: the one scenario that isn't authored in a
-        scenario file at all. It's a scenario with no overrides -- there's
-        nothing for an author to write, and requiring an empty
-        `"Current"` entry in every ad-hoc `--scenario-file` was pure
-        ceremony -- but it's still classified through the exact same code
-        path as every other scenario, never as a special case.
-
-        It's also the one scenario with no route universe of its own:
-        today's routing isn't about any particular set of routes, so it
-        adopts whichever ones the run it's compared in is about (see
-        `ScenarioRun`), rather than declaring a superset by hand."""
-        return cls(
-            name=CURRENT,
-            description="Current routes today",
-            category=CURRENT,
-            slug=slugify(CURRENT),
-            routes=frozenset(),
-            overrides={},
-            effective_routes={},
-        )
-
-    @classmethod
     def load(
         cls,
         entry: ScenarioEntry,
@@ -548,6 +520,32 @@ class Scenario:
         )
 
 
+# Today's real routing: the one scenario that isn't authored in a
+# scenario file at all. It's a scenario with no overrides -- there's
+# nothing for an author to write, and requiring an empty entry in every
+# ad-hoc `--scenario-file` was pure ceremony -- but it's still classified
+# through the exact same code path as every other scenario, never as a
+# special case.
+#
+# It's also the one scenario with no route universe of its own: today's
+# routing isn't about any particular set of routes, so it adopts
+# whichever ones the run it's compared in is about (see `ScenarioRun`),
+# rather than declaring a superset by hand.
+#
+# A constant rather than a factory: nothing ever mutates a `Scenario`'s
+# `overrides`/`effective_routes` (`load`/`combine` each build their own),
+# so one shared instance is as good as a fresh one per run.
+CURRENT = Scenario(
+    name="Current",
+    description="Current routes today",
+    category="Current",
+    slug=slugify("Current"),
+    routes=frozenset(),
+    overrides={},
+    effective_routes={},
+)
+
+
 @dataclass(slots=True, frozen=True)
 class ScenarioCategory:
     """Every scenario loaded under one category key in a scenario file's
@@ -555,7 +553,7 @@ class ScenarioCategory:
     scenarios) -- one element of `ScenarioFile.categories`. Selecting more
     than one category at once takes the cartesian product of their
     `scenarios` (one scenario per selected category per combination,
-    "unchanged" -- `Scenario.current()` -- being one of the options for
+    "unchanged" -- the `CURRENT` scenario -- being one of the options for
     every category), each combination merged into a single scenario
     by `Scenario.combine` -- see `ScenarioFile.combine_scenarios`."""
 
@@ -589,9 +587,8 @@ class ScenarioFile:
     `scenarios` (plus the baseline it's passed, as an option for every
     category) and merges each combination via `Scenario.combine`.
     `resolve_scenarios` composes these: `filter` to the `--category`
-    selection, then combine it against `Scenario.current()` as the
-    baseline. A file never defines the baseline itself -- `load` rejects a
-    category named `"Current"` outright."""
+    selection, then combine it against the `CURRENT` scenario as the
+    baseline."""
 
     path: Path
     categories: list[ScenarioCategory]
@@ -621,12 +618,6 @@ class ScenarioFile:
             raise ScenarioError(
                 f"scenario file {path} doesn't match the expected shape:\n{e}"
             ) from e
-        if CURRENT in by_category:
-            raise ScenarioError(
-                f'scenario file {path}: "{CURRENT}" is a reserved category '
-                f"({Scenario.current().description}, built in) -- remove it, "
-                "every selected category is already compared against it"
-            )
         return cls(
             path=path,
             categories=[
@@ -663,7 +654,7 @@ class ScenarioFile:
         )
 
     def combine_scenarios(self, baseline: list[Scenario]) -> list[Scenario]:
-        """`baseline` (`Scenario.current()`) joins *every*
+        """`baseline` (the `CURRENT` scenario) joins *every*
         category's own options, rather than standing alone as one more
         combination: leaving a category unchanged is itself one of the
         choices for it, so selecting two categories with two scenarios
@@ -865,9 +856,9 @@ def resolve_scenarios(
     station_index: StationIndex,
 ) -> ScenarioRun:
     """One combined scenario per element of the cartesian product of every
-    `--category`-selected category's scenarios *plus* `Scenario.current()`
-    (today's real routing, i.e. the option of leaving that category
-    unchanged) -- `Scenario.combine`, via
+    `--category`-selected category's scenarios *plus* the `CURRENT`
+    scenario (today's real routing, i.e. the option of leaving that
+    category unchanged) -- `Scenario.combine`, via
     `ScenarioFile.filter`/`combine_scenarios`. So two categories with two
     scenarios each select nine combined scenarios: every pairing, each
     category's scenarios on their own, and `Current` throughout as the
@@ -894,7 +885,7 @@ def resolve_scenarios(
     selected = file.filter(frozenset(categories))
     return ScenarioRun(
         routes=selected.routes,
-        scenarios=selected.combine_scenarios([Scenario.current()]),
+        scenarios=selected.combine_scenarios([CURRENT]),
     )
 
 
