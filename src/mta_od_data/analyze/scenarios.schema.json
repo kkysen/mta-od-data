@@ -5,7 +5,7 @@
   "$defs": {
     "OverrideGroup": {
       "additionalProperties": false,
-      "description": "One override group in a scenario file's `overrides` array: an\nadd/remove pair shared by every station in `stations` -- the usual\ncase, since a deinterlining change typically affects several stations\non one line the same way. `line` (e.g. \"8th Av - Fulton St\", from the\nindividual-station reference data) is required on every group: it\ndisambiguates a `stations` entry whose bare name is shared by more\nthan one real complex elsewhere in the system (see\n`StationIndex.resolve`), and lets a reader tell which physical line a\ngroup's `add`/`remove` applies to without cross-referencing\n`stations_individual.csv`, even when every name here happens to\nalready be unique on its own.",
+      "description": "One entry in a scenario's `overrides`: an add/remove pair applied\nto every station in `stations`, since a deinterlining change usually\nhits several stations on one line the same way.\n\n`line` (e.g. \"8th Av - Fulton St\") is required even where a name is\nalready unique: it disambiguates names shared by several complexes\n(see `StationIndex.resolve`), and says which physical line a group is\nabout without cross-referencing `stations_individual.csv`.",
       "properties": {
         "line": {
           "minLength": 1,
@@ -511,7 +511,7 @@
     },
     "ScenarioEntry": {
       "additionalProperties": false,
-      "description": "One scenario in a scenario file's top-level JSON object (see\n`SCENARIO_FILE_ADAPTER`), grouped under its category's key rather than\ncarrying its own `category` field. `name` is a short identifier, used\nfor dedup and as this scenario's CSV-suffix/label when several are\ncompared in one run; `description` defaults to `name` when omitted.\n\n`routes` is the route universe this scenario is about (e.g. A,B,C,D\nfor a Columbus Circle swap): which routes a rider can be considered\nto have a one-seat ride on, and which stations are origins worth\nclassifying at all. It lives here rather than on the command line\nbecause it's a property of the scenario -- a Columbus swap is about\nthe same four routes no matter who runs it -- and every route the\nscenario moves must be in it (`Scenario.load`), so it can't silently\ndisagree with the scenario's own `add`/`remove`. A run selecting\nseveral categories classifies every scenario under the union of\ntheirs, so the comparison stays like-for-like; see `ScenarioRun`.",
+      "description": "One scenario in a scenario file, under its category's key rather\nthan carrying a `category` field. `description` defaults to `name`.\n\n`routes` is the universe this scenario is about (e.g. A,B,C,D for a\nColumbus Circle swap): which routes count towards a one-seat ride,\nand which origins are worth classifying. It belongs to the scenario\nrather than the invocation -- a Columbus swap is about the same four\nroutes whoever runs it -- and must cover every route the scenario\nmoves (`Scenario.load`). A run classifies everything it selects under\nthe union of these; see `ScenarioRun`.",
       "properties": {
         "name": {
           "minLength": 1,
