@@ -2,13 +2,13 @@
 
 See `deinterlining_design.md` (next to this file) for the design this
 implements,
-and `ScenarioRun` for what a single comparison covers.
+and `ScenarioComparison` for what a single one covers.
 
 Unlike `one_seat_rides.py`
 (one latitude boundary, two named corridors converging into two named
 trunks, origin-side reassignment only),
 this classifies *every* origin/destination pair
-whose origin could plausibly use one of the run's routes.
+whose origin could plausibly use one of the comparison's routes.
 Kept independent of it,
 duplicating a couple of small helpers rather than importing them;
 reconcile if the two ever merge.
@@ -106,7 +106,8 @@ class ScenarioEntry(BaseModel):
     (e.g. A,B,C,D for a Columbus Circle swap):
     which routes count towards a one-seat ride,
     and which origins are worth classifying at all.
-    A run uses the union of the selected scenarios'; see `ScenarioRun`."""
+    A comparison uses the union of the selected scenarios';
+    see `ScenarioComparison`."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -230,7 +231,8 @@ class Scenario:
     description: str
     category: str
     # What everything below is already narrowed to:
-    # the entry's own `routes` as loaded, the whole run's once combined.
+    # the entry's own `routes` as loaded,
+    # the whole comparison's once combined.
     # Empty on `CURRENT` until then.
     routes: Routes
     overrides: dict[Station, RouteDelta]
@@ -283,7 +285,8 @@ class Scenario:
 
     @classmethod
     def combine(cls, scenarios: list[Scenario], routes: Routes) -> Scenario:
-        """`routes` is the whole run's universe (`ScenarioRun`),
+        """`routes` is the whole comparison's universe
+        (`ScenarioComparison`),
         not these scenarios' own,
         which is also why a single-element `scenarios` isn't returned
         as-is, its `effective_routes` being narrowed to just its own."""
@@ -387,8 +390,8 @@ class Scenario:
 
 
 # Today's real routing, which no scenario file has to declare.
-# Its empty `routes` is what makes it adopt the run's universe
-# (see `ScenarioRun`).
+# Its empty `routes` is what makes it adopt the comparison's universe
+# (see `ScenarioComparison`).
 CURRENT = Scenario(
     name="Current",
     description="Current routes today",
@@ -642,7 +645,7 @@ def render_comparison_markdown(results: list[ScenarioResult]) -> str:
 
 
 @dataclass(slots=True, frozen=True)
-class ScenarioRun:
+class ScenarioComparison:
     """The `routes` universe is the union of the selected scenarios' own,
     applied to all of them alike.
     Scenarios classified under different universes aren't comparable:
@@ -659,8 +662,8 @@ def resolve_scenarios(
     categories: list[str],
     scenario_file: Path,
     station_index: StationIndex,
-) -> ScenarioRun:
-    """The run for a `--category` selection,
+) -> ScenarioComparison:
+    """The comparison for a `--category` selection,
     `CURRENT` among every category's options
     (see `ScenarioFile.combine_scenarios`)."""
     try:
@@ -676,7 +679,7 @@ def resolve_scenarios(
             f"in {scenario_file}: {available})"
         )
     selected = file.filter(frozenset(categories))
-    return ScenarioRun(
+    return ScenarioComparison(
         routes=selected.routes,
         scenarios=selected.combine_scenarios([CURRENT]),
     )
@@ -803,7 +806,7 @@ def deinterlining(
     individual_stations = Station.load_individuals(stations_individual)
     station_index = StationIndex.build(stations_by_id, individual_stations)
     try:
-        run = resolve_scenarios(
+        comparison = resolve_scenarios(
             categories=categories,
             scenario_file=scenario_file,
             station_index=station_index,
@@ -811,8 +814,8 @@ def deinterlining(
     except ScenarioError as e:
         print(f"error: {e}", file=sys.stderr)
         raise SystemExit(1) from e
-    scenarios = run.scenarios
-    routes_set = run.routes
+    scenarios = comparison.scenarios
+    routes_set = comparison.routes
     show_label = len(scenarios) > 1
     for s in scenarios:
         print(f"Scenario: {s.name} ({len(s.overrides)} stations overridden)")
@@ -821,7 +824,7 @@ def deinterlining(
 
     # Systemwide, but not literally every station:
     # an origin only matters
-    # if some scenario gives it one of the run's routes.
+    # if some scenario gives it one of the comparison's routes.
     origin_ids = [
         s.complex_id
         for s in stations_by_id.values()

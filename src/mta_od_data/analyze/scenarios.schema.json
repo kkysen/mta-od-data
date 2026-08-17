@@ -511,7 +511,7 @@
     },
     "ScenarioEntry": {
       "additionalProperties": false,
-      "description": "`routes` is the universe this scenario is about\n(e.g. A,B,C,D for a Columbus Circle swap):\nwhich routes count towards a one-seat ride,\nand which origins are worth classifying at all.\nA run uses the union of the selected scenarios'; see `ScenarioRun`.",
+      "description": "`routes` is the universe this scenario is about\n(e.g. A,B,C,D for a Columbus Circle swap):\nwhich routes count towards a one-seat ride,\nand which origins are worth classifying at all.\nA comparison uses the union of the selected scenarios';\nsee `ScenarioComparison`.",
       "properties": {
         "name": {
           "minLength": 1,
