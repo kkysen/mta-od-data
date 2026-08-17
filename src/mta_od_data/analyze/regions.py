@@ -16,11 +16,12 @@ def borough_region(name: str, boroughs: frozenset[str]) -> Region:
 
 
 def cbd_region() -> Region:
-    """Manhattan's Congestion Relief Zone (the congestion-pricing sense
-    of "Lower Manhattan": below 60th St). The source data's curated `cbd`
-    flag, not a latitude cut: Manhattan's grid is rotated, so no single
-    latitude separates the zone cleanly, and a cut would wrongly include
-    Roosevelt Island."""
+    """Manhattan's Congestion Relief Zone
+    (the congestion-pricing sense of "Lower Manhattan": below 60th St).
+    The source data's curated `cbd` flag, not a latitude cut:
+    Manhattan's grid is rotated,
+    so no single latitude separates the zone cleanly,
+    and a cut would wrongly include Roosevelt Island."""
     return Region(
         name="Lower Manhattan (below 60th St / Congestion Relief Zone)",
         contains=lambda s: s.cbd,
