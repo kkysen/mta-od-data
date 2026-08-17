@@ -611,39 +611,6 @@ class ScenarioResult:
         return "\n".join(lines)
 
 
-def print_comparison(results: list[ScenarioResult]) -> None:
-    print("\n=== Scenario comparison ===")
-    for r in results:
-        print(
-            f"  {r.scenario.name:<55} total={r.total_riders:>9,.0f}  "
-            f"direct={r.one_seat_riders:>8,.0f} ({r.pct(r.one_seat_riders):5.1f}%)  "
-            f"close={r.close_riders:>7,.0f}  "
-            f"effective={r.effective_riders:>8,.0f} ({r.pct(r.effective_riders):5.1f}%)"
-        )
-
-
-def render_comparison_markdown(results: list[ScenarioResult]) -> str:
-    lines = [
-        "## Scenario comparison",
-        "",
-        f"Total riders is the same {results[0].total_riders:,.0f} across every "
-        f"scenario below; only how many of those riders get a one-seat ride "
-        f"changes.",
-        "",
-        "| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |",
-        "| --- | --- | --- | --- | --- |",
-    ]
-    for r in results:
-        lines.append(
-            f"| {r.scenario.name} | {r.total_riders:,.0f} | "
-            f"{r.one_seat_riders:,.0f} ({r.pct(r.one_seat_riders):.1f}%) | "
-            f"{r.close_riders:,.0f} ({r.pct(r.close_riders):.1f}%) | "
-            f"{r.effective_riders:,.0f} ({r.pct(r.effective_riders):.1f}%) |"
-        )
-    lines.append("")
-    return "\n".join(lines)
-
-
 @dataclass(slots=True, frozen=True)
 class ScenarioComparison:
     """The `routes` universe is the union of the selected scenarios' own,
@@ -655,6 +622,122 @@ class ScenarioComparison:
 
     routes: Routes
     scenarios: list[Scenario]
+
+
+@dataclass(slots=True, frozen=True)
+class ScenarioComparisonResult:
+    """Every scenario in a `ScenarioComparison`,
+    classified over the same OD pairs."""
+
+    comparison: ScenarioComparison
+    results: list[ScenarioResult]
+
+    @classmethod
+    def classify(
+        cls,
+        comparison: ScenarioComparison,
+        *,
+        pairs: list[tuple[int, int, float]],
+        stations_by_id: dict[int, Station],
+        stations_path: Path,
+        close_lookup: Callable[[Station, Routes], tuple[bool, float, str | None]],
+    ) -> ScenarioComparisonResult:
+        return cls(
+            comparison=comparison,
+            results=[
+                scenario.classify(
+                    pairs=pairs,
+                    stations_by_id=stations_by_id,
+                    stations_path=stations_path,
+                    close_lookup=close_lookup,
+                )
+                for scenario in comparison.scenarios
+            ],
+        )
+
+    @property
+    def labelled(self) -> bool:
+        """Whether output has to name which scenario it's describing.
+        With one there's nothing to tell apart,
+        and no comparison table to write either."""
+        return len(self.results) > 1
+
+    def csv_paths(self, csv_out: Path | None) -> list[Path | None]:
+        """One path per scenario, suffixed to keep them apart,
+        except for a lone scenario, which keeps `csv_out` itself."""
+        if csv_out is None:
+            return [None] * len(self.results)
+        if not self.labelled:
+            return [csv_out]
+        return [suffixed_path(csv_out, r.scenario.slug()) for r in self.results]
+
+    def print_summary(self, *, close_threshold_m: float) -> None:
+        for result in self.results:
+            result.print_headline(close_threshold_m=close_threshold_m)
+        if not self.labelled:
+            return
+        print("\n=== Scenario comparison ===")
+        for r in self.results:
+            print(
+                f"  {r.scenario.name:<55} total={r.total_riders:>9,.0f}  "
+                f"direct={r.one_seat_riders:>8,.0f} "
+                f"({r.pct(r.one_seat_riders):5.1f}%)  "
+                f"close={r.close_riders:>7,.0f}  "
+                f"effective={r.effective_riders:>8,.0f} "
+                f"({r.pct(r.effective_riders):5.1f}%)"
+            )
+
+    def write_csvs(self, csv_out: Path) -> None:
+        for path, result in zip(self.csv_paths(csv_out), self.results, strict=True):
+            assert path is not None
+            result.write_csv(path)
+
+    def comparison_table_markdown(self) -> str:
+        lines = [
+            "## Scenario comparison",
+            "",
+            f"Total riders is the same {self.results[0].total_riders:,.0f} "
+            f"across every scenario below; only how many of those riders get "
+            f"a one-seat ride changes.",
+            "",
+            "| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | "
+            "Effective 1-Seat |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+        for r in self.results:
+            lines.append(
+                f"| {r.scenario.name} | {r.total_riders:,.0f} | "
+                f"{r.one_seat_riders:,.0f} ({r.pct(r.one_seat_riders):.1f}%) | "
+                f"{r.close_riders:,.0f} ({r.pct(r.close_riders):.1f}%) | "
+                f"{r.effective_riders:,.0f} ({r.pct(r.effective_riders):.1f}%) |"
+            )
+        lines.append("")
+        return "\n".join(lines)
+
+    def render_markdown(
+        self,
+        *,
+        preamble: str,
+        close_threshold_m: float,
+        top_n: int,
+        csv_out: Path | None,
+    ) -> str:
+        sections = [
+            preamble,
+            *([self.comparison_table_markdown()] if self.labelled else []),
+            *(
+                result.render_markdown(
+                    show_label=self.labelled,
+                    close_threshold_m=close_threshold_m,
+                    top_n=top_n,
+                    csv_out=path,
+                )
+                for result, path in zip(
+                    self.results, self.csv_paths(csv_out), strict=True
+                )
+            ),
+        ]
+        return "\n---\n\n".join(sections)
 
 
 def resolve_scenarios(
@@ -816,7 +899,6 @@ def deinterlining(
         raise SystemExit(1) from e
     scenarios = comparison.scenarios
     routes_set = comparison.routes
-    show_label = len(scenarios) > 1
     for s in scenarios:
         print(f"Scenario: {s.name} ({len(s.overrides)} stations overridden)")
     print(f"Route universe: {sorted(routes_set)}")
@@ -914,60 +996,42 @@ def deinterlining(
         return close, dist_m, near_station_name
 
     try:
-        results = [
-            s.classify(
-                pairs=pairs,
-                stations_by_id=stations_by_id,
-                stations_path=stations,
-                close_lookup=close_lookup,
-            )
-            for s in scenarios
-        ]
+        result = ScenarioComparisonResult.classify(
+            comparison,
+            pairs=pairs,
+            stations_by_id=stations_by_id,
+            stations_path=stations,
+            close_lookup=close_lookup,
+        )
     except ScenarioError as e:
         print(f"error: {e}", file=sys.stderr)
         raise SystemExit(1) from e
 
-    for result in results:
-        result.print_headline(close_threshold_m=close_threshold_m)
-    if show_label:
-        print_comparison(results)
-
-    csv_paths: list[Path | None] = [
-        None
-        if csv_out is None
-        else (csv_out if not show_label else suffixed_path(csv_out, s.slug()))
-        for s in scenarios
-    ]
+    result.print_summary(close_threshold_m=close_threshold_m)
     if csv_out:
-        for path, result in zip(csv_paths, results, strict=True):
-            assert path is not None
-            result.write_csv(path)
+        result.write_csvs(csv_out)
 
     if markdown_out:
         produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
-        preamble_lines = [
-            f"# Deinterlining scenario comparison: {','.join(sorted(routes_set))}",
-            "",
-            f"Average {day_type_label} ridership ({n_distinct_days} distinct "
-            f"days in the data, {min_date} to {max_date}), every "
-            f"origin/destination pair whose origin could plausibly use "
-            f"{','.join(sorted(routes_set))} under any scenario compared here.",
-            "",
-            f"Produced by `{produced_by}`.",
-            "",
-        ]
-        sections = [
-            "\n".join(preamble_lines),
-            *([render_comparison_markdown(results)] if show_label else []),
-            *(
-                result.render_markdown(
-                    show_label=show_label,
-                    close_threshold_m=close_threshold_m,
-                    top_n=top_n,
-                    csv_out=path,
-                )
-                for result, path in zip(results, csv_paths, strict=True)
-            ),
-        ]
-        markdown_out.write_text("\n---\n\n".join(sections))
+        preamble = "\n".join(
+            [
+                f"# Deinterlining scenario comparison: {','.join(sorted(routes_set))}",
+                "",
+                f"Average {day_type_label} ridership ({n_distinct_days} distinct "
+                f"days in the data, {min_date} to {max_date}), every "
+                f"origin/destination pair whose origin could plausibly use "
+                f"{','.join(sorted(routes_set))} under any scenario compared here.",
+                "",
+                f"Produced by `{produced_by}`.",
+                "",
+            ]
+        )
+        markdown_out.write_text(
+            result.render_markdown(
+                preamble=preamble,
+                close_threshold_m=close_threshold_m,
+                top_n=top_n,
+                csv_out=csv_out,
+            )
+        )
         print(f"\nWrote markdown report to {markdown_out}")
