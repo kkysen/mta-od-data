@@ -318,21 +318,17 @@ class Scenario:
     is the longer explanatory text. `category` is the scenario file key
     this scenario was loaded from (e.g. "Columbus" for every Columbus
     Circle swap direction) -- `--category` selects by it, the only way to
-    select a scenario besides always-included `Current`. `slug` names
-    this scenario's own suffixed CSV file when multiple scenarios are
-    compared in one run (see `suffixed_path`) -- derived from `name`, not
-    a separate thing to keep in sync."""
+    select a scenario besides always-included `Current`."""
 
     name: str
     description: str
     category: str
-    slug: str
     # The route universe this scenario classifies under -- everything
     # here is already narrowed to it, so nothing downstream intersects
     # again. On a scenario as loaded from a file, it's that entry's own
     # `routes`; on a combined one (`combine`, what a run actually
     # classifies with) it's the whole run's universe, so every row of a
-    # comparison covers the same routes. Empty only on `current()`, which
+    # comparison covers the same routes. Empty only on `CURRENT`, which
     # is unrestricted until it's combined into a run.
     routes: Routes
     # Keyed by `Station` itself, not `complex_id` -- `Station` is frozen
@@ -347,6 +343,13 @@ class Scenario:
     # population (e.g. `stations_by_id`) needed -- and already narrowed
     # to `routes`, so `routes_of` is the only place that narrowing lives.
     effective_routes: dict[Station, Routes]
+
+    def slug(self) -> str:
+        """Names this scenario's own suffixed CSV file when several are
+        compared in one run (see `suffixed_path`). Derived from `name`
+        every time it's asked for, rather than stored alongside it, so
+        there's nothing that can fall out of sync with it."""
+        return slugify(self.name)
 
     def routes_of(self, station: Station) -> Routes:
         """This scenario's routes for `station`, within its universe: its
@@ -391,7 +394,6 @@ class Scenario:
             name=entry.name,
             description=entry.description or entry.name,
             category=category,
-            slug=slugify(entry.name),
             routes=routes,
             overrides=overrides,
             effective_routes={
@@ -425,7 +427,6 @@ class Scenario:
             name=name,
             description=" + ".join(s.description for s in scenarios),
             category=" + ".join(s.category for s in scenarios),
-            slug=slugify(name),
             routes=routes,
             overrides=overrides,
             effective_routes={
@@ -539,7 +540,6 @@ CURRENT = Scenario(
     name="Current",
     description="Current routes today",
     category="Current",
-    slug=slugify("Current"),
     routes=frozenset(),
     overrides={},
     effective_routes={},
@@ -1162,7 +1162,7 @@ def deinterlining(
     csv_paths: list[Path | None] = [
         None
         if csv_out is None
-        else (csv_out if not show_label else suffixed_path(csv_out, s.slug))
+        else (csv_out if not show_label else suffixed_path(csv_out, s.slug()))
         for s in scenarios
     ]
     if csv_out:
