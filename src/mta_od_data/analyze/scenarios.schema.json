@@ -5,7 +5,7 @@
   "$defs": {
     "OverrideGroup": {
       "additionalProperties": false,
-      "description": "`line` (e.g. \"8th Av - Fulton St\") is required even where a\nstation name is already unique: names are shared by several complexes\n(\"72 St\" is three), and it says which physical line a group is about\nwithout cross-referencing `stations_individual.csv`.",
+      "description": "`line` (e.g. \"8th Av - Fulton St\") is required\neven where a station name is already unique:\nnames are shared by several complexes (\"72 St\" is three),\nand it says which physical line a group is about\nwithout cross-referencing `stations_individual.csv`.",
       "properties": {
         "line": {
           "minLength": 1,
@@ -511,7 +511,7 @@
     },
     "ScenarioEntry": {
       "additionalProperties": false,
-      "description": "`routes` is the universe this scenario is about (e.g. A,B,C,D for\na Columbus Circle swap): which routes count towards a one-seat ride,\nand which origins are worth classifying at all. A run uses the union\nof the selected scenarios'; see `ScenarioRun`.",
+      "description": "`routes` is the universe this scenario is about\n(e.g. A,B,C,D for a Columbus Circle swap):\nwhich routes count towards a one-seat ride,\nand which origins are worth classifying at all.\nA run uses the union of the selected scenarios'; see `ScenarioRun`.",
       "properties": {
         "name": {
           "minLength": 1,
