@@ -25,9 +25,10 @@ DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {
 
 def abbreviate_name(name: str) -> str:
     """Shorter forms for station names that are unwieldy at full length,
-    especially with a route list appended. A plain substring replacement, so
-    it also shortens merged complex names containing the long form (e.g.
-    "Chambers St/WTC/Park Place/Cortlandt St")."""
+    especially with a route list appended.
+    A plain substring replacement,
+    so it also shortens merged complex names containing the long form
+    (e.g. "Chambers St/WTC/Park Place/Cortlandt St")."""
     abbreviations = (
         ("Atlantic Av-Barclays Ctr", "Atlantic Av"),
         ("Port Authority Bus Terminal", "PABT"),
@@ -54,13 +55,13 @@ class Station:
     borough: str
     # In Manhattan's Congestion Relief Zone; see `regions.cbd_region`.
     cbd: bool
-    # Physical line name (e.g. "4th Av"), individual per-platform stations
-    # only -- empty for a complex, which can span several lines.
+    # Physical line name (e.g. "4th Av"), per-platform stations only;
+    # empty for a complex, which can span several lines.
     line: str = ""
 
-    # B019 warns that caching a method keeps `self` alive forever, but
-    # `load_complexes`/`load_individuals` already hold every `Station` for
-    # the process's lifetime.
+    # B019 warns that caching a method keeps `self` alive forever,
+    # but `load_complexes`/`load_individuals` already hold every `Station`
+    # for the process's lifetime.
     @cache  # noqa: B019
     def display(self, routes: frozenset[str] | None = None) -> str:
         shown_routes = self.routes if routes is None else routes
@@ -88,10 +89,10 @@ class Station:
 
     @classmethod
     def load_individual(cls, row: dict[str, str]) -> Self:
-        """Per-platform rows, not complex centroids: a merged complex
-        (e.g. Times Sq-42 St/Port Authority Bus Terminal) has a centroid
-        that can sit well away from any of its actual platforms, which
-        would throw off a nearest-station distance."""
+        """Per-platform rows, not complex centroids:
+        a merged complex (e.g. Times Sq-42 St/Port Authority Bus Terminal)
+        has a centroid that can sit well away from any of its actual
+        platforms, which would throw off a nearest-station distance."""
         return cls(
             complex_id=int(row["complex_id"]),
             name=abbreviate_name(row["stop_name"]),
