@@ -1,31 +1,22 @@
 """Systemwide deinterlining scenario comparator.
 
 See `deinterlining_design.md` (next to this file) for the design this
-implements. Deliberately kept independent of `one_seat_rides.py` --
-duplicates a couple of small helpers (the CSV/markdown rendering shape,
-nearest-station search) rather than importing them, since the user
-doesn't want that module touched until this one is proven out;
-reconcile the duplication if/when the two get merged.
+implements. Kept independent of `one_seat_rides.py`, duplicating a
+couple of small helpers (the CSV/markdown rendering shape,
+nearest-station search) rather than importing them; reconcile if the two
+ever merge.
 
 Unlike `one_seat_rides.py` (one latitude boundary, two named corridors
 converging into two named trunks, origin-side reassignment only), this
 classifies *every* origin/destination pair whose origin could plausibly
-use one of the run's routes (under any scenario being compared) -- no
-boundary, same shape as `regional_flow.py`'s unfiltered OD-pairs query
--- comparing one-seat-ride share across today's real routes and any
-number of scenarios' route overrides. Those routes come from the
-scenarios themselves (each declares its own, unioned across the run --
-see `ScenarioRun`), not from the command line.
+use one of the run's routes -- no boundary, same shape as
+`regional_flow.py`'s unfiltered OD-pairs query. Those routes come from
+the scenarios themselves, not the command line; see `ScenarioRun`.
 
-"Today" is not a special case: it's the `CURRENT` scenario, a `Scenario`
-with no overrides, classified through the exact same code path as every
-other scenario. Selecting several scenarios via `--category`
-classifies all of them (plus `Current`) against the *same* fetched OD
-pairs in one run, so comparing several proposals doesn't reclassify
-"today" once per proposal. Selecting more than one category at once
-combines them -- see `Scenario.combine`/`resolve_scenarios` -- for
-comparing compound proposals across independent junctions, not just each
-junction's proposals in isolation.
+Today's routing is not a special case: it's `CURRENT`, a `Scenario` with
+no overrides. Every scenario in a run is classified against the same
+fetched OD pairs, so comparing several proposals doesn't reclassify
+"today" once per proposal.
 """
 
 import csv
@@ -53,24 +44,20 @@ app = Typer()
 
 SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json5"
 
-# A set of route letters (e.g. `{"A", "C"}`), not a single station's or
-# pair's routes specifically -- named for what it holds, not where it's
-# used, since it shows up as a station's actual routes, a scenario's
-# effective routes, and a run's whole route universe alike.
+# A set of route letters (e.g. `{"A", "C"}`): a station's real routes, a
+# scenario's effective routes, and a run's whole universe alike.
 type Routes = frozenset[str]
 
 
 class ScenarioError(Exception):
-    """Raised for a scenario/CLI-input problem that only `deinterlining()`
-    (the CLI command) should turn into a printed error and `SystemExit` --
-    every other method here raises this instead of exiting directly, so
-    it stays usable as a library function."""
+    """A scenario or CLI input problem. Only `deinterlining()` turns
+    these into a printed error and `SystemExit`, so everything else here
+    stays usable as a library function."""
 
 
 def slugify(name: str) -> str:
-    """A scenario's `name` (e.g. "Columbus A/C Express") isn't safe as a
-    filename suffix (spaces, `/`) -- this derives one that is, for
-    `suffixed_path`."""
+    """A scenario `name` (e.g. "A/C CPW Express") made safe as a
+    filename suffix, for `suffixed_path`."""
     return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_") or "scenario"
 
 
@@ -82,9 +69,9 @@ class ODPair:
     dest_name: str
     riders: float
     one_seat: bool
-    # Only meaningful when `one_seat` is false: is a station on the
-    # scenario-effective origin corridor within `close_threshold_m` of the
-    # destination anyway (a short walk, not a real transfer)?
+    # Only meaningful when `one_seat` is false: is the effective origin
+    # corridor within `close_threshold_m` of the destination anyway (a
+    # short walk, not a real transfer)?
     close: bool
     dist_m: float
     near_station: str | None
@@ -100,25 +87,19 @@ class DestStats:
 
 @dataclass(slots=True, frozen=True)
 class RouteDelta:
-    """A scenario's change to one station's real routes, as an explicit
-    add/remove pair rather than a full replacement list -- so a scenario
-    author only has to say what actually changes (e.g. "the B stops
-    running here"), not re-derive and spell out every route that's
-    unaffected. `apply` applies `remove` before `add`, so listing a route
-    in both is equivalent to just `add`."""
+    """A scenario's change to one station's real routes: what an author
+    actually writes ("the B stops running here"), not the full resulting
+    route list. `apply` removes before adding, so a route in both is
+    just an add."""
 
     add: Routes
     remove: Routes
 
     def __or__(self, other: RouteDelta) -> RouteDelta:
-        """Two deltas for the same station -- from two override groups in
-        one `ScenarioEntry`, or two scenarios being combined -- union
-        cleanly: `add`/`remove` are each just sets, so there's no real
-        conflict to detect, even when one delta's `add` is another's
-        `remove` (`apply`'s remove-before-add order already means add
-        wins for a single delta; unioning preserves that). `|`, not a
-        named method, since it's exactly `add`/`remove` each unioned with
-        `|` in turn."""
+        """Two deltas for the same station -- two override groups in one
+        entry, or two scenarios being combined -- union cleanly: there's
+        no conflict to detect even when one's `add` is the other's
+        `remove`, since `apply` already resolves that in add's favor."""
         return RouteDelta(add=self.add | other.add, remove=self.remove | other.remove)
 
     def apply(self, station: Station) -> Routes:
@@ -126,17 +107,14 @@ class RouteDelta:
 
 
 class OverrideGroup(BaseModel):
-    """One override group in a scenario file's `overrides` array: an
-    add/remove pair shared by every station in `stations` -- the usual
-    case, since a deinterlining change typically affects several stations
-    on one line the same way. `line` (e.g. "8th Av - Fulton St", from the
-    individual-station reference data) is required on every group: it
-    disambiguates a `stations` entry whose bare name is shared by more
-    than one real complex elsewhere in the system (see
-    `StationIndex.resolve`), and lets a reader tell which physical line a
-    group's `add`/`remove` applies to without cross-referencing
-    `stations_individual.csv`, even when every name here happens to
-    already be unique on its own."""
+    """One entry in a scenario's `overrides`: an add/remove pair applied
+    to every station in `stations`, since a deinterlining change usually
+    hits several stations on one line the same way.
+
+    `line` (e.g. "8th Av - Fulton St") is required even where a name is
+    already unique: it disambiguates names shared by several complexes
+    (see `StationIndex.resolve`), and says which physical line a group is
+    about without cross-referencing `stations_individual.csv`."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -147,22 +125,16 @@ class OverrideGroup(BaseModel):
 
 
 class ScenarioEntry(BaseModel):
-    """One scenario in a scenario file's top-level JSON object (see
-    `SCENARIO_FILE_ADAPTER`), grouped under its category's key rather than
-    carrying its own `category` field. `name` is a short identifier, used
-    for dedup and as this scenario's CSV-suffix/label when several are
-    compared in one run; `description` defaults to `name` when omitted.
+    """One scenario in a scenario file, under its category's key rather
+    than carrying a `category` field. `description` defaults to `name`.
 
-    `routes` is the route universe this scenario is about (e.g. A,B,C,D
-    for a Columbus Circle swap): which routes a rider can be considered
-    to have a one-seat ride on, and which stations are origins worth
-    classifying at all. It lives here rather than on the command line
-    because it's a property of the scenario -- a Columbus swap is about
-    the same four routes no matter who runs it -- and every route the
-    scenario moves must be in it (`Scenario.load`), so it can't silently
-    disagree with the scenario's own `add`/`remove`. A run selecting
-    several categories classifies every scenario under the union of
-    theirs, so the comparison stays like-for-like; see `ScenarioRun`."""
+    `routes` is the universe this scenario is about (e.g. A,B,C,D for a
+    Columbus Circle swap): which routes count towards a one-seat ride,
+    and which origins are worth classifying. It belongs to the scenario
+    rather than the invocation -- a Columbus swap is about the same four
+    routes whoever runs it -- and must cover every route the scenario
+    moves (`Scenario.load`). A run classifies everything it selects under
+    the union of these; see `ScenarioRun`."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -172,13 +144,11 @@ class ScenarioEntry(BaseModel):
     overrides: list[OverrideGroup] = Field(default_factory=list)
 
 
-# The root of a scenario file: a JSON object mapping a category name to
-# the `ScenarioEntry`s in it (e.g. `"Columbus"` to that junction's swap
-# directions) -- `--category` selects by this key directly. A
-# category's list can't be empty (`min_length=1`): `resolve_scenarios`'s
-# cartesian product over selected categories would otherwise silently
-# produce zero combined scenarios for an empty one, with no error at all.
-# Also what `scenarios.schema.json` is generated from -- see
+# The root of a scenario file: category name -> the `ScenarioEntry`s in
+# it, which `--category` selects by directly. A category can't be empty
+# (`min_length=1`) -- it would silently contribute zero combinations to
+# `resolve_scenarios`'s cartesian product. Also what
+# `scenarios.schema.json` is generated from, see
 # `tests/test_scenarios_schema.py`.
 SCENARIO_FILE_ADAPTER = TypeAdapter(
     dict[str, Annotated[list[ScenarioEntry], Field(min_length=1)]]
@@ -194,27 +164,21 @@ def generate_scenario_schema(
     stations_path: Path = DATA / "stations_complexes.csv",
     individual_stations_path: Path = DATA / "stations_individual.csv",
 ) -> str:
-    """The JSON Schema for a scenario file, generated from
-    `SCENARIO_FILE_ADAPTER` (i.e. from `OverrideGroup`/`ScenarioEntry`
-    directly) plus the top-level metadata a standalone schema file needs
-    (`$schema`, `title`), plus real `line`/`stations`/`add`/`remove`
-    values from the station reference data as JSON Schema `enum`s -- an
-    editor can then autocomplete (and flag a typo in) an actual line,
-    station name, or route directly while editing a scenario file,
-    without cross-referencing the CSVs by hand. These `enum`s are an
-    editor-time snapshot only: `OverrideGroup`/`ScenarioEntry` themselves
-    stay plain `str`, so a real load still goes through
-    `StationIndex.resolve`/`check_routes`'s own runtime checks (against
-    whichever `--stations`/`--stations-individual` was actually passed,
-    not necessarily these defaults) rather than trusting this baked-in
-    list -- the two can disagree (e.g. a rider count run against an older
-    station extract) without either one being wrong for its own purpose.
+    """The JSON Schema for a scenario file: `SCENARIO_FILE_ADAPTER`'s own
+    schema, plus the `$schema`/`title` a standalone file needs, plus real
+    line, station, and route values from the station reference data as
+    `enum`s, so an editor can autocomplete them and flag a typo.
 
-    `stations_path`/`individual_stations_path` aren't committed
-    (gitignored, `mta-od-data prepare`-generated) -- see the
-    `pytest.mark.skipif` in `tests/test_scenarios_schema.py`, which skips
-    rather than fails when they're missing. What `scenarios.schema.json`
-    must always equal when they *are* present -- regenerate it with:
+    Those `enum`s are an editor-time snapshot only: the models stay plain
+    `str` and a real load re-checks (`StationIndex.resolve`/
+    `check_routes`) against whichever `--stations`/`--stations-individual`
+    was actually passed, which can legitimately differ from these
+    defaults.
+
+    The reference CSVs aren't committed (gitignored,
+    `mta-od-data prepare`-generated); `tests/test_scenarios_schema.py`
+    skips rather than fails without them. What `scenarios.schema.json`
+    must equal when they are present -- regenerate it with:
 
         uv run python -c "from mta_od_data.analyze.deinterlining import \\
             SCENARIOS_SCHEMA_FILE, generate_scenario_schema; \\
@@ -223,11 +187,9 @@ def generate_scenario_schema(
     stations_by_id = Station.load_complexes(stations_path)
     individual_stations = Station.load_individuals(individual_stations_path)
     known_lines = sorted({s.line for s in individual_stations if s.line})
-    # A `stations` entry always resolves against an individual platform's
-    # own name plus `line` (`StationIndex.by_name_line`), never a
-    # complex's own name -- `line` is required on every `OverrideGroup`,
-    # so the complex-level name (e.g. "62 St/New Utrecht Av", merging
-    # "62 St" and "New Utrecht Av") is never what's actually checked.
+    # A `stations` entry resolves against a platform's own name plus
+    # `line` (`StationIndex.by_name_line`), never a complex's merged name
+    # (e.g. "62 St/New Utrecht Av"), so that's not what to offer here.
     known_stations = sorted({s.name for s in individual_stations})
     known_routes = sorted({r for s in stations_by_id.values() for r in s.routes})
 
@@ -255,17 +217,11 @@ def generate_scenario_schema(
 
 @dataclass(slots=True, frozen=True)
 class StationIndex:
-    """Resolves a scenario override's (station name, line) to a `Station`,
-    and checks an override's `add`/`remove` routes against the real route
-    universe. Keyed by (individual platform name, line) rather than a
-    complex's own name -- `line` is required on every `OverrideGroup` (see
-    its docstring), so a bare-name lookup with no line is never actually
-    needed: station names alone aren't unique (e.g. "72 St" is three
-    different real complexes: CPW, Broadway-7 Av, and 2 Av), and `line`
-    (e.g. "8th Av - Fulton St", from the individual-station reference
-    data) always resolves which one is meant instead. Built once per
-    invocation from the same station reference data used everywhere else,
-    not a separate lookup source."""
+    """Resolves a scenario override's (station name, line) to a
+    `Station`, and its routes against the ones that really exist. Keyed
+    by platform name plus line because names alone aren't unique ("72 St"
+    is three different complexes: CPW, Broadway-7 Av, and 2 Av), and
+    `line` is required on every `OverrideGroup` anyway."""
 
     by_name_line: dict[tuple[str, str], Station]
     known_routes: frozenset[str]
@@ -295,10 +251,9 @@ class StationIndex:
         return self.by_name_line[key]
 
     def check_routes(self, routes: Routes, *, name: str, path: Path) -> None:
-        """Only a scenario's own `routes` needs checking against the real
-        route universe: `Scenario.load` requires every `add`/`remove`
-        route to be in it, so an unknown route anywhere in a scenario
-        surfaces here rather than needing its own near-identical check."""
+        """`Scenario.load` requires `add`/`remove` to stay within
+        `routes`, so checking `routes` catches every unknown route in a
+        scenario."""
         unknown = sorted(routes - self.known_routes)
         if unknown:
             raise ScenarioError(
@@ -310,53 +265,38 @@ class StationIndex:
 @dataclass(slots=True, frozen=True)
 class Scenario:
     """A deinterlining scenario: real routes overridden only for the
-    specific stations it actually changes -- see `deinterlining_design.md`
-    for why this replaces `one_seat_rides.py`'s corridor-A/corridor-B
-    machinery instead of extending it.
+    stations it actually changes -- see `deinterlining_design.md` for why
+    this replaces `one_seat_rides.py`'s corridor-A/corridor-B machinery
+    instead of extending it.
 
-    `name` is a short identifier (e.g. "A/C CPW Express"); `description`
-    is the longer explanatory text. `category` is the scenario file key
-    this scenario was loaded from (e.g. "Columbus" for every Columbus
-    Circle swap direction) -- `--category` selects by it, the only way to
-    select a scenario besides always-included `Current`."""
+    `category` is the scenario file key this was loaded from (e.g.
+    "Columbus"), which `--category` selects by."""
 
     name: str
     description: str
     category: str
-    # The route universe this scenario classifies under -- everything
-    # here is already narrowed to it, so nothing downstream intersects
-    # again. On a scenario as loaded from a file, it's that entry's own
-    # `routes`; on a combined one (`combine`, what a run actually
-    # classifies with) it's the whole run's universe, so every row of a
-    # comparison covers the same routes. Empty only on `CURRENT`, which
-    # is unrestricted until it's combined into a run.
+    # The universe this scenario classifies under, which everything
+    # below is already narrowed to: the entry's own `routes` as loaded,
+    # and the whole run's once combined, so every row of a comparison
+    # covers the same routes. Empty only on `CURRENT`, until combined.
     routes: Routes
-    # Keyed by `Station` itself, not `complex_id` -- `Station` is frozen
-    # (so hashable), letting every consumer here look a station up
-    # directly instead of needing an indirection through its id.
+    # Keyed by `Station` (frozen, so hashable) rather than `complex_id`,
+    # so consumers look a station up directly.
     overrides: dict[Station, RouteDelta]
-    # A station absent from `overrides` (the overwhelming majority of
-    # them) has no entry here either -- `routes_of` falls back to the
-    # station's own real routes, rather than this dict carrying a
-    # redundant real-routes entry for every unaffected station. Computed
-    # once in `load`/`combine`, from `overrides` alone -- no station
-    # population (e.g. `stations_by_id`) needed -- and already narrowed
-    # to `routes`, so `routes_of` is the only place that narrowing lives.
+    # Only for stations in `overrides`; `routes_of` falls back to a
+    # station's real routes rather than storing an entry for every
+    # unaffected one.
     effective_routes: dict[Station, Routes]
 
     def slug(self) -> str:
-        """Names this scenario's own suffixed CSV file when several are
-        compared in one run (see `suffixed_path`). Derived from `name`
-        every time it's asked for, rather than stored alongside it, so
-        there's nothing that can fall out of sync with it."""
+        """Filename suffix for this scenario's own CSV when several are
+        compared in one run (see `suffixed_path`)."""
         return slugify(self.name)
 
     def routes_of(self, station: Station) -> Routes:
-        """This scenario's routes for `station`, within its universe: its
-        override if it has one, otherwise the station's real routes. The
-        `& self.routes` on the fallback is what `effective_routes`
-        already baked into every override, so both sides come out
-        narrowed the same way."""
+        """This scenario's routes for `station`, narrowed to its
+        universe -- which `effective_routes` already is, so only the
+        fallback needs narrowing."""
         return self.effective_routes.get(station, station.routes & self.routes)
 
     @classmethod
@@ -373,10 +313,8 @@ class Scenario:
         for group in entry.overrides:
             add = frozenset(group.add)
             remove = frozenset(group.remove)
-            # A scenario that moves a route its own universe leaves out
-            # would be classified as if that move never happened -- the
-            # narrowing to `routes` drops it right back out again -- so
-            # it's a scenario-file mistake, not a subtlety to document.
+            # Narrowing to `routes` would drop such a move right back
+            # out, classifying the scenario as if it never happened.
             outside = sorted((add | remove) - routes)
             if outside:
                 raise ScenarioError(
@@ -404,19 +342,13 @@ class Scenario:
 
     @classmethod
     def combine(cls, scenarios: list[Scenario], routes: Routes) -> Scenario:
-        """Merges several scenarios -- one per category in a
-        `resolve_scenarios` cartesian-product combination -- into one:
-        `overrides` is their union (two scenarios touching the same
-        station combine via `RouteDelta.__or__`, same as two override
-        groups within one `ScenarioEntry`), `name`/`description`/
-        `category` are each `" + "`-joined.
+        """Merge one scenario per category into one: `overrides` unioned
+        (`RouteDelta.__or__`), the rest `" + "`-joined.
 
-        `routes` is the whole run's universe, not the union of these
-        scenarios' own: every combination in a run has to classify under
-        the same routes for their totals to be comparable. That's also
-        why a single-element `scenarios` isn't returned as-is -- its
-        `effective_routes` is still narrowed to its own declared routes,
-        which the run's universe may be wider than."""
+        `routes` is the whole run's universe, not these scenarios' own --
+        rows are only comparable if they cover the same routes -- which
+        is also why a single-element `scenarios` isn't returned as-is,
+        its `effective_routes` being narrowed to just its own."""
         overrides: dict[Station, RouteDelta] = {}
         for scenario in scenarios:
             for station, delta in scenario.overrides.items():
@@ -466,11 +398,10 @@ class Scenario:
             one_seat = bool(effective_origin_routes & effective_dest_routes)
 
             total_riders += riders
-            # A `False`/`0.0`/`None` no-op result when the pair is already
-            # one-seat (no walk to evaluate) matches `one_seat_rides.py`'s
-            # `close, dist_m = True, 0.0` convention for that case, just
-            # inverted here since `close` at 1-seat distance 0 isn't a
-            # meaningful "close transfer".
+            # No walk to evaluate when the pair is already one-seat.
+            # `one_seat_rides.py` writes that case as `True, 0.0`;
+            # inverted here, since "close transfer" at distance 0 isn't
+            # meaningful.
             if one_seat:
                 one_seat_riders += riders
                 close, dist_m, near_station_name = False, 0.0, None
@@ -521,21 +452,13 @@ class Scenario:
         )
 
 
-# Today's real routing: the one scenario that isn't authored in a
-# scenario file at all. It's a scenario with no overrides -- there's
-# nothing for an author to write, and requiring an empty entry in every
-# ad-hoc `--scenario-file` was pure ceremony -- but it's still classified
-# through the exact same code path as every other scenario, never as a
-# special case.
+# Today's real routing: a scenario with no overrides, and the only one
+# not authored in a scenario file, since there'd be nothing to write. It
+# has no universe of its own either -- today's routing isn't about any
+# particular routes -- and adopts the run's (see `ScenarioRun`).
 #
-# It's also the one scenario with no route universe of its own: today's
-# routing isn't about any particular set of routes, so it adopts
-# whichever ones the run it's compared in is about (see `ScenarioRun`),
-# rather than declaring a superset by hand.
-#
-# A constant rather than a factory: nothing ever mutates a `Scenario`'s
-# `overrides`/`effective_routes` (`load`/`combine` each build their own),
-# so one shared instance is as good as a fresh one per run.
+# Shared rather than built per run: nothing mutates a `Scenario`'s dicts,
+# `load`/`combine` each build their own.
 CURRENT = Scenario(
     name="Current",
     description="Current routes today",
@@ -548,14 +471,8 @@ CURRENT = Scenario(
 
 @dataclass(slots=True, frozen=True)
 class ScenarioCategory:
-    """Every scenario loaded under one category key in a scenario file's
-    top-level JSON object (e.g. "DeKalb", grouping its swap-direction
-    scenarios) -- one element of `ScenarioFile.categories`. Selecting more
-    than one category at once takes the cartesian product of their
-    `scenarios` (one scenario per selected category per combination,
-    "unchanged" -- the `CURRENT` scenario -- being one of the options for
-    every category), each combination merged into a single scenario
-    by `Scenario.combine` -- see `ScenarioFile.combine_scenarios`."""
+    """The scenarios under one category key (e.g. "DeKalb", grouping its
+    swap directions) -- one element of `ScenarioFile.categories`."""
 
     name: str
     scenarios: list[Scenario]
@@ -578,40 +495,25 @@ class ScenarioCategory:
 
 @dataclass(slots=True, frozen=True)
 class ScenarioFile:
-    """Every category in one scenario file (`path`, e.g. `scenarios.json5`
-    or an ad-hoc `--scenario-file`) -- what `load` parses the whole file
-    into. `filter` narrows to the named categories (raising
-    `ScenarioError` for any that don't exist), preserving `categories`'
-    own order rather than the order they were requested in.
-    `combine_scenarios` takes the cartesian product of `categories`'
-    `scenarios` (plus the baseline it's passed, as an option for every
-    category) and merges each combination via `Scenario.combine`.
-    `resolve_scenarios` composes these: `filter` to the `--category`
-    selection, then combine it against the `CURRENT` scenario as the
-    baseline."""
+    """Every category in one scenario file. `filter` narrows to the
+    named categories, keeping this file's own order rather than the order
+    requested; `combine_scenarios` builds the run's scenarios from what's
+    left. `resolve_scenarios` composes the two."""
 
     path: Path
     categories: list[ScenarioCategory]
 
     @classmethod
     def load(cls, path: Path, station_index: StationIndex) -> ScenarioFile:
-        """A scenario file holds a JSON object of category name to the
-        `ScenarioEntry`s in it, not just one -- `--scenario-file` (the
-        catalog) defines several related scenarios, across several
-        categories, together."""
-        # JSON5 (a strict superset of JSON): tolerates a trailing comma
-        # before a closing `}`/`]`, an easy slip when hand-editing scenario
-        # files -- plain `json.loads` would reject it outright.
+        # JSON5, not JSON: tolerates the trailing comma before a closing
+        # `}`/`]` that's easy to leave when hand-editing.
         try:
             data = json5.loads(path.read_text())
         except ValueError as e:
             raise ScenarioError(f"scenario file {path} isn't valid JSON: {e}") from e
-        # `ScenarioEntry`/`OverrideGroup` (both `pydantic.BaseModel`s) own
-        # the shape validation here -- a required field missing, an unknown
-        # field (`extra="forbid"`), or a wrong type all become one
-        # `ValidationError`, so there's no manual field-by-field checking
-        # to keep in sync with the schema (`scenarios.schema.json`, itself
-        # generated from these same models).
+        # The models own shape validation: missing, unknown
+        # (`extra="forbid"`), and wrong-typed fields all come back as one
+        # `ValidationError`, with nothing to keep in sync by hand.
         try:
             by_category = SCENARIO_FILE_ADAPTER.validate_python(data)
         except ValidationError as e:
@@ -642,10 +544,8 @@ class ScenarioFile:
 
     @property
     def routes(self) -> Routes:
-        """Every route any scenario in this file's categories is about --
-        the run's universe once `filter`ed down to the selected
-        categories. See `ScenarioRun` for why one universe covers the
-        whole run rather than each scenario keeping its own."""
+        """Every route the scenarios here are about: the run's universe,
+        once `filter`ed to the selected categories (see `ScenarioRun`)."""
         return frozenset(
             route
             for category in self.categories
@@ -654,18 +554,15 @@ class ScenarioFile:
         )
 
     def combine_scenarios(self, baseline: list[Scenario]) -> list[Scenario]:
-        """`baseline` (the `CURRENT` scenario) joins *every*
-        category's own options, rather than standing alone as one more
-        combination: leaving a category unchanged is itself one of the
-        choices for it, so selecting two categories with two scenarios
-        each yields nine combinations (three options per category), not
-        four -- each category's scenarios on their own (the other left at
-        today's routing) included, not just every proposal paired with
-        another proposal.
+        """Cartesian product of the categories' scenarios, each
+        combination merged by `Scenario.combine`, all against this file's
+        `routes` as the one universe for the run.
 
-        Every combination is built against this file's `routes` -- one
-        universe for the whole run, `baseline` (which has none of its
-        own) included."""
+        `baseline` (the `CURRENT` scenario) is an option for *every*
+        category rather than one extra combination alongside them:
+        leaving a category unchanged is itself one of its choices. So two
+        categories with two scenarios each give nine combinations, not
+        four, each category's scenarios on their own included."""
         if not self.categories:
             return []
         routes = self.routes
@@ -695,9 +592,8 @@ class ScenarioResult:
         return self.one_seat_riders + self.close_riders
 
     def pct(self, riders: float) -> float:
-        # `total_riders` is never 0 here: `Scenario.classify` raises
-        # `ScenarioError` before constructing a `ScenarioResult` with one,
-        # rather than let every caller of `pct()` guard against it.
+        # Never 0: `Scenario.classify` raises before building a
+        # `ScenarioResult` with no riders.
         return 100 * riders / self.total_riders
 
     def write_csv(self, path: Path) -> None:
@@ -832,18 +728,15 @@ def render_comparison_markdown(results: list[ScenarioResult]) -> str:
 
 @dataclass(slots=True, frozen=True)
 class ScenarioRun:
-    """Everything one comparison run classifies: its `scenarios` and the
-    `routes` universe they all share.
+    """One comparison run: its `scenarios` and the `routes` universe they
+    all share.
 
-    That universe is the union of every selected scenario's own `routes`,
-    applied to all of them alike (`Scenario.combine`) rather than each
-    scenario classifying under just its own. Two scenarios compared under
-    different universes aren't comparable: the origins in scope are the
-    union either way, so the one with the narrower universe would count
-    the other's riders in its total while never being able to give them a
-    one-seat ride, and would look worse for no reason but the
-    bookkeeping. `Current` has no universe of its own at all, and only
-    ever gets one from here."""
+    That universe is the union of the selected scenarios' own, applied to
+    all of them alike. Scenarios classified under different universes
+    aren't comparable: origins in scope are the union either way, so the
+    narrower one carries the other's riders in its total while never
+    giving them a one-seat ride. `CURRENT` has no universe of its own and
+    gets one only from here."""
 
     routes: Routes
     scenarios: list[Scenario]
@@ -855,18 +748,10 @@ def resolve_scenarios(
     scenario_file: Path,
     station_index: StationIndex,
 ) -> ScenarioRun:
-    """One combined scenario per element of the cartesian product of every
-    `--category`-selected category's scenarios *plus* the `CURRENT`
-    scenario (today's real routing, i.e. the option of leaving that
-    category unchanged) -- `Scenario.combine`, via
-    `ScenarioFile.filter`/`combine_scenarios`. So two categories with two
-    scenarios each select nine combined scenarios: every pairing, each
-    category's scenarios on their own, and `Current` throughout as the
-    baseline. A single selected category just yields `Current` plus its
-    own scenarios, nothing to combine. Raises `ScenarioError` (not
-    `SystemExit`) for a missing/malformed `--scenario-file`, an unknown
-    `--category`, or no `--category` at all; only `deinterlining()` itself
-    exits."""
+    """The run for a `--category` selection: the selected categories'
+    scenarios combined every possible way, with `CURRENT` among each
+    category's options (see `ScenarioFile.combine_scenarios`). Raises
+    `ScenarioError` rather than exiting; only `deinterlining()` exits."""
     try:
         file = ScenarioFile.load(scenario_file, station_index)
     except FileNotFoundError as e:
@@ -874,9 +759,6 @@ def resolve_scenarios(
 
     if not categories:
         available = ", ".join(sorted(c.name for c in file.categories)) or "none"
-        # Not just "nothing to compare against today's routing": the route
-        # universe comes from the selected scenarios now, so a selection
-        # of none leaves nothing to classify under either.
         raise ScenarioError(
             f"no --category selected: the scenarios to compare, and the "
             f"routes to compare them over, both come from one (available "
@@ -897,18 +779,14 @@ def deinterlining(
             "--category",
             help=(
                 "Select a category in --scenario-file (e.g. a junction's "
-                "proposed swap directions) -- required, and the only way "
-                'to select scenarios besides always-included "Current". '
-                "The routes a run covers come from the scenarios it "
-                "selects (each declares its own), not from the command "
-                "line. Repeatable: "
+                "proposed swap directions). Required: both the scenarios "
+                "to compare and the routes to compare them over come from "
+                "it, with today's routing always included. Repeatable -- "
                 "with two or more, every scenario in each selected "
-                "category is combined with one from every other (their "
-                "overrides unioned), leaving a category unchanged being "
-                "one of the options for it, so two categories with two "
-                "scenarios each run nine combined scenarios -- every "
-                "pairing, each category's two on their own, and today's "
-                "routing throughout."
+                "category runs combined with one from every other, and "
+                "leaving a category unchanged is one of its options, so "
+                "two categories with two scenarios each run nine "
+                "combinations."
             ),
         ),
     ] = None,
@@ -917,20 +795,18 @@ def deinterlining(
         Option(
             help=(
                 "JSON file, a JSON object of {category: [{'name': str, "
-                "'description': str, 'overrides': [{'line': str, 'add': "
-                "[route, ...], 'remove': [route, ...], 'stations': "
-                "[station_name, ...]}, ...]}, ...]}. Each override group "
-                "applies the same add/remove to every listed station -- "
-                "the usual case, since a deinterlining change typically "
-                "affects several stations on one line the same way. "
-                "'line' (e.g. '8th Av - Fulton St') is required on every "
-                "group: besides disambiguating a station_name shared by "
-                "multiple complexes elsewhere in the system, it states "
-                "which physical line a group applies to without cross-"
-                "referencing station reference data. --category selects by "
-                'the top-level key; "Current" (today\'s real routing) is '
-                "built in rather than defined here, and always compared "
-                "against. Trailing commas are tolerated."
+                "'description': str, 'routes': [route, ...], 'overrides': "
+                "[{'line': str, 'add': [route, ...], 'remove': [route, "
+                "...], 'stations': [station_name, ...]}, ...]}, ...]}. "
+                "Each override group applies the same add/remove to every "
+                "station listed; 'routes' must cover every route the "
+                "scenario moves. 'line' (e.g. '8th Av - Fulton St') is "
+                "required on every group: it disambiguates station names "
+                "shared by several complexes, and states which physical "
+                "line the group applies to. --category selects by the "
+                'top-level key; "Current" (today\'s real routing) is built '
+                "in rather than defined here. Trailing commas are "
+                "tolerated."
             ),
         ),
     ] = SCENARIOS_FILE,
@@ -971,23 +847,16 @@ def deinterlining(
 ) -> None:
     """Systemwide deinterlining scenario comparator: classify every
     origin/destination pair whose origin could plausibly use one of the
-    selected scenarios' own routes as one-seat or transfer, under today's
-    real routing and any
-    number of route-override scenarios -- selected from `--scenario-file`
-    by `--category` (every scenario in it with that category; selecting
-    more than one category combines them into every pairing, see
-    `Scenario.combine`) -- all classified in one pass over the same
-    fetched OD pairs, so comparing several proposals doesn't reclassify
-    "today" once per proposal.
+    selected scenarios' routes as one-seat or transfer, under today's
+    routing and any number of route-override scenarios, all in one pass
+    over the same fetched OD pairs.
 
     Unlike `one-seat-rides`, there's no latitude boundary and no
-    origin-side-only corridor restriction -- a scenario can reassign which
-    routes serve a *destination* station too, so this can express
-    deinterlining shapes `one-seat-rides` can't (e.g. Columbus Circle's
-    destination-stopping-pattern swap). Also unlike `one-seat-rides`,
-    there's no primary/non-primary route distinction: any route a rider
-    actually shares with their destination counts as one-seat, even a
-    "slower" one -- see `deinterlining_design.md` for why.
+    origin-side-only corridor restriction -- a scenario can reassign
+    which routes serve a *destination* station too, e.g. Columbus
+    Circle's stopping-pattern swap -- and no primary/non-primary route
+    distinction: any route a rider shares with their destination counts,
+    even a "slower" one. See `deinterlining_design.md` for why.
 
     \b
     Examples:
@@ -997,11 +866,9 @@ def deinterlining(
             --markdown-out src/mta_od_data/analyze/deinterlining_columbus_circle.md
 
     \b
-        # DeKalb and Columbus together: every combination of one DeKalb
-        # swap direction and one Columbus swap direction, each a single
-        # combined scenario with both changes' overrides applied at once,
-        # plus each junction's own swaps with the other left as it is today
-        # (classified over both categories' routes together)
+        # DeKalb and Columbus together, over both categories' routes:
+        # every pairing of one swap direction from each, plus each
+        # junction's own swaps with the other left as it is today
         mta-od-data analyze deinterlining --category "DeKalb" --category "Columbus"
 
     \b
@@ -1038,12 +905,11 @@ def deinterlining(
     print(f"Route universe: {sorted(routes_set)}")
     print(f"Day filter: {days_list if days_list else 'all days'} ({day_type_label})")
 
-    # Systemwide, but not literally every station: an origin only matters
-    # if it could plausibly use one of the run's routes under *any* scenario
-    # being compared (today's real routing included) -- otherwise its
-    # trips have nothing to do with the junction(s) being analyzed (unlike
-    # `regional_flow.py`, whose question -- does a trip touch this region
-    # -- has no such natural restriction).
+    # Systemwide, but not literally every station: an origin only
+    # matters if some scenario gives it one of the run's routes,
+    # otherwise its trips have nothing to do with the junctions being
+    # analyzed. Unlike `regional_flow.py`, whose question -- does a trip
+    # touch this region -- has no such natural restriction.
     origin_ids = [
         s.complex_id
         for s in stations_by_id.values()
@@ -1096,13 +962,10 @@ def deinterlining(
     for s in individual_stations:
         platforms_by_complex.setdefault(s.complex_id, []).append(s)
 
-    # Same caching structure as `one_seat_rides.py`'s `assigned_points`/
-    # `min_dist_to_corridor` -- local rather than cached at their own
-    # definition since both close over `individual_stations`/
-    # `platforms_by_complex`, loaded fresh per invocation. Shared across
-    # every scenario's `Scenario.classify` call (including the "Current"
-    # scenario's), since cache keys are (dest, effective routes) pairs,
-    # not scenario-specific.
+    # Same caching structure as `one_seat_rides.py`'s, local because
+    # both close over `individual_stations`/`platforms_by_complex`. The
+    # cache is shared across every scenario, its keys being (dest,
+    # effective routes) rather than anything scenario-specific.
     @cache
     def assigned_points(assigned_routes: Routes) -> list[Station]:
         return [s for s in individual_stations if s.routes & assigned_routes]
@@ -1113,12 +976,9 @@ def deinterlining(
     ) -> tuple[float, Station] | None:
         candidates = assigned_points(assigned_routes)
         if not candidates:
-            # Unlike `one_seat_rides.py`, this can legitimately happen here:
-            # systemwide, a scenario-effective route set might have no
-            # individual-station match at all for some origin (e.g. a
-            # synthetic route with no real platform data -- not used by any
-            # scenario yet, but the classifier shouldn't crash if one ever
-            # is).
+            # Can legitimately happen systemwide, unlike in
+            # `one_seat_rides.py`: a route with no individual-station data
+            # at all, e.g. a synthetic one no scenario uses yet.
             return None
         points = [s.loc for s in platforms_by_complex.get(dest.complex_id, [dest])]
         best: tuple[float, Station] | None = None
