@@ -1,11 +1,9 @@
-"""`scenarios.schema.json` (checked in, for editor autocompletion) must
-match the schema `OverrideGroup`/`ScenarioFile` -- the Pydantic models that
-actually validate a scenario file at load time -- currently generate, or
-it's silently documenting a shape `Scenario.load_all` no longer accepts.
+"""The checked-in `scenarios.schema.json` must match what the models
+that actually validate a scenario file generate, or it's silently
+documenting a shape `ScenarioFile.load` no longer accepts.
 
-Skipped when the station reference CSVs are missing: they're gitignored,
-`mta-od-data prepare`-generated, and `generate_scenario_schema` reads them
-to populate the schema's `line`/`stations`/`add`/`remove` enums.
+Skipped without the station reference CSVs, which
+`generate_scenario_schema` reads for its enums.
 """
 
 import pytest

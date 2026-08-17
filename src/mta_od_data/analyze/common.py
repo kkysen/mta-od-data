@@ -24,11 +24,10 @@ DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {
 
 
 def abbreviate_name(name: str) -> str:
-    """Shortened forms for station names that are unwieldy at their full length,
-    especially once a route list gets appended in parentheses.
-    Applied as a plain substring replacement, so it also shortens compound complex
-    names that merge in the long form (e.g. "Chambers St/WTC/Park Place/Cortlandt
-    St")."""
+    """Shorter forms for station names that are unwieldy at full length,
+    especially with a route list appended. A plain substring replacement, so
+    it also shortens merged complex names containing the long form (e.g.
+    "Chambers St/WTC/Park Place/Cortlandt St")."""
     abbreviations = (
         ("Atlantic Av-Barclays Ctr", "Atlantic Av"),
         ("Port Authority Bus Terminal", "PABT"),
@@ -48,36 +47,20 @@ class Coord:
 @dataclass(slots=True, frozen=True)
 class Station:
     complex_id: int
-    # Base name, without a route list baked in -- callers wanting one call
-    # `display()`, either with this station's own full route set (the
-    # default) or a narrower one (e.g. just the route(s) a given trip
-    # actually used, for a merged complex where those stop at only one of
-    # several physical platforms).
     name: str
     routes: frozenset[str]
     loc: Coord
     # "M"/"Bk"/"Bx"/"Q"/"SI", as given by the source data.
     borough: str
-    # Whether the station falls in Manhattan's Congestion Relief Zone (below
-    # 60th St) -- a curated flag from the source data, not a latitude cut:
-    # it correctly excludes Roosevelt Island despite its latitude, and its
-    # actual boundary follows 60th St rather than a fixed parallel.
+    # In Manhattan's Congestion Relief Zone; see `regions.cbd_region`.
     cbd: bool
     # Physical line name (e.g. "4th Av"), individual per-platform stations
     # only -- empty for a complex, which can span several lines.
     line: str = ""
 
-    # Cached at the method itself, not just at call sites that happen to
-    # want it: `Station` is frozen and every field (including `routes`, a
-    # `frozenset[str]`) is hashable, so this is a pure function of
-    # `(self, routes)` -- there's no invocation-specific state involved (a
-    # `Station` is a fixed value once loaded, unlike e.g. `assigned_points`
-    # in `one_seat_rides.py`, which closes over per-invocation station-file
-    # data and so stays scoped to that invocation instead).
-    # noqa justification: B019 warns that caching a method can keep `self`
-    # alive forever, but every `Station` here is already held for the whole
-    # process's life by `Station.load_complexes`/`load_individuals`'s own
-    # dict/list -- the cache isn't extending anything's lifetime.
+    # B019 warns that caching a method keeps `self` alive forever, but
+    # `load_complexes`/`load_individuals` already hold every `Station` for
+    # the process's lifetime.
     @cache  # noqa: B019
     def display(self, routes: frozenset[str] | None = None) -> str:
         shown_routes = self.routes if routes is None else routes
@@ -105,10 +88,10 @@ class Station:
 
     @classmethod
     def load_individual(cls, row: dict[str, str]) -> Self:
-        """Per-physical-station rows (not complex centroids). A complex can merge
-        several physical stations (e.g. Times Sq-42 St/Port Authority Bus
-        Terminal), so its centroid can sit well away from any actual platform;
-        these per-station points give accurate nearest-station distances."""
+        """Per-platform rows, not complex centroids: a merged complex
+        (e.g. Times Sq-42 St/Port Authority Bus Terminal) has a centroid
+        that can sit well away from any of its actual platforms, which
+        would throw off a nearest-station distance."""
         return cls(
             complex_id=int(row["complex_id"]),
             name=abbreviate_name(row["stop_name"]),
@@ -127,9 +110,6 @@ class Station:
             return [cls.load_individual(row) for row in csv.DictReader(f)]
 
 
-# Pure function of two `Coord`s (both frozen and hashable), so this is safe
-# to cache for the process's lifetime -- unlike `one_seat_rides.py`'s other
-# caches, nothing here depends on which invocation is asking.
 @cache
 def haversine_m(c1: Coord, c2: Coord) -> float:
     r = 6_371_000.0

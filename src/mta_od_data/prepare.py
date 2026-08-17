@@ -14,10 +14,7 @@ DEFAULT_PARQUET = DATA / "mta_od.parquet"
 DEFAULT_STATIONS_CSV = DATA / "stations_complexes.csv"
 DEFAULT_STATIONS_INDIVIDUAL_CSV = DATA / "stations_individual.csv"
 STATIONS_URL = "https://data.ny.gov/resource/5f5g-n3cz.csv?$limit=1000"
-# Per-physical-station (not complex-centroid) coordinates; complexes can merge
-# multiple physical stations (e.g. Times Sq-42 St/Port Authority Bus Terminal),
-# so complex centroids can sit well away from any actual platform. This gives
-# the true per-station points for accurate nearest-station distance checks.
+# Per-platform coordinates; see `Station.load_individual`.
 STATIONS_INDIVIDUAL_URL = "https://data.ny.gov/resource/39hk-dx4f.csv?$limit=1000"
 
 
@@ -42,16 +39,11 @@ def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> No
         """
         COPY (
             SELECT * FROM read_csv($csv_patterns, union_by_name=true, thousands=',')
-            -- Sorted so every `analyze` query's row-group statistics (zonemaps)
-            -- can actually skip data instead of scanning the whole file: "Day
-            -- of Week" is the one filter every current and (presumably) future
-            -- analysis scopes by, and "Origin Station Complex ID" is the other
-            -- natural scoping dimension (a specific corridor/station set) --
-            -- together they're a superset of every query shape seen so far, and
-            -- sorting by them is never worse than leaving the file in its
-            -- original date/hour-ordered form, even for a query that filters by
-            -- neither (it also shrinks the file: better run-length/dictionary
-            -- compression on sorted columns).
+            -- Sorted so `analyze`'s row-group statistics can skip data
+            -- rather than scan the whole file: every analysis so far
+            -- filters by day of week, and scopes to some set of origins.
+            -- Never worse than the original date/hour order even for a
+            -- query filtering by neither, and it compresses better.
             ORDER BY "Day of Week", "Origin Station Complex ID"
         ) TO $out (FORMAT parquet)
         """,
