@@ -23,13 +23,9 @@ Two junctions are currently tracked as committed snapshots:
   Franklin Av. See
   [`src/mta_od_data/analyze/nostrand_one_seat_rides.md`](src/mta_od_data/analyze/nostrand_one_seat_rides.md).
 
-Both are generated, not hand-written -- e.g. `mta-od-data analyze
-one-seat-rides --markdown-out src/mta_od_data/analyze/dekalb_one_seat_rides.md`
-(see each file's own `Produced by` line for its exact invocation). A
-`pre-commit` hook (`pytest`, see
-[`.pre-commit-config.yaml`](.pre-commit-config.yaml)) checks each is still
-up to date on every commit, so they can't drift out of sync—see
-[Development](#development).
+Both are generated, not hand-written -- see each file's own `Produced by`
+line for its exact invocation, and [Development](#development) for the
+hook that keeps them from drifting.
 
 ## Data
 
@@ -53,8 +49,7 @@ up to date on every commit, so they can't drift out of sync—see
 
 [`src/mta_od_data/`](src/mta_od_data/) is an installable package
 (`duckdb`/`typer` as its only runtime dependencies); `uv sync` installs it
-and its `mta-od-data` entry point into the project's `.venv`. Three
-commands:
+and its `mta-od-data` entry point into the project's `.venv`.
 
 ### `mta-od-data prepare`
 
@@ -90,6 +85,22 @@ deinterlining scenarios entirely (different junction, different trunk
 pairs) — run `--help` for the full list, or see the module docstring for
 worked examples.
 
+### `mta-od-data analyze deinterlining`
+
+The systemwide successor to `one-seat-rides`, for junctions its shape
+can't express: a scenario overrides which routes serve individual
+stations, so it covers express/local swaps at a single trunk (Columbus
+Circle) as well as corridor swaps. Scenarios live in
+[`scenarios.json5`](src/mta_od_data/analyze/scenarios.json5), grouped into
+categories that `--category` selects by, each declaring the routes it
+covers; today's real routing is always compared against, and selecting
+two categories runs every combination of them.
+See [`deinterlining_design.md`](src/mta_od_data/analyze/deinterlining_design.md).
+
+```sh
+uv run mta-od-data analyze deinterlining --category Columbus
+```
+
 ### `mta-od-data analyze regional-flow`
 
 A more general question than `one-seat-rides`: for any region, what share of
@@ -104,9 +115,8 @@ region, using `--region`/`--region-borough`/`--region-bbox` (see
 uv run mta-od-data analyze regional-flow --region cbd
 ```
 
-Defaults to `cbd`: Manhattan's Congestion Relief Zone, i.e. "Lower
-Manhattan" in the congestion-pricing/Hub Bound Report sense (below 60th
-St). Same `--csv-out`/`--markdown-out` options as `one-seat-rides`; see
+Defaults to `cbd`. Same `--csv-out`/`--markdown-out` options as
+`one-seat-rides`; see
 [`src/mta_od_data/analyze/regional_flow.md`](src/mta_od_data/analyze/regional_flow.md)
 for example output.
 
@@ -177,18 +187,11 @@ uv run pre-commit install
 
 installs the `git` hooks in
 [`.pre-commit-config.yaml`](.pre-commit-config.yaml): `ruff`, `ty`,
-`pyrefly`, and a local `pytest` hook that runs `uv run pytest` on every
-commit, unconditionally (`always_run: true`, no `files:` filter), same as
-the others.
+`pyrefly`, and `pytest`.
+
 [`tests/test_analyze_snapshots.py`](tests/test_analyze_snapshots.py)
-reruns each `analyze` subcommand into a scratch file and diffs it against
-its committed `.md` snapshot, kept alongside its module under
-[`src/mta_od_data/analyze/`](src/mta_od_data/analyze/) (e.g.
-[`dekalb_one_seat_rides.md`](src/mta_od_data/analyze/dekalb_one_seat_rides.md)).
-Check-only, like the other hooks
-(`ruff format --check`, `ty`, `pyrefly-check`): it never rewrites a
-snapshot itself, it just fails with a diff and the regen command to run
-by hand. Skipped (not failed) when `data/mta_od.parquet` isn't present
-(e.g. a fresh clone before running `mta-od-data prepare`)—the same skip
-applies to a plain `uv run pytest`, since the real OD data is gitignored
-and unavailable in CI.
+reruns each `analyze` subcommand and diffs it against its committed `.md`
+snapshot. Check-only, like every other hook here: it fails with a diff and
+the regen command rather than rewriting the snapshot itself. Skipped, not
+failed, without `data/mta_od.parquet`, which is gitignored and so
+unavailable in CI or a fresh clone.

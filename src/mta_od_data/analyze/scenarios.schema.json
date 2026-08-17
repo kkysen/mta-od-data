@@ -5,7 +5,7 @@
   "$defs": {
     "OverrideGroup": {
       "additionalProperties": false,
-      "description": "One entry in a scenario's `overrides`: an add/remove pair applied\nto every station in `stations`, since a deinterlining change usually\nhits several stations on one line the same way.\n\n`line` (e.g. \"8th Av - Fulton St\") is required even where a name is\nalready unique: it disambiguates names shared by several complexes\n(see `StationIndex.resolve`), and says which physical line a group is\nabout without cross-referencing `stations_individual.csv`.",
+      "description": "`line` (e.g. \"8th Av - Fulton St\") is required even where a\nstation name is already unique: names are shared by several complexes\n(\"72 St\" is three), and it says which physical line a group is about\nwithout cross-referencing `stations_individual.csv`.",
       "properties": {
         "line": {
           "minLength": 1,
@@ -511,7 +511,7 @@
     },
     "ScenarioEntry": {
       "additionalProperties": false,
-      "description": "One scenario in a scenario file, under its category's key rather\nthan carrying a `category` field. `description` defaults to `name`.\n\n`routes` is the universe this scenario is about (e.g. A,B,C,D for a\nColumbus Circle swap): which routes count towards a one-seat ride,\nand which origins are worth classifying. It belongs to the scenario\nrather than the invocation -- a Columbus swap is about the same four\nroutes whoever runs it -- and must cover every route the scenario\nmoves (`Scenario.load`). A run classifies everything it selects under\nthe union of these; see `ScenarioRun`.",
+      "description": "`routes` is the universe this scenario is about (e.g. A,B,C,D for\na Columbus Circle swap): which routes count towards a one-seat ride,\nand which origins are worth classifying at all. A run uses the union\nof the selected scenarios'; see `ScenarioRun`.",
       "properties": {
         "name": {
           "minLength": 1,
