@@ -50,13 +50,10 @@ class RegionalFlowResult:
 
     @property
     def inter(self) -> float:
-        """Riders whose trip crosses the region boundary, either
-        direction."""
         return self.in_out + self.out_in
 
     @property
     def intra(self) -> float:
-        """Riders whose trip stays on one side of it."""
         return self.in_in + self.out_out
 
     def pct(self, riders: float) -> float:
@@ -314,8 +311,7 @@ def regional_flow(
     assert n_days_result is not None, "aggregate query always returns exactly one row"
     n_distinct_days, min_date, max_date = n_days_result
 
-    # "riders" throughout is per-day average, not a multi-day total. No
-    # origin filter, unlike `one-seat-rides`: every trip has some
+    # No origin filter, unlike `one-seat-rides`: every trip has some
     # relationship to the region.
     pairs_query = f"""
         SELECT "Origin Station Complex ID" AS origin_id,

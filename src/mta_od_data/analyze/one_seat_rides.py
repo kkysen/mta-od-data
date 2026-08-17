@@ -42,8 +42,7 @@ class PairRow:
     one_seat: bool
     close: bool
     dist_m: float
-    # What `dist_m` was measured to; None for `1-seat` rows, which are
-    # 0m by construction.
+    # None for `1-seat` rows, which are 0m by construction.
     near_station: str | None
 
 
@@ -194,7 +193,6 @@ class ScenarioResult:
         top_n: int,
         csv_out: Path | None,
     ) -> str:
-        # A level deeper when each scenario has its own `##` section.
         h2 = "###" if show_label else "##"
         lines: list[str] = []
         if show_label:
@@ -337,8 +335,6 @@ class ScenarioDef:
     corridor_a_assigned_set: frozenset[str]
     corridor_b_assigned_set: frozenset[str]
     active: bool
-    # Filename suffix for per-scenario CSV output; None writes to the
-    # given path unchanged, keeping single-scenario runs' filenames.
     suffix: str | None
 
 
@@ -463,8 +459,7 @@ def run_scenario(
 
     rows: list[PairRow] = []
     # The same per-row narrowing as `dest_name`, unioned across origins
-    # for the aggregate per-destination table. A destination with no such
-    # rows falls back to its full route list below.
+    # for the aggregate table below.
     dest_route_union: dict[int, set[str]] = {}
     for origin_id, dest_id, riders in scoped:
         origin = stations_by_id[origin_id]
@@ -1063,7 +1058,6 @@ def one_seat_rides(
     assert n_days_result is not None, "aggregate query always returns exactly one row"
     n_distinct_days, min_date, max_date = n_days_result
 
-    # "riders" throughout is per-day average, not a multi-day total.
     pairs_query = f"""
         SELECT "Origin Station Complex ID" AS origin_id,
                "Destination Station Complex ID" AS dest_id,
