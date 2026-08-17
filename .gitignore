@@ -7,3 +7,6 @@ __pycache__/
 *.csv
 *.csv.xz
 data/
+
+# Contains useful settings for JSON schemas.
+!.vscode/
