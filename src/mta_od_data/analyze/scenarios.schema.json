@@ -511,7 +511,7 @@
     },
     "ScenarioEntry": {
       "additionalProperties": false,
-      "description": "One scenario in a scenario file's top-level JSON object (see\n`SCENARIO_FILE_ADAPTER`), grouped under its category's key rather than\ncarrying its own `category` field. `name` is a short identifier, used\nfor dedup and as this scenario's CSV-suffix/label when several are\ncompared in one run; `description` defaults to `name` when omitted.",
+      "description": "One scenario in a scenario file's top-level JSON object (see\n`SCENARIO_FILE_ADAPTER`), grouped under its category's key rather than\ncarrying its own `category` field. `name` is a short identifier, used\nfor dedup and as this scenario's CSV-suffix/label when several are\ncompared in one run; `description` defaults to `name` when omitted.\n\n`routes` is the route universe this scenario is about (e.g. A,B,C,D\nfor a Columbus Circle swap): which routes a rider can be considered\nto have a one-seat ride on, and which stations are origins worth\nclassifying at all. It lives here rather than on the command line\nbecause it's a property of the scenario -- a Columbus swap is about\nthe same four routes no matter who runs it -- and every route the\nscenario moves must be in it (`Scenario.load`), so it can't silently\ndisagree with the scenario's own `add`/`remove`. A run selecting\nseveral categories classifies every scenario under the union of\ntheirs, so the comparison stays like-for-like; see `ScenarioRun`.",
       "properties": {
         "name": {
           "minLength": 1,
@@ -530,6 +530,40 @@
           "default": null,
           "title": "Description"
         },
+        "routes": {
+          "items": {
+            "type": "string",
+            "enum": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "A",
+              "B",
+              "C",
+              "D",
+              "E",
+              "F",
+              "G",
+              "J",
+              "L",
+              "M",
+              "N",
+              "Q",
+              "R",
+              "S",
+              "SIR",
+              "W",
+              "Z"
+            ]
+          },
+          "minItems": 1,
+          "title": "Routes",
+          "type": "array"
+        },
         "overrides": {
           "items": {
             "$ref": "#/$defs/OverrideGroup"
@@ -539,7 +573,8 @@
         }
       },
       "required": [
-        "name"
+        "name",
+        "routes"
       ],
       "title": "ScenarioEntry",
       "type": "object"
