@@ -73,6 +73,17 @@ to keep both turns up.
 A genuinely new command name is warranted when RAPTOR lands, since the
 tool then answers a qualitatively different question.
 
+## Known gap: the route data is weekday-only
+
+`daytime_routes` -- the only route field either station reference CSV has
+-- is documented (per its `data.ny.gov` metadata) as the subway routes
+serving a station **during weekdays**. So every run silently uses weekday
+route membership, whatever `--day-type` or `--days` says. This affects
+every command here, not just this one, and is unfixed.
+
+Static GTFS (`calendar.txt`/`trips.txt`) would give real service-day-aware
+membership.
+
 ## GTFS and RAPTOR sequencing
 
 **RAPTOR: later.** One-seat classification is a set intersection; RAPTOR
@@ -81,14 +92,10 @@ questions (Herald Sq being a shorter transfer than Atlantic Av; a 4 Av-to-
 Brighton rider making two easy cross-platform transfers rather than one
 bad one).
 
-Deferring it isn't wasted effort. Static GTFS ingestion, which RAPTOR
-needs as its core input anyway, is worth having on its own: `daytime_routes`
--- the only route field either station reference CSV has -- is documented
-as the routes serving a station **during weekdays**, so every run silently
-uses weekday route membership whatever `--day-type` says.
-`calendar.txt`/`trips.txt` would fix that. And the classification logic
-RAPTOR would eventually make obsolete is a set intersection, cheap to
-replace later.
+Deferring it isn't wasted effort. Static GTFS ingestion is RAPTOR's core
+input anyway, and worth having on its own for the gap above. And the
+classification logic RAPTOR would eventually make obsolete is a set
+intersection, cheap to replace later.
 
 GTFS-RT is a different, harder problem, and not needed for any of this.
 
