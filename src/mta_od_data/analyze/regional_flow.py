@@ -50,14 +50,13 @@ class RegionalFlowResult:
 
     @property
     def inter(self) -> float:
-        """Interregional: riders whose trip crosses the region boundary,
-        either direction."""
+        """Riders whose trip crosses the region boundary, either
+        direction."""
         return self.in_out + self.out_in
 
     @property
     def intra(self) -> float:
-        """Intraregional: riders whose trip never crosses the region
-        boundary, on either side of it -- the complement of `inter`."""
+        """Riders whose trip stays on one side of it."""
         return self.in_in + self.out_out
 
     def pct(self, riders: float) -> float:
@@ -315,11 +314,9 @@ def regional_flow(
     assert n_days_result is not None, "aggregate query always returns exactly one row"
     n_distinct_days, min_date, max_date = n_days_result
 
-    # "riders" throughout is average weekday (or whichever day-type) ridership,
-    # i.e. the sum over all matching days divided by the number of distinct
-    # matching days -- not a multi-day total. System-wide: no origin filter,
-    # unlike `one-seat-rides`, since the question here is about every trip's
-    # relationship to the region, not just trips from a pre-selected corridor.
+    # "riders" throughout is per-day average, not a multi-day total. No
+    # origin filter, unlike `one-seat-rides`: every trip has some
+    # relationship to the region.
     pairs_query = f"""
         SELECT "Origin Station Complex ID" AS origin_id,
                "Destination Station Complex ID" AS dest_id,
@@ -365,10 +362,8 @@ def regional_flow(
         else:
             out_out += riders
 
-        # Bare names, not `display()` -- the route(s) a rider actually used
-        # aren't knowable here the way `one_seat_rides` narrows them (there's
-        # no route universe to narrow against), so showing a merged complex's
-        # full route list would just be noise for a region-boundary question.
+        # Bare names, not `display()`: with no route universe to narrow
+        # against, a merged complex's full route list would just be noise.
         rows.append(
             FlowRow(
                 origin_id=origin_id,

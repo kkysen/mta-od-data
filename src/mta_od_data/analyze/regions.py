@@ -16,13 +16,11 @@ def borough_region(name: str, boroughs: frozenset[str]) -> Region:
 
 
 def cbd_region() -> Region:
-    """Manhattan's Congestion Relief Zone (the congestion-pricing/Hub Bound
-    Report sense of "Lower Manhattan": below 60th St). Backed by the source
-    data's own curated `cbd` flag rather than a latitude cut -- Manhattan's
-    grid is rotated relative to true north, so no single latitude cleanly
-    separates the zone, and a latitude cut would also wrongly include
-    Roosevelt Island (south of 60th St by latitude, but not part of the
-    zone), which `cbd` correctly excludes."""
+    """Manhattan's Congestion Relief Zone (the congestion-pricing sense
+    of "Lower Manhattan": below 60th St). The source data's curated `cbd`
+    flag, not a latitude cut: Manhattan's grid is rotated, so no single
+    latitude separates the zone cleanly, and a cut would wrongly include
+    Roosevelt Island."""
     return Region(
         name="Lower Manhattan (below 60th St / Congestion Relief Zone)",
         contains=lambda s: s.cbd,
@@ -70,8 +68,7 @@ class RegionPreset(StrEnum):
     STATEN_ISLAND = "staten-island"
 
 
-# Borough codes as given by the source data (stations_complexes.csv/
-# stations_individual.csv's `borough` column).
+# Borough codes as given by the source data's own `borough` column.
 PRESET_BOROUGH_CODES: dict[RegionPreset, frozenset[str]] = {
     RegionPreset.MANHATTAN: frozenset({"M"}),
     RegionPreset.BROOKLYN: frozenset({"Bk"}),
