@@ -39,6 +39,8 @@ def convert_od_to_parquet(
         return
     resolved = [str(ROOT / p) if not Path(p).is_absolute() else p for p in csv_patterns]
     print(f"converting {resolved} -> {out}")
+    # Two constant `SELECT`s chosen by a branch, with the precision bound as a
+    # parameter: nothing the caller controls is ever interpolated into the SQL.
     if ridership_decimals is None:
         select = "*"
     else:
@@ -47,8 +49,8 @@ def convert_od_to_parquet(
                 f"--ridership-decimals must be >= 0, got {ridership_decimals}"
             )
         select = (
-            '* REPLACE (round("Estimated Average Ridership", '
-            f'{ridership_decimals}) AS "Estimated Average Ridership")'
+            '* REPLACE (round("Estimated Average Ridership", $decimals) '
+            'AS "Estimated Average Ridership")'
         )
         print(f"rounding ridership to {ridership_decimals} decimals")
     con = duckdb.connect()
@@ -65,7 +67,8 @@ def convert_od_to_parquet(
             ORDER BY "Day of Week", "Origin Station Complex ID"
         ) TO $out (FORMAT parquet, COMPRESSION zstd, COMPRESSION_LEVEL 3)
         """,
-        {"csv_patterns": resolved, "out": str(out)},
+        {"csv_patterns": resolved, "out": str(out)}
+        | ({} if ridership_decimals is None else {"decimals": ridership_decimals}),
     )
     result: tuple[int, int, int] | None = con.execute(
         """
