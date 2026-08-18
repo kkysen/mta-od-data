@@ -149,7 +149,9 @@ grouped into categories that `--category` selects by,
 each declaring the routes it covers.
 Today's real routing is always compared against,
 and selecting two categories runs every combination of them.
-See [`deinterlining_design.md`](src/mta_od_data/analyze/deinterlining_design.md).
+See [`deinterlining_design.md`](src/mta_od_data/analyze/deinterlining_design.md),
+and [`src/mta_od_data/analyze/dekalb_deinterlining.md`](src/mta_od_data/analyze/dekalb_deinterlining.md)
+for the DeKalb Av category's report.
 
 ```sh
 uv run mta-od-data analyze deinterlining --category Columbus
