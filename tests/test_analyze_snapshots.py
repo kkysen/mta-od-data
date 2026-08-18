@@ -92,6 +92,11 @@ SNAPSHOTS = [
         cmd=["mta-od-data", "analyze", "regional-flow"],
         path=ANALYZE_DIR / "regional_flow.md",
     ),
+    Snapshot(
+        name="deinterlining-dekalb",
+        cmd=["mta-od-data", "analyze", "deinterlining", "--category", "DeKalb"],
+        path=ANALYZE_DIR / "dekalb_deinterlining.md",
+    ),
 ]
 
 
