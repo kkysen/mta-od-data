@@ -18,7 +18,7 @@ STATIONS_URL = "https://data.ny.gov/resource/5f5g-n3cz.csv?$limit=1000"
 STATIONS_INDIVIDUAL_URL = "https://data.ny.gov/resource/39hk-dx4f.csv?$limit=1000"
 
 
-def fetch_csv(url: str, out: Path, force: bool) -> None:
+def fetch_csv(url: str, out: Path, *, force: bool) -> None:
     if out.exists() and not force:
         print(f"skip: {out} already exists (use --force-stations to refetch)")
         return
@@ -87,6 +87,15 @@ def prepare(
     force_stations: Annotated[
         bool, Option(help="Refetch station reference data even if it exists")
     ] = False,
+    stations_only: Annotated[
+        bool,
+        Option(
+            help=(
+                "Refetch only the station reference data, skipping the OD "
+                "Parquet conversion (implies --force-stations)"
+            )
+        ),
+    ] = False,
 ) -> None:
     """Fetch station reference data and convert MTA OD CSV extract(s) to Parquet.
 
@@ -100,8 +109,12 @@ def prepare(
             --csv 'data/MTA_Subway_Origin-Destination_Ridership_Estimate__2024_*.csv' \\
             --out data/mta_od_2024.parquet
         mta-od-data prepare --force-stations
+        mta-od-data prepare --stations-only
     """
     DATA.mkdir(exist_ok=True)
-    fetch_csv(STATIONS_URL, stations_out, force_stations)
-    fetch_csv(STATIONS_INDIVIDUAL_URL, stations_individual_out, force_stations)
+    force_stations = force_stations or stations_only
+    fetch_csv(STATIONS_URL, stations_out, force=force_stations)
+    fetch_csv(STATIONS_INDIVIDUAL_URL, stations_individual_out, force=force_stations)
+    if stations_only:
+        return
     convert_od_to_parquet(csv if csv else [DEFAULT_CSV_GLOB], out, force)
