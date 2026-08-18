@@ -69,14 +69,25 @@ Run `--help` for all options.
 uv run mta-od-data prepare
 ```
 
-The Parquet drops the origin/destination name, latitude, longitude, and point columns:
-each is functionally determined by the complex ID beside it,
-so they are the station reference CSVs repeated once per row,
-and `analyze` joins them by complex ID instead.
+The Parquet comes out considerably smaller than the extract it's built from
+(1.5GB to 358MB for 2025), losslessly:
+
+- The origin/destination name, latitude, longitude, and point columns are dropped:
+  each is functionally determined by the complex ID beside it,
+  so they are the station reference CSVs repeated once per row,
+  and `analyze` joins them by complex ID instead.
+- `Timestamp` is dropped too:
+  it holds one synthesized label per (year, month, day of week, hour) group,
+  which `DayCoverage` reconstructs from those columns.
+- Ridership is stored as `DECIMAL(9, 4)`,
+  exact for every value in the extract,
+  and packed as an integer rather than as a `DOUBLE` that never compresses.
+- Rows are sorted by origin/destination pair,
+  which runs the ID columns into long constant stretches: ~190MB by itself.
 
 ### Publishing the Parquet as a release asset
 
-`data/mta_od.parquet` is too big to commit (734MB for the 2025 extract),
+`data/mta_od.parquet` is too big to commit (358MB for the 2025 extract),
 but small enough to download in seconds, so it lives as an asset on the `od-data` release.
 CI fetches it before `pytest`, which is what lets
 the `analyze` tests run there instead of skipping.
