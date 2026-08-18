@@ -2,7 +2,7 @@ name: Station data freshness
 
 # The station reference CSVs are checked in, so they go stale silently
 # when the MTA edits a station upstream. Refetch them on a schedule
-# and open an issue when they've drifted, rather than failing every PR's
+# and open a PR with the fresh data, rather than failing every PR's
 # CI on an unrelated upstream edit (or on `data.ny.gov` being down).
 on:
   schedule:
@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  issues: write
+  contents: write
+  pull-requests: write
 
 jobs:
   check:
@@ -24,21 +24,8 @@ jobs:
         with:
           enable-cache: true
 
-      # Through `prepare.fetch_csv` so the URLs stay defined in one place.
       - name: refetch station reference data
-        run: |
-          uv run python -c '
-          from mta_od_data.prepare import (
-              DEFAULT_STATIONS_CSV,
-              DEFAULT_STATIONS_INDIVIDUAL_CSV,
-              STATIONS_URL,
-              STATIONS_INDIVIDUAL_URL,
-              fetch_csv,
-          )
-
-          fetch_csv(STATIONS_URL, DEFAULT_STATIONS_CSV, True)
-          fetch_csv(STATIONS_INDIVIDUAL_URL, DEFAULT_STATIONS_INDIVIDUAL_CSV, True)
-          '
+        run: uv run mta-od-data prepare --stations-only
 
       - name: diff against what's checked in
         id: diff
@@ -48,37 +35,42 @@ jobs:
             echo "stale=false" >> "$GITHUB_OUTPUT"
           else
             echo "stale=true" >> "$GITHUB_OUTPUT"
-            {
-              echo 'diff<<EOF'
-              git diff --stat -- data/
-              echo
-              git diff -- data/ | head -200
-              echo EOF
-            } >> "$GITHUB_OUTPUT"
+            git diff --stat -- data/
           fi
 
+      # Not `continue-on-error`, since the PR body reports the outcome:
+      # drift that breaks the analyses is exactly what needs a human.
       - name: run the tests against the fresh data
         if: steps.diff.outputs.stale == 'true'
-        continue-on-error: true
         id: tests
+        continue-on-error: true
         run: uv run pytest
 
-      - name: open an issue
+      - name: open a PR
         if: steps.diff.outputs.stale == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          DIFF: ${{ steps.diff.outputs.diff }}
           TESTS: ${{ steps.tests.outcome }}
         run: |
-          existing="$(gh issue list --state open --label station-data \
-            --json number --jq '.[0].number')"
-          body="$(printf '%s\n\n%s\n\n```diff\n%s\n```\n' \
+          branch="station-data/refresh"
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          # A single reused branch, force-pushed: successive weeks of drift
+          # belong in one open PR, not one PR per week.
+          git switch -c "$branch"
+          git commit -m "refresh the station reference data" -- data/
+          git push --force origin "$branch"
+
+          body="$(printf '%s\n\n%s\n\n```\n%s\n```\n' \
             "\`data.ny.gov\` has edited the station reference data since it was checked in." \
-            "\`pytest\` against the fresh data: **$TESTS**. Refresh with \`mta-od-data prepare --force-stations\` and commit \`data/stations_*.csv\`." \
-            "$DIFF")"
+            "\`pytest\` against the fresh data: **$TESTS**." \
+            "$(git diff --stat HEAD~1 -- data/)")"
+          existing="$(gh pr list --head "$branch" --state open \
+            --json number --jq '.[0].number')"
           if [ -n "$existing" ]; then
-            gh issue comment "$existing" --body "$body"
+            gh pr comment "$existing" --body "$body"
           else
-            gh issue create --title "Station reference data is stale" \
-              --label station-data --body "$body"
+            gh pr create --base main --head "$branch" \
+              --title "Refresh the station reference data" --body "$body"
           fi
