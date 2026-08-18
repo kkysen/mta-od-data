@@ -1,6 +1,6 @@
 # One Seat Ride Analysis for Deinterlining 7 Av/West Side/Lexington Av/East Side at Franklin Av-Medgar Evers College/Botanic Garden (2,3,4,5)
 
-Scenario: average weekday ridership (60 distinct days in the data, 2025-01-06 to 2025-12-12) on trains originating at stations served by 2,3,4,5, south of Franklin Av-Medgar Evers College/Botanic Garden (2,3,4,5), with destinations north of it (i.e. trips that cross the junction).
+Scenario: average weekday ridership (60 distinct days in the data, 2025-01 to 2025-12) on trains originating at stations served by 2,3,4,5, south of Franklin Av-Medgar Evers College/Botanic Garden (2,3,4,5), with destinations north of it (i.e. trips that cross the junction).
 
 Produced by `mta-od-data analyze one-seat-rides --boundary-complex-id 626 --origin-side south --dest-side north --routes 2,3,4,5 --primary-routes 2,3,4,5 --trunk-a 2,3 --trunk-a-label '7 Av/West Side' --trunk-b 4,5 --trunk-b-label 'Lexington Av/East Side' --origin-corridor-a-routes 2,5 --origin-corridor-a-label 'Nostrand Av Line' --origin-corridor-b-routes 3,4 --origin-corridor-b-label 'Eastern Pkwy/New Lots Line' --all-corridor-scenarios --csv-out data/nostrand_weekday_pairs.csv --markdown-out src/mta_od_data/analyze/nostrand_one_seat_rides.md`.
 
