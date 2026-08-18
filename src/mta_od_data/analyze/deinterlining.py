@@ -400,15 +400,15 @@ class Scenario:
 
         return ScenarioResult(
             scenario=self,
-            overall=Totals(
-                total_riders=total_riders,
-                one_seat_riders=one_seat_riders,
-                close_riders=close_riders,
+            overall=RiderStats(
+                total=total_riders,
+                one_seat=one_seat_riders,
+                close=close_riders,
             ),
-            both_ends=Totals(
-                total_riders=both_total,
-                one_seat_riders=both_one_seat,
-                close_riders=both_close,
+            both_ends=RiderStats(
+                total=both_total,
+                one_seat=both_one_seat,
+                close=both_close,
             ),
             rows=rows,
             dest_stats=dest_stats,
@@ -522,60 +522,60 @@ def suffixed_path(path: Path, suffix: str) -> Path:
 
 
 @dataclass(slots=True, frozen=True)
-class Totals:
+class RiderStats:
     """One-seat split over some set of pairs,
     so the same arithmetic serves the whole comparison
     and the both-ends subset of it."""
 
-    total_riders: float
-    one_seat_riders: float
-    close_riders: float
+    total: float
+    one_seat: float
+    close: float
 
     @property
-    def effective_riders(self) -> float:
-        return self.one_seat_riders + self.close_riders
+    def effective(self) -> float:
+        return self.one_seat + self.close
 
     def pct(self, riders: float) -> float:
         # `Scenario.classify` raises before building a `ScenarioResult`
         # with no riders at all, but the both-ends subset of a category
         # whose routes share no station can legitimately be empty.
-        if not self.total_riders:
+        if not self.total:
             return 0.0
-        return 100 * riders / self.total_riders
+        return 100 * riders / self.total
 
     def markdown_row(self, label: str) -> str:
         return (
-            f"| {label} | {self.total_riders:,.0f} "
-            f"| {self.one_seat_riders:,.0f} ({self.pct(self.one_seat_riders):.1f}%) "
-            f"| {self.close_riders:,.0f} ({self.pct(self.close_riders):.1f}%) "
-            f"| {self.effective_riders:,.0f} "
-            f"({self.pct(self.effective_riders):.1f}%) |"
+            f"| {label} | {self.total:,.0f} "
+            f"| {self.one_seat:,.0f} ({self.pct(self.one_seat):.1f}%) "
+            f"| {self.close:,.0f} ({self.pct(self.close):.1f}%) "
+            f"| {self.effective:,.0f} "
+            f"({self.pct(self.effective):.1f}%) |"
         )
 
     def print_lines(self, *, close_threshold_m: float) -> None:
-        print(f"Total riders: {self.total_riders:,.0f}")
+        print(f"Total riders: {self.total:,.0f}")
         print(
-            f"One-seat:              {self.one_seat_riders:>12,.0f} "
-            f"({self.pct(self.one_seat_riders):5.1f}%)"
+            f"One-seat:              {self.one_seat:>12,.0f} "
+            f"({self.pct(self.one_seat):5.1f}%)"
         )
         print(
             f"Close one-seat (within {close_threshold_m:.0f}m): "
-            f"{self.close_riders:>12,.0f} ({self.pct(self.close_riders):5.1f}%)"
+            f"{self.close:>12,.0f} ({self.pct(self.close):5.1f}%)"
         )
         print(
-            f"Effective one-seat:    {self.effective_riders:>12,.0f} "
-            f"({self.pct(self.effective_riders):5.1f}%)"
+            f"Effective one-seat:    {self.effective:>12,.0f} "
+            f"({self.pct(self.effective):5.1f}%)"
         )
 
 
 @dataclass(slots=True, frozen=True)
 class ScenarioResult:
     scenario: Scenario
-    overall: Totals
+    overall: RiderStats
     # Pairs with both ends on the comparison's routes, a subset of `overall`:
     # the trips the routes could plausibly carry end to end,
     # where a swap shows up undiluted by trips only half in scope.
-    both_ends: Totals
+    both_ends: RiderStats
     rows: list[ODPair]
     dest_stats: dict[int, DestStats]
 
@@ -607,16 +607,14 @@ class ScenarioResult:
         lines += [
             f"{h2} Headline numbers",
             "",
-            f"- **Total: {t.total_riders:,.0f} riders**",
-            f"- **One-seat: {t.pct(t.one_seat_riders):.1f}%** "
-            f"({t.one_seat_riders:,.0f})",
-            f"- **Close one-seat: {t.pct(t.close_riders):.1f}%** "
-            f"({t.close_riders:,.0f}), within {close_threshold_m:.0f}m of a "
+            f"- **Total: {t.total:,.0f} riders**",
+            f"- **One-seat: {t.pct(t.one_seat):.1f}%** ({t.one_seat:,.0f})",
+            f"- **Close one-seat: {t.pct(t.close):.1f}%** "
+            f"({t.close:,.0f}), within {close_threshold_m:.0f}m of a "
             f"station on the scenario-effective origin corridor",
-            f"- **Effective one-seat: {t.pct(t.effective_riders):.1f}%** "
-            f"({t.effective_riders:,.0f})",
-            f"- **Both ends on the routes: {self.both_ends.total_riders:,.0f} "
-            f"riders**, {self.both_ends.pct(self.both_ends.effective_riders):.1f}% "
+            f"- **Effective one-seat: {t.pct(t.effective):.1f}%** ({t.effective:,.0f})",
+            f"- **Both ends on the routes: {self.both_ends.total:,.0f} "
+            f"riders**, {self.both_ends.pct(self.both_ends.effective):.1f}% "
             f"effective one-seat",
             "",
             f"{h2} Top {top_n} origin/destination pairs",
@@ -738,12 +736,12 @@ class ScenarioComparisonResult:
         print("\n=== Scenario comparison ===")
         for r in self.results:
             print(
-                f"  {r.scenario.name:<55} total={r.overall.total_riders:>9,.0f}  "
-                f"direct={r.overall.one_seat_riders:>8,.0f} "
-                f"({r.overall.pct(r.overall.one_seat_riders):5.1f}%)  "
-                f"close={r.overall.close_riders:>7,.0f}  "
-                f"effective={r.overall.effective_riders:>8,.0f} "
-                f"({r.overall.pct(r.overall.effective_riders):5.1f}%)"
+                f"  {r.scenario.name:<55} total={r.overall.total:>9,.0f}  "
+                f"direct={r.overall.one_seat:>8,.0f} "
+                f"({r.overall.pct(r.overall.one_seat):5.1f}%)  "
+                f"close={r.overall.close:>7,.0f}  "
+                f"effective={r.overall.effective:>8,.0f} "
+                f"({r.overall.pct(r.overall.effective):5.1f}%)"
             )
 
     def write_csvs(self, csv_out: Path) -> None:
@@ -755,7 +753,7 @@ class ScenarioComparisonResult:
         lines = [
             "## Scenario comparison",
             "",
-            f"Total riders is the same {self.results[0].overall.total_riders:,.0f} "
+            f"Total riders is the same {self.results[0].overall.total:,.0f} "
             f"across every scenario below; only how many of those riders get "
             f"a one-seat ride changes.",
             "",
@@ -773,7 +771,7 @@ class ScenarioComparisonResult:
             "",
             "### Both ends on the comparison's routes",
             "",
-            f"The {self.results[0].both_ends.total_riders:,.0f} riders above "
+            f"The {self.results[0].both_ends.total:,.0f} riders above "
             f"whose origin *and* destination are served by "
             f"{','.join(sorted(self.comparison.routes))}, "
             f"where a scenario's effect isn't diluted by trips only half in "
