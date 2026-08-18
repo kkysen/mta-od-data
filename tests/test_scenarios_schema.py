@@ -22,7 +22,7 @@ STATIONS_INDIVIDUAL = DATA / "stations_individual.csv"
     not (STATIONS.exists() and STATIONS_INDIVIDUAL.exists()),
     reason=(
         f"{STATIONS.relative_to(ROOT)}/{STATIONS_INDIVIDUAL.relative_to(ROOT)} not "
-        "found (run `mta-od-data prepare` first)"
+        "found (run `uv run mta-od-data prepare` first)"
     ),
 )
 def test_scenarios_schema_matches_models() -> None:
