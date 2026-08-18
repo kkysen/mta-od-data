@@ -102,7 +102,10 @@ SNAPSHOTS = [
 
 @pytest.mark.skipif(
     not PARQUET.exists(),
-    reason=(f"{PARQUET.relative_to(ROOT)} not found (run `mta-od-data prepare` first)"),
+    reason=(
+        f"{PARQUET.relative_to(ROOT)} not found "
+        "(run `uv run mta-od-data prepare` first)"
+    ),
 )
 @pytest.mark.parametrize("snapshot", SNAPSHOTS, ids=lambda s: s.name)
 def test_snapshot_matches_fresh_run(snapshot: Snapshot, tmp_path: Path) -> None:
@@ -123,6 +126,6 @@ def test_snapshot_matches_fresh_run(snapshot: Snapshot, tmp_path: Path) -> None:
     committed = snapshot.path.read_text()
     assert fresh == committed, (
         f"{rel_path} is out of date. Regenerate it with:\n"
-        f"  {' '.join(snapshot.cmd)} --markdown-out {rel_path}\n"
+        f"  uv run {' '.join(snapshot.cmd)} --markdown-out {rel_path}\n"
         "and commit the result."
     )
