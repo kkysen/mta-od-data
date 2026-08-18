@@ -43,6 +43,37 @@ is the wrong direction;
 swapping `Region.contains` for a scenario's effective-routes lookup
 is the right one.
 
+## Which pairs are in scope
+
+Systemwide doesn't mean every pair in the extract:
+a pair is in scope if *either* end is served by one of the comparison's routes
+under any scenario in it.
+
+Either end, not the origin,
+because a swap changes a trip the same way whichever direction it runs,
+so scoping by the origin counted the outbound half of a commute
+and dropped the inbound half of the same journey.
+For the DeKalb category that's 1,576,111 riders/weekday against 2,332,194.
+
+The cost is a denominator far wider than any one junction can move.
+`B/D 4 Av Express` takes 19,757 riders off a direct one-seat ride,
+and the systemwide effective share still reads 31.0% either way:
+the close-one-seat column absorbs almost exactly what the direct column loses,
+and what's left is a rounding error against 2.3M riders.
+So the subset with *both* ends on the routes is reported alongside it,
+837,408 riders, where the same swap reads 73.2% to 70.8% direct.
+Neither number is the real one:
+the wide scope says how much of the system a plan touches at all,
+the narrow one says what it does to the riders it touches.
+
+That subset is a reporting split, not a second pass:
+one query, one classification,
+with each pair's contribution added to both sets of totals
+(`RiderStats`, shared so the two tables can't drift apart).
+Direct one-seat riders are necessarily identical in both,
+since sharing a route puts both ends in scope by construction;
+the wider scope only ever adds transfer trips.
+
 ## A scenario is a route-override map
 
 A scenario overrides real routes
