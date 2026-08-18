@@ -69,6 +69,35 @@ Run `--help` for all options.
 uv run mta-od-data prepare
 ```
 
+The Parquet drops the origin/destination name, latitude, longitude, and point
+columns: each is functionally determined by the complex ID beside it, so they
+are the station reference CSVs repeated once per row, and `analyze` joins them
+by complex ID instead.
+
+### Publishing the Parquet as a release asset
+
+`data/mta_od.parquet` is too big to commit (734MB for the 2025 extract) but
+small enough to download in seconds, so it lives as an asset on the `od-data`
+release. CI fetches it before `pytest`, which is what lets the `analyze` tests
+run there instead of skipping.
+
+Publish (or replace) it from a machine that has run `prepare`:
+
+```sh
+# first time only
+gh release create od-data --title 'OD dataset' \
+    --notes 'Parquet built by `mta-od-data prepare` from the 2025 extract.'
+
+gh release upload od-data data/mta_od.parquet --clobber
+```
+
+Anyone (including a fresh clone) can then get it without rebuilding from the
+27GB CSV:
+
+```sh
+gh release download od-data --pattern mta_od.parquet --dir data
+```
+
 ### `mta-od-data analyze one-seat-rides`
 
 Does the actual classification:
@@ -227,4 +256,5 @@ Check-only, like every other hook here:
 it fails with a diff and the regen command
 rather than rewriting the snapshot itself.
 Skipped, not failed, without `data/mta_od.parquet`,
-which is gitignored and so unavailable in CI or a fresh clone.
+which is gitignored, so a fresh clone that hasn't downloaded the release asset
+still gets a passing suite.
