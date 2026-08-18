@@ -552,6 +552,14 @@ class RiderStats:
             f"({self.pct(self.effective):.1f}%) |"
         )
 
+    def summary_line(self, label: str) -> str:
+        return (
+            f"  {label:<55} total={self.total:>9,.0f}  "
+            f"direct={self.one_seat:>8,.0f} ({self.pct(self.one_seat):5.1f}%)  "
+            f"close={self.close:>7,.0f}  "
+            f"effective={self.effective:>8,.0f} ({self.pct(self.effective):5.1f}%)"
+        )
+
     def print_lines(self, *, close_threshold_m: float) -> None:
         print(f"Total riders: {self.total:,.0f}")
         print(
@@ -604,19 +612,26 @@ class ScenarioResult:
         t = self.overall
         lines: list[str] = [f"## {self.scenario.name}", ""] if show_label else []
 
+        # Only without a comparison table above, which says all of this
+        # for every scenario at once.
+        if not show_label:
+            lines += [
+                f"{h2} Headline numbers",
+                "",
+                f"- **Total: {t.total:,.0f} riders**",
+                f"- **One-seat: {t.pct(t.one_seat):.1f}%** ({t.one_seat:,.0f})",
+                f"- **Close one-seat: {t.pct(t.close):.1f}%** "
+                f"({t.close:,.0f}), within {close_threshold_m:.0f}m of a "
+                f"station on the scenario-effective origin corridor",
+                f"- **Effective one-seat: {t.pct(t.effective):.1f}%** "
+                f"({t.effective:,.0f})",
+                f"- **Both ends on the routes: {self.both_ends.total:,.0f} "
+                f"riders**, {self.both_ends.pct(self.both_ends.effective):.1f}% "
+                f"effective one-seat",
+                "",
+            ]
+
         lines += [
-            f"{h2} Headline numbers",
-            "",
-            f"- **Total: {t.total:,.0f} riders**",
-            f"- **One-seat: {t.pct(t.one_seat):.1f}%** ({t.one_seat:,.0f})",
-            f"- **Close one-seat: {t.pct(t.close):.1f}%** "
-            f"({t.close:,.0f}), within {close_threshold_m:.0f}m of a "
-            f"station on the scenario-effective origin corridor",
-            f"- **Effective one-seat: {t.pct(t.effective):.1f}%** ({t.effective:,.0f})",
-            f"- **Both ends on the routes: {self.both_ends.total:,.0f} "
-            f"riders**, {self.both_ends.pct(self.both_ends.effective):.1f}% "
-            f"effective one-seat",
-            "",
             f"{h2} Top {top_n} origin/destination pairs",
             "",
             "| # | Riders | % Total | Type | Close? | Dist | Origin → Destination |",
@@ -729,33 +744,34 @@ class ScenarioComparisonResult:
         return [suffixed_path(csv_out, r.scenario.slug()) for r in self.results]
 
     def print_summary(self, *, close_threshold_m: float) -> None:
-        for result in self.results:
-            result.print_headline(close_threshold_m=close_threshold_m)
         if not self.labelled:
+            for result in self.results:
+                result.print_headline(close_threshold_m=close_threshold_m)
             return
-        print("\n=== Scenario comparison ===")
+        print(
+            f"\n=== Scenario comparison "
+            f"(close one-seat: within {close_threshold_m:.0f}m) ==="
+        )
         for r in self.results:
-            print(
-                f"  {r.scenario.name:<55} total={r.overall.total:>9,.0f}  "
-                f"direct={r.overall.one_seat:>8,.0f} "
-                f"({r.overall.pct(r.overall.one_seat):5.1f}%)  "
-                f"close={r.overall.close:>7,.0f}  "
-                f"effective={r.overall.effective:>8,.0f} "
-                f"({r.overall.pct(r.overall.effective):5.1f}%)"
-            )
+            print(r.overall.summary_line(r.scenario.name))
+        print("\n=== Both ends on the comparison's routes ===")
+        for r in self.results:
+            print(r.both_ends.summary_line(r.scenario.name))
 
     def write_csvs(self, csv_out: Path) -> None:
         for path, result in zip(self.csv_paths(csv_out), self.results, strict=True):
             assert path is not None
             result.write_csv(path)
 
-    def comparison_table_markdown(self) -> str:
+    def comparison_table_markdown(self, *, close_threshold_m: float) -> str:
         lines = [
             "## Scenario comparison",
             "",
             f"Total riders is the same {self.results[0].overall.total:,.0f} "
             f"across every scenario below; only how many of those riders get "
-            f"a one-seat ride changes.",
+            f"a one-seat ride changes. Close one-seat counts a transfer trip "
+            f"whose destination is within {close_threshold_m:.0f}m of a station "
+            f"on that scenario's effective origin corridor.",
             "",
             "| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | "
             "Effective 1-Seat |",
@@ -796,7 +812,11 @@ class ScenarioComparisonResult:
     ) -> str:
         sections = [
             preamble,
-            *([self.comparison_table_markdown()] if self.labelled else []),
+            *(
+                [self.comparison_table_markdown(close_threshold_m=close_threshold_m)]
+                if self.labelled
+                else []
+            ),
             *(
                 result.render_markdown(
                     show_label=self.labelled,
