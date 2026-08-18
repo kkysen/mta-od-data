@@ -33,29 +33,7 @@ jobs:
       # The OD Parquet is too big to check in, so it lives as a release asset (see `README.md`).
       # Without it the analyze tests skip themselves,
       # so a missing or not-yet-published release leaves CI green but thinner.
-      - name: look up the OD dataset digest
-        id: od
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          digest="$(gh release view "$OD_RELEASE_TAG" --json assets \
-            --jq '.assets[] | select(.name == "mta_od.parquet") | .digest')" \
-          || digest=""
-          echo "digest=$digest" >> "$GITHUB_OUTPUT"
-
-      # Keyed on the digest rather than on the tag,
-      # since the asset is re-uploaded in place:
-      # a tag key would serve the superseded data for as long as the entry lived.
-      - name: cache the OD dataset
-        id: od-cache
-        if: steps.od.outputs.digest != ''
-        uses: actions/cache@v4
-        with:
-          path: data/mta_od.parquet
-          key: od-dataset-${{ steps.od.outputs.digest }}
-
       - name: download the OD dataset
-        if: steps.od-cache.outputs.cache-hit != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
