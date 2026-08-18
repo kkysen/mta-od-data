@@ -69,17 +69,17 @@ Run `--help` for all options.
 uv run mta-od-data prepare
 ```
 
-The Parquet drops the origin/destination name, latitude, longitude, and point
-columns: each is functionally determined by the complex ID beside it, so they
-are the station reference CSVs repeated once per row, and `analyze` joins them
-by complex ID instead.
+The Parquet drops the origin/destination name, latitude, longitude, and point columns:
+each is functionally determined by the complex ID beside it,
+so they are the station reference CSVs repeated once per row,
+and `analyze` joins them by complex ID instead.
 
 ### Publishing the Parquet as a release asset
 
-`data/mta_od.parquet` is too big to commit (734MB for the 2025 extract) but
-small enough to download in seconds, so it lives as an asset on the `od-data`
-release. CI fetches it before `pytest`, which is what lets the `analyze` tests
-run there instead of skipping.
+`data/mta_od.parquet` is too big to commit (734MB for the 2025 extract),
+but small enough to download in seconds, so it lives as an asset on the `od-data` release.
+CI fetches it before `pytest`, which is what lets
+the `analyze` tests run there instead of skipping.
 
 Publish (or replace) it from a machine that has run `prepare`:
 
@@ -91,8 +91,7 @@ gh release create od-data --title 'OD dataset' \
 gh release upload od-data data/mta_od.parquet --clobber
 ```
 
-Anyone (including a fresh clone) can then get it without rebuilding from the
-27GB CSV:
+Anyone (including a fresh clone) can then get it without rebuilding from the 27GB CSV:
 
 ```sh
 gh release download od-data --pattern mta_od.parquet --dir data
