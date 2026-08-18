@@ -25,8 +25,16 @@ DERIVED_COLUMNS = """
     "Origin Station Complex Name", "Origin Latitude",
     "Origin Longitude", "Origin Point",
     "Destination Station Complex Name", "Destination Latitude",
-    "Destination Longitude", "Destination Point"
+    "Destination Longitude", "Destination Point",
+    -- One distinct value per (Year, Month, Day of Week, Hour of Day): the
+    -- extract has no real dates, just a label per averaged group, which is
+    -- what `DayCoverage` reconstructs from those four columns instead.
+    "Timestamp"
 """
+
+# Every ridership value is an exact multiple of 1e-4, so this is lossless,
+# and it packs as an integer rather than a `DOUBLE` that never compresses.
+RIDERSHIP_DECIMAL = "DECIMAL(9, 4)"
 
 
 def fetch_csv(url: str, out: Path, *, force: bool) -> None:
@@ -53,7 +61,11 @@ def convert_od_to_parquet(
     # Two constant `SELECT`s chosen by a branch, with the precision bound as a
     # parameter: nothing the caller controls is ever interpolated into the SQL.
     if ridership_decimals is None:
-        select = f"* EXCLUDE ({DERIVED_COLUMNS})"
+        select = (
+            f"* EXCLUDE ({DERIVED_COLUMNS}) "
+            f'REPLACE ("Estimated Average Ridership"::{RIDERSHIP_DECIMAL} '
+            'AS "Estimated Average Ridership")'
+        )
     else:
         if ridership_decimals < 0:
             raise ValueError(
@@ -61,8 +73,8 @@ def convert_od_to_parquet(
             )
         select = (
             f"* EXCLUDE ({DERIVED_COLUMNS}) "
-            'REPLACE (round("Estimated Average Ridership", $decimals) '
-            'AS "Estimated Average Ridership")'
+            'REPLACE (round("Estimated Average Ridership", $decimals)'
+            f'::{RIDERSHIP_DECIMAL} AS "Estimated Average Ridership")'
         )
         print(f"rounding ridership to {ridership_decimals} decimals")
     con = duckdb.connect()
@@ -73,11 +85,17 @@ def convert_od_to_parquet(
             FROM read_csv($csv_patterns, union_by_name=true, thousands=',')
             -- Sorted so `analyze`'s row-group statistics can skip data
             -- rather than scan the whole file: every analysis so far
-            -- filters by day of week, and scopes to some set of origins.
-            -- Never worse than the original date/hour order even for a
-            -- query filtering by neither, and it compresses better.
-            ORDER BY "Day of Week", "Origin Station Complex ID"
-        ) TO $out (FORMAT parquet, COMPRESSION zstd, COMPRESSION_LEVEL 3)
+            -- scopes to some set of origins, and filters by day of week.
+            -- Clustering the OD pair also runs the ID columns into long
+            -- constant stretches and puts similar ridership values next to
+            -- each other, which is worth ~190M on the 2025 extract.
+            ORDER BY "Origin Station Complex ID", "Destination Station Complex ID",
+                     "Day of Week", "Hour of Day"
+        -- v2 pages, for the delta encoding the ridership column packs into.
+        ) TO $out (
+            FORMAT parquet, COMPRESSION zstd, COMPRESSION_LEVEL 3,
+            PARQUET_VERSION v2
+        )
         """,
         {"csv_patterns": resolved, "out": str(out)}
         | ({} if ridership_decimals is None else {"decimals": ridership_decimals}),
