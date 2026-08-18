@@ -6,6 +6,8 @@ from math import asin, cos, radians, sin, sqrt
 from pathlib import Path
 from typing import Self
 
+import duckdb
+
 
 class DayType(StrEnum):
     WEEKDAY = "weekday"
@@ -119,3 +121,49 @@ def haversine_m(c1: Coord, c2: Coord) -> float:
     dlambda = radians(c2.lon - c1.lon)
     a = sin(dphi / 2) ** 2 + cos(p1) * cos(p2) * sin(dlambda / 2) ** 2
     return 2 * r * asin(sqrt(a))
+
+
+@dataclass(slots=True, frozen=True)
+class DayCoverage:
+    """How much of the extract a day filter selects.
+
+    The extract has no dates: every row is already an average over one
+    (year, month, day of week), which is why a "day" here is one such group
+    and the span is a range of months rather than of dates.
+    """
+
+    n_days: int
+    first_month: str
+    last_month: str
+
+    @classmethod
+    def query(
+        cls,
+        con: duckdb.DuckDBPyConnection,
+        parquet: Path,
+        day_filter_sql: str,
+        day_params: list[str],
+    ) -> Self:
+        query = f"""
+            SELECT COUNT(*), MIN(year_month), MAX(year_month)
+            FROM (
+                SELECT DISTINCT "Year" * 100 + "Month" AS year_month, "Day of Week"
+                FROM read_parquet(?)
+                WHERE {day_filter_sql}
+            )
+        """
+        result: tuple[int, int, int] | None = con.execute(
+            query, [str(parquet), *day_params]
+        ).fetchone()
+        assert result is not None, "aggregate query always returns exactly one row"
+        n_days, first, last = result
+        return cls(
+            n_days=n_days,
+            first_month=cls.format_month(first),
+            last_month=cls.format_month(last),
+        )
+
+    @staticmethod
+    def format_month(year_month: int) -> str:
+        year, month = divmod(year_month, 100)
+        return f"{year}-{month:02d}"

@@ -2,7 +2,6 @@ import csv
 import shlex
 import sys
 from dataclasses import asdict, dataclass, fields
-from datetime import date
 from pathlib import Path
 from typing import Annotated
 
@@ -10,7 +9,7 @@ import duckdb
 from typer import Option, Typer
 
 from mta_od_data import DATA
-from mta_od_data.analyze.common import DAY_TYPE_PRESETS, DayType, Station
+from mta_od_data.analyze.common import DAY_TYPE_PRESETS, DayCoverage, DayType, Station
 from mta_od_data.analyze.regions import (
     Region,
     RegionPreset,
@@ -299,18 +298,8 @@ def regional_flow(
         else '"Day of Week" IN (' + ", ".join("?" for _ in days_list) + ")"
     )
 
-    n_days_query = f"""
-        SELECT COUNT(DISTINCT CAST(Timestamp AS DATE)),
-               MIN(CAST(Timestamp AS DATE)),
-               MAX(CAST(Timestamp AS DATE))
-        FROM read_parquet(?)
-        WHERE {day_filter_sql}
-    """
-    n_days_result: tuple[int, date, date] | None = con.execute(
-        n_days_query, [str(parquet), *day_params]
-    ).fetchone()
-    assert n_days_result is not None, "aggregate query always returns exactly one row"
-    n_distinct_days, min_date, max_date = n_days_result
+    coverage = DayCoverage.query(con, parquet, day_filter_sql, day_params)
+    n_distinct_days = coverage.n_days
 
     # No origin filter, unlike `one-seat-rides`: every trip has some
     # relationship to the region.
@@ -328,7 +317,7 @@ def regional_flow(
     print(
         f"\n{len(pairs):,} distinct origin/destination pairs, averaged over "
         f"{n_distinct_days} distinct days matching the day filter "
-        f"({min_date} to {max_date})"
+        f"({coverage.first_month} to {coverage.last_month})"
     )
 
     rows: list[FlowRow] = []
@@ -394,7 +383,8 @@ def regional_flow(
             f"# Regional flow: {result.region_name}",
             "",
             f"Scenario: average {day_type} ridership ({n_distinct_days} distinct "
-            f"days in the data, {min_date} to {max_date}), every "
+            f"days in the data, {coverage.first_month} to "
+            f"{coverage.last_month}), every "
             f"origin/destination pair classified by whether each end falls "
             f"inside {result.region_name}.",
             "",
