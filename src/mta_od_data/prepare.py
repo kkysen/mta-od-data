@@ -17,6 +17,17 @@ STATIONS_URL = "https://data.ny.gov/resource/5f5g-n3cz.csv?$limit=1000"
 # Per-platform coordinates; see `Station.load_individual`.
 STATIONS_INDIVIDUAL_URL = "https://data.ny.gov/resource/39hk-dx4f.csv?$limit=1000"
 
+# Every one of these is functionally determined by the complex ID next to it
+# (verified over all 121M rows: one distinct value per ID), so they're the
+# station reference CSVs repeated once per row: half the file, and `analyze`
+# reads none of them, joining the station data by complex ID instead.
+DERIVED_COLUMNS = """
+    "Origin Station Complex Name", "Origin Latitude",
+    "Origin Longitude", "Origin Point",
+    "Destination Station Complex Name", "Destination Latitude",
+    "Destination Longitude", "Destination Point"
+"""
+
 
 def fetch_csv(url: str, out: Path, *, force: bool) -> None:
     if out.exists() and not force:
@@ -42,14 +53,15 @@ def convert_od_to_parquet(
     # Two constant `SELECT`s chosen by a branch, with the precision bound as a
     # parameter: nothing the caller controls is ever interpolated into the SQL.
     if ridership_decimals is None:
-        select = "*"
+        select = f"* EXCLUDE ({DERIVED_COLUMNS})"
     else:
         if ridership_decimals < 0:
             raise ValueError(
                 f"--ridership-decimals must be >= 0, got {ridership_decimals}"
             )
         select = (
-            '* REPLACE (round("Estimated Average Ridership", $decimals) '
+            f"* EXCLUDE ({DERIVED_COLUMNS}) "
+            'REPLACE (round("Estimated Average Ridership", $decimals) '
             'AS "Estimated Average Ridership")'
         )
         print(f"rounding ridership to {ridership_decimals} decimals")
