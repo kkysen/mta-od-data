@@ -8,7 +8,10 @@ Unlike `one_seat_rides.py`
 (one latitude boundary, two named corridors converging into two named
 trunks, origin-side reassignment only),
 this classifies *every* origin/destination pair
-whose origin could plausibly use one of the comparison's routes.
+with either end on one of the comparison's routes,
+symmetrically: a swap changes a trip the same way whichever way it runs.
+The subset with *both* ends on them is reported alongside,
+since a junction's effect washes out in a systemwide total.
 Kept independent of it,
 duplicating a couple of small helpers rather than importing them;
 reconcile if the two ever merge.
@@ -319,12 +322,16 @@ class Scenario:
         pairs: list[tuple[int, int, float]],
         stations_by_id: dict[int, Station],
         stations_path: Path,
+        scope_ids: frozenset[int],
         close_lookup: Callable[[Station, Routes], tuple[bool, float, str | None]],
     ) -> ScenarioResult:
         rows: list[ODPair] = []
         total_riders = 0.0
         one_seat_riders = 0.0
         close_riders = 0.0
+        both_total = 0.0
+        both_one_seat = 0.0
+        both_close = 0.0
         dest_stats: dict[int, DestStats] = {}
         for origin_id, dest_id, riders in pairs:
             origin = stations_by_id.get(origin_id)
@@ -343,9 +350,14 @@ class Scenario:
             dest_name = dest.display(effective_dest_routes)
             one_seat = bool(effective_origin_routes & effective_dest_routes)
 
+            both_ends = origin_id in scope_ids and dest_id in scope_ids
             total_riders += riders
+            if both_ends:
+                both_total += riders
             if one_seat:
                 one_seat_riders += riders
+                if both_ends:
+                    both_one_seat += riders
                 close, dist_m, near_station_name = False, 0.0, None
             else:
                 close, dist_m, near_station_name = close_lookup(
@@ -353,6 +365,8 @@ class Scenario:
                 )
                 if close:
                     close_riders += riders
+                    if both_ends:
+                        both_close += riders
 
             rows.append(
                 ODPair(
@@ -386,9 +400,16 @@ class Scenario:
 
         return ScenarioResult(
             scenario=self,
-            total_riders=total_riders,
-            one_seat_riders=one_seat_riders,
-            close_riders=close_riders,
+            overall=Totals(
+                total_riders=total_riders,
+                one_seat_riders=one_seat_riders,
+                close_riders=close_riders,
+            ),
+            both_ends=Totals(
+                total_riders=both_total,
+                one_seat_riders=both_one_seat,
+                close_riders=both_close,
+            ),
             rows=rows,
             dest_stats=dest_stats,
         )
@@ -501,33 +522,37 @@ def suffixed_path(path: Path, suffix: str) -> Path:
 
 
 @dataclass(slots=True, frozen=True)
-class ScenarioResult:
-    scenario: Scenario
+class Totals:
+    """One-seat split over some set of pairs,
+    so the same arithmetic serves the whole comparison
+    and the both-ends subset of it."""
+
     total_riders: float
     one_seat_riders: float
     close_riders: float
-    rows: list[ODPair]
-    dest_stats: dict[int, DestStats]
 
     @property
     def effective_riders(self) -> float:
         return self.one_seat_riders + self.close_riders
 
     def pct(self, riders: float) -> float:
-        # Never 0:
         # `Scenario.classify` raises before building a `ScenarioResult`
-        # with no riders.
+        # with no riders at all, but the both-ends subset of a category
+        # whose routes share no station can legitimately be empty.
+        if not self.total_riders:
+            return 0.0
         return 100 * riders / self.total_riders
 
-    def write_csv(self, path: Path) -> None:
-        with path.open("w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=[fld.name for fld in fields(ODPair)])
-            writer.writeheader()
-            writer.writerows(asdict(r) for r in self.rows)
-        print(f"\nWrote {len(self.rows):,} rows to {path}")
+    def markdown_row(self, label: str) -> str:
+        return (
+            f"| {label} | {self.total_riders:,.0f} "
+            f"| {self.one_seat_riders:,.0f} ({self.pct(self.one_seat_riders):.1f}%) "
+            f"| {self.close_riders:,.0f} ({self.pct(self.close_riders):.1f}%) "
+            f"| {self.effective_riders:,.0f} "
+            f"({self.pct(self.effective_riders):.1f}%) |"
+        )
 
-    def print_headline(self, *, close_threshold_m: float) -> None:
-        print(f"\n=== Scenario: {self.scenario.name} ===")
+    def print_lines(self, *, close_threshold_m: float) -> None:
         print(f"Total riders: {self.total_riders:,.0f}")
         print(
             f"One-seat:              {self.one_seat_riders:>12,.0f} "
@@ -542,6 +567,31 @@ class ScenarioResult:
             f"({self.pct(self.effective_riders):5.1f}%)"
         )
 
+
+@dataclass(slots=True, frozen=True)
+class ScenarioResult:
+    scenario: Scenario
+    overall: Totals
+    # Pairs with both ends on the comparison's routes, a subset of `overall`:
+    # the trips the routes could plausibly carry end to end,
+    # where a swap shows up undiluted by trips only half in scope.
+    both_ends: Totals
+    rows: list[ODPair]
+    dest_stats: dict[int, DestStats]
+
+    def write_csv(self, path: Path) -> None:
+        with path.open("w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=[fld.name for fld in fields(ODPair)])
+            writer.writeheader()
+            writer.writerows(asdict(r) for r in self.rows)
+        print(f"\nWrote {len(self.rows):,} rows to {path}")
+
+    def print_headline(self, *, close_threshold_m: float) -> None:
+        print(f"\n=== Scenario: {self.scenario.name} ===")
+        self.overall.print_lines(close_threshold_m=close_threshold_m)
+        print("Both ends on the comparison's routes:")
+        self.both_ends.print_lines(close_threshold_m=close_threshold_m)
+
     def render_markdown(
         self,
         *,
@@ -551,19 +601,23 @@ class ScenarioResult:
         csv_out: Path | None,
     ) -> str:
         h2 = "###" if show_label else "##"
+        t = self.overall
         lines: list[str] = [f"## {self.scenario.name}", ""] if show_label else []
 
         lines += [
             f"{h2} Headline numbers",
             "",
-            f"- **Total: {self.total_riders:,.0f} riders**",
-            f"- **One-seat: {self.pct(self.one_seat_riders):.1f}%** "
-            f"({self.one_seat_riders:,.0f})",
-            f"- **Close one-seat: {self.pct(self.close_riders):.1f}%** "
-            f"({self.close_riders:,.0f}), within {close_threshold_m:.0f}m of a "
+            f"- **Total: {t.total_riders:,.0f} riders**",
+            f"- **One-seat: {t.pct(t.one_seat_riders):.1f}%** "
+            f"({t.one_seat_riders:,.0f})",
+            f"- **Close one-seat: {t.pct(t.close_riders):.1f}%** "
+            f"({t.close_riders:,.0f}), within {close_threshold_m:.0f}m of a "
             f"station on the scenario-effective origin corridor",
-            f"- **Effective one-seat: {self.pct(self.effective_riders):.1f}%** "
-            f"({self.effective_riders:,.0f})",
+            f"- **Effective one-seat: {t.pct(t.effective_riders):.1f}%** "
+            f"({t.effective_riders:,.0f})",
+            f"- **Both ends on the routes: {self.both_ends.total_riders:,.0f} "
+            f"riders**, {self.both_ends.pct(self.both_ends.effective_riders):.1f}% "
+            f"effective one-seat",
             "",
             f"{h2} Top {top_n} origin/destination pairs",
             "",
@@ -580,7 +634,7 @@ class ScenarioResult:
             close_str = "" if pr.one_seat else ("close" if pr.close else "far")
             dist_str = "" if pr.one_seat else f"{pr.dist_m:.0f}m"
             lines.append(
-                f"| {i} | {pr.riders:,.0f} | {self.pct(pr.riders):.2f}% | "
+                f"| {i} | {pr.riders:,.0f} | {self.overall.pct(pr.riders):.2f}% | "
                 f"{type_str} | {close_str} | {dist_str} | "
                 f"{pr.origin_name} → {pr.dest_name} |"
             )
@@ -634,6 +688,7 @@ class ScenarioComparison:
         pairs: list[tuple[int, int, float]],
         stations_by_id: dict[int, Station],
         stations_path: Path,
+        scope_ids: frozenset[int],
         close_lookup: Callable[[Station, Routes], tuple[bool, float, str | None]],
     ) -> ScenarioComparisonResult:
         return ScenarioComparisonResult(
@@ -643,6 +698,7 @@ class ScenarioComparison:
                     pairs=pairs,
                     stations_by_id=stations_by_id,
                     stations_path=stations_path,
+                    scope_ids=scope_ids,
                     close_lookup=close_lookup,
                 )
                 for scenario in self.scenarios
@@ -682,12 +738,12 @@ class ScenarioComparisonResult:
         print("\n=== Scenario comparison ===")
         for r in self.results:
             print(
-                f"  {r.scenario.name:<55} total={r.total_riders:>9,.0f}  "
-                f"direct={r.one_seat_riders:>8,.0f} "
-                f"({r.pct(r.one_seat_riders):5.1f}%)  "
-                f"close={r.close_riders:>7,.0f}  "
-                f"effective={r.effective_riders:>8,.0f} "
-                f"({r.pct(r.effective_riders):5.1f}%)"
+                f"  {r.scenario.name:<55} total={r.overall.total_riders:>9,.0f}  "
+                f"direct={r.overall.one_seat_riders:>8,.0f} "
+                f"({r.overall.pct(r.overall.one_seat_riders):5.1f}%)  "
+                f"close={r.overall.close_riders:>7,.0f}  "
+                f"effective={r.overall.effective_riders:>8,.0f} "
+                f"({r.overall.pct(r.overall.effective_riders):5.1f}%)"
             )
 
     def write_csvs(self, csv_out: Path) -> None:
@@ -699,7 +755,7 @@ class ScenarioComparisonResult:
         lines = [
             "## Scenario comparison",
             "",
-            f"Total riders is the same {self.results[0].total_riders:,.0f} "
+            f"Total riders is the same {self.results[0].overall.total_riders:,.0f} "
             f"across every scenario below; only how many of those riders get "
             f"a one-seat ride changes.",
             "",
@@ -708,12 +764,27 @@ class ScenarioComparisonResult:
             "| --- | --- | --- | --- | --- |",
         ]
         for r in self.results:
-            lines.append(
-                f"| {r.scenario.name} | {r.total_riders:,.0f} | "
-                f"{r.one_seat_riders:,.0f} ({r.pct(r.one_seat_riders):.1f}%) | "
-                f"{r.close_riders:,.0f} ({r.pct(r.close_riders):.1f}%) | "
-                f"{r.effective_riders:,.0f} ({r.pct(r.effective_riders):.1f}%) |"
-            )
+            lines.append(r.overall.markdown_row(r.scenario.name))
+
+        # The same comparison over the pairs the routes could carry end to end:
+        # a swap at one junction moves a few hundred riders out of a systemwide
+        # total, and reads as no change at all, without this.
+        lines += [
+            "",
+            "### Both ends on the comparison's routes",
+            "",
+            f"The {self.results[0].both_ends.total_riders:,.0f} riders above "
+            f"whose origin *and* destination are served by "
+            f"{','.join(sorted(self.comparison.routes))}, "
+            f"where a scenario's effect isn't diluted by trips only half in "
+            f"scope.",
+            "",
+            "| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | "
+            "Effective 1-Seat |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+        for r in self.results:
+            lines.append(r.both_ends.markdown_row(r.scenario.name))
         lines.append("")
         return "\n".join(lines)
 
@@ -847,7 +918,7 @@ def deinterlining(
 ) -> None:
     """Systemwide deinterlining scenario comparator:
     classify every origin/destination pair
-    whose origin could plausibly use one of the selected scenarios' routes
+    with either end on one of the selected scenarios' routes
     as one-seat or transfer,
     under today's routing and any number of route-override scenarios,
     all in one pass over the same fetched OD pairs.
@@ -908,14 +979,16 @@ def deinterlining(
     print(f"Day filter: {days_list if days_list else 'all days'} ({day_type_label})")
 
     # Systemwide, but not literally every station:
-    # an origin only matters
+    # a station only matters
     # if some scenario gives it one of the comparison's routes.
-    origin_ids = [
+    # Either end putting a pair in scope, since a swap changes a trip
+    # the same way whichever direction it runs.
+    scope_ids = frozenset(
         s.complex_id
         for s in stations_by_id.values()
         if any(sc.routes_of(s) for sc in scenarios)
-    ]
-    print(f"Origin stations in scope: {len(origin_ids):,} of {len(stations_by_id):,}")
+    )
+    print(f"Stations in scope: {len(scope_ids):,} of {len(stations_by_id):,}")
 
     con = duckdb.connect()
     day_params: list[str] = list(days_list) if days_list else []
@@ -924,8 +997,10 @@ def deinterlining(
         if not days_list
         else '"Day of Week" IN (' + ", ".join("?" for _ in days_list) + ")"
     )
-    origin_filter_sql = (
-        '"Origin Station Complex ID" IN (' + ", ".join(str(i) for i in origin_ids) + ")"
+    scope_id_list = ", ".join(str(i) for i in sorted(scope_ids))
+    scope_filter_sql = (
+        f'("Origin Station Complex ID" IN ({scope_id_list})'
+        f' OR "Destination Station Complex ID" IN ({scope_id_list}))'
     )
 
     coverage = DayCoverage.query(con, parquet, day_filter_sql, day_params)
@@ -936,7 +1011,7 @@ def deinterlining(
                "Destination Station Complex ID" AS dest_id,
                SUM("Estimated Average Ridership") / {n_distinct_days} AS riders
         FROM read_parquet(?)
-        WHERE {day_filter_sql} AND {origin_filter_sql}
+        WHERE {day_filter_sql} AND {scope_filter_sql}
         GROUP BY 1, 2
     """
     pairs: list[tuple[int, int, float]] = con.execute(
@@ -993,6 +1068,7 @@ def deinterlining(
             pairs=pairs,
             stations_by_id=stations_by_id,
             stations_path=stations,
+            scope_ids=scope_ids,
             close_lookup=close_lookup,
         )
     except ScenarioError as e:
@@ -1012,7 +1088,7 @@ def deinterlining(
                 f"Average {day_type_label} ridership ({n_distinct_days} distinct "
                 f"days in the data, {coverage.first_month} to "
                 f"{coverage.last_month}), every "
-                f"origin/destination pair whose origin could plausibly use "
+                f"origin/destination pair with either end served by "
                 f"{','.join(sorted(routes_set))} under any scenario compared here.",
                 "",
                 f"Produced by `{produced_by}`.",
