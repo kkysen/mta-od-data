@@ -8,7 +8,7 @@ Produced by `mta-od-data analyze deinterlining --category DeKalb --markdown-out 
 
 ## Scenario comparison
 
-Total riders is the same 2,332,194 across every scenario below; only how many of those riders get a one-seat ride changes.
+Total riders is the same 2,332,194 across every scenario below; only how many of those riders get a one-seat ride changes. Close one-seat counts a transfer trip whose destination is within 300m of a station on that scenario's effective origin corridor.
 
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | --- | --- | --- | --- |
@@ -27,14 +27,6 @@ The 837,408 riders above whose origin *and* destination are served by B,D,N,Q,R,
 ---
 
 ## Current
-
-### Headline numbers
-
-- **Total: 2,332,194 riders**
-- **One-seat: 26.3%** (612,795)
-- **Close one-seat: 4.8%** (111,095), within 300m of a station on the scenario-effective origin corridor
-- **Effective one-seat: 31.0%** (723,890)
-- **Both ends on the routes: 837,408 riders**, 79.0% effective one-seat
 
 ### Top 25 origin/destination pairs
 
@@ -99,14 +91,6 @@ The 837,408 riders above whose origin *and* destination are served by B,D,N,Q,R,
 ---
 
 ## B/D 4 Av Express
-
-### Headline numbers
-
-- **Total: 2,332,194 riders**
-- **One-seat: 25.4%** (593,038)
-- **Close one-seat: 5.6%** (130,686), within 300m of a station on the scenario-effective origin corridor
-- **Effective one-seat: 31.0%** (723,724)
-- **Both ends on the routes: 837,408 riders**, 79.0% effective one-seat
 
 ### Top 25 origin/destination pairs
 
