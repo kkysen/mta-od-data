@@ -3,7 +3,6 @@ import shlex
 import sys
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
-from datetime import date
 from functools import cache
 from pathlib import Path
 from typing import Annotated, Literal
@@ -14,6 +13,7 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
+    DayCoverage,
     DayType,
     Station,
     haversine_m,
@@ -1060,18 +1060,8 @@ def one_seat_rides(
         '"Origin Station Complex ID" IN (' + ", ".join(str(i) for i in origin_ids) + ")"
     )
 
-    n_days_query = f"""
-        SELECT COUNT(DISTINCT CAST(Timestamp AS DATE)),
-               MIN(CAST(Timestamp AS DATE)),
-               MAX(CAST(Timestamp AS DATE))
-        FROM read_parquet(?)
-        WHERE {day_filter_sql}
-    """
-    n_days_result: tuple[int, date, date] | None = con.execute(
-        n_days_query, [str(parquet), *day_params]
-    ).fetchone()
-    assert n_days_result is not None, "aggregate query always returns exactly one row"
-    n_distinct_days, min_date, max_date = n_days_result
+    coverage = DayCoverage.query(con, parquet, day_filter_sql, day_params)
+    n_distinct_days = coverage.n_days
 
     pairs_query = f"""
         SELECT "Origin Station Complex ID" AS origin_id,
@@ -1087,7 +1077,7 @@ def one_seat_rides(
     print(
         f"\n{len(pairs):,} distinct origin/destination pairs, averaged over "
         f"{n_distinct_days} distinct days matching the day filter "
-        f"({min_date} to {max_date})"
+        f"({coverage.first_month} to {coverage.last_month})"
     )
 
     # Real geography only, so this is scenario-independent:
@@ -1235,7 +1225,8 @@ def one_seat_rides(
             f"{trunk_a_label}/{trunk_b_label} at {boundary_name}",
             "",
             f"Scenario: average {day_type_label} ridership ({n_distinct_days} "
-            f"distinct days in the data, {min_date} to {max_date}) on trains "
+            f"distinct days in the data, {coverage.first_month} to "
+            f"{coverage.last_month}) on trains "
             f"originating at stations served by {','.join(sorted(routes_set))}, "
             f"{origin_side} of {boundary_name}, with destinations {dest_side} "
             f"of it (i.e. trips that cross the junction).",

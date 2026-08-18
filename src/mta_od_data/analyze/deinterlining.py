@@ -22,7 +22,6 @@ import shlex
 import sys
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
-from datetime import date
 from functools import cache
 from pathlib import Path
 from typing import Annotated, Any
@@ -33,7 +32,13 @@ from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
 from typer import Option, Typer
 
 from mta_od_data import DATA, ROOT
-from mta_od_data.analyze.common import DAY_TYPE_PRESETS, DayType, Station, haversine_m
+from mta_od_data.analyze.common import (
+    DAY_TYPE_PRESETS,
+    DayCoverage,
+    DayType,
+    Station,
+    haversine_m,
+)
 
 app = Typer()
 
@@ -923,18 +928,8 @@ def deinterlining(
         '"Origin Station Complex ID" IN (' + ", ".join(str(i) for i in origin_ids) + ")"
     )
 
-    n_days_query = f"""
-        SELECT COUNT(DISTINCT CAST(Timestamp AS DATE)),
-               MIN(CAST(Timestamp AS DATE)),
-               MAX(CAST(Timestamp AS DATE))
-        FROM read_parquet(?)
-        WHERE {day_filter_sql}
-    """
-    n_days_result: tuple[int, date, date] | None = con.execute(
-        n_days_query, [str(parquet), *day_params]
-    ).fetchone()
-    assert n_days_result is not None, "aggregate query always returns exactly one row"
-    n_distinct_days, min_date, max_date = n_days_result
+    coverage = DayCoverage.query(con, parquet, day_filter_sql, day_params)
+    n_distinct_days = coverage.n_days
 
     pairs_query = f"""
         SELECT "Origin Station Complex ID" AS origin_id,
@@ -950,7 +945,7 @@ def deinterlining(
     print(
         f"\n{len(pairs):,} distinct origin/destination pairs, averaged over "
         f"{n_distinct_days} distinct days matching the day filter "
-        f"({min_date} to {max_date})"
+        f"({coverage.first_month} to {coverage.last_month})"
     )
 
     platforms_by_complex: dict[int, list[Station]] = {}
@@ -1015,7 +1010,8 @@ def deinterlining(
                 f"# Deinterlining scenario comparison: {','.join(sorted(routes_set))}",
                 "",
                 f"Average {day_type_label} ridership ({n_distinct_days} distinct "
-                f"days in the data, {min_date} to {max_date}), every "
+                f"days in the data, {coverage.first_month} to "
+                f"{coverage.last_month}), every "
                 f"origin/destination pair whose origin could plausibly use "
                 f"{','.join(sorted(routes_set))} under any scenario compared here.",
                 "",
