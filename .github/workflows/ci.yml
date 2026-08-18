@@ -30,9 +30,9 @@ jobs:
       - name: pyrefly
         run: uv run pyrefly check
 
-      # The OD Parquet is too big to check in, so it lives as a release asset
-      # (see README.md). Without it the analyze tests skip themselves, so a
-      # missing or not-yet-published release leaves CI green but thinner.
+      # The OD Parquet is too big to check in, so it lives as a release asset (see `README.md`).
+      # Without it the analyze tests skip themselves,
+      # so a missing or not-yet-published release leaves CI green but thinner.
       - name: download the OD dataset
         env:
           GH_TOKEN: ${{ github.token }}
