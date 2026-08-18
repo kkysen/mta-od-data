@@ -28,24 +28,42 @@ def fetch_csv(url: str, out: Path, *, force: bool) -> None:
     print(f"wrote {out} ({n} rows)")
 
 
-def convert_od_to_parquet(csv_patterns: list[str], out: Path, force: bool) -> None:
+def convert_od_to_parquet(
+    csv_patterns: list[str],
+    out: Path,
+    force: bool,
+    ridership_decimals: int | None,
+) -> None:
     if out.exists() and not force:
         print(f"skip: {out} already exists (use --force to reconvert)")
         return
     resolved = [str(ROOT / p) if not Path(p).is_absolute() else p for p in csv_patterns]
     print(f"converting {resolved} -> {out}")
+    if ridership_decimals is None:
+        select = "*"
+    else:
+        if ridership_decimals < 0:
+            raise ValueError(
+                f"--ridership-decimals must be >= 0, got {ridership_decimals}"
+            )
+        select = (
+            '* REPLACE (round("Estimated Average Ridership", '
+            f'{ridership_decimals}) AS "Estimated Average Ridership")'
+        )
+        print(f"rounding ridership to {ridership_decimals} decimals")
     con = duckdb.connect()
     con.execute(
-        """
+        f"""
         COPY (
-            SELECT * FROM read_csv($csv_patterns, union_by_name=true, thousands=',')
+            SELECT {select}
+            FROM read_csv($csv_patterns, union_by_name=true, thousands=',')
             -- Sorted so `analyze`'s row-group statistics can skip data
             -- rather than scan the whole file: every analysis so far
             -- filters by day of week, and scopes to some set of origins.
             -- Never worse than the original date/hour order even for a
             -- query filtering by neither, and it compresses better.
             ORDER BY "Day of Week", "Origin Station Complex ID"
-        ) TO $out (FORMAT parquet)
+        ) TO $out (FORMAT parquet, COMPRESSION zstd, COMPRESSION_LEVEL 3)
         """,
         {"csv_patterns": resolved, "out": str(out)},
     )
@@ -87,6 +105,16 @@ def prepare(
     force_stations: Annotated[
         bool, Option(help="Refetch station reference data even if it exists")
     ] = False,
+    ridership_decimals: Annotated[
+        int | None,
+        Option(
+            help=(
+                "Round `Estimated Average Ridership` to this many decimals "
+                "(default: keep every digit the extract has). The ridership "
+                "column is most of the Parquet; 2 decimals is ~35% smaller"
+            )
+        ),
+    ] = None,
     stations_only: Annotated[
         bool,
         Option(
@@ -110,6 +138,7 @@ def prepare(
             --out data/mta_od_2024.parquet
         mta-od-data prepare --force-stations
         mta-od-data prepare --stations-only
+        mta-od-data prepare --ridership-decimals 2
     """
     DATA.mkdir(exist_ok=True)
     force_stations = force_stations or stations_only
@@ -117,4 +146,6 @@ def prepare(
     fetch_csv(STATIONS_INDIVIDUAL_URL, stations_individual_out, force=force_stations)
     if stations_only:
         return
-    convert_od_to_parquet(csv if csv else [DEFAULT_CSV_GLOB], out, force)
+    convert_od_to_parquet(
+        csv if csv else [DEFAULT_CSV_GLOB], out, force, ridership_decimals
+    )
