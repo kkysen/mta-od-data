@@ -565,22 +565,21 @@ class Scenario:
             for station, delta in scenario.overrides.items():
                 existing = overrides.get(station)
                 overrides[station] = delta if existing is None else existing | delta
-        # Leaving every category unchanged is today's routing, however
-        # many categories were selected, so it's named once rather than
-        # joined into "Current + Current".
-        unchanged = all(not s.overrides for s in scenarios)
+        # A category left unchanged contributes nothing to the name:
+        # "Current + A/C CPW Express" and "A/C CPW Express" describe the
+        # same routing, and the longer one gets longer with every
+        # category selected. Only when *every* category is unchanged is
+        # there nothing else to say, and then it's `Current` once rather
+        # than "Current + Current".
+        # By identity, not by an empty `overrides`: a scenario file is
+        # free to declare one that happens to change nothing, and that
+        # one still has a name worth printing.
+        changed = [s for s in scenarios if s is not CURRENT]
+        named = changed or [CURRENT]
         return cls(
-            name=CURRENT.name if unchanged else " + ".join(s.name for s in scenarios),
-            description=(
-                CURRENT.description
-                if unchanged
-                else " + ".join(s.description for s in scenarios)
-            ),
-            category=(
-                CURRENT.category
-                if unchanged
-                else " + ".join(s.category for s in scenarios)
-            ),
+            name=" + ".join(s.name for s in named),
+            description=" + ".join(s.description for s in named),
+            category=" + ".join(s.category for s in named),
             routes=routes,
             overrides=overrides,
             effective_routes={

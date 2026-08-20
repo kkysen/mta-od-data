@@ -181,10 +181,16 @@ It needs no declaring:
 so the combination that leaves them all unchanged comes first.
 `ScenarioComparisonResult.baseline` asserts that
 by the scenario overriding nothing, not by its name,
-which is only a label:
-with two categories selected,
-`Scenario.combine` would otherwise join it into `Current + Current`,
-so it is named `Current` once however many were selected.
+which is only a label.
+
+Names join the categories a combination actually changes,
+and nothing else.
+`Current + A/C CPW Express` and `A/C CPW Express`
+describe the same routing,
+and the first gets longer with every category selected,
+so an unchanged category drops out of the name.
+The all-unchanged combination has nothing left to name,
+and is `Current` once rather than `Current + Current`.
 
 A changed pair is named by the routes serving it *today*.
 Naming it from the scenario made rows contradict themselves,
