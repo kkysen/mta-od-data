@@ -134,13 +134,13 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 ### What changed, against Current
 
-Every both-ends rider, and their share of the 837,408 of them, by what Current gives them (rows) and what B/D 4 Av Express gives them (columns). Off-diagonal cells are the whole effect of the swap; the diagonal is everyone it leaves alone. `direct` is a one-seat ride, `close` a one-seat ride after a walk of 300m or less, `far` neither.
+Every both-ends rider, and their share of the 837,408 of them: **was** is what Current gives them, **now** what B/D 4 Av Express would. Off-diagonal cells are the whole effect of the swap; the diagonal is everyone it leaves alone. `direct` is a one-seat ride, `close` a one-seat ride after a walk of 300m or less, `far` neither.
 
-| ↓ Current / B/D 4 Av Express → | direct | close | far |
+| Riders | now direct | now close | now far |
 | --- | --- | --- | --- |
-| direct | 585,153 (69.9%) | 9,252 (1.1%) | 18,390 (2.2%) |
-| close | 2,130 (0.3%) | 84,124 (10.0%) | 272 (0.0%) |
-| far | 5,754 (0.7%) | 142 (0.0%) | 132,191 (15.8%) |
+| **was direct** | 585,153 (69.9%) | 9,252 (1.1%) | 18,390 (2.2%) |
+| **was close** | 2,130 (0.3%) | 84,124 (10.0%) | 272 (0.0%) |
+| **was far** | 5,754 (0.7%) | 142 (0.0%) | 132,191 (15.8%) |
 
 - **Gained an effective one-seat ride: 5,896 (0.7%)**
 - **Lost one: 18,662 (2.2%)**
