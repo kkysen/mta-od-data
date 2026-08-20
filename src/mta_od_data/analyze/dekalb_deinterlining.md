@@ -148,35 +148,35 @@ Every both-ends rider by what Current gives them (rows) and what B/D 4 Av Expres
 
 ### Biggest changes, against Current
 
-The top 25 station pairs by riders whose outcome moved, both directions combined as above.
+The top 25 station pairs by riders whose outcome moved, both directions combined as above. Each pair is named by the routes serving it today; `Dist` is the walk under B/D 4 Av Express.
 
 | # | Riders | Was | Now | Dist | Origin ↔ Destination |
 | --- | --- | --- | --- | --- | --- |
-| 1 | 919 | direct | far | 518m | Canal St (N,Q,R) ↔ 8 Av (B) |
-| 2 | 774 | direct | close | 274m | Kings Hwy (N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 3 | 633 | direct | close | 191m | Kings Hwy (N,Q) ↔ 42 St-Bryant Pk/5 Av (B,D) |
-| 4 | 584 | far | direct |  | 8 Av (B) ↔ Grand St (B,D) |
-| 5 | 575 | direct | close | 274m | Sheepshead Bay (N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 6 | 557 | direct | far | 518m | Kings Hwy (N,Q) ↔ Grand St (B,D) |
-| 7 | 534 | direct | far | 518m | Fort Hamilton Pkwy (B) ↔ Canal St (N,Q,R) |
-| 8 | 509 | direct | far | 518m | Bay Pkwy (B) ↔ Canal St (N,Q,R) |
-| 9 | 505 | direct | close | 274m | 7 Av (N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 10 | 436 | direct | close | 191m | Times Sq-42 St/PABT (N,Q,R) ↔ 8 Av (B) |
-| 11 | 435 | direct | close | 191m | Sheepshead Bay (N,Q) ↔ 42 St-Bryant Pk/5 Av (B,D) |
-| 12 | 423 | direct | far | 518m | Sheepshead Bay (N,Q) ↔ Grand St (B,D) |
-| 13 | 408 | direct | far | 795m | 7 Av (N,Q) ↔ Broadway-Lafayette St/Bleecker St (B,D) |
-| 14 | 402 | direct | far | 1429m | Coney Island-Stillwell Av (D,N,Q) ↔ 8 Av (B) |
-| 15 | 393 | direct | far | 518m | Kings Hwy (B) ↔ Canal St (N,Q,R) |
-| 16 | 349 | direct | far | 518m | 20 Av (B) ↔ Canal St (N,Q,R) |
-| 17 | 340 | direct | far | 413m | Kings Hwy (N,Q) ↔ 59 St-Columbus Circle (B,D) |
-| 18 | 332 | direct | close | 191m | 7 Av (N,Q) ↔ 42 St-Bryant Pk/5 Av (B,D) |
-| 19 | 318 | direct | close | 274m | Newkirk Plaza (N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 20 | 314 | direct | far | 867m | 8 Av (B) ↔ 14 St-Union Sq (N,Q,R) |
-| 21 | 312 | direct | close | 274m | Church Av (N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 22 | 307 | direct | far | 1720m | Coney Island-Stillwell Av (D,N,Q) ↔ 59 St (B,R) |
-| 23 | 306 | direct | close | 191m | Fort Hamilton Pkwy (B) ↔ Times Sq-42 St/PABT (N,Q,R) |
-| 24 | 305 | direct | far | 795m | Church Av (N,Q) ↔ Broadway-Lafayette St/Bleecker St (B,D) |
-| 25 | 297 | direct | far | 518m | 18 Av (B) ↔ Canal St (N,Q,R) |
+| 1 | 919 | direct | far | 518m | Canal St (N,Q,R) ↔ 8 Av (N) |
+| 2 | 774 | direct | close | 274m | Kings Hwy (B,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 3 | 633 | direct | close | 191m | Kings Hwy (B,Q) ↔ 42 St-Bryant Pk/5 Av (B,D) |
+| 4 | 584 | far | direct |  | 8 Av (N) ↔ Grand St (B,D) |
+| 5 | 575 | direct | close | 274m | Sheepshead Bay (B,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 6 | 557 | direct | far | 518m | Kings Hwy (B,Q) ↔ Grand St (B,D) |
+| 7 | 534 | direct | far | 518m | Fort Hamilton Pkwy (N) ↔ Canal St (N,Q,R) |
+| 8 | 509 | direct | far | 518m | Bay Pkwy (N) ↔ Canal St (N,Q,R) |
+| 9 | 505 | direct | close | 274m | 7 Av (B,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 10 | 436 | direct | close | 191m | Times Sq-42 St/PABT (N,Q,R) ↔ 8 Av (N) |
+| 11 | 435 | direct | close | 191m | Sheepshead Bay (B,Q) ↔ 42 St-Bryant Pk/5 Av (B,D) |
+| 12 | 423 | direct | far | 518m | Sheepshead Bay (B,Q) ↔ Grand St (B,D) |
+| 13 | 408 | direct | far | 795m | 7 Av (B,Q) ↔ Broadway-Lafayette St/Bleecker St (B,D) |
+| 14 | 402 | direct | far | 1429m | Coney Island-Stillwell Av (D,N,Q) ↔ 8 Av (N) |
+| 15 | 393 | direct | far | 518m | Kings Hwy (N) ↔ Canal St (N,Q,R) |
+| 16 | 349 | direct | far | 518m | 20 Av (N) ↔ Canal St (N,Q,R) |
+| 17 | 340 | direct | far | 413m | Kings Hwy (B,Q) ↔ 59 St-Columbus Circle (B,D) |
+| 18 | 332 | direct | close | 191m | 7 Av (B,Q) ↔ 42 St-Bryant Pk/5 Av (B,D) |
+| 19 | 318 | direct | close | 274m | Newkirk Plaza (B,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 20 | 314 | direct | far | 867m | 8 Av (N) ↔ 14 St-Union Sq (N,Q,R) |
+| 21 | 312 | direct | close | 274m | Church Av (B,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 22 | 307 | direct | far | 1720m | Coney Island-Stillwell Av (D,N,Q) ↔ 59 St (N,R) |
+| 23 | 306 | direct | close | 191m | Fort Hamilton Pkwy (N) ↔ Times Sq-42 St/PABT (N,Q,R) |
+| 24 | 305 | direct | far | 795m | Church Av (B,Q) ↔ Broadway-Lafayette St/Bleecker St (B,D) |
+| 25 | 297 | direct | far | 518m | 18 Av (N) ↔ Canal St (N,Q,R) |
 
 ### Top 25 origin/destination pairs
 

@@ -127,6 +127,19 @@ class Outcome(StrEnum):
 
 
 @dataclass(slots=True, frozen=True)
+class Change:
+    """One station pair whose outcome a scenario moved."""
+
+    before: Outcome
+    after: Outcome
+    # Classified under the scenario, so its distance is the walk a rider
+    # would face *after* the change.
+    pair: SymmetricPair
+    # `origin ↔ destination` as the baseline names them.
+    label: str
+
+
+@dataclass(slots=True, frozen=True)
 class Transitions:
     """Where one scenario's riders end up relative to another's.
 
@@ -138,13 +151,14 @@ class Transitions:
     baseline_name: str
     scenario_name: str
     riders: dict[tuple[Outcome, Outcome], float]
-    # The pairs that moved, most riders first, as `(before, after, pair)`.
-    changed: list[tuple[Outcome, Outcome, SymmetricPair]]
+    # The pairs that moved, most riders first.
+    changed: list[Change]
 
     @classmethod
     def between(cls, baseline: ScenarioResult, result: ScenarioResult) -> Transitions:
         riders: dict[tuple[Outcome, Outcome], float] = {}
         changed_rows: list[tuple[Outcome, Outcome, ODPair]] = []
+        baseline_labels: dict[tuple[int, int], str] = {}
         for before_pair, after_pair in zip(baseline.rows, result.rows, strict=True):
             assert (before_pair.origin_id, before_pair.dest_id) == (
                 after_pair.origin_id,
@@ -157,6 +171,9 @@ class Transitions:
             riders[before, after] = riders.get((before, after), 0.0) + after_pair.riders
             if before is not after:
                 changed_rows.append((before, after, after_pair))
+                baseline_labels[after_pair.origin_id, after_pair.dest_id] = (
+                    f"{before_pair.origin_name} ↔ {before_pair.dest_name}"
+                )
 
         # Grouped the same way the pair tables are, so a reader comparing
         # the two isn't matching one row against two.
@@ -164,13 +181,24 @@ class Transitions:
         for before, after, pair in changed_rows:
             by_transition.setdefault((before, after), []).append(pair)
         changed = [
-            (before, after, symmetric)
+            Change(
+                before=before,
+                after=after,
+                pair=symmetric,
+                # A reader knows the pair by what serves it today,
+                # so name it from the baseline: labelling a `Was direct`
+                # row with the scenario's routes asserts a one-seat ride
+                # between route sets that don't share one.
+                label=baseline_labels[
+                    symmetric.forward.origin_id, symmetric.forward.dest_id
+                ],
+            )
             for (before, after), pairs in by_transition.items()
             for symmetric in SymmetricPair.group(pairs)
         ]
 
-        def changed_riders(entry: tuple[Outcome, Outcome, SymmetricPair]) -> float:
-            return entry[2].riders
+        def changed_riders(change: Change) -> float:
+            return change.pair.riders
 
         changed.sort(key=changed_riders, reverse=True)
         return cls(
@@ -240,17 +268,19 @@ class Transitions:
                 f"{h2} Biggest changes, against {self.baseline_name}",
                 "",
                 f"The top {top_n} station pairs by riders whose outcome "
-                f"moved, both directions combined as above.",
+                f"moved, both directions combined as above. Each pair is "
+                f"named by the routes serving it today; `Dist` is the walk "
+                f"under {self.scenario_name}.",
                 "",
                 "| # | Riders | Was | Now | Dist | Origin ↔ Destination |",
                 "| --- | --- | --- | --- | --- | --- |",
             ]
-            for i, (before, after, pair) in enumerate(self.changed[:top_n], 1):
-                fwd = pair.forward
+            for i, change in enumerate(self.changed[:top_n], 1):
+                fwd = change.pair.forward
                 dist = "" if fwd.one_seat else f"{fwd.dist_m:.0f}m"
                 lines.append(
-                    f"| {i} | {pair.riders:,.0f} | {before} | {after} | {dist} "
-                    f"| {fwd.origin_name} ↔ {fwd.dest_name} |"
+                    f"| {i} | {change.pair.riders:,.0f} | {change.before} "
+                    f"| {change.after} | {dist} | {change.label} |"
                 )
             lines.append("")
         return "\n".join(lines)
