@@ -83,6 +83,51 @@ class ODPair:
     near_station: str | None
 
 
+@dataclass(slots=True, frozen=True)
+class SymmetricPair:
+    """Both directions of one station pair, as a single row.
+
+    A swap changes a trip the same way whichever way it runs,
+    so listing A->B and B->A separately
+    spent two of the top N slots on one fact,
+    and buried the pair that would otherwise have been last.
+
+    `one_seat` is symmetric--a shared route is a shared route--so the
+    two directions can only differ in `close`/`dist_m`,
+    which measure the *destination* against the origin's corridor
+    and genuinely aren't symmetric.
+    Both directions' values are kept rather than combined.
+
+    `forward` is the busier direction, so the arrow points the way most
+    riders travel; `reverse` is `None` for a pair the data only has one
+    way round, and for a trip that starts and ends at one complex.
+    """
+
+    forward: ODPair
+    reverse: ODPair | None
+
+    @property
+    def riders(self) -> float:
+        return self.forward.riders + (
+            self.reverse.riders if self.reverse is not None else 0.0
+        )
+
+    @classmethod
+    def group(cls, rows: list[ODPair]) -> list[SymmetricPair]:
+        by_ends: dict[frozenset[int], list[ODPair]] = {}
+        for row in rows:
+            by_ends.setdefault(frozenset((row.origin_id, row.dest_id)), []).append(row)
+
+        def row_riders(row: ODPair) -> float:
+            return row.riders
+
+        pairs: list[SymmetricPair] = []
+        for directions in by_ends.values():
+            forward, *rest = sorted(directions, key=row_riders, reverse=True)
+            pairs.append(cls(forward=forward, reverse=rest[0] if rest else None))
+        return pairs
+
+
 @dataclass(slots=True)
 class EndStats:
     """One end of a trip--an origin or a destination--summed over every
@@ -665,25 +710,38 @@ class ScenarioResult:
             f"{h2} Top {top_n} origin/destination pairs",
             "",
             "Both ends on the comparison's routes, per that section of the "
-            "comparison above.",
+            "comparison above. Each row is both directions of one station "
+            "pair, their riders summed, oriented so the arrow points the "
+            "way more of them travel. One-seat is symmetric, but close "
+            "one-seat measures the destination against the origin's "
+            "corridor, so it is given per direction.",
             "",
-            "| # | Riders | % Total | Type | Close? | Dist | Origin → Destination |",
-            "| --- | --- | --- | --- | --- | --- | --- |",
+            "| # | Riders | % Total | Type | → Close? | → Dist | ← Close? | "
+            "← Dist | Origin ↔ Destination |",
+            "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
         ]
 
-        def pair_riders(pair: ODPair) -> float:
+        def pair_riders(pair: SymmetricPair) -> float:
             return pair.riders
 
+        def close_cells(direction: ODPair | None) -> str:
+            if direction is None or direction.one_seat:
+                return "  |  |"
+            close_str = "close" if direction.close else "far"
+            dist_str = "" if direction.dist_m is None else f"{direction.dist_m:.0f}m"
+            return f" {close_str} | {dist_str} |"
+
         both_ends_rows = [r for r in self.rows if r.both_ends]
-        top_pairs = sorted(both_ends_rows, key=pair_riders, reverse=True)[:top_n]
+        top_pairs = sorted(
+            SymmetricPair.group(both_ends_rows), key=pair_riders, reverse=True
+        )[:top_n]
         for i, pr in enumerate(top_pairs, 1):
-            type_str = "1-seat" if pr.one_seat else "xfer"
-            close_str = "" if pr.one_seat else ("close" if pr.close else "far")
-            dist_str = "" if pr.dist_m is None else f"{pr.dist_m:.0f}m"
+            fwd = pr.forward
             lines.append(
                 f"| {i} | {pr.riders:,.0f} | {self.both_ends.pct(pr.riders):.2f}% | "
-                f"{type_str} | {close_str} | {dist_str} | "
-                f"{pr.origin_name} → {pr.dest_name} |"
+                f"{'1-seat' if fwd.one_seat else 'xfer'} |"
+                f"{close_cells(fwd)}{close_cells(pr.reverse)}"
+                f" {fwd.origin_name} ↔ {fwd.dest_name} |"
             )
         lines.append("")
 
@@ -721,10 +779,10 @@ class ScenarioResult:
 
         if csv_out:
             lines.append(
-                f"_Full row-level detail (every origin/destination pair, "
-                f"either end on the routes, not just the top {top_n} with "
-                f"both: `{csv_out}`, whose `both_ends` column is what the "
-                f"tables above filter on)._"
+                f"_Full row-level detail (one row per direction, every "
+                f"origin/destination pair with either end on the routes, "
+                f"not just the top {top_n}): `{csv_out}`, whose `both_ends` "
+                f"column is what the tables above filter on._"
             )
             lines.append("")
         return "\n".join(lines)
