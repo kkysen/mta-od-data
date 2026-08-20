@@ -535,11 +535,22 @@ class Scenario:
             for station, delta in scenario.overrides.items():
                 existing = overrides.get(station)
                 overrides[station] = delta if existing is None else existing | delta
-        name = " + ".join(s.name for s in scenarios)
+        # Leaving every category unchanged is today's routing, however
+        # many categories were selected, so it's named once rather than
+        # joined into "Current + Current".
+        unchanged = all(not s.overrides for s in scenarios)
         return cls(
-            name=name,
-            description=" + ".join(s.description for s in scenarios),
-            category=" + ".join(s.category for s in scenarios),
+            name=CURRENT.name if unchanged else " + ".join(s.name for s in scenarios),
+            description=(
+                CURRENT.description
+                if unchanged
+                else " + ".join(s.description for s in scenarios)
+            ),
+            category=(
+                CURRENT.category
+                if unchanged
+                else " + ".join(s.category for s in scenarios)
+            ),
             routes=routes,
             overrides=overrides,
             effective_routes={
@@ -1040,8 +1051,12 @@ class ScenarioComparisonResult:
         `combine_scenarios` puts `CURRENT` first in every category's
         options, so the all-unchanged combination is the first result."""
         baseline = self.results[0]
-        assert baseline.scenario.name == CURRENT.name, (
-            f"expected {CURRENT.name!r} first, got {baseline.scenario.name!r}"
+        # By its overrides, not its name: the name is a label, while
+        # "overrides nothing" is what makes a scenario today's routing.
+        assert not baseline.scenario.overrides, (
+            f"expected an unchanged baseline first, got "
+            f"{baseline.scenario.name!r} with "
+            f"{len(baseline.scenario.overrides)} station(s) overridden"
         )
         return baseline
 
