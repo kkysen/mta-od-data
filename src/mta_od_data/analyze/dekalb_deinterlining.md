@@ -17,7 +17,7 @@ The 837,408 riders whose origin *and* destination are served by B,D,N,Q,R: the t
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | --- | --- | --- | --- |
 | Current | 837,408 | 612,795 (73.2%) | 86,527 (10.3%) | 699,321 (83.5%) |
-| B/D 4 Av Express | 837,408 | 593,038 (70.8%) | 93,517 (11.2%) | 686,555 (82.0%) |
+| B/D 4 Av Express | 837,408 | 593,038 (70.8%, -19,757) | 93,517 (11.2%, +6,991) | 686,555 (82.0%, -12,766) |
 
 ### Either end on the comparison's routes
 
@@ -26,7 +26,7 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | --- | --- | --- | --- |
 | Current | 2,332,194 | 612,795 (26.3%) | 229,764 (9.9%) | 842,558 (36.1%) |
-| B/D 4 Av Express | 2,332,194 | 593,038 (25.4%) | 235,698 (10.1%) | 828,736 (35.5%) |
+| B/D 4 Av Express | 2,332,194 | 593,038 (25.4%, -19,757) | 235,698 (10.1%, +5,935) | 828,736 (35.5%, -13,822) |
 
 ---
 
@@ -131,6 +131,52 @@ Both ends on the comparison's routes, per that section of the comparison above.
 ---
 
 ## B/D 4 Av Express
+
+### What changed, against Current
+
+Every both-ends rider by what Current gives them (rows) and what B/D 4 Av Express gives them (columns). Off-diagonal cells are the whole effect of the swap; the diagonal is everyone it leaves alone. `direct` is a one-seat ride, `close` a one-seat ride after a walk of 300m or less, `far` neither.
+
+| ↓ Current / B/D 4 Av Express → | direct | close | far |
+| --- | --- | --- | --- |
+| direct | 585,153 | 9,252 | 18,390 |
+| close | 2,130 | 84,124 | 272 |
+| far | 5,754 | 142 | 132,191 |
+
+- **Gained an effective one-seat ride: 5,896**
+- **Lost one: 18,662**
+- **Net: -12,766**
+
+### Biggest changes, against Current
+
+The top 25 station pairs by riders whose outcome moved, both directions combined as above.
+
+| # | Riders | Was | Now | Dist | Origin ↔ Destination |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 919 | direct | far | 518m | Canal St (N,Q,R) ↔ 8 Av (B) |
+| 2 | 774 | direct | close | 274m | Kings Hwy (N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 3 | 633 | direct | close | 191m | Kings Hwy (N,Q) ↔ 42 St-Bryant Pk/5 Av (B,D) |
+| 4 | 584 | far | direct |  | 8 Av (B) ↔ Grand St (B,D) |
+| 5 | 575 | direct | close | 274m | Sheepshead Bay (N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 6 | 557 | direct | far | 518m | Kings Hwy (N,Q) ↔ Grand St (B,D) |
+| 7 | 534 | direct | far | 518m | Fort Hamilton Pkwy (B) ↔ Canal St (N,Q,R) |
+| 8 | 509 | direct | far | 518m | Bay Pkwy (B) ↔ Canal St (N,Q,R) |
+| 9 | 505 | direct | close | 274m | 7 Av (N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 10 | 436 | direct | close | 191m | Times Sq-42 St/PABT (N,Q,R) ↔ 8 Av (B) |
+| 11 | 435 | direct | close | 191m | Sheepshead Bay (N,Q) ↔ 42 St-Bryant Pk/5 Av (B,D) |
+| 12 | 423 | direct | far | 518m | Sheepshead Bay (N,Q) ↔ Grand St (B,D) |
+| 13 | 408 | direct | far | 795m | 7 Av (N,Q) ↔ Broadway-Lafayette St/Bleecker St (B,D) |
+| 14 | 402 | direct | far | 1429m | Coney Island-Stillwell Av (D,N,Q) ↔ 8 Av (B) |
+| 15 | 393 | direct | far | 518m | Kings Hwy (B) ↔ Canal St (N,Q,R) |
+| 16 | 349 | direct | far | 518m | 20 Av (B) ↔ Canal St (N,Q,R) |
+| 17 | 340 | direct | far | 413m | Kings Hwy (N,Q) ↔ 59 St-Columbus Circle (B,D) |
+| 18 | 332 | direct | close | 191m | 7 Av (N,Q) ↔ 42 St-Bryant Pk/5 Av (B,D) |
+| 19 | 318 | direct | close | 274m | Newkirk Plaza (N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 20 | 314 | direct | far | 867m | 8 Av (B) ↔ 14 St-Union Sq (N,Q,R) |
+| 21 | 312 | direct | close | 274m | Church Av (N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 22 | 307 | direct | far | 1720m | Coney Island-Stillwell Av (D,N,Q) ↔ 59 St (B,R) |
+| 23 | 306 | direct | close | 191m | Fort Hamilton Pkwy (B) ↔ Times Sq-42 St/PABT (N,Q,R) |
+| 24 | 305 | direct | far | 795m | Church Av (N,Q) ↔ Broadway-Lafayette St/Bleecker St (B,D) |
+| 25 | 297 | direct | far | 518m | 18 Av (B) ↔ Canal St (N,Q,R) |
 
 ### Top 25 origin/destination pairs
 

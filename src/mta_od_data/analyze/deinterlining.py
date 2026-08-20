@@ -25,6 +25,7 @@ import shlex
 import sys
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
+from enum import StrEnum
 from functools import cache
 from pathlib import Path
 from typing import Annotated, Any
@@ -95,6 +96,164 @@ class ODPair:
     # and there is no walk to model.
     dist_m: float
     near_station: str | None
+
+
+class Outcome(StrEnum):
+    """What a scenario leaves a rider with.
+
+    Three states, not two:
+    losing a one-seat ride to a 200m walk
+    and losing it outright
+    are the same drop in the direct column
+    and nothing like the same thing for a rider,
+    which is why the comparison reports transitions
+    and not a single signed number.
+    """
+
+    DIRECT = "direct"
+    CLOSE = "close"
+    FAR = "far"
+
+    @classmethod
+    def of(cls, pair: ODPair) -> Outcome:
+        if pair.one_seat:
+            return cls.DIRECT
+        return cls.CLOSE if pair.close else cls.FAR
+
+    @property
+    def effective(self) -> bool:
+        """Whether this counts towards effective one-seat."""
+        return self is not Outcome.FAR
+
+
+@dataclass(slots=True, frozen=True)
+class Transitions:
+    """Where one scenario's riders end up relative to another's.
+
+    Both scenarios classify the same `pairs` list in the same order,
+    so the two `rows` lists are positionally aligned
+    and a transition is a zip, not a join.
+    """
+
+    baseline_name: str
+    scenario_name: str
+    riders: dict[tuple[Outcome, Outcome], float]
+    # The pairs that moved, most riders first, as `(before, after, pair)`.
+    changed: list[tuple[Outcome, Outcome, SymmetricPair]]
+
+    @classmethod
+    def between(cls, baseline: ScenarioResult, result: ScenarioResult) -> Transitions:
+        riders: dict[tuple[Outcome, Outcome], float] = {}
+        changed_rows: list[tuple[Outcome, Outcome, ODPair]] = []
+        for before_pair, after_pair in zip(baseline.rows, result.rows, strict=True):
+            assert (before_pair.origin_id, before_pair.dest_id) == (
+                after_pair.origin_id,
+                after_pair.dest_id,
+            ), "scenario rows are not aligned"
+            if not before_pair.both_ends:
+                continue
+            before = Outcome.of(before_pair)
+            after = Outcome.of(after_pair)
+            riders[before, after] = riders.get((before, after), 0.0) + after_pair.riders
+            if before is not after:
+                changed_rows.append((before, after, after_pair))
+
+        # Grouped the same way the pair tables are, so a reader comparing
+        # the two isn't matching one row against two.
+        by_transition: dict[tuple[Outcome, Outcome], list[ODPair]] = {}
+        for before, after, pair in changed_rows:
+            by_transition.setdefault((before, after), []).append(pair)
+        changed = [
+            (before, after, symmetric)
+            for (before, after), pairs in by_transition.items()
+            for symmetric in SymmetricPair.group(pairs)
+        ]
+
+        def changed_riders(entry: tuple[Outcome, Outcome, SymmetricPair]) -> float:
+            return entry[2].riders
+
+        changed.sort(key=changed_riders, reverse=True)
+        return cls(
+            baseline_name=baseline.scenario.name,
+            scenario_name=result.scenario.name,
+            riders=riders,
+            changed=changed,
+        )
+
+    def total(self, before: Outcome, after: Outcome) -> float:
+        return self.riders.get((before, after), 0.0)
+
+    @property
+    def gained(self) -> float:
+        return sum(
+            v
+            for (before, after), v in self.riders.items()
+            if not before.effective and after.effective
+        )
+
+    @property
+    def lost(self) -> float:
+        return sum(
+            v
+            for (before, after), v in self.riders.items()
+            if before.effective and not after.effective
+        )
+
+    @property
+    def net(self) -> float:
+        return self.gained - self.lost
+
+    def markdown(self, *, h2: str, top_n: int, close_threshold_m: float) -> str:
+        order = list(Outcome)
+        lines = [
+            f"{h2} What changed, against {self.baseline_name}",
+            "",
+            f"Every both-ends rider by what {self.baseline_name} gives them "
+            f"(rows) and what {self.scenario_name} gives them (columns). "
+            f"Off-diagonal cells are the whole effect of the swap; the "
+            f"diagonal is everyone it leaves alone. `direct` is a one-seat "
+            f"ride, `close` a one-seat ride after a walk of "
+            f"{close_threshold_m:.0f}m or less, `far` neither.",
+            "",
+            "| ↓ "
+            + self.baseline_name
+            + " / "
+            + self.scenario_name
+            + " → | "
+            + " | ".join(str(o) for o in order)
+            + " |",
+            "| --- " * (len(order) + 1) + "|",
+        ]
+        for before in order:
+            cells = " | ".join(f"{self.total(before, after):,.0f}" for after in order)
+            lines.append(f"| {before} | {cells} |")
+        lines += [
+            "",
+            f"- **Gained an effective one-seat ride: {self.gained:,.0f}**",
+            f"- **Lost one: {self.lost:,.0f}**",
+            f"- **Net: {self.net:+,.0f}**",
+            "",
+        ]
+
+        if self.changed:
+            lines += [
+                f"{h2} Biggest changes, against {self.baseline_name}",
+                "",
+                f"The top {top_n} station pairs by riders whose outcome "
+                f"moved, both directions combined as above.",
+                "",
+                "| # | Riders | Was | Now | Dist | Origin ↔ Destination |",
+                "| --- | --- | --- | --- | --- | --- |",
+            ]
+            for i, (before, after, pair) in enumerate(self.changed[:top_n], 1):
+                fwd = pair.forward
+                dist = "" if fwd.one_seat else f"{fwd.dist_m:.0f}m"
+                lines.append(
+                    f"| {i} | {pair.riders:,.0f} | {before} | {after} | {dist} "
+                    f"| {fwd.origin_name} ↔ {fwd.dest_name} |"
+                )
+            lines.append("")
+        return "\n".join(lines)
 
 
 @dataclass(slots=True, frozen=True)
@@ -633,13 +792,28 @@ class RiderStats:
             return 0.0
         return 100 * riders / self.total
 
-    def markdown_row(self, label: str) -> str:
+    def markdown_row(self, label: str, baseline: RiderStats | None = None) -> str:
+        """`baseline` adds each column's change against it,
+        saving the reader the subtraction.
+        `None` for the baseline's own row, which has nothing to differ
+        from."""
+
+        def cell(value: float, base: float | None) -> str:
+            pct = f"{value:,.0f} ({self.pct(value):.1f}%"
+            if base is None:
+                return f"{pct}) "
+            return f"{pct}, {value - base:+,.0f}) "
+
+        one_seat, close, effective = (
+            (None, None, None)
+            if baseline is None
+            else (baseline.one_seat, baseline.close, baseline.effective)
+        )
         return (
             f"| {label} | {self.total:,.0f} "
-            f"| {self.one_seat:,.0f} ({self.pct(self.one_seat):.1f}%) "
-            f"| {self.close:,.0f} ({self.pct(self.close):.1f}%) "
-            f"| {self.effective:,.0f} "
-            f"({self.pct(self.effective):.1f}%) |"
+            f"| {cell(self.one_seat, one_seat)}"
+            f"| {cell(self.close, close)}"
+            f"| {cell(self.effective, effective)}|"
         )
 
     def summary_line(self, label: str) -> str:
@@ -699,6 +873,7 @@ class ScenarioResult:
         close_threshold_m: float,
         top_n: int,
         csv_out: Path | None,
+        transitions: Transitions | None = None,
     ) -> str:
         h2 = "###" if show_label else "##"
         t = self.both_ends
@@ -722,6 +897,13 @@ class ScenarioResult:
                 f"effective one-seat",
                 "",
             ]
+
+        if transitions is not None:
+            lines.append(
+                transitions.markdown(
+                    h2=h2, top_n=top_n, close_threshold_m=close_threshold_m
+                )
+            )
 
         lines += [
             f"{h2} Top {top_n} origin/destination pairs",
@@ -853,6 +1035,24 @@ class ScenarioComparisonResult:
     results: list[ScenarioResult]
 
     @property
+    def baseline(self) -> ScenarioResult:
+        """Today's routing, which every change is reported against.
+        `combine_scenarios` puts `CURRENT` first in every category's
+        options, so the all-unchanged combination is the first result."""
+        baseline = self.results[0]
+        assert baseline.scenario.name == CURRENT.name, (
+            f"expected {CURRENT.name!r} first, got {baseline.scenario.name!r}"
+        )
+        return baseline
+
+    def transitions(self, result: ScenarioResult) -> Transitions | None:
+        """`None` for the baseline itself, which cannot differ from
+        itself."""
+        if result is self.baseline:
+            return None
+        return Transitions.between(self.baseline, result)
+
+    @property
     def labelled(self) -> bool:
         """Whether output has to name which scenario it's describing.
         With one there's nothing to tell apart,
@@ -882,6 +1082,15 @@ class ScenarioComparisonResult:
         print("\n=== Either end on the comparison's routes ===")
         for r in self.results:
             print(r.overall.summary_line(r.scenario.name))
+        print(f"\n=== Effective one-seat against {self.baseline.scenario.name} ===")
+        for r in self.results:
+            t = self.transitions(r)
+            if t is None:
+                continue
+            print(
+                f"  {r.scenario.name:<55} gained={t.gained:>8,.0f}  "
+                f"lost={t.lost:>8,.0f}  net={t.net:>+9,.0f}"
+            )
 
     def write_csvs(self, csv_out: Path) -> None:
         for path, result in zip(self.csv_paths(csv_out), self.results, strict=True):
@@ -929,7 +1138,12 @@ class ScenarioComparisonResult:
             header,
         ]
         for r in self.results:
-            lines.append(r.both_ends.markdown_row(r.scenario.name))
+            lines.append(
+                r.both_ends.markdown_row(
+                    r.scenario.name,
+                    None if r is self.baseline else self.baseline.both_ends,
+                )
+            )
 
         lines += [
             "",
@@ -945,7 +1159,12 @@ class ScenarioComparisonResult:
             header,
         ]
         for r in self.results:
-            lines.append(r.overall.markdown_row(r.scenario.name))
+            lines.append(
+                r.overall.markdown_row(
+                    r.scenario.name,
+                    None if r is self.baseline else self.baseline.overall,
+                )
+            )
         lines.append("")
         return "\n".join(lines)
 
@@ -970,6 +1189,7 @@ class ScenarioComparisonResult:
                     close_threshold_m=close_threshold_m,
                     top_n=top_n,
                     csv_out=path,
+                    transitions=self.transitions(result),
                 )
                 for result, path in zip(
                     self.results, self.csv_paths(csv_out), strict=True
