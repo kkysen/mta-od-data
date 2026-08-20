@@ -186,6 +186,11 @@ with two categories selected,
 `Scenario.combine` would otherwise join it into `Current + Current`,
 so it is named `Current` once however many were selected.
 
+A changed pair is named by the routes serving it *today*.
+Naming it from the scenario made rows contradict themselves,
+a `Was direct` row labelled with two route sets sharing no route.
+Its distance is the scenario's, being the walk a rider would then face.
+
 ## A scenario is a route-override map
 
 A scenario overrides real routes
