@@ -179,6 +179,12 @@ They are a convenience, not the answer.
 It needs no declaring:
 `combine_scenarios` offers `CURRENT` as an option in every category,
 so the combination that leaves them all unchanged comes first.
+`ScenarioComparisonResult.baseline` asserts that
+by the scenario overriding nothing, not by its name,
+which is only a label:
+with two categories selected,
+`Scenario.combine` would otherwise join it into `Current + Current`,
+so it is named `Current` once however many were selected.
 
 ## A scenario is a route-override map
 
