@@ -406,7 +406,10 @@ def run_scenario(
     origin_ids: list[int],
     routes_set: frozenset[str],
     primary_routes_set: frozenset[str],
-    min_dist_to_corridor: Callable[[Station, frozenset[str]], tuple[float, Station]],
+    make_min_dist_to_corridor: Callable[
+        [dict[int, frozenset[str]]],
+        Callable[[Station, frozenset[str]], tuple[float, Station]],
+    ],
     origin_express_partners: dict[int, frozenset[str]],
     close_threshold_m: float,
     origin_corridor_a_routes_set: frozenset[str],
@@ -460,6 +463,10 @@ def run_scenario(
                 f"  {cid:>4}  {s.display():<40}  corridor={corridor_tag:<3}  "
                 f"effective_routes={sorted(effective_origin_routes[cid])}"
             )
+
+    # Only now that this scenario's reassignment is known:
+    # it decides which stations serve which corridor.
+    min_dist_to_corridor = make_min_dist_to_corridor(effective_origin_routes)
 
     one_seat_riders = 0.0
     classified_many_seat_riders = 0.0
@@ -1134,40 +1141,70 @@ def one_seat_rides(
         for cid in origin_ids
     }
 
-    # Keyed by route set rather than by corridor,
-    # since "close" is about walking to whichever trunk a corridor got
-    # assigned, and assignments repeat across scenarios.
+    # Built per scenario, not once for all of them.
+    # A scenario reassigns which routes serve an origin,
+    # so which stations a rider could board a corridor at
+    # is a property of the scenario, not of today's route data.
+    # Sharing one lookup across scenarios silently measured every walk
+    # against today's routing;
+    # see `deinterlining.py`'s `make_close_lookup` for the same fix,
+    # and the commit that made it for what it cost there.
+    #
+    # Latent here rather than wrong:
+    # this command reassigns origins only, all south of the boundary,
+    # and only ever measures a walk to a *destination*, all north of it,
+    # so the nearest corridor station is never a reassigned one.
+    # Fixed anyway: nothing in the types or the call enforces that,
+    # and `--origin-side north` alone would break it.
+    #
     # Local, not cached at its own definition like `haversine_m`:
-    # it closes over `individual_stations`, loaded per invocation,
+    # these close over `individual_stations`, loaded per invocation,
     # so a longer-lived cache could serve another invocation's data.
-    @cache
-    def assigned_points(assigned_routes: frozenset[str]) -> list[Station]:
-        return [s for s in individual_stations if s.routes & assigned_routes]
+    def make_min_dist_to_corridor(
+        effective_origin_routes: dict[int, frozenset[str]],
+    ) -> Callable[[Station, frozenset[str]], tuple[float, Station]]:
+        # Keyed by route set rather than by corridor,
+        # since "close" is about walking to whichever trunk a corridor
+        # got assigned, and assignments repeat across scenarios.
+        @cache
+        def assigned_points(assigned_routes: frozenset[str]) -> list[Station]:
+            # Membership is decided at the complex level,
+            # the granularity a reassignment is keyed at,
+            # while the platforms are what's returned and measured
+            # between, a complex being able to span physically separate
+            # stations.
+            return [
+                platform
+                for platform in individual_stations
+                if effective_origin_routes.get(platform.complex_id, platform.routes)
+                & assigned_routes
+            ]
 
-    # (dest, route set) repeats constantly across rows,
-    # and skipping a whole sweep beats `haversine_m`'s own
-    # per-point-pair cache,
-    # which still catches the overlap between two different sweeps.
-    # On the default DeKalb scenario the two layers together
-    # take 2.19M haversine calls down to ~39K distinct point pairs.
-    # Local, as above.
-    @cache
-    def min_dist_to_corridor(
-        dest: Station, assigned_routes: frozenset[str]
-    ) -> tuple[float, Station]:
-        candidates = assigned_points(assigned_routes)
-        # The checks above rule out an empty route set,
-        # but not a gap in `stations_individual.csv` itself.
-        assert candidates, "no individual station serves this route set"
-        points = [s.loc for s in platforms_by_complex.get(dest.complex_id, [dest])]
-        best: tuple[float, Station] | None = None
-        for p in points:
-            for c in candidates:
-                dist_m = haversine_m(p, c.loc)
-                if best is None or dist_m < best[0]:
-                    best = (dist_m, c)
-        assert best is not None
-        return best
+        # (dest, route set) repeats constantly across rows,
+        # and skipping a whole sweep beats `haversine_m`'s own
+        # per-point-pair cache,
+        # which still catches the overlap between two different sweeps.
+        # On the default DeKalb scenario the two layers together
+        # take 2.19M haversine calls down to ~39K distinct point pairs.
+        @cache
+        def min_dist_to_corridor(
+            dest: Station, assigned_routes: frozenset[str]
+        ) -> tuple[float, Station]:
+            candidates = assigned_points(assigned_routes)
+            # The checks above rule out an empty route set,
+            # but not a gap in `stations_individual.csv` itself.
+            assert candidates, "no individual station serves this route set"
+            points = [s.loc for s in platforms_by_complex.get(dest.complex_id, [dest])]
+            best: tuple[float, Station] | None = None
+            for p in points:
+                for c in candidates:
+                    dist_m = haversine_m(p, c.loc)
+                    if best is None or dist_m < best[0]:
+                        best = (dist_m, c)
+            assert best is not None
+            return best
+
+        return min_dist_to_corridor
 
     results: list[ScenarioResult] = []
     for sdef in scenario_defs:
@@ -1179,7 +1216,7 @@ def one_seat_rides(
             origin_ids=origin_ids,
             routes_set=routes_set,
             primary_routes_set=primary_routes_set,
-            min_dist_to_corridor=min_dist_to_corridor,
+            make_min_dist_to_corridor=make_min_dist_to_corridor,
             origin_express_partners=origin_express_partners,
             close_threshold_m=close_threshold_m,
             origin_corridor_a_routes_set=origin_corridor_a_routes_set,
