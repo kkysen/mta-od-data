@@ -8,7 +8,11 @@ Produced by `mta-od-data analyze deinterlining --category DeKalb --markdown-out 
 
 ## Scenario comparison
 
-Every origin/destination pair with *both* ends served by B,D,N,Q,R: the trips these routes could carry end to end, including the many that keep a one-seat ride whatever the scenario. Total riders is the same 837,408 across every scenario below; only how many of those riders get a one-seat ride changes. Close one-seat counts a transfer trip whose destination is within 300m of a station on that scenario's effective origin corridor.
+Two cuts of the same classification. Neither is the whole answer: the first says what a scenario does to the riders it can reach, the second how much of the system it reaches at all. In both, only how many riders get a one-seat ride changes between scenarios, never the total. Close one-seat counts a transfer trip whose destination is within 300m of a station on that scenario's effective origin corridor.
+
+### Both ends on the comparison's routes
+
+The 837,408 riders whose origin *and* destination are served by B,D,N,Q,R: the trips these routes could carry end to end, including the many that keep a one-seat ride whatever the scenario. Every table below is scoped to these.
 
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | --- | --- | --- | --- |
@@ -17,7 +21,7 @@ Every origin/destination pair with *both* ends served by B,D,N,Q,R: the trips th
 
 ### Either end on the comparison's routes
 
-The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above among them. This says how much of the system a plan touches at all; the difference is transfer trips with one end off these routes entirely, which no scenario here can change.
+The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above among them. The difference is transfer trips with one end off these routes entirely, which no scenario here can change: they can only dilute the rate, which is why a junction's effect washes out against this total.
 
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | --- | --- | --- | --- |
@@ -30,7 +34,7 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 
 ### Top 25 origin/destination pairs
 
-Both ends on the comparison's routes, as in the comparison table above.
+Both ends on the comparison's routes, per that section of the comparison above.
 
 | # | Riders | % Total | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -62,7 +66,7 @@ Both ends on the comparison's routes, as in the comparison table above.
 
 ### Top 25 destination stations, summed across all origins
 
-Both ends on the comparison's routes, as in the comparison table above.
+Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Destination |
 | --- | --- | --- | --- |
@@ -98,7 +102,7 @@ Both ends on the comparison's routes, as in the comparison table above.
 
 ### Top 25 origin/destination pairs
 
-Both ends on the comparison's routes, as in the comparison table above.
+Both ends on the comparison's routes, per that section of the comparison above.
 
 | # | Riders | % Total | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -130,7 +134,7 @@ Both ends on the comparison's routes, as in the comparison table above.
 
 ### Top 25 destination stations, summed across all origins
 
-Both ends on the comparison's routes, as in the comparison table above.
+Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Destination |
 | --- | --- | --- | --- |

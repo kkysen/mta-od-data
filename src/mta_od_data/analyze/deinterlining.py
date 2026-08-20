@@ -652,7 +652,8 @@ class ScenarioResult:
         lines += [
             f"{h2} Top {top_n} origin/destination pairs",
             "",
-            "Both ends on the comparison's routes, as in the comparison table above.",
+            "Both ends on the comparison's routes, per that section of the "
+            "comparison above.",
             "",
             "| # | Riders | % Total | Type | Close? | Dist | Origin → Destination |",
             "| --- | --- | --- | --- | --- | --- | --- |",
@@ -679,7 +680,8 @@ class ScenarioResult:
         )
         lines.append("")
         lines.append(
-            "Both ends on the comparison's routes, as in the comparison table above."
+            "Both ends on the comparison's routes, per that section of the "
+            "comparison above."
         )
         lines.append("")
         lines.append("| Riders | 1-Seat % | Effective % | Destination |")
@@ -804,36 +806,47 @@ class ScenarioComparisonResult:
         # carry end to end. Trips with only one end on them can never be a
         # one-seat ride under any scenario (that needs a shared route, which
         # puts both ends in scope), so they only ever dilute the rate.
+        # Two cuts of one classification, as sibling `###` tables:
+        # neither is *the* number, they answer different questions,
+        # and nesting one under the other implied a precedence
+        # that isn't there.
+        # Both-ends comes first because it's the denominator the
+        # detailed tables below are scoped to.
         lines = [
             "## Scenario comparison",
             "",
-            f"Every origin/destination pair with *both* ends served by "
-            f"{routes}: the trips these routes could carry end to end, "
-            f"including the many that keep a one-seat ride whatever the "
-            f"scenario. Total riders is the same "
-            f"{self.results[0].both_ends.total:,.0f} across every scenario "
-            f"below; only how many of those riders get a one-seat ride "
-            f"changes. Close one-seat counts a transfer trip whose "
-            f"destination is within {close_threshold_m:.0f}m of a station on "
-            f"that scenario's effective origin corridor.",
+            f"Two cuts of the same classification. Neither is the whole "
+            f"answer: the first says what a scenario does to the riders it "
+            f"can reach, the second how much of the system it reaches at "
+            f"all. In both, only how many riders get a one-seat ride "
+            f"changes between scenarios, never the total. Close one-seat "
+            f"counts a transfer trip whose destination is within "
+            f"{close_threshold_m:.0f}m of a station on that scenario's "
+            f"effective origin corridor.",
+            "",
+            "### Both ends on the comparison's routes",
+            "",
+            f"The {self.results[0].both_ends.total:,.0f} riders whose origin "
+            f"*and* destination are served by {routes}: the trips these "
+            f"routes could carry end to end, including the many that keep a "
+            f"one-seat ride whatever the scenario. Every table below is "
+            f"scoped to these.",
             "",
             header,
         ]
         for r in self.results:
             lines.append(r.both_ends.markdown_row(r.scenario.name))
 
-        # Kept as context, not as the headline: it says how much of the
-        # system a plan touches at all, but a single junction's effect
-        # washes out against a systemwide total.
         lines += [
             "",
             "### Either end on the comparison's routes",
             "",
             f"The wider {self.results[0].overall.total:,.0f} riders with "
-            f"*either* end served by {routes}, the above among them. This "
-            f"says how much of the system a plan touches at all; the "
+            f"*either* end served by {routes}, the above among them. The "
             f"difference is transfer trips with one end off these routes "
-            f"entirely, which no scenario here can change.",
+            f"entirely, which no scenario here can change: they can only "
+            f"dilute the rate, which is why a junction's effect washes out "
+            f"against this total.",
             "",
             header,
         ]
