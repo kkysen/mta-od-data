@@ -70,31 +70,31 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Origin |
 | ---: | ---: | ---: | --- |
-| 54,350 | 71.7% | 100.0% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
-| 48,290 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 29,069 | 84.4% | 89.6% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
-| 22,108 | 56.1% | 93.2% | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
-| 22,015 | 67.1% | 74.2% | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) |
-| 19,234 | 61.8% | 77.3% | 59 St-Columbus Circle (1,A,B,C,D) |
-| 18,461 | 100.0% | 100.0% | Atlantic Av (2,3,4,5,B,D,N,Q,R) |
-| 18,143 | 61.2% | 78.1% | Jackson Hts-Roosevelt Av/74 St-Broadway (7,E,F,M,R) |
-| 18,101 | 87.3% | 92.5% | Canal St (6,J,N,Q,R,W,Z) |
-| 17,855 | 55.5% | 100.0% | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
-| 16,103 | 94.2% | 100.0% | 57 St-7 Av (N,Q,R,W) |
-| 15,212 | 50.3% | 65.1% | W 4 St-Wash Sq (A,B,C,D,E,F,M) |
+| 54,350 | 71.7% | 100.0% | Times Sq-42 St (N,Q,R) |
+| 48,290 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,N,Q,R) |
+| 29,069 | 84.4% | 89.6% | 14 St-Union Sq (N,Q,R) |
+| 22,108 | 56.1% | 93.2% | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 22,015 | 67.1% | 74.2% | Cortlandt St (R) |
+| 19,234 | 61.8% | 77.3% | 59 St-Columbus Circle (B,D) |
+| 18,461 | 100.0% | 100.0% | Atlantic Av (B,D,N,Q,R) |
+| 18,143 | 61.2% | 78.1% | Jackson Hts-Roosevelt Av (R) |
+| 18,101 | 87.3% | 92.5% | Canal St (N,Q,R) |
+| 17,855 | 55.5% | 100.0% | 42 St-Bryant Pk (B,D) |
+| 16,103 | 94.2% | 100.0% | 57 St-7 Av (N,Q,R) |
+| 15,212 | 50.3% | 65.1% | W 4 St-Wash Sq (B,D) |
 | 14,511 | 64.0% | 66.7% | 72 St (Q) |
-| 14,205 | 78.4% | 89.8% | Lexington Av/59 St (4,5,6,N,R,W) |
-| 13,206 | 84.4% | 93.6% | 49 St (N,R,W) |
+| 14,205 | 78.4% | 89.8% | Lexington Av/59 St (N,R) |
+| 13,206 | 84.4% | 93.6% | 49 St (N,R) |
 | 13,162 | 91.9% | 91.9% | DeKalb Av (B,Q,R) |
-| 12,565 | 54.9% | 92.0% | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
+| 12,565 | 54.9% | 92.0% | Broadway-Lafayette St (B,D) |
 | 12,290 | 64.7% | 68.1% | 86 St (Q) |
 | 11,900 | 64.4% | 71.4% | Grand St (B,D) |
 | 10,959 | 85.1% | 86.1% | Kings Hwy (B,Q) |
-| 10,676 | 70.7% | 76.5% | Whitehall St-South Ferry (1,R,W) |
-| 10,159 | 59.7% | 68.5% | Jay St-MetroTech (A,C,F,R) |
-| 9,284 | 70.7% | 82.9% | 125 St (A,B,C,D) |
-| 9,225 | 67.9% | 73.7% | 23 St (R,W) |
-| 9,209 | 59.5% | 81.1% | Forest Hills-71 Av (E,F,M,R) |
+| 10,676 | 70.7% | 76.5% | Whitehall St-South Ferry (R) |
+| 10,159 | 59.7% | 68.5% | Jay St-MetroTech (R) |
+| 9,284 | 70.7% | 82.9% | 125 St (B,D) |
+| 9,225 | 67.9% | 73.7% | 23 St (R) |
+| 9,209 | 59.5% | 81.1% | Forest Hills-71 Av (R) |
 
 ### Top 25 destination stations, summed across all origins
 
@@ -102,31 +102,31 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Destination |
 | ---: | ---: | ---: | --- |
-| 54,675 | 71.6% | 100.0% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
-| 48,360 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 31,416 | 86.4% | 90.8% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
-| 23,378 | 55.9% | 92.4% | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
-| 21,158 | 57.6% | 72.0% | 59 St-Columbus Circle (1,A,B,C,D) |
-| 20,826 | 67.7% | 72.7% | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) |
-| 19,376 | 87.1% | 91.8% | Canal St (6,J,N,Q,R,W,Z) |
-| 18,786 | 53.9% | 100.0% | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
-| 17,432 | 100.0% | 100.0% | Atlantic Av (2,3,4,5,B,D,N,Q,R) |
-| 16,993 | 61.0% | 78.2% | Jackson Hts-Roosevelt Av/74 St-Broadway (7,E,F,M,R) |
-| 16,838 | 89.8% | 100.0% | 57 St-7 Av (N,Q,R,W) |
-| 15,995 | 50.6% | 64.2% | W 4 St-Wash Sq (A,B,C,D,E,F,M) |
-| 14,601 | 80.5% | 92.0% | Lexington Av/59 St (4,5,6,N,R,W) |
+| 54,675 | 71.6% | 100.0% | Times Sq-42 St (N,Q,R) |
+| 48,360 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,N,Q,R) |
+| 31,416 | 86.4% | 90.8% | 14 St-Union Sq (N,Q,R) |
+| 23,378 | 55.9% | 92.4% | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 21,158 | 57.6% | 72.0% | 59 St-Columbus Circle (B,D) |
+| 20,826 | 67.7% | 72.7% | Cortlandt St (R) |
+| 19,376 | 87.1% | 91.8% | Canal St (N,Q,R) |
+| 18,786 | 53.9% | 100.0% | 42 St-Bryant Pk (B,D) |
+| 17,432 | 100.0% | 100.0% | Atlantic Av (B,D,N,Q,R) |
+| 16,993 | 61.0% | 78.2% | Jackson Hts-Roosevelt Av (R) |
+| 16,838 | 89.8% | 100.0% | 57 St-7 Av (N,Q,R) |
+| 15,995 | 50.6% | 64.2% | W 4 St-Wash Sq (B,D) |
+| 14,601 | 80.5% | 92.0% | Lexington Av/59 St (N,R) |
 | 14,250 | 66.2% | 67.8% | 72 St (Q) |
-| 14,100 | 54.1% | 92.9% | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
-| 12,855 | 79.7% | 92.6% | 49 St (N,R,W) |
+| 14,100 | 54.1% | 92.9% | Broadway-Lafayette St (B,D) |
+| 12,855 | 79.7% | 92.6% | 49 St (N,R) |
 | 12,413 | 63.6% | 69.2% | Grand St (B,D) |
 | 12,331 | 91.4% | 91.4% | DeKalb Av (B,Q,R) |
 | 11,243 | 64.9% | 67.8% | 86 St (Q) |
 | 11,048 | 85.1% | 85.9% | Kings Hwy (B,Q) |
-| 10,457 | 59.5% | 67.6% | Jay St-MetroTech (A,C,F,R) |
-| 9,785 | 73.8% | 76.5% | Whitehall St-South Ferry (1,R,W) |
-| 9,281 | 68.7% | 73.3% | 23 St (R,W) |
-| 9,136 | 60.2% | 81.8% | Forest Hills-71 Av (E,F,M,R) |
-| 9,112 | 71.8% | 83.6% | 125 St (A,B,C,D) |
+| 10,457 | 59.5% | 67.6% | Jay St-MetroTech (R) |
+| 9,785 | 73.8% | 76.5% | Whitehall St-South Ferry (R) |
+| 9,281 | 68.7% | 73.3% | 23 St (R) |
+| 9,136 | 60.2% | 81.8% | Forest Hills-71 Av (R) |
+| 9,112 | 71.8% | 83.6% | 125 St (B,D) |
 
 ---
 
@@ -216,31 +216,31 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Origin |
 | ---: | ---: | ---: | --- |
-| 54,350 | 69.9% | 100.0% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
-| 48,290 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 29,069 | 81.6% | 86.7% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
-| 22,108 | 50.8% | 93.2% | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
-| 22,015 | 67.1% | 74.2% | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) |
-| 19,234 | 59.3% | 74.7% | 59 St-Columbus Circle (1,A,B,C,D) |
-| 18,461 | 100.0% | 100.0% | Atlantic Av (2,3,4,5,B,D,N,Q,R) |
-| 18,143 | 61.2% | 78.1% | Jackson Hts-Roosevelt Av/74 St-Broadway (7,E,F,M,R) |
-| 18,101 | 77.6% | 82.9% | Canal St (6,J,N,Q,R,W,Z) |
-| 17,855 | 50.6% | 100.0% | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
-| 16,103 | 92.3% | 100.0% | 57 St-7 Av (N,Q,R,W) |
-| 15,212 | 47.0% | 61.8% | W 4 St-Wash Sq (A,B,C,D,E,F,M) |
+| 54,350 | 69.9% | 100.0% | Times Sq-42 St (N,Q,R) |
+| 48,290 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,N,Q,R) |
+| 29,069 | 81.6% | 86.7% | 14 St-Union Sq (N,Q,R) |
+| 22,108 | 50.8% | 93.2% | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 22,015 | 67.1% | 74.2% | Cortlandt St (R) |
+| 19,234 | 59.3% | 74.7% | 59 St-Columbus Circle (B,D) |
+| 18,461 | 100.0% | 100.0% | Atlantic Av (B,D,N,Q,R) |
+| 18,143 | 61.2% | 78.1% | Jackson Hts-Roosevelt Av (R) |
+| 18,101 | 77.6% | 82.9% | Canal St (N,Q,R) |
+| 17,855 | 50.6% | 100.0% | 42 St-Bryant Pk (B,D) |
+| 16,103 | 92.3% | 100.0% | 57 St-7 Av (N,Q,R) |
+| 15,212 | 47.0% | 61.8% | W 4 St-Wash Sq (B,D) |
 | 14,511 | 64.0% | 66.7% | 72 St (Q) |
-| 14,205 | 77.9% | 87.6% | Lexington Av/59 St (4,5,6,N,R,W) |
-| 13,206 | 83.1% | 93.6% | 49 St (N,R,W) |
+| 14,205 | 77.9% | 87.6% | Lexington Av/59 St (N,R) |
+| 13,206 | 83.1% | 93.6% | 49 St (N,R) |
 | 13,162 | 95.3% | 95.3% | DeKalb Av (B,Q,R) |
-| 12,565 | 49.7% | 86.4% | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
+| 12,565 | 49.7% | 86.4% | Broadway-Lafayette St (B,D) |
 | 12,290 | 64.7% | 68.1% | 86 St (Q) |
 | 11,900 | 64.7% | 71.7% | Grand St (B,D) |
-| 10,959 | 69.8% | 77.2% | Kings Hwy (B,Q) |
-| 10,676 | 70.7% | 76.5% | Whitehall St-South Ferry (1,R,W) |
-| 10,159 | 59.7% | 68.5% | Jay St-MetroTech (A,C,F,R) |
-| 9,284 | 69.8% | 82.0% | 125 St (A,B,C,D) |
-| 9,225 | 67.9% | 73.7% | 23 St (R,W) |
-| 9,209 | 59.5% | 81.1% | Forest Hills-71 Av (E,F,M,R) |
+| 10,959 | 69.8% | 77.2% | Kings Hwy (N,Q) |
+| 10,676 | 70.7% | 76.5% | Whitehall St-South Ferry (R) |
+| 10,159 | 59.7% | 68.5% | Jay St-MetroTech (R) |
+| 9,284 | 69.8% | 82.0% | 125 St (B,D) |
+| 9,225 | 67.9% | 73.7% | 23 St (R) |
+| 9,209 | 59.5% | 81.1% | Forest Hills-71 Av (R) |
 
 ### Top 25 destination stations, summed across all origins
 
@@ -248,28 +248,28 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Destination |
 | ---: | ---: | ---: | --- |
-| 54,675 | 69.8% | 100.0% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
-| 48,360 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 31,416 | 83.6% | 88.1% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
-| 23,378 | 50.3% | 92.4% | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
-| 21,158 | 55.0% | 69.4% | 59 St-Columbus Circle (1,A,B,C,D) |
-| 20,826 | 67.7% | 72.7% | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) |
-| 19,376 | 77.7% | 82.5% | Canal St (6,J,N,Q,R,W,Z) |
-| 18,786 | 48.8% | 100.0% | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
-| 17,432 | 100.0% | 100.0% | Atlantic Av (2,3,4,5,B,D,N,Q,R) |
-| 16,993 | 61.0% | 78.2% | Jackson Hts-Roosevelt Av/74 St-Broadway (7,E,F,M,R) |
-| 16,838 | 87.8% | 100.0% | 57 St-7 Av (N,Q,R,W) |
-| 15,995 | 47.2% | 60.8% | W 4 St-Wash Sq (A,B,C,D,E,F,M) |
-| 14,601 | 80.1% | 89.8% | Lexington Av/59 St (4,5,6,N,R,W) |
+| 54,675 | 69.8% | 100.0% | Times Sq-42 St (N,Q,R) |
+| 48,360 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,N,Q,R) |
+| 31,416 | 83.6% | 88.1% | 14 St-Union Sq (N,Q,R) |
+| 23,378 | 50.3% | 92.4% | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 21,158 | 55.0% | 69.4% | 59 St-Columbus Circle (B,D) |
+| 20,826 | 67.7% | 72.7% | Cortlandt St (R) |
+| 19,376 | 77.7% | 82.5% | Canal St (N,Q,R) |
+| 18,786 | 48.8% | 100.0% | 42 St-Bryant Pk (B,D) |
+| 17,432 | 100.0% | 100.0% | Atlantic Av (B,D,N,Q,R) |
+| 16,993 | 61.0% | 78.2% | Jackson Hts-Roosevelt Av (R) |
+| 16,838 | 87.8% | 100.0% | 57 St-7 Av (N,Q,R) |
+| 15,995 | 47.2% | 60.8% | W 4 St-Wash Sq (B,D) |
+| 14,601 | 80.1% | 89.8% | Lexington Av/59 St (N,R) |
 | 14,250 | 66.2% | 67.8% | 72 St (Q) |
-| 14,100 | 48.9% | 87.2% | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
-| 12,855 | 78.6% | 92.6% | 49 St (N,R,W) |
+| 14,100 | 48.9% | 87.2% | Broadway-Lafayette St (B,D) |
+| 12,855 | 78.6% | 92.6% | 49 St (N,R) |
 | 12,413 | 63.6% | 69.1% | Grand St (B,D) |
 | 12,331 | 95.0% | 95.0% | DeKalb Av (B,Q,R) |
 | 11,243 | 64.9% | 67.8% | 86 St (Q) |
-| 11,048 | 70.2% | 77.2% | Kings Hwy (B,Q) |
-| 10,457 | 59.5% | 67.6% | Jay St-MetroTech (A,C,F,R) |
-| 9,785 | 73.8% | 76.5% | Whitehall St-South Ferry (1,R,W) |
-| 9,281 | 68.7% | 73.3% | 23 St (R,W) |
-| 9,136 | 60.2% | 81.8% | Forest Hills-71 Av (E,F,M,R) |
-| 9,112 | 70.9% | 82.6% | 125 St (A,B,C,D) |
+| 11,048 | 70.2% | 77.2% | Kings Hwy (N,Q) |
+| 10,457 | 59.5% | 67.6% | Jay St-MetroTech (R) |
+| 9,785 | 73.8% | 76.5% | Whitehall St-South Ferry (R) |
+| 9,281 | 68.7% | 73.3% | 23 St (R) |
+| 9,136 | 60.2% | 81.8% | Forest Hills-71 Av (R) |
+| 9,112 | 70.9% | 82.6% | 125 St (B,D) |
