@@ -67,6 +67,11 @@ class ODPair:
     dest_id: int
     dest_name: str
     riders: float
+    # Both ends served by the comparison's routes.
+    # The detailed tables are scoped to these
+    # (see `comparison_table_markdown`);
+    # the CSV keeps every row, with this column to filter on.
+    both_ends: bool
     one_seat: bool
     # Only meaningful when `one_seat` is false.
     close: bool
@@ -381,6 +386,7 @@ class Scenario:
                     dest_id=dest_id,
                     dest_name=dest_name,
                     riders=riders,
+                    both_ends=both_ends,
                     one_seat=one_seat,
                     close=close,
                     dist_m=dist_m,
@@ -388,14 +394,19 @@ class Scenario:
                 )
             )
 
-            d = dest_stats.setdefault(
-                dest_id, DestStats(name=dest.display(dest.routes))
-            )
-            d.total += riders
-            if one_seat:
-                d.one_seat += riders
-            elif close:
-                d.close += riders
+            # Both-ends only, to match the tables it feeds:
+            # a destination off the comparison's routes has no one-seat
+            # ridership from anywhere, so it would only ever add rows
+            # reading 0.0%.
+            if both_ends:
+                d = dest_stats.setdefault(
+                    dest_id, DestStats(name=dest.display(dest.routes))
+                )
+                d.total += riders
+                if one_seat:
+                    d.one_seat += riders
+                elif close:
+                    d.close += riders
 
         if not total_riders:
             raise ScenarioError(
@@ -616,7 +627,7 @@ class ScenarioResult:
         csv_out: Path | None,
     ) -> str:
         h2 = "###" if show_label else "##"
-        t = self.overall
+        t = self.both_ends
         lines: list[str] = [f"## {self.scenario.name}", ""] if show_label else []
 
         # Only without a comparison table above, which says all of this
@@ -632,14 +643,16 @@ class ScenarioResult:
                 f"station on the scenario-effective origin corridor",
                 f"- **Effective one-seat: {t.pct(t.effective):.1f}%** "
                 f"({t.effective:,.0f})",
-                f"- **Both ends on the routes: {self.both_ends.total:,.0f} "
-                f"riders**, {self.both_ends.pct(self.both_ends.effective):.1f}% "
+                f"- **Either end on the routes: {self.overall.total:,.0f} "
+                f"riders**, {self.overall.pct(self.overall.effective):.1f}% "
                 f"effective one-seat",
                 "",
             ]
 
         lines += [
             f"{h2} Top {top_n} origin/destination pairs",
+            "",
+            "Both ends on the comparison's routes, as in the comparison table above.",
             "",
             "| # | Riders | % Total | Type | Close? | Dist | Origin → Destination |",
             "| --- | --- | --- | --- | --- | --- | --- |",
@@ -648,13 +661,14 @@ class ScenarioResult:
         def pair_riders(pair: ODPair) -> float:
             return pair.riders
 
-        top_pairs = sorted(self.rows, key=pair_riders, reverse=True)[:top_n]
+        both_ends_rows = [r for r in self.rows if r.both_ends]
+        top_pairs = sorted(both_ends_rows, key=pair_riders, reverse=True)[:top_n]
         for i, pr in enumerate(top_pairs, 1):
             type_str = "1-seat" if pr.one_seat else "xfer"
             close_str = "" if pr.one_seat else ("close" if pr.close else "far")
             dist_str = "" if pr.dist_m is None else f"{pr.dist_m:.0f}m"
             lines.append(
-                f"| {i} | {pr.riders:,.0f} | {self.overall.pct(pr.riders):.2f}% | "
+                f"| {i} | {pr.riders:,.0f} | {self.both_ends.pct(pr.riders):.2f}% | "
                 f"{type_str} | {close_str} | {dist_str} | "
                 f"{pr.origin_name} → {pr.dest_name} |"
             )
@@ -662,6 +676,10 @@ class ScenarioResult:
 
         lines.append(
             f"{h2} Top {top_n} destination stations, summed across all origins"
+        )
+        lines.append("")
+        lines.append(
+            "Both ends on the comparison's routes, as in the comparison table above."
         )
         lines.append("")
         lines.append("| Riders | 1-Seat % | Effective % | Destination |")
@@ -683,8 +701,10 @@ class ScenarioResult:
 
         if csv_out:
             lines.append(
-                f"_Full row-level detail (every origin/destination pair, not "
-                f"just the top {top_n}): `{csv_out}`._"
+                f"_Full row-level detail (every origin/destination pair, "
+                f"either end on the routes, not just the top {top_n} with "
+                f"both: `{csv_out}`, whose `both_ends` column is what the "
+                f"tables above filter on)._"
             )
             lines.append("")
         return "\n".join(lines)
@@ -1125,9 +1145,11 @@ def deinterlining(
                 "",
                 f"Average {day_type_label} ridership ({n_distinct_days} distinct "
                 f"days in the data, {coverage.first_month} to "
-                f"{coverage.last_month}), every "
-                f"origin/destination pair with either end served by "
-                f"{','.join(sorted(routes_set))} under any scenario compared here.",
+                f"{coverage.last_month}), over every origin/destination pair "
+                f"with both ends served by {','.join(sorted(routes_set))} "
+                f"under any scenario compared here. Pairs with only one end "
+                f"on those routes are reported alongside as context, but "
+                f"can't be a one-seat ride under any of them.",
                 "",
                 f"Produced by `{produced_by}`.",
                 "",
