@@ -70,7 +70,11 @@ class ODPair:
     one_seat: bool
     # Only meaningful when `one_seat` is false.
     close: bool
-    dist_m: float
+    # `None` when there is no corridor to measure against at all,
+    # i.e. the origin has no route in the comparison's universe,
+    # which is distinct from a measured distance of 0m
+    # (the destination is itself on the corridor).
+    dist_m: float | None
     near_station: str | None
 
 
@@ -323,7 +327,9 @@ class Scenario:
         stations_by_id: dict[int, Station],
         stations_path: Path,
         scope_ids: frozenset[int],
-        close_lookup: Callable[[Station, Routes], tuple[bool, float, str | None]],
+        close_lookup: Callable[
+            [Station, Routes], tuple[bool, float | None, str | None]
+        ],
     ) -> ScenarioResult:
         rows: list[ODPair] = []
         total_riders = 0.0
@@ -358,7 +364,7 @@ class Scenario:
                 one_seat_riders += riders
                 if both_ends:
                     both_one_seat += riders
-                close, dist_m, near_station_name = False, 0.0, None
+                close, dist_m, near_station_name = False, None, None
             else:
                 close, dist_m, near_station_name = close_lookup(
                     dest, effective_origin_routes
@@ -645,7 +651,7 @@ class ScenarioResult:
         for i, pr in enumerate(top_pairs, 1):
             type_str = "1-seat" if pr.one_seat else "xfer"
             close_str = "" if pr.one_seat else ("close" if pr.close else "far")
-            dist_str = "" if pr.one_seat else f"{pr.dist_m:.0f}m"
+            dist_str = "" if pr.dist_m is None else f"{pr.dist_m:.0f}m"
             lines.append(
                 f"| {i} | {pr.riders:,.0f} | {self.overall.pct(pr.riders):.2f}% | "
                 f"{type_str} | {close_str} | {dist_str} | "
@@ -702,7 +708,9 @@ class ScenarioComparison:
         stations_by_id: dict[int, Station],
         stations_path: Path,
         scope_ids: frozenset[int],
-        close_lookup: Callable[[Station, Routes], tuple[bool, float, str | None]],
+        close_lookup: Callable[
+            [Station, Routes], tuple[bool, float | None, str | None]
+        ],
     ) -> ScenarioComparisonResult:
         return ScenarioComparisonResult(
             comparison=self,
@@ -1072,10 +1080,10 @@ def deinterlining(
 
     def close_lookup(
         dest: Station, effective_origin_routes: Routes
-    ) -> tuple[bool, float, str | None]:
+    ) -> tuple[bool, float | None, str | None]:
         best = min_dist_to_corridor(dest, effective_origin_routes)
         if best is None:
-            return False, 0.0, None
+            return False, None, None
         dist_m, near_station = best
         close = dist_m <= close_threshold_m
         near_station_name = near_station.display(near_station.routes & routes_set)
