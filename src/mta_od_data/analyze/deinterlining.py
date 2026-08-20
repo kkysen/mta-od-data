@@ -101,9 +101,14 @@ def slugify(name: str) -> str:
 @dataclass(slots=True, frozen=True)
 class ODPair:
     origin_id: int
-    origin_name: str
+    # Split rather than one display string, so a scenario comparison can
+    # say what changed at an end (`8 Av (N -> B)`) without taking the
+    # string back apart, and so the CSV can be filtered on either.
+    origin_station: str
+    origin_routes: str
     dest_id: int
-    dest_name: str
+    dest_station: str
+    dest_routes: str
     riders: float
     # Both ends served by the comparison's routes.
     # The detailed tables are scoped to these
@@ -121,6 +126,38 @@ class ODPair:
     # and there is no walk to model.
     dist_m: float
     near_station: str | None
+
+    @property
+    def origin_name(self) -> str:
+        return f"{self.origin_station} ({self.origin_routes})"
+
+    @property
+    def dest_name(self) -> str:
+        return f"{self.dest_station} ({self.dest_routes})"
+
+    @staticmethod
+    def end_label(
+        station: str, routes: str, other_station: str, other_routes: str
+    ) -> str:
+        """One end of a pair as the baseline names it,
+        carrying what a scenario does to it.
+
+        `8 Av (N)` against `8 Av (B)` reads `8 Av (N → B)`.
+        A changed-pairs row is about the change,
+        and naming only today's routes
+        left a reader to look up what the scenario does to that station,
+        which is the one thing the row is for.
+
+        Usually only the routes differ.
+        A route move can take the narrowed platform name with it,
+        though, and then there is no shared name to factor out
+        and both halves are named in full.
+        """
+        if (station, routes) == (other_station, other_routes):
+            return f"{station} ({routes})"
+        if station == other_station:
+            return f"{station} ({routes} → {other_routes})"
+        return f"{station} ({routes}) → {other_station} ({other_routes})"
 
 
 class Outcome(StrEnum):
@@ -198,9 +235,21 @@ class Transitions:
             riders[before, after] = riders.get((before, after), 0.0) + after_pair.riders
             if before is not after:
                 changed_rows.append((before, after, after_pair))
-                baseline_labels[after_pair.origin_id, after_pair.dest_id] = (
-                    f"{before_pair.origin_name} ↔ {before_pair.dest_name}"
-                )
+                baseline_labels[after_pair.origin_id, after_pair.dest_id] = f"{
+                    ODPair.end_label(
+                        before_pair.origin_station,
+                        before_pair.origin_routes,
+                        after_pair.origin_station,
+                        after_pair.origin_routes,
+                    )
+                } ↔ {
+                    ODPair.end_label(
+                        before_pair.dest_station,
+                        before_pair.dest_routes,
+                        after_pair.dest_station,
+                        after_pair.dest_routes,
+                    )
+                }"
 
         # Grouped the same way the pair tables are, so a reader comparing
         # the two isn't matching one row against two.
@@ -212,10 +261,11 @@ class Transitions:
                 before=before,
                 after=after,
                 pair=symmetric,
-                # A reader knows the pair by what serves it today,
-                # so name it from the baseline: labelling a `Was direct`
-                # row with the scenario's routes asserts a one-seat ride
-                # between route sets that don't share one.
+                # Named from the baseline, since a reader knows the pair
+                # by what serves it today, and a `Was direct` row
+                # labelled with the scenario's routes would assert a
+                # one-seat ride between route sets sharing none. Each end
+                # carries what the scenario does to it (`8 Av (N -> B)`).
                 label=baseline_labels[
                     symmetric.forward.origin_id, symmetric.forward.dest_id
                 ],
@@ -312,8 +362,9 @@ class Transitions:
                 f"{h2} Biggest changes, against {self.baseline_name}",
                 "",
                 f"The top {top_n} station pairs by riders whose outcome "
-                f"moved, both directions combined as above. Each pair is "
-                f"named by the routes serving it today; `Dist` is the walk "
+                f"moved, both directions combined as above. An end reads "
+                f"`today → {self.scenario_name}` where its routes change, "
+                f"and today's alone where they don't; `Dist` is the walk "
                 f"under {self.scenario_name}.",
                 "",
                 "| # | Riders | Was | Now | Dist | Origin ↔ Destination |",
@@ -670,8 +721,10 @@ class Scenario:
 
             effective_origin_routes = self.routes_of(origin)
             effective_dest_routes = self.routes_of(dest)
-            origin_name = platforms.display(origin, effective_origin_routes)
-            dest_name = platforms.display(dest, effective_dest_routes)
+            origin_station = platforms.name(origin, effective_origin_routes)
+            dest_station = platforms.name(dest, effective_dest_routes)
+            origin_routes = ",".join(sorted(effective_origin_routes))
+            dest_routes = ",".join(sorted(effective_dest_routes))
             one_seat = bool(effective_origin_routes & effective_dest_routes)
 
             both_ends = origin_id in scope_ids and dest_id in scope_ids
@@ -696,21 +749,22 @@ class Scenario:
                     if both_ends:
                         both_close += riders
 
-            rows.append(
-                ODPair(
-                    origin_id=origin_id,
-                    origin_name=origin_name,
-                    dest_id=dest_id,
-                    dest_name=dest_name,
-                    riders=riders,
-                    both_ends=both_ends,
-                    one_seat=one_seat,
-                    close=close,
-                    walk_at_origin=walk_at_origin,
-                    dist_m=dist_m,
-                    near_station=near_station_name,
-                )
+            pair = ODPair(
+                origin_id=origin_id,
+                origin_station=origin_station,
+                origin_routes=origin_routes,
+                dest_id=dest_id,
+                dest_station=dest_station,
+                dest_routes=dest_routes,
+                riders=riders,
+                both_ends=both_ends,
+                one_seat=one_seat,
+                close=close,
+                walk_at_origin=walk_at_origin,
+                dist_m=dist_m,
+                near_station=near_station_name,
             )
+            rows.append(pair)
 
             # Both-ends only, to match the tables these feed:
             # a station off the comparison's routes has no one-seat
@@ -723,8 +777,8 @@ class Scenario:
                 # one report two conventions, and named the station by
                 # routes no row in it is about.
                 for stats, sid, name in (
-                    (origin_stats, origin_id, origin_name),
-                    (dest_stats, dest_id, dest_name),
+                    (origin_stats, origin_id, pair.origin_name),
+                    (dest_stats, dest_id, pair.dest_name),
                 ):
                     e = stats.setdefault(sid, EndStats(name=name))
                     e.total += riders
