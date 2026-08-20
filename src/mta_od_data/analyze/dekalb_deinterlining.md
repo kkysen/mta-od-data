@@ -33,8 +33,8 @@ The 837,408 riders above whose origin *and* destination are served by B,D,N,Q,R,
 | # | Riders | % Total | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 4,381 | 0.19% | xfer | far | 671m | Times Sq-42 St/PABT (N,Q,R) → Grand Central-42 St () |
-| 2 | 4,284 | 0.18% | xfer | far | 0m | Grand Central-42 St () → 14 St-Union Sq (N,Q,R) |
-| 3 | 4,276 | 0.18% | xfer | far | 0m | Grand Central-42 St () → Times Sq-42 St/PABT (N,Q,R) |
+| 2 | 4,284 | 0.18% | xfer | far |  | Grand Central-42 St () → 14 St-Union Sq (N,Q,R) |
+| 3 | 4,276 | 0.18% | xfer | far |  | Grand Central-42 St () → Times Sq-42 St/PABT (N,Q,R) |
 | 4 | 3,771 | 0.16% | xfer | far | 671m | 14 St-Union Sq (N,Q,R) → Grand Central-42 St () |
 | 5 | 2,981 | 0.13% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Chambers St/WTC/Park Pl/Cortlandt St (R) |
 | 6 | 2,847 | 0.12% | 1-seat |  |  | Chambers St/WTC/Park Pl/Cortlandt St (R) → Times Sq-42 St/PABT (N,Q,R) |
@@ -44,18 +44,18 @@ The 837,408 riders above whose origin *and* destination are served by B,D,N,Q,R,
 | 10 | 2,646 | 0.11% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 47-50 Sts-Rockefeller Ctr (B,D) |
 | 11 | 2,592 | 0.11% | xfer | close | 191m | 59 St-Columbus Circle (B,D) → Times Sq-42 St/PABT (N,Q,R) |
 | 12 | 2,584 | 0.11% | 1-seat |  |  | 14 St-Union Sq (N,Q,R) → Times Sq-42 St/PABT (N,Q,R) |
-| 13 | 2,512 | 0.11% | xfer | far | 0m | 34 St-Penn Station () → 59 St-Columbus Circle (B,D) |
-| 14 | 2,500 | 0.11% | xfer | far | 0m | Fulton St () → Times Sq-42 St/PABT (N,Q,R) |
+| 13 | 2,512 | 0.11% | xfer | far |  | 34 St-Penn Station () → 59 St-Columbus Circle (B,D) |
+| 14 | 2,500 | 0.11% | xfer | far |  | Fulton St () → Times Sq-42 St/PABT (N,Q,R) |
 | 15 | 2,464 | 0.11% | xfer | far | 588m | Times Sq-42 St/PABT (N,Q,R) → Lexington Av/51-53 Sts () |
 | 16 | 2,445 | 0.10% | xfer | far | 1041m | Times Sq-42 St/PABT (N,Q,R) → 14 St/8 Av () |
 | 17 | 2,428 | 0.10% | 1-seat |  |  | 47-50 Sts-Rockefeller Ctr (B,D) → 34 St-Herald Sq (B,D,N,Q,R) |
 | 18 | 2,351 | 0.10% | 1-seat |  |  | 72 St (Q) → Times Sq-42 St/PABT (N,Q,R) |
 | 19 | 2,333 | 0.10% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 14 St-Union Sq (N,Q,R) |
-| 20 | 2,315 | 0.10% | xfer | far | 0m | 14 St/8 Av () → Times Sq-42 St/PABT (N,Q,R) |
+| 20 | 2,315 | 0.10% | xfer | far |  | 14 St/8 Av () → Times Sq-42 St/PABT (N,Q,R) |
 | 21 | 2,306 | 0.10% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 72 St (Q) |
 | 22 | 2,291 | 0.10% | 1-seat |  |  | 72 St (Q) → 34 St-Herald Sq (B,D,N,Q,R) |
 | 23 | 2,269 | 0.10% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 72 St (Q) |
-| 24 | 2,251 | 0.10% | xfer | far | 0m | Lexington Av/51-53 Sts () → Times Sq-42 St/PABT (N,Q,R) |
+| 24 | 2,251 | 0.10% | xfer | far |  | Lexington Av/51-53 Sts () → Times Sq-42 St/PABT (N,Q,R) |
 | 25 | 2,184 | 0.09% | xfer | far | 549m | 59 St-Columbus Circle (B,D) → 34 St-Penn Station () |
 
 ### Top 25 destination stations, summed across all origins
@@ -97,8 +97,8 @@ The 837,408 riders above whose origin *and* destination are served by B,D,N,Q,R,
 | # | Riders | % Total | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 4,381 | 0.19% | xfer | far | 671m | Times Sq-42 St/PABT (N,Q,R) → Grand Central-42 St () |
-| 2 | 4,284 | 0.18% | xfer | far | 0m | Grand Central-42 St () → 14 St-Union Sq (N,Q,R) |
-| 3 | 4,276 | 0.18% | xfer | far | 0m | Grand Central-42 St () → Times Sq-42 St/PABT (N,Q,R) |
+| 2 | 4,284 | 0.18% | xfer | far |  | Grand Central-42 St () → 14 St-Union Sq (N,Q,R) |
+| 3 | 4,276 | 0.18% | xfer | far |  | Grand Central-42 St () → Times Sq-42 St/PABT (N,Q,R) |
 | 4 | 3,771 | 0.16% | xfer | far | 671m | 14 St-Union Sq (N,Q,R) → Grand Central-42 St () |
 | 5 | 2,981 | 0.13% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Chambers St/WTC/Park Pl/Cortlandt St (R) |
 | 6 | 2,847 | 0.12% | 1-seat |  |  | Chambers St/WTC/Park Pl/Cortlandt St (R) → Times Sq-42 St/PABT (N,Q,R) |
@@ -108,18 +108,18 @@ The 837,408 riders above whose origin *and* destination are served by B,D,N,Q,R,
 | 10 | 2,646 | 0.11% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 47-50 Sts-Rockefeller Ctr (B,D) |
 | 11 | 2,592 | 0.11% | xfer | close | 191m | 59 St-Columbus Circle (B,D) → Times Sq-42 St/PABT (N,Q,R) |
 | 12 | 2,584 | 0.11% | 1-seat |  |  | 14 St-Union Sq (N,Q,R) → Times Sq-42 St/PABT (N,Q,R) |
-| 13 | 2,512 | 0.11% | xfer | far | 0m | 34 St-Penn Station () → 59 St-Columbus Circle (B,D) |
-| 14 | 2,500 | 0.11% | xfer | far | 0m | Fulton St () → Times Sq-42 St/PABT (N,Q,R) |
+| 13 | 2,512 | 0.11% | xfer | far |  | 34 St-Penn Station () → 59 St-Columbus Circle (B,D) |
+| 14 | 2,500 | 0.11% | xfer | far |  | Fulton St () → Times Sq-42 St/PABT (N,Q,R) |
 | 15 | 2,464 | 0.11% | xfer | far | 588m | Times Sq-42 St/PABT (N,Q,R) → Lexington Av/51-53 Sts () |
 | 16 | 2,445 | 0.10% | xfer | far | 1041m | Times Sq-42 St/PABT (N,Q,R) → 14 St/8 Av () |
 | 17 | 2,428 | 0.10% | 1-seat |  |  | 47-50 Sts-Rockefeller Ctr (B,D) → 34 St-Herald Sq (B,D,N,Q,R) |
 | 18 | 2,351 | 0.10% | 1-seat |  |  | 72 St (Q) → Times Sq-42 St/PABT (N,Q,R) |
 | 19 | 2,333 | 0.10% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 14 St-Union Sq (N,Q,R) |
-| 20 | 2,315 | 0.10% | xfer | far | 0m | 14 St/8 Av () → Times Sq-42 St/PABT (N,Q,R) |
+| 20 | 2,315 | 0.10% | xfer | far |  | 14 St/8 Av () → Times Sq-42 St/PABT (N,Q,R) |
 | 21 | 2,306 | 0.10% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 72 St (Q) |
 | 22 | 2,291 | 0.10% | 1-seat |  |  | 72 St (Q) → 34 St-Herald Sq (B,D,N,Q,R) |
 | 23 | 2,269 | 0.10% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 72 St (Q) |
-| 24 | 2,251 | 0.10% | xfer | far | 0m | Lexington Av/51-53 Sts () → Times Sq-42 St/PABT (N,Q,R) |
+| 24 | 2,251 | 0.10% | xfer | far |  | Lexington Av/51-53 Sts () → Times Sq-42 St/PABT (N,Q,R) |
 | 25 | 2,184 | 0.09% | xfer | far | 549m | 59 St-Columbus Circle (B,D) → 34 St-Penn Station () |
 
 ### Top 25 destination stations, summed across all origins
