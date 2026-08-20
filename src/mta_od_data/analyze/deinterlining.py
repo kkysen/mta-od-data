@@ -49,6 +49,14 @@ SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json5"
 
 type Routes = frozenset[str]
 
+# `(origin, dest, origin routes, dest routes) ->
+#  (close, walk distance, station walked to, walk is at the origin)`.
+# Both ends and both route sets, because the walk can be at either end;
+# see `close_lookup`.
+type CloseLookup = Callable[
+    [Station, Station, Routes, Routes], tuple[bool, float, str | None, bool]
+]
+
 
 class ScenarioError(Exception):
     """Raised rather than exiting,
@@ -75,11 +83,13 @@ class ODPair:
     one_seat: bool
     # Only meaningful when `one_seat` is false.
     close: bool
-    # `None` when there is no corridor to measure against at all,
-    # i.e. the origin has no route in the comparison's universe,
-    # which is distinct from a measured distance of 0m
-    # (the destination is itself on the corridor).
-    dist_m: float | None
+    # Which end the walk in `dist_m` is at.
+    # Symmetric in the pair, but not a property of it:
+    # which end is the shorter walk is exactly what this records.
+    walk_at_origin: bool
+    # 0.0 for a one-seat ride, where the ridden route stops at both ends
+    # and there is no walk to model.
+    dist_m: float
     near_station: str | None
 
 
@@ -92,11 +102,11 @@ class SymmetricPair:
     spent two of the top N slots on one fact,
     and buried the pair that would otherwise have been last.
 
-    `one_seat` is symmetric--a shared route is a shared route--so the
-    two directions can only differ in `close`/`dist_m`,
-    which measure the *destination* against the origin's corridor
-    and genuinely aren't symmetric.
-    Both directions' values are kept rather than combined.
+    Every classification here is symmetric--`one_seat` because a shared
+    route is a shared route, `close`/`dist_m` because a rider can walk
+    at either end (see `close_lookup`)--so the two directions differ
+    only in their rider counts, and `forward`'s classification stands
+    for the pair.
 
     `forward` is the busier direction, so the arrow points the way most
     riders travel; `reverse` is `None` for a pair the data only has one
@@ -382,9 +392,7 @@ class Scenario:
         stations_by_id: dict[int, Station],
         stations_path: Path,
         scope_ids: frozenset[int],
-        close_lookup: Callable[
-            [Station, Routes], tuple[bool, float | None, str | None]
-        ],
+        close_lookup: CloseLookup,
     ) -> ScenarioResult:
         rows: list[ODPair] = []
         total_riders = 0.0
@@ -420,10 +428,14 @@ class Scenario:
                 one_seat_riders += riders
                 if both_ends:
                     both_one_seat += riders
-                close, dist_m, near_station_name = False, None, None
+                close, dist_m, near_station_name = False, 0.0, None
+                walk_at_origin = False
             else:
-                close, dist_m, near_station_name = close_lookup(
-                    dest, effective_origin_routes
+                close, dist_m, near_station_name, walk_at_origin = close_lookup(
+                    origin,
+                    dest,
+                    effective_origin_routes,
+                    effective_dest_routes,
                 )
                 if close:
                     close_riders += riders
@@ -440,6 +452,7 @@ class Scenario:
                     both_ends=both_ends,
                     one_seat=one_seat,
                     close=close,
+                    walk_at_origin=walk_at_origin,
                     dist_m=dist_m,
                     near_station=near_station_name,
                 )
@@ -712,24 +725,17 @@ class ScenarioResult:
             "Both ends on the comparison's routes, per that section of the "
             "comparison above. Each row is both directions of one station "
             "pair, their riders summed, oriented so the arrow points the "
-            "way more of them travel. One-seat is symmetric, but close "
-            "one-seat measures the destination against the origin's "
-            "corridor, so it is given per direction.",
+            "way more of them travel. Every column but the riders is "
+            "symmetric, so one value covers both directions; `Walk` names the "
+            "station the shorter walk reaches, and the end it is at.",
             "",
-            "| # | Riders | % Total | Type | → Close? | → Dist | ← Close? | "
-            "← Dist | Origin ↔ Destination |",
-            "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+            "| # | Riders | % Total | Type | Close? | Dist | Walk | "
+            "Origin ↔ Destination |",
+            "| --- | --- | --- | --- | --- | --- | --- | --- |",
         ]
 
         def pair_riders(pair: SymmetricPair) -> float:
             return pair.riders
-
-        def close_cells(direction: ODPair | None) -> str:
-            if direction is None or direction.one_seat:
-                return "  |  |"
-            close_str = "close" if direction.close else "far"
-            dist_str = "" if direction.dist_m is None else f"{direction.dist_m:.0f}m"
-            return f" {close_str} | {dist_str} |"
 
         both_ends_rows = [r for r in self.rows if r.both_ends]
         top_pairs = sorted(
@@ -737,11 +743,21 @@ class ScenarioResult:
         )[:top_n]
         for i, pr in enumerate(top_pairs, 1):
             fwd = pr.forward
+            if fwd.one_seat:
+                type_str, close_str, dist_str, walk_str = "1-seat", "", "", ""
+            else:
+                type_str = "xfer"
+                close_str = "close" if fwd.close else "far"
+                dist_str = f"{fwd.dist_m:.0f}m"
+                # The station walked *to*, which is the actionable half,
+                # tagged with the end it's at rather than an arrow, so it
+                # reads the same whichever way the row is oriented.
+                end = "origin" if fwd.walk_at_origin else "dest"
+                walk_str = f"{end}: {fwd.near_station}"
             lines.append(
                 f"| {i} | {pr.riders:,.0f} | {self.both_ends.pct(pr.riders):.2f}% | "
-                f"{'1-seat' if fwd.one_seat else 'xfer'} |"
-                f"{close_cells(fwd)}{close_cells(pr.reverse)}"
-                f" {fwd.origin_name} ↔ {fwd.dest_name} |"
+                f"{type_str} | {close_str} | {dist_str} | {walk_str} | "
+                f"{fwd.origin_name} ↔ {fwd.dest_name} |"
             )
         lines.append("")
 
@@ -807,9 +823,7 @@ class ScenarioComparison:
         stations_by_id: dict[int, Station],
         stations_path: Path,
         scope_ids: frozenset[int],
-        close_lookup: Callable[
-            [Station, Routes], tuple[bool, float | None, str | None]
-        ],
+        close_lookup: CloseLookup,
     ) -> ScenarioComparisonResult:
         return ScenarioComparisonResult(
             comparison=self,
@@ -1183,14 +1197,20 @@ def deinterlining(
 
     @cache
     def min_dist_to_corridor(
-        dest: Station, assigned_routes: Routes
+        station: Station, corridor_routes: Routes
     ) -> tuple[float, Station] | None:
-        candidates = assigned_points(assigned_routes)
+        candidates = assigned_points(corridor_routes)
         if not candidates:
-            # A route with no individual-station data at all,
+            # Either the station has no route in this comparison at all
+            # (so there is no corridor of its own to measure against),
+            # or a route has no individual-station data,
             # e.g. a synthetic one no scenario uses yet.
+            # `close_lookup` decides what an unmeasurable end means;
+            # here it's just "nothing to measure to".
             return None
-        points = [s.loc for s in platforms_by_complex.get(dest.complex_id, [dest])]
+        points = [
+            s.loc for s in platforms_by_complex.get(station.complex_id, [station])
+        ]
         best: tuple[float, Station] | None = None
         for p in points:
             for c in candidates:
@@ -1200,15 +1220,49 @@ def deinterlining(
         return best
 
     def close_lookup(
-        dest: Station, effective_origin_routes: Routes
-    ) -> tuple[bool, float | None, str | None]:
-        best = min_dist_to_corridor(dest, effective_origin_routes)
-        if best is None:
-            return False, None, None
-        dist_m, near_station = best
+        origin: Station,
+        dest: Station,
+        origin_routes: Routes,
+        dest_routes: Routes,
+    ) -> tuple[bool, float, str | None, bool]:
+        """How far a rider without a one-seat ride would have to walk
+        to turn the trip into one, at whichever end is the shorter walk.
+
+        Two ways to do that, and a rider can take either:
+
+        - walk at the destination end: ride your own corridor to the
+          station nearest the destination, and walk from there;
+        - walk at the origin end: walk to the nearest station served by
+          a route that reaches the destination, and ride that.
+
+        Taking the minimum makes the result symmetric,
+        which the underlying fact is:
+        `A -> B` and `B -> A` offer the same two walks,
+        so they must classify alike.
+        """
+        options = [
+            (min_dist_to_corridor(dest, origin_routes), False),
+            (min_dist_to_corridor(origin, dest_routes), True),
+        ]
+        measured = [
+            (best, at_origin) for best, at_origin in options if best is not None
+        ]
+        # Both ends unmeasurable means neither end is on the comparison's
+        # routes, which `scope_ids` already excluded from the query.
+        # Loud rather than silently `far`, per the same argument as
+        # `one_seat_rides.py`'s `assert candidates`.
+        assert measured, (
+            f"neither {origin.name} nor {dest.name} has a corridor to "
+            f"measure a walk against, but the pair was fetched as in scope"
+        )
+
+        def walk_dist(option: tuple[tuple[float, Station], bool]) -> float:
+            return option[0][0]
+
+        (dist_m, near_station), walk_at_origin = min(measured, key=walk_dist)
         close = dist_m <= close_threshold_m
         near_station_name = near_station.display(near_station.routes & routes_set)
-        return close, dist_m, near_station_name
+        return close, dist_m, near_station_name, walk_at_origin
 
     try:
         result = comparison.classify(

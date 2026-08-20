@@ -177,6 +177,50 @@ and `xfer_applicable_routes`, and the bug surface with them.
 "Close one-seat" for a genuine transfer,
 where the two ends share no route at all, is unaffected.
 
+### Close one-seat is symmetric, and measured at both ends
+
+A rider with no one-seat ride has two ways to walk into one,
+and no reason to prefer either:
+
+- walk at the destination end:
+  ride your own corridor to the station nearest the destination,
+  and walk from there;
+- walk at the origin end:
+  walk to the nearest station served by a route reaching the destination,
+  and ride that one seat the whole way.
+
+Only the first was measured at first,
+inherited from `one_seat_rides.py`,
+whose origin-side scoping made it the only one expressible.
+It reported
+`Times Sq-42 St/PABT <-> 59 St-Columbus Circle` as far, 413m,
+when a rider walks 191m to 42 St-Bryant Pk and takes a B or D.
+Taking the shorter of the two raised close one-seat
+from 49,159 to 86,527 riders/weekday among DeKalb's both-ends riders,
+and stopped the two scenarios tying at 79.0% effective
+(now 83.5% against 84.5%).
+
+Measuring both ends is also what makes the metric symmetric,
+which the underlying fact always was:
+`A -> B` and `B -> A` offer the same two walks.
+So every column of the pair table is a property of the *pair*,
+which is why the two directions are reported as one row.
+Only the rider counts are directional.
+
+`dist_m` is a plain `float`, never `None`.
+An end with no corridor to measure against is not a distance of zero,
+and rendering it as `0m` said the opposite of what was meant
+(that the station is *on* the corridor).
+With both ends measured, at least one is always measurable
+for any pair the scope query fetched,
+so `close_lookup` asserts rather than carrying a null,
+following `one_seat_rides.py`'s `assert candidates`
+(commit `d3d031a`, which likewise removed an Optional
+by guaranteeing the case instead of encoding it).
+The 0.0 that *is* kept is a one-seat ride's,
+where the ridden route stops at both ends and there is no walk:
+a real measurement, as in `one_seat_rides.py`.
+
 ## Relationship to `one-seat-rides`
 
 Separate while this one is proven out,
@@ -228,4 +272,8 @@ GTFS-RT is a different, harder problem, and not needed for any of this.
   how a scenario declares a route with no real geo/platform data,
   and how the close-one-seat distance search degrades
   when it can't look one up.
-  `min_dist_to_corridor` already returns `None` rather than crashing.
+  `min_dist_to_corridor` returns `None` for an unmeasurable end
+  rather than crashing,
+  and `close_lookup` falls back to the other end,
+  so a synthetic route costs precision rather than the whole row.
+  It asserts only if *both* ends are unmeasurable.
