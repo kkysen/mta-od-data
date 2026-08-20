@@ -84,7 +84,12 @@ class ODPair:
 
 
 @dataclass(slots=True)
-class DestStats:
+class EndStats:
+    """One end of a trip--an origin or a destination--summed over every
+    trip with the other end anywhere.
+    The same shape either way,
+    since a pair contributes its one classification to both of its ends."""
+
     name: str
     total: float = 0.0
     one_seat: float = 0.0
@@ -343,7 +348,8 @@ class Scenario:
         both_total = 0.0
         both_one_seat = 0.0
         both_close = 0.0
-        dest_stats: dict[int, DestStats] = {}
+        origin_stats: dict[int, EndStats] = {}
+        dest_stats: dict[int, EndStats] = {}
         for origin_id, dest_id, riders in pairs:
             origin = stations_by_id.get(origin_id)
             dest = stations_by_id.get(dest_id)
@@ -394,19 +400,23 @@ class Scenario:
                 )
             )
 
-            # Both-ends only, to match the tables it feeds:
-            # a destination off the comparison's routes has no one-seat
-            # ridership from anywhere, so it would only ever add rows
-            # reading 0.0%.
+            # Both-ends only, to match the tables these feed:
+            # a station off the comparison's routes has no one-seat
+            # ridership to or from anywhere, so it would only ever add
+            # rows reading 0.0%.
             if both_ends:
-                d = dest_stats.setdefault(
-                    dest_id, DestStats(name=dest.display(dest.routes))
-                )
-                d.total += riders
-                if one_seat:
-                    d.one_seat += riders
-                elif close:
-                    d.close += riders
+                for stats, sid, station in (
+                    (origin_stats, origin_id, origin),
+                    (dest_stats, dest_id, dest),
+                ):
+                    e = stats.setdefault(
+                        sid, EndStats(name=station.display(station.routes))
+                    )
+                    e.total += riders
+                    if one_seat:
+                        e.one_seat += riders
+                    elif close:
+                        e.close += riders
 
         if not total_riders:
             raise ScenarioError(
@@ -428,6 +438,7 @@ class Scenario:
                 close=both_close,
             ),
             rows=rows,
+            origin_stats=origin_stats,
             dest_stats=dest_stats,
         )
 
@@ -602,7 +613,8 @@ class ScenarioResult:
     # where a swap shows up undiluted by trips only half in scope.
     both_ends: RiderStats
     rows: list[ODPair]
-    dest_stats: dict[int, DestStats]
+    origin_stats: dict[int, EndStats]
+    dest_stats: dict[int, EndStats]
 
     def write_csv(self, path: Path) -> None:
         with path.open("w", newline="") as f:
@@ -675,31 +687,37 @@ class ScenarioResult:
             )
         lines.append("")
 
-        lines.append(
-            f"{h2} Top {top_n} destination stations, summed across all origins"
-        )
-        lines.append("")
-        lines.append(
-            "Both ends on the comparison's routes, per that section of the "
-            "comparison above."
-        )
-        lines.append("")
-        lines.append("| Riders | 1-Seat % | Effective % | Destination |")
-        lines.append("| --- | --- | --- | --- |")
+        def end_total(e: EndStats) -> float:
+            return e.total
 
-        def dest_total(d: DestStats) -> float:
-            return d.total
-
-        for d in sorted(self.dest_stats.values(), key=dest_total, reverse=True)[:top_n]:
-            one_seat_pct = 100 * d.one_seat / d.total if d.total else float("nan")
-            effective_pct = (
-                100 * (d.one_seat + d.close) / d.total if d.total else float("nan")
-            )
-            lines.append(
-                f"| {d.total:,.0f} | {one_seat_pct:.1f}% | {effective_pct:.1f}% | "
-                f"{d.name} |"
-            )
-        lines.append("")
+        # Origins and destinations both, and not one table standing in for
+        # the other: a station's one-seat share is not symmetric, since
+        # "close one-seat" measures the *destination* against the origin's
+        # corridor. A terminal that reads well as an origin can read badly
+        # as a destination.
+        for label, end, stats in (
+            ("origin", "destinations", self.origin_stats),
+            ("destination", "origins", self.dest_stats),
+        ):
+            lines += [
+                f"{h2} Top {top_n} {label} stations, summed across all {end}",
+                "",
+                "Both ends on the comparison's routes, per that section of "
+                "the comparison above.",
+                "",
+                f"| Riders | 1-Seat % | Effective % | {label.capitalize()} |",
+                "| --- | --- | --- | --- |",
+            ]
+            for e in sorted(stats.values(), key=end_total, reverse=True)[:top_n]:
+                one_seat_pct = 100 * e.one_seat / e.total if e.total else float("nan")
+                effective_pct = (
+                    100 * (e.one_seat + e.close) / e.total if e.total else float("nan")
+                )
+                lines.append(
+                    f"| {e.total:,.0f} | {one_seat_pct:.1f}% | "
+                    f"{effective_pct:.1f}% | {e.name} |"
+                )
+            lines.append("")
 
         if csv_out:
             lines.append(
