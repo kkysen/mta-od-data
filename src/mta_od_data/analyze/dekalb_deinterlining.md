@@ -1,6 +1,6 @@
 # Deinterlining scenario comparison: B,D,N,Q,R
 
-Average weekday ridership (60 distinct days in the data, 2025-01 to 2025-12), every origin/destination pair with either end served by B,D,N,Q,R under any scenario compared here.
+Average weekday ridership (60 distinct days in the data, 2025-01 to 2025-12), over every origin/destination pair with both ends served by B,D,N,Q,R under any scenario compared here. Pairs with only one end on those routes are reported alongside as context, but can't be a one-seat ride under any of them.
 
 Produced by `mta-od-data analyze deinterlining --category DeKalb --markdown-out src/mta_od_data/analyze/dekalb_deinterlining.md`.
 
@@ -30,63 +30,67 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 
 ### Top 25 origin/destination pairs
 
+Both ends on the comparison's routes, as in the comparison table above.
+
 | # | Riders | % Total | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 4,381 | 0.19% | xfer | far | 671m | Times Sq-42 St/PABT (N,Q,R) → Grand Central-42 St () |
-| 2 | 4,284 | 0.18% | xfer | far |  | Grand Central-42 St () → 14 St-Union Sq (N,Q,R) |
-| 3 | 4,276 | 0.18% | xfer | far |  | Grand Central-42 St () → Times Sq-42 St/PABT (N,Q,R) |
-| 4 | 3,771 | 0.16% | xfer | far | 671m | 14 St-Union Sq (N,Q,R) → Grand Central-42 St () |
-| 5 | 2,981 | 0.13% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Chambers St/WTC/Park Pl/Cortlandt St (R) |
-| 6 | 2,847 | 0.12% | 1-seat |  |  | Chambers St/WTC/Park Pl/Cortlandt St (R) → Times Sq-42 St/PABT (N,Q,R) |
-| 7 | 2,831 | 0.12% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 14 St-Union Sq (N,Q,R) |
-| 8 | 2,829 | 0.12% | xfer | close | 132m | Times Sq-42 St/PABT (N,Q,R) → Fulton St () |
-| 9 | 2,738 | 0.12% | xfer | far | 413m | Times Sq-42 St/PABT (N,Q,R) → 59 St-Columbus Circle (B,D) |
-| 10 | 2,646 | 0.11% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 47-50 Sts-Rockefeller Ctr (B,D) |
-| 11 | 2,592 | 0.11% | xfer | close | 191m | 59 St-Columbus Circle (B,D) → Times Sq-42 St/PABT (N,Q,R) |
-| 12 | 2,584 | 0.11% | 1-seat |  |  | 14 St-Union Sq (N,Q,R) → Times Sq-42 St/PABT (N,Q,R) |
-| 13 | 2,512 | 0.11% | xfer | far |  | 34 St-Penn Station () → 59 St-Columbus Circle (B,D) |
-| 14 | 2,500 | 0.11% | xfer | far |  | Fulton St () → Times Sq-42 St/PABT (N,Q,R) |
-| 15 | 2,464 | 0.11% | xfer | far | 588m | Times Sq-42 St/PABT (N,Q,R) → Lexington Av/51-53 Sts () |
-| 16 | 2,445 | 0.10% | xfer | far | 1041m | Times Sq-42 St/PABT (N,Q,R) → 14 St/8 Av () |
-| 17 | 2,428 | 0.10% | 1-seat |  |  | 47-50 Sts-Rockefeller Ctr (B,D) → 34 St-Herald Sq (B,D,N,Q,R) |
-| 18 | 2,351 | 0.10% | 1-seat |  |  | 72 St (Q) → Times Sq-42 St/PABT (N,Q,R) |
-| 19 | 2,333 | 0.10% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 14 St-Union Sq (N,Q,R) |
-| 20 | 2,315 | 0.10% | xfer | far |  | 14 St/8 Av () → Times Sq-42 St/PABT (N,Q,R) |
-| 21 | 2,306 | 0.10% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 72 St (Q) |
-| 22 | 2,291 | 0.10% | 1-seat |  |  | 72 St (Q) → 34 St-Herald Sq (B,D,N,Q,R) |
-| 23 | 2,269 | 0.10% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 72 St (Q) |
-| 24 | 2,251 | 0.10% | xfer | far |  | Lexington Av/51-53 Sts () → Times Sq-42 St/PABT (N,Q,R) |
-| 25 | 2,184 | 0.09% | xfer | far | 549m | 59 St-Columbus Circle (B,D) → 34 St-Penn Station () |
+| 1 | 2,981 | 0.36% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Chambers St/WTC/Park Pl/Cortlandt St (R) |
+| 2 | 2,847 | 0.34% | 1-seat |  |  | Chambers St/WTC/Park Pl/Cortlandt St (R) → Times Sq-42 St/PABT (N,Q,R) |
+| 3 | 2,831 | 0.34% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 14 St-Union Sq (N,Q,R) |
+| 4 | 2,738 | 0.33% | xfer | far | 413m | Times Sq-42 St/PABT (N,Q,R) → 59 St-Columbus Circle (B,D) |
+| 5 | 2,646 | 0.32% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 47-50 Sts-Rockefeller Ctr (B,D) |
+| 6 | 2,592 | 0.31% | xfer | close | 191m | 59 St-Columbus Circle (B,D) → Times Sq-42 St/PABT (N,Q,R) |
+| 7 | 2,584 | 0.31% | 1-seat |  |  | 14 St-Union Sq (N,Q,R) → Times Sq-42 St/PABT (N,Q,R) |
+| 8 | 2,428 | 0.29% | 1-seat |  |  | 47-50 Sts-Rockefeller Ctr (B,D) → 34 St-Herald Sq (B,D,N,Q,R) |
+| 9 | 2,351 | 0.28% | 1-seat |  |  | 72 St (Q) → Times Sq-42 St/PABT (N,Q,R) |
+| 10 | 2,333 | 0.28% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 14 St-Union Sq (N,Q,R) |
+| 11 | 2,306 | 0.28% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 72 St (Q) |
+| 12 | 2,291 | 0.27% | 1-seat |  |  | 72 St (Q) → 34 St-Herald Sq (B,D,N,Q,R) |
+| 13 | 2,269 | 0.27% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 72 St (Q) |
+| 14 | 2,004 | 0.24% | 1-seat |  |  | 14 St-Union Sq (N,Q,R) → 34 St-Herald Sq (B,D,N,Q,R) |
+| 15 | 1,872 | 0.22% | 1-seat |  |  | 86 St (Q) → Times Sq-42 St/PABT (N,Q,R) |
+| 16 | 1,864 | 0.22% | xfer | far | 699m | Times Sq-42 St/PABT (N,Q,R) → W 4 St-Wash Sq (B,D) |
+| 17 | 1,794 | 0.21% | xfer | close | 191m | W 4 St-Wash Sq (B,D) → Times Sq-42 St/PABT (N,Q,R) |
+| 18 | 1,768 | 0.21% | 1-seat |  |  | 86 St (Q) → 34 St-Herald Sq (B,D,N,Q,R) |
+| 19 | 1,700 | 0.20% | 1-seat |  |  | Jackson Hts-Roosevelt Av/74 St-Broadway (R) → Times Sq-42 St/PABT (N,Q,R) |
+| 20 | 1,650 | 0.20% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 86 St (Q) |
+| 21 | 1,638 | 0.20% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Whitehall St-South Ferry (R) |
+| 22 | 1,592 | 0.19% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Jackson Hts-Roosevelt Av/74 St-Broadway (R) |
+| 23 | 1,588 | 0.19% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 86 St (Q) |
+| 24 | 1,528 | 0.18% | 1-seat |  |  | Whitehall St-South Ferry (R) → Times Sq-42 St/PABT (N,Q,R) |
+| 25 | 1,438 | 0.17% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Lexington Av/59 St (N,R) |
 
 ### Top 25 destination stations, summed across all origins
 
+Both ends on the comparison's routes, as in the comparison table above.
+
 | Riders | 1-Seat % | Effective % | Destination |
 | --- | --- | --- | --- |
-| 141,635 | 27.6% | 38.6% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
-| 80,522 | 60.1% | 60.1% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 77,392 | 35.1% | 35.1% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
-| 54,511 | 22.4% | 22.4% | 59 St-Columbus Circle (1,A,B,C,D) |
-| 45,842 | 28.5% | 47.1% | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
-| 45,792 | 30.8% | 30.8% | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) |
-| 43,380 | 23.4% | 43.3% | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
-| 42,493 | 24.4% | 24.4% | Jackson Hts-Roosevelt Av/74 St-Broadway (7,E,F,M,R) |
-| 40,012 | 29.4% | 31.8% | Lexington Av/59 St (4,5,6,N,R,W) |
-| 36,275 | 22.3% | 22.3% | W 4 St-Wash Sq (A,B,C,D,E,F,M) |
-| 35,767 | 47.2% | 47.2% | Canal St (6,J,N,Q,R,W,Z) |
-| 33,621 | 51.8% | 51.8% | Atlantic Av (2,3,4,5,B,D,N,Q,R) |
-| 33,577 | 22.7% | 39.0% | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
-| 33,120 | 0.0% | 0.0% | Grand Central-42 St (4,5,6,7,S) |
-| 28,431 | 21.9% | 21.9% | Jay St-MetroTech (A,C,F,R) |
-| 27,538 | 54.9% | 61.1% | 57 St-7 Av (N,Q,R,W) |
-| 24,115 | 39.1% | 39.1% | 72 St (Q) |
-| 23,217 | 0.0% | 0.0% | 34 St-Penn Station (A,C,E) |
-| 22,311 | 21.9% | 21.9% | Borough Hall/Court St (2,3,4,5,R) |
-| 21,480 | 47.7% | 55.1% | 49 St (N,R,W) |
-| 20,661 | 34.9% | 34.9% | Whitehall St-South Ferry (1,R,W) |
-| 19,563 | 28.1% | 28.1% | Forest Hills-71 Av (E,F,M,R) |
-| 18,984 | 0.0% | 64.1% | Fulton St (2,3,4,5,A,C,J,Z) |
-| 18,879 | 34.7% | 34.7% | 125 St (A,B,C,D) |
-| 18,605 | 42.5% | 42.5% | Grand St (B,D) |
+| 54,675 | 71.6% | 100.0% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
+| 48,360 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
+| 31,416 | 86.4% | 86.4% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
+| 23,378 | 55.9% | 92.4% | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
+| 21,158 | 57.6% | 57.6% | 59 St-Columbus Circle (1,A,B,C,D) |
+| 20,826 | 67.7% | 67.7% | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) |
+| 19,376 | 87.1% | 87.1% | Canal St (6,J,N,Q,R,W,Z) |
+| 18,786 | 53.9% | 100.0% | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
+| 17,432 | 100.0% | 100.0% | Atlantic Av (2,3,4,5,B,D,N,Q,R) |
+| 16,993 | 61.0% | 61.0% | Jackson Hts-Roosevelt Av/74 St-Broadway (7,E,F,M,R) |
+| 16,838 | 89.8% | 100.0% | 57 St-7 Av (N,Q,R,W) |
+| 15,995 | 50.6% | 50.6% | W 4 St-Wash Sq (A,B,C,D,E,F,M) |
+| 14,601 | 80.5% | 87.3% | Lexington Av/59 St (4,5,6,N,R,W) |
+| 14,250 | 66.2% | 66.2% | 72 St (Q) |
+| 14,100 | 54.1% | 92.9% | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
+| 12,855 | 79.7% | 92.0% | 49 St (N,R,W) |
+| 12,413 | 63.6% | 63.6% | Grand St (B,D) |
+| 12,331 | 91.4% | 91.4% | DeKalb Av (B,Q,R) |
+| 11,243 | 64.9% | 64.9% | 86 St (Q) |
+| 11,048 | 85.1% | 85.1% | Kings Hwy (B,Q) |
+| 10,457 | 59.5% | 59.5% | Jay St-MetroTech (A,C,F,R) |
+| 9,785 | 73.8% | 73.8% | Whitehall St-South Ferry (1,R,W) |
+| 9,281 | 68.7% | 68.7% | 23 St (R,W) |
+| 9,136 | 60.2% | 60.2% | Forest Hills-71 Av (E,F,M,R) |
+| 9,112 | 71.8% | 71.8% | 125 St (A,B,C,D) |
 
 ---
 
@@ -94,60 +98,64 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 
 ### Top 25 origin/destination pairs
 
+Both ends on the comparison's routes, as in the comparison table above.
+
 | # | Riders | % Total | Type | Close? | Dist | Origin → Destination |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 4,381 | 0.19% | xfer | far | 671m | Times Sq-42 St/PABT (N,Q,R) → Grand Central-42 St () |
-| 2 | 4,284 | 0.18% | xfer | far |  | Grand Central-42 St () → 14 St-Union Sq (N,Q,R) |
-| 3 | 4,276 | 0.18% | xfer | far |  | Grand Central-42 St () → Times Sq-42 St/PABT (N,Q,R) |
-| 4 | 3,771 | 0.16% | xfer | far | 671m | 14 St-Union Sq (N,Q,R) → Grand Central-42 St () |
-| 5 | 2,981 | 0.13% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Chambers St/WTC/Park Pl/Cortlandt St (R) |
-| 6 | 2,847 | 0.12% | 1-seat |  |  | Chambers St/WTC/Park Pl/Cortlandt St (R) → Times Sq-42 St/PABT (N,Q,R) |
-| 7 | 2,831 | 0.12% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 14 St-Union Sq (N,Q,R) |
-| 8 | 2,829 | 0.12% | xfer | close | 132m | Times Sq-42 St/PABT (N,Q,R) → Fulton St () |
-| 9 | 2,738 | 0.12% | xfer | far | 413m | Times Sq-42 St/PABT (N,Q,R) → 59 St-Columbus Circle (B,D) |
-| 10 | 2,646 | 0.11% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 47-50 Sts-Rockefeller Ctr (B,D) |
-| 11 | 2,592 | 0.11% | xfer | close | 191m | 59 St-Columbus Circle (B,D) → Times Sq-42 St/PABT (N,Q,R) |
-| 12 | 2,584 | 0.11% | 1-seat |  |  | 14 St-Union Sq (N,Q,R) → Times Sq-42 St/PABT (N,Q,R) |
-| 13 | 2,512 | 0.11% | xfer | far |  | 34 St-Penn Station () → 59 St-Columbus Circle (B,D) |
-| 14 | 2,500 | 0.11% | xfer | far |  | Fulton St () → Times Sq-42 St/PABT (N,Q,R) |
-| 15 | 2,464 | 0.11% | xfer | far | 588m | Times Sq-42 St/PABT (N,Q,R) → Lexington Av/51-53 Sts () |
-| 16 | 2,445 | 0.10% | xfer | far | 1041m | Times Sq-42 St/PABT (N,Q,R) → 14 St/8 Av () |
-| 17 | 2,428 | 0.10% | 1-seat |  |  | 47-50 Sts-Rockefeller Ctr (B,D) → 34 St-Herald Sq (B,D,N,Q,R) |
-| 18 | 2,351 | 0.10% | 1-seat |  |  | 72 St (Q) → Times Sq-42 St/PABT (N,Q,R) |
-| 19 | 2,333 | 0.10% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 14 St-Union Sq (N,Q,R) |
-| 20 | 2,315 | 0.10% | xfer | far |  | 14 St/8 Av () → Times Sq-42 St/PABT (N,Q,R) |
-| 21 | 2,306 | 0.10% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 72 St (Q) |
-| 22 | 2,291 | 0.10% | 1-seat |  |  | 72 St (Q) → 34 St-Herald Sq (B,D,N,Q,R) |
-| 23 | 2,269 | 0.10% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 72 St (Q) |
-| 24 | 2,251 | 0.10% | xfer | far |  | Lexington Av/51-53 Sts () → Times Sq-42 St/PABT (N,Q,R) |
-| 25 | 2,184 | 0.09% | xfer | far | 549m | 59 St-Columbus Circle (B,D) → 34 St-Penn Station () |
+| 1 | 2,981 | 0.36% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Chambers St/WTC/Park Pl/Cortlandt St (R) |
+| 2 | 2,847 | 0.34% | 1-seat |  |  | Chambers St/WTC/Park Pl/Cortlandt St (R) → Times Sq-42 St/PABT (N,Q,R) |
+| 3 | 2,831 | 0.34% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 14 St-Union Sq (N,Q,R) |
+| 4 | 2,738 | 0.33% | xfer | far | 413m | Times Sq-42 St/PABT (N,Q,R) → 59 St-Columbus Circle (B,D) |
+| 5 | 2,646 | 0.32% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 47-50 Sts-Rockefeller Ctr (B,D) |
+| 6 | 2,592 | 0.31% | xfer | close | 191m | 59 St-Columbus Circle (B,D) → Times Sq-42 St/PABT (N,Q,R) |
+| 7 | 2,584 | 0.31% | 1-seat |  |  | 14 St-Union Sq (N,Q,R) → Times Sq-42 St/PABT (N,Q,R) |
+| 8 | 2,428 | 0.29% | 1-seat |  |  | 47-50 Sts-Rockefeller Ctr (B,D) → 34 St-Herald Sq (B,D,N,Q,R) |
+| 9 | 2,351 | 0.28% | 1-seat |  |  | 72 St (Q) → Times Sq-42 St/PABT (N,Q,R) |
+| 10 | 2,333 | 0.28% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 14 St-Union Sq (N,Q,R) |
+| 11 | 2,306 | 0.28% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 72 St (Q) |
+| 12 | 2,291 | 0.27% | 1-seat |  |  | 72 St (Q) → 34 St-Herald Sq (B,D,N,Q,R) |
+| 13 | 2,269 | 0.27% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 72 St (Q) |
+| 14 | 2,004 | 0.24% | 1-seat |  |  | 14 St-Union Sq (N,Q,R) → 34 St-Herald Sq (B,D,N,Q,R) |
+| 15 | 1,872 | 0.22% | 1-seat |  |  | 86 St (Q) → Times Sq-42 St/PABT (N,Q,R) |
+| 16 | 1,864 | 0.22% | xfer | far | 699m | Times Sq-42 St/PABT (N,Q,R) → W 4 St-Wash Sq (B,D) |
+| 17 | 1,794 | 0.21% | xfer | close | 191m | W 4 St-Wash Sq (B,D) → Times Sq-42 St/PABT (N,Q,R) |
+| 18 | 1,768 | 0.21% | 1-seat |  |  | 86 St (Q) → 34 St-Herald Sq (B,D,N,Q,R) |
+| 19 | 1,700 | 0.20% | 1-seat |  |  | Jackson Hts-Roosevelt Av/74 St-Broadway (R) → Times Sq-42 St/PABT (N,Q,R) |
+| 20 | 1,650 | 0.20% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → 86 St (Q) |
+| 21 | 1,638 | 0.20% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Whitehall St-South Ferry (R) |
+| 22 | 1,592 | 0.19% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Jackson Hts-Roosevelt Av/74 St-Broadway (R) |
+| 23 | 1,588 | 0.19% | 1-seat |  |  | 34 St-Herald Sq (B,D,N,Q,R) → 86 St (Q) |
+| 24 | 1,528 | 0.18% | 1-seat |  |  | Whitehall St-South Ferry (R) → Times Sq-42 St/PABT (N,Q,R) |
+| 25 | 1,438 | 0.17% | 1-seat |  |  | Times Sq-42 St/PABT (N,Q,R) → Lexington Av/59 St (N,R) |
 
 ### Top 25 destination stations, summed across all origins
 
+Both ends on the comparison's routes, as in the comparison table above.
+
 | Riders | 1-Seat % | Effective % | Destination |
 | --- | --- | --- | --- |
-| 141,635 | 27.0% | 38.6% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
-| 80,522 | 60.1% | 60.1% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
-| 77,392 | 33.9% | 33.9% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
-| 54,511 | 21.3% | 21.3% | 59 St-Columbus Circle (1,A,B,C,D) |
-| 45,842 | 25.6% | 47.1% | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
-| 45,792 | 30.8% | 30.8% | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) |
-| 43,380 | 21.1% | 43.3% | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
-| 42,493 | 24.4% | 24.4% | Jackson Hts-Roosevelt Av/74 St-Broadway (7,E,F,M,R) |
-| 40,012 | 29.2% | 31.0% | Lexington Av/59 St (4,5,6,N,R,W) |
-| 36,275 | 20.8% | 20.8% | W 4 St-Wash Sq (A,B,C,D,E,F,M) |
-| 35,767 | 42.1% | 42.1% | Canal St (6,J,N,Q,R,W,Z) |
-| 33,621 | 51.8% | 51.8% | Atlantic Av (2,3,4,5,B,D,N,Q,R) |
-| 33,577 | 20.5% | 36.6% | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
-| 33,120 | 0.0% | 0.0% | Grand Central-42 St (4,5,6,7,S) |
-| 28,431 | 21.9% | 21.9% | Jay St-MetroTech (A,C,F,R) |
-| 27,538 | 53.7% | 61.1% | 57 St-7 Av (N,Q,R,W) |
-| 24,115 | 39.1% | 39.1% | 72 St (Q) |
-| 23,217 | 0.0% | 0.0% | 34 St-Penn Station (A,C,E) |
-| 22,311 | 21.9% | 21.9% | Borough Hall/Court St (2,3,4,5,R) |
-| 21,480 | 47.0% | 55.1% | 49 St (N,R,W) |
-| 20,661 | 34.9% | 34.9% | Whitehall St-South Ferry (1,R,W) |
-| 19,563 | 28.1% | 28.1% | Forest Hills-71 Av (E,F,M,R) |
-| 18,984 | 0.0% | 64.1% | Fulton St (2,3,4,5,A,C,J,Z) |
-| 18,879 | 34.2% | 34.2% | 125 St (A,B,C,D) |
-| 18,605 | 42.4% | 42.4% | Grand St (B,D) |
+| 54,675 | 69.8% | 100.0% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
+| 48,360 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
+| 31,416 | 83.6% | 83.6% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
+| 23,378 | 50.3% | 92.4% | 47-50 Sts-Rockefeller Ctr (B,D,F,M) |
+| 21,158 | 55.0% | 55.0% | 59 St-Columbus Circle (1,A,B,C,D) |
+| 20,826 | 67.7% | 67.7% | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) |
+| 19,376 | 77.7% | 77.7% | Canal St (6,J,N,Q,R,W,Z) |
+| 18,786 | 48.8% | 100.0% | 42 St-Bryant Pk/5 Av (7,B,D,F,M) |
+| 17,432 | 100.0% | 100.0% | Atlantic Av (2,3,4,5,B,D,N,Q,R) |
+| 16,993 | 61.0% | 61.0% | Jackson Hts-Roosevelt Av/74 St-Broadway (7,E,F,M,R) |
+| 16,838 | 87.8% | 100.0% | 57 St-7 Av (N,Q,R,W) |
+| 15,995 | 47.2% | 47.2% | W 4 St-Wash Sq (A,B,C,D,E,F,M) |
+| 14,601 | 80.1% | 85.0% | Lexington Av/59 St (4,5,6,N,R,W) |
+| 14,250 | 66.2% | 66.2% | 72 St (Q) |
+| 14,100 | 48.9% | 87.2% | Broadway-Lafayette St/Bleecker St (6,B,D,F,M) |
+| 12,855 | 78.6% | 92.0% | 49 St (N,R,W) |
+| 12,413 | 63.6% | 63.6% | Grand St (B,D) |
+| 12,331 | 95.0% | 95.0% | DeKalb Av (B,Q,R) |
+| 11,243 | 64.9% | 64.9% | 86 St (Q) |
+| 11,048 | 70.2% | 89.2% | Kings Hwy (B,Q) |
+| 10,457 | 59.5% | 59.5% | Jay St-MetroTech (A,C,F,R) |
+| 9,785 | 73.8% | 73.8% | Whitehall St-South Ferry (1,R,W) |
+| 9,281 | 68.7% | 68.7% | 23 St (R,W) |
+| 9,136 | 60.2% | 60.2% | Forest Hills-71 Av (E,F,M,R) |
+| 9,112 | 70.9% | 70.9% | 125 St (A,B,C,D) |
