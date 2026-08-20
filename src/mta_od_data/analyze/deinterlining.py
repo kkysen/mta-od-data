@@ -602,9 +602,10 @@ class ScenarioResult:
 
     def print_headline(self, *, close_threshold_m: float) -> None:
         print(f"\n=== Scenario: {self.scenario.name} ===")
-        self.overall.print_lines(close_threshold_m=close_threshold_m)
         print("Both ends on the comparison's routes:")
         self.both_ends.print_lines(close_threshold_m=close_threshold_m)
+        print("Either end on the comparison's routes:")
+        self.overall.print_lines(close_threshold_m=close_threshold_m)
 
     def render_markdown(
         self,
@@ -757,14 +758,14 @@ class ScenarioComparisonResult:
                 result.print_headline(close_threshold_m=close_threshold_m)
             return
         print(
-            f"\n=== Scenario comparison "
-            f"(close one-seat: within {close_threshold_m:.0f}m) ==="
+            f"\n=== Scenario comparison, both ends on the comparison's "
+            f"routes (close one-seat: within {close_threshold_m:.0f}m) ==="
         )
         for r in self.results:
-            print(r.overall.summary_line(r.scenario.name))
-        print("\n=== Both ends on the comparison's routes ===")
-        for r in self.results:
             print(r.both_ends.summary_line(r.scenario.name))
+        print("\n=== Either end on the comparison's routes ===")
+        for r in self.results:
+            print(r.overall.summary_line(r.scenario.name))
 
     def write_csvs(self, csv_out: Path) -> None:
         for path, result in zip(self.csv_paths(csv_out), self.results, strict=True):
@@ -772,41 +773,52 @@ class ScenarioComparisonResult:
             result.write_csv(path)
 
     def comparison_table_markdown(self, *, close_threshold_m: float) -> str:
+        routes = ",".join(sorted(self.comparison.routes))
+        header = (
+            "| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | "
+            "Effective 1-Seat |\n| --- | --- | --- | --- | --- |"
+        )
+
+        # Both ends first, and every detailed table below scoped to it:
+        # it's the denominator a reader needs, the trips these routes could
+        # carry end to end. Trips with only one end on them can never be a
+        # one-seat ride under any scenario (that needs a shared route, which
+        # puts both ends in scope), so they only ever dilute the rate.
         lines = [
             "## Scenario comparison",
             "",
-            f"Total riders is the same {self.results[0].overall.total:,.0f} "
-            f"across every scenario below; only how many of those riders get "
-            f"a one-seat ride changes. Close one-seat counts a transfer trip "
-            f"whose destination is within {close_threshold_m:.0f}m of a station "
-            f"on that scenario's effective origin corridor.",
+            f"Every origin/destination pair with *both* ends served by "
+            f"{routes}: the trips these routes could carry end to end, "
+            f"including the many that keep a one-seat ride whatever the "
+            f"scenario. Total riders is the same "
+            f"{self.results[0].both_ends.total:,.0f} across every scenario "
+            f"below; only how many of those riders get a one-seat ride "
+            f"changes. Close one-seat counts a transfer trip whose "
+            f"destination is within {close_threshold_m:.0f}m of a station on "
+            f"that scenario's effective origin corridor.",
             "",
-            "| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | "
-            "Effective 1-Seat |",
-            "| --- | --- | --- | --- | --- |",
-        ]
-        for r in self.results:
-            lines.append(r.overall.markdown_row(r.scenario.name))
-
-        # The same comparison over the pairs the routes could carry end to end:
-        # a swap at one junction moves a few hundred riders out of a systemwide
-        # total, and reads as no change at all, without this.
-        lines += [
-            "",
-            "### Both ends on the comparison's routes",
-            "",
-            f"The {self.results[0].both_ends.total:,.0f} riders above "
-            f"whose origin *and* destination are served by "
-            f"{','.join(sorted(self.comparison.routes))}, "
-            f"where a scenario's effect isn't diluted by trips only half in "
-            f"scope.",
-            "",
-            "| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | "
-            "Effective 1-Seat |",
-            "| --- | --- | --- | --- | --- |",
+            header,
         ]
         for r in self.results:
             lines.append(r.both_ends.markdown_row(r.scenario.name))
+
+        # Kept as context, not as the headline: it says how much of the
+        # system a plan touches at all, but a single junction's effect
+        # washes out against a systemwide total.
+        lines += [
+            "",
+            "### Either end on the comparison's routes",
+            "",
+            f"The wider {self.results[0].overall.total:,.0f} riders with "
+            f"*either* end served by {routes}, the above among them. This "
+            f"says how much of the system a plan touches at all; the "
+            f"difference is transfer trips with one end off these routes "
+            f"entirely, which no scenario here can change.",
+            "",
+            header,
+        ]
+        for r in self.results:
+            lines.append(r.overall.markdown_row(r.scenario.name))
         lines.append("")
         return "\n".join(lines)
 
