@@ -717,14 +717,16 @@ class Scenario:
             # ridership to or from anywhere, so it would only ever add
             # rows reading 0.0%.
             if both_ends:
-                for stats, sid, station in (
-                    (origin_stats, origin_id, origin),
-                    (dest_stats, dest_id, dest),
+                # The pair rows' own labels, not a second naming of the
+                # same stations: displaying every real route here
+                # (`Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W)`) gave
+                # one report two conventions, and named the station by
+                # routes no row in it is about.
+                for stats, sid, name in (
+                    (origin_stats, origin_id, origin_name),
+                    (dest_stats, dest_id, dest_name),
                 ):
-                    e = stats.setdefault(
-                        sid,
-                        EndStats(name=platforms.display(station, station.routes)),
-                    )
+                    e = stats.setdefault(sid, EndStats(name=name))
                     e.total += riders
                     if one_seat:
                         e.one_seat += riders
