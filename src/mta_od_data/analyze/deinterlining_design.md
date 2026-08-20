@@ -145,6 +145,41 @@ i.e. the hardest trips only.
 (see Classification below) also counts fewer trips as one-seat,
 a secondary and unquantified factor.
 
+## What a comparison reports
+
+Levels first, and then the thing the tool exists to answer: what changed.
+
+A scenario's own tables report levels,
+and for a while that was all there was,
+which left a reader subtracting two rows by hand
+to get the only number they came for.
+The subtraction also hides more than it shows.
+A net of -19,757 direct one-seat riders for `B/D 4 Av Express`
+says nothing about how many riders *gained* one (5,754 did),
+nor whether those who lost one kept a walkable alternative.
+
+Neither a signed delta nor a lost/gained column pair can say that,
+because an outcome is not one-dimensional.
+Each rider has a *before* and an *after*,
+each one of three states (`Outcome`): direct, close, or far.
+`direct -> close` and `direct -> far`
+are the same drop in the direct column
+and nothing like the same thing for a rider:
+for DeKalb they are 9,252 riders and 18,390 riders,
+and the second group is the one a plan has to answer for.
+So the report is a 3x3 transition matrix
+with gained/lost/net under it,
+and a table of the pairs that moved.
+
+Deltas do appear in the comparison tables,
+but only as arithmetic on numbers already in the row.
+They are a convenience, not the answer.
+
+`Current` is the baseline every change is measured against.
+It needs no declaring:
+`combine_scenarios` offers `CURRENT` as an option in every category,
+so the combination that leaves them all unchanged comes first.
+
 ## A scenario is a route-override map
 
 A scenario overrides real routes
