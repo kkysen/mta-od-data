@@ -17,7 +17,7 @@ The 837,408 riders whose origin *and* destination are served by B,D,N,Q,R: the t
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | --- | --- | --- | --- |
 | Current | 837,408 | 612,795 (73.2%) | 86,527 (10.3%) | 699,321 (83.5%) |
-| B/D 4 Av Express | 837,408 | 593,038 (70.8%, -19,757) | 93,517 (11.2%, +6,991) | 686,555 (82.0%, -12,766) |
+| B/D 4 Av Express | 837,408 | 593,038 (70.8%), -19,757 (-2.4%) | 93,517 (11.2%), +6,991 (+0.8%) | 686,555 (82.0%), -12,766 (-1.5%) |
 
 ### Either end on the comparison's routes
 
@@ -26,7 +26,7 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | --- | --- | --- | --- |
 | Current | 2,332,194 | 612,795 (26.3%) | 229,764 (9.9%) | 842,558 (36.1%) |
-| B/D 4 Av Express | 2,332,194 | 593,038 (25.4%, -19,757) | 235,698 (10.1%, +5,935) | 828,736 (35.5%, -13,822) |
+| B/D 4 Av Express | 2,332,194 | 593,038 (25.4%), -19,757 (-0.8%) | 235,698 (10.1%), +5,935 (+0.3%) | 828,736 (35.5%), -13,822 (-0.6%) |
 
 ---
 
@@ -134,17 +134,17 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 ### What changed, against Current
 
-Every both-ends rider by what Current gives them (rows) and what B/D 4 Av Express gives them (columns). Off-diagonal cells are the whole effect of the swap; the diagonal is everyone it leaves alone. `direct` is a one-seat ride, `close` a one-seat ride after a walk of 300m or less, `far` neither.
+Every both-ends rider, and their share of the 837,408 of them, by what Current gives them (rows) and what B/D 4 Av Express gives them (columns). Off-diagonal cells are the whole effect of the swap; the diagonal is everyone it leaves alone. `direct` is a one-seat ride, `close` a one-seat ride after a walk of 300m or less, `far` neither.
 
 | ↓ Current / B/D 4 Av Express → | direct | close | far |
 | --- | --- | --- | --- |
-| direct | 585,153 | 9,252 | 18,390 |
-| close | 2,130 | 84,124 | 272 |
-| far | 5,754 | 142 | 132,191 |
+| direct | 585,153 (69.9%) | 9,252 (1.1%) | 18,390 (2.2%) |
+| close | 2,130 (0.3%) | 84,124 (10.0%) | 272 (0.0%) |
+| far | 5,754 (0.7%) | 142 (0.0%) | 132,191 (15.8%) |
 
-- **Gained an effective one-seat ride: 5,896**
-- **Lost one: 18,662**
-- **Net: -12,766**
+- **Gained an effective one-seat ride: 5,896 (0.7%)**
+- **Lost one: 18,662 (2.2%)**
+- **Net: -12,766 (-1.5%)**
 
 ### Biggest changes, against Current
 

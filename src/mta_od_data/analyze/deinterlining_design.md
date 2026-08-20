@@ -171,8 +171,15 @@ So the report is a 3x3 transition matrix
 with gained/lost/net under it,
 and a table of the pairs that moved.
 
+Every rider count anywhere in a comparison
+carries its share of the same both-ends total,
+matrix cells included,
+so a cell and a table column read against one denominator
+and can be compared without arithmetic.
+
 Deltas do appear in the comparison tables,
-but only as arithmetic on numbers already in the row.
+but only as arithmetic on numbers already in the row,
+each as a rider count and a share both.
 They are a convenience, not the answer.
 
 `Current` is the baseline every change is measured against.
