@@ -114,7 +114,7 @@ class Station:
 
 
 @cache
-def platform_display(
+def platform_name(
     platforms: tuple[Station, ...], complex_name: str, routes: frozenset[str]
 ) -> str:
     """`complex_name` narrowed to the platforms `routes` actually stops at.
@@ -133,8 +133,7 @@ def platform_display(
     (34 St-Herald Sq's 6 Av and Broadway platforms).
     """
     names = {p.name for p in platforms if p.routes & routes}
-    name = names.pop() if len(names) == 1 else complex_name
-    return f"{name} ({','.join(sorted(routes))})"
+    return names.pop() if len(names) == 1 else complex_name
 
 
 @dataclass(slots=True, frozen=True)
@@ -152,10 +151,13 @@ class PlatformIndex:
             by_complex={cid: tuple(v) for cid, v in by_complex.items()},
         )
 
-    def display(self, station: Station, routes: frozenset[str]) -> str:
-        return platform_display(
+    def name(self, station: Station, routes: frozenset[str]) -> str:
+        return platform_name(
             self.by_complex.get(station.complex_id, ()), station.name, routes
         )
+
+    def display(self, station: Station, routes: frozenset[str]) -> str:
+        return f"{self.name(station, routes)} ({','.join(sorted(routes))})"
 
 
 @cache
