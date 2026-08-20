@@ -55,24 +55,95 @@ so scoping by the origin counted the outbound half of a commute
 and dropped the inbound half of the same journey.
 For the DeKalb category that's 1,576,111 riders/weekday against 2,332,194.
 
-The cost is a denominator far wider than any one junction can move.
-`B/D 4 Av Express` takes 19,757 riders off a direct one-seat ride,
-and the systemwide effective share still reads 31.0% either way:
-the close-one-seat column absorbs almost exactly what the direct column loses,
-and what's left is a rounding error against 2.3M riders.
-So the subset with *both* ends on the routes is reported alongside it,
-837,408 riders, where the same swap reads 73.2% to 70.8% direct.
-Neither number is the real one:
-the wide scope says how much of the system a plan touches at all,
-the narrow one says what it does to the riders it touches.
+## Which pairs are reported
 
-That subset is a reporting split, not a second pass:
+Fetching by either end is not the same question as reporting by it,
+and the two came apart in practice.
+
+A pair with only *one* end on the comparison's routes
+can never be a one-seat ride under any scenario:
+that needs the two ends to share a route,
+which puts both of them in scope by construction.
+Such a pair therefore sits in the denominator, never the numerator,
+and its classification is identical in every scenario.
+For the DeKalb category that's 1,494,786 of the 2,332,194 riders,
+which is why the effective share reads 31.0% under every scenario
+while the same swap moves 73.2% to 70.8% among both-ends riders.
+It also put
+`Times Sq-42 St/PABT (N,Q,R) -> Grand Central-42 St ()`
+at the top of every detailed table,
+a trip no scenario here can move.
+
+So both-ends leads:
+it is the headline comparison table,
+and the per-scenario pair and destination tables are scoped to it.
+Either-end is kept below as context,
+saying how much of the system a plan touches at all.
+
+Both-ends is not the narrow cut its name suggests.
+It keeps every trip these routes could carry end to end,
+including the large majority that keep their one-seat ride
+whatever the scenario:
+59 St-Columbus Circle to 86 St stays one-seat under every CPW swap,
+and belongs in the denominator precisely because it does.
+Restricting instead to pairs with an end at an *overridden* station
+would be exactly complete for what changes
+and wrong as a denominator,
+dropping every such related-but-unchanged trip.
+
+The split is a reporting one, not a second pass:
 one query, one classification,
 with each pair's contribution added to both sets of totals
-(`RiderStats`, shared so the two tables can't drift apart).
+(`RiderStats`, shared so the two tables can't drift apart),
+and `ODPair.both_ends` recording which side a row falls on
+so the CSV stays a superset of the tables.
 Direct one-seat riders are necessarily identical in both,
-since sharing a route puts both ends in scope by construction;
+per the argument above;
 the wider scope only ever adds transfer trips.
+
+### What both-ends scope leaves out
+
+Two known residues, neither currently reported:
+
+- Trips that cross the junction to a destination off the routes
+  (Grand Central, Fulton St, 14 St/8 Av).
+  `one-seat-rides` counts these, since it restricts only the origin side;
+  for DeKalb they are 58,967 riders/weekday.
+  They can never change under any scenario, so this costs context only.
+- Trips with both ends on the routes
+  that no scenario can nonetheless touch,
+  e.g. 95 St to Whitehall St on an R that never crosses DeKalb.
+  These are exactly the rows a per-pair delta report would show as zero.
+
+## Why the numbers differ so much from `one-seat-rides`
+
+The two scopes overlap far less than their shared subject suggests.
+`one-seat-rides` is
+origin on the routes and south of Atlantic Av, destination anywhere north:
+163,203 riders/weekday.
+Both-ends here is 837,408, and decomposes by side of that same boundary as:
+
+| Bucket | Riders/weekday | Share |
+| --- | --- | --- |
+| north to north | 546,052 | 65.2% |
+| south to north (the `one-seat-rides` direction) | 104,236 | 12.4% |
+| north to south (the return direction) | 102,771 | 12.3% |
+| south to south | 84,349 | 10.1% |
+
+So they share only 104,236 riders.
+Both-ends adds 733,172 that `one-seat-rides` excludes by construction,
+and `one-seat-rides` adds the 58,967 noted above.
+
+That two-thirds north-to-north bucket
+is most of why the direct one-seat rate reads 73.2% here and 41.1% there:
+it is short intra-trunk Manhattan trips
+(Times Sq to Union Sq, Herald Sq to Rockefeller Ctr)
+that are trivially one-seat,
+where `one-seat-rides` is junction-crossing by construction,
+i.e. the hardest trips only.
+`one-seat-rides`' primary-route fallback classification
+(see Classification below) also counts fewer trips as one-seat,
+a secondary and unquantified factor.
 
 ## A scenario is a route-override map
 
