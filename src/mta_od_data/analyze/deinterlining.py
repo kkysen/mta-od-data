@@ -151,6 +151,8 @@ class Transitions:
     baseline_name: str
     scenario_name: str
     riders: dict[tuple[Outcome, Outcome], float]
+    # Every both-ends rider, what each cell is a share of.
+    total: float
     # The pairs that moved, most riders first.
     changed: list[Change]
 
@@ -205,11 +207,20 @@ class Transitions:
             baseline_name=baseline.scenario.name,
             scenario_name=result.scenario.name,
             riders=riders,
+            total=sum(riders.values()),
             changed=changed,
         )
 
-    def total(self, before: Outcome, after: Outcome) -> float:
+    def cell(self, before: Outcome, after: Outcome) -> float:
         return self.riders.get((before, after), 0.0)
+
+    def pct(self, riders: float) -> str:
+        """Shares of the same both-ends total the comparison table uses,
+        so a matrix cell and a table column are read against the same
+        denominator."""
+        if not self.total:
+            return "0.0%"
+        return f"{100 * riders / self.total:.1f}%"
 
     @property
     def gained(self) -> float:
@@ -236,7 +247,8 @@ class Transitions:
         lines = [
             f"{h2} What changed, against {self.baseline_name}",
             "",
-            f"Every both-ends rider by what {self.baseline_name} gives them "
+            f"Every both-ends rider, and their share of the "
+            f"{self.total:,.0f} of them, by what {self.baseline_name} gives them "
             f"(rows) and what {self.scenario_name} gives them (columns). "
             f"Off-diagonal cells are the whole effect of the swap; the "
             f"diagonal is everyone it leaves alone. `direct` is a one-seat "
@@ -253,13 +265,18 @@ class Transitions:
             "| --- " * (len(order) + 1) + "|",
         ]
         for before in order:
-            cells = " | ".join(f"{self.total(before, after):,.0f}" for after in order)
+            cells = " | ".join(
+                f"{self.cell(before, after):,.0f} "
+                f"({self.pct(self.cell(before, after))})"
+                for after in order
+            )
             lines.append(f"| {before} | {cells} |")
         lines += [
             "",
-            f"- **Gained an effective one-seat ride: {self.gained:,.0f}**",
-            f"- **Lost one: {self.lost:,.0f}**",
-            f"- **Net: {self.net:+,.0f}**",
+            f"- **Gained an effective one-seat ride: {self.gained:,.0f} "
+            f"({self.pct(self.gained)})**",
+            f"- **Lost one: {self.lost:,.0f} ({self.pct(self.lost)})**",
+            f"- **Net: {self.net:+,.0f} ({self.pct(self.net)})**",
             "",
         ]
 
@@ -839,10 +856,16 @@ class RiderStats:
         from."""
 
         def cell(value: float, base: float | None) -> str:
-            pct = f"{value:,.0f} ({self.pct(value):.1f}%"
+            level = f"{value:,.0f} ({self.pct(value):.1f}%)"
             if base is None:
-                return f"{pct}) "
-            return f"{pct}, {value - base:+,.0f}) "
+                return f"{level} "
+            # `pct` of the change, not the change in `pct`:
+            # identical either way, every scenario classifying the same
+            # pairs and so sharing a total, and this one can't drift if
+            # that ever stops being true without the subtraction below
+            # becoming meaningless first.
+            delta = value - base
+            return f"{level}, {delta:+,.0f} ({self.pct(delta):+.1f}%) "
 
         one_seat, close, effective = (
             (None, None, None)
