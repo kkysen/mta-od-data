@@ -114,6 +114,51 @@ class Station:
 
 
 @cache
+def platform_display(
+    platforms: tuple[Station, ...], complex_name: str, routes: frozenset[str]
+) -> str:
+    """`complex_name` narrowed to the platforms `routes` actually stops at.
+
+    A complex's name lists every station merged into it
+    ("Chambers St/WTC/Park Pl/Cortlandt St"),
+    which is the widest column in most reports
+    and mostly about routes the row has nothing to do with.
+    The R stops only at Cortlandt St there, so an `(R)` row says that.
+
+    Only when the routes land on exactly one *named* platform.
+    Two names means the complex really is the smallest thing
+    that covers them
+    (Times Sq-42 St and 42 St-Port Authority Bus Terminal, for A,C,N),
+    and several platforms sharing one name collapse to it anyway
+    (34 St-Herald Sq's 6 Av and Broadway platforms).
+    """
+    names = {p.name for p in platforms if p.routes & routes}
+    name = names.pop() if len(names) == 1 else complex_name
+    return f"{name} ({','.join(sorted(routes))})"
+
+
+@dataclass(slots=True, frozen=True)
+class PlatformIndex:
+    """Per-platform stations grouped by complex, for `display`."""
+
+    by_complex: dict[int, tuple[Station, ...]]
+
+    @classmethod
+    def build(cls, individual_stations: list[Station]) -> Self:
+        by_complex: dict[int, list[Station]] = {}
+        for station in individual_stations:
+            by_complex.setdefault(station.complex_id, []).append(station)
+        return cls(
+            by_complex={cid: tuple(v) for cid, v in by_complex.items()},
+        )
+
+    def display(self, station: Station, routes: frozenset[str]) -> str:
+        return platform_display(
+            self.by_complex.get(station.complex_id, ()), station.name, routes
+        )
+
+
+@cache
 def haversine_m(c1: Coord, c2: Coord) -> float:
     r = 6_371_000.0
     p1, p2 = radians(c1.lat), radians(c2.lat)
