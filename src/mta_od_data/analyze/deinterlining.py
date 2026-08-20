@@ -69,6 +69,21 @@ class ScenarioError(Exception):
     stays usable as a library function."""
 
 
+def table_rule(alignments: str) -> str:
+    """A markdown table's header rule, `l`/`r` per column.
+
+    Right-aligned numeric columns so a reader can compare magnitudes
+    down a column at a glance.
+    Alignment markers only, not padding:
+    a rendered table lines up either way,
+    while padding the source to the widest cell
+    means one number gaining a digit repads its whole column
+    and every row of a committed report shows as changed.
+    """
+    cells = {"l": " --- ", "r": " ---: "}
+    return "|" + "|".join(cells[a] for a in alignments) + "|"
+
+
 def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_") or "scenario"
 
@@ -260,7 +275,7 @@ class Transitions:
             # `was`/`now` are the words the changed-pairs table below
             # already uses for the same two states.
             "| Riders | " + " | ".join(f"now {o}" for o in order) + " |",
-            "| --- " * (len(order) + 1) + "|",
+            table_rule("l" + "r" * len(order)),
         ]
         for before in order:
             cells = " | ".join(
@@ -288,7 +303,7 @@ class Transitions:
                 f"under {self.scenario_name}.",
                 "",
                 "| # | Riders | Was | Now | Dist | Origin ↔ Destination |",
-                "| --- | --- | --- | --- | --- | --- |",
+                table_rule("rrllrl"),
             ]
             for i, change in enumerate(self.changed[:top_n], 1):
                 fwd = change.pair.forward
@@ -978,7 +993,7 @@ class ScenarioResult:
             "",
             "| # | Riders | % Total | Type | Close? | Dist | Walk | "
             "Origin ↔ Destination |",
-            "| --- | --- | --- | --- | --- | --- | --- | --- |",
+            table_rule("rrrllrll"),
         ]
 
         def pair_riders(pair: SymmetricPair) -> float:
@@ -1027,7 +1042,7 @@ class ScenarioResult:
                 "the comparison above.",
                 "",
                 f"| Riders | 1-Seat % | Effective % | {label.capitalize()} |",
-                "| --- | --- | --- | --- |",
+                table_rule("rrrl"),
             ]
             for e in sorted(stats.values(), key=end_total, reverse=True)[:top_n]:
                 one_seat_pct = 100 * e.one_seat / e.total if e.total else float("nan")
@@ -1166,7 +1181,7 @@ class ScenarioComparisonResult:
         routes = ",".join(sorted(self.comparison.routes))
         header = (
             "| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | "
-            "Effective 1-Seat |\n| --- | --- | --- | --- | --- |"
+            "Effective 1-Seat |\n" + table_rule("lrrrr")
         )
 
         # Both ends first, and every detailed table below scoped to it:

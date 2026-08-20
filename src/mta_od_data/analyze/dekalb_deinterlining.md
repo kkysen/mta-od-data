@@ -15,7 +15,7 @@ Two cuts of the same classification. Neither is the whole answer: the first says
 The 837,408 riders whose origin *and* destination are served by B,D,N,Q,R: the trips these routes could carry end to end, including the many that keep a one-seat ride whatever the scenario. Every table below is scoped to these.
 
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
-| --- | --- | --- | --- | --- |
+| --- | ---: | ---: | ---: | ---: |
 | Current | 837,408 | 612,795 (73.2%) | 86,527 (10.3%) | 699,321 (83.5%) |
 | B/D 4 Av Express | 837,408 | 593,038 (70.8%), -19,757 (-2.4%) | 93,517 (11.2%), +6,991 (+0.8%) | 686,555 (82.0%), -12,766 (-1.5%) |
 
@@ -24,7 +24,7 @@ The 837,408 riders whose origin *and* destination are served by B,D,N,Q,R: the t
 The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above among them. The difference is transfer trips with one end off these routes entirely, which no scenario here can change: they can only dilute the rate, which is why a junction's effect washes out against this total.
 
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
-| --- | --- | --- | --- | --- |
+| --- | ---: | ---: | ---: | ---: |
 | Current | 2,332,194 | 612,795 (26.3%) | 229,764 (9.9%) | 842,558 (36.1%) |
 | B/D 4 Av Express | 2,332,194 | 593,038 (25.4%), -19,757 (-0.8%) | 235,698 (10.1%), +5,935 (+0.3%) | 828,736 (35.5%), -13,822 (-0.6%) |
 
@@ -37,7 +37,7 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
 | # | Riders | % Total | Type | Close? | Dist | Walk | Origin ↔ Destination |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| ---: | ---: | ---: | --- | --- | ---: | --- | --- |
 | 1 | 5,828 | 0.70% | 1-seat |  |  |  | Times Sq-42 St/PABT (N,Q,R) ↔ Chambers St/WTC/Park Pl/Cortlandt St (R) |
 | 2 | 5,414 | 0.65% | 1-seat |  |  |  | Times Sq-42 St/PABT (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
 | 3 | 5,330 | 0.64% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St/PABT (N,Q,R) ↔ 59 St-Columbus Circle (B,D) |
@@ -69,7 +69,7 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Origin |
-| --- | --- | --- | --- |
+| ---: | ---: | ---: | --- |
 | 54,350 | 71.7% | 100.0% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
 | 48,290 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 29,069 | 84.4% | 89.6% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
@@ -101,7 +101,7 @@ Both ends on the comparison's routes, per that section of the comparison above.
 Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Destination |
-| --- | --- | --- | --- |
+| ---: | ---: | ---: | --- |
 | 54,675 | 71.6% | 100.0% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
 | 48,360 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 31,416 | 86.4% | 90.8% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
@@ -137,7 +137,7 @@ Both ends on the comparison's routes, per that section of the comparison above.
 Every both-ends rider, and their share of the 837,408 of them: **was** is what Current gives them, **now** what B/D 4 Av Express would. Off-diagonal cells are the whole effect of the swap; the diagonal is everyone it leaves alone. `direct` is a one-seat ride, `close` a one-seat ride after a walk of 300m or less, `far` neither.
 
 | Riders | now direct | now close | now far |
-| --- | --- | --- | --- |
+| --- | ---: | ---: | ---: |
 | **was direct** | 585,153 (69.9%) | 9,252 (1.1%) | 18,390 (2.2%) |
 | **was close** | 2,130 (0.3%) | 84,124 (10.0%) | 272 (0.0%) |
 | **was far** | 5,754 (0.7%) | 142 (0.0%) | 132,191 (15.8%) |
@@ -151,7 +151,7 @@ Every both-ends rider, and their share of the 837,408 of them: **was** is what C
 The top 25 station pairs by riders whose outcome moved, both directions combined as above. Each pair is named by the routes serving it today; `Dist` is the walk under B/D 4 Av Express.
 
 | # | Riders | Was | Now | Dist | Origin ↔ Destination |
-| --- | --- | --- | --- | --- | --- |
+| ---: | ---: | --- | --- | ---: | --- |
 | 1 | 919 | direct | far | 518m | Canal St (N,Q,R) ↔ 8 Av (N) |
 | 2 | 774 | direct | close | 274m | Kings Hwy (B,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
 | 3 | 633 | direct | close | 191m | Kings Hwy (B,Q) ↔ 42 St-Bryant Pk/5 Av (B,D) |
@@ -183,7 +183,7 @@ The top 25 station pairs by riders whose outcome moved, both directions combined
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
 | # | Riders | % Total | Type | Close? | Dist | Walk | Origin ↔ Destination |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| ---: | ---: | ---: | --- | --- | ---: | --- | --- |
 | 1 | 5,828 | 0.70% | 1-seat |  |  |  | Times Sq-42 St/PABT (N,Q,R) ↔ Chambers St/WTC/Park Pl/Cortlandt St (R) |
 | 2 | 5,414 | 0.65% | 1-seat |  |  |  | Times Sq-42 St/PABT (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
 | 3 | 5,330 | 0.64% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St/PABT (N,Q,R) ↔ 59 St-Columbus Circle (B,D) |
@@ -215,7 +215,7 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Origin |
-| --- | --- | --- | --- |
+| ---: | ---: | ---: | --- |
 | 54,350 | 69.9% | 100.0% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
 | 48,290 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 29,069 | 81.6% | 86.7% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
@@ -247,7 +247,7 @@ Both ends on the comparison's routes, per that section of the comparison above.
 Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Destination |
-| --- | --- | --- | --- |
+| ---: | ---: | ---: | --- |
 | 54,675 | 69.8% | 100.0% | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) |
 | 48,360 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,F,M,N,Q,R,W) |
 | 31,416 | 83.6% | 88.1% | 14 St-Union Sq (4,5,6,L,N,Q,R,W) |
