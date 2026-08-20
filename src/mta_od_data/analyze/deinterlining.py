@@ -40,6 +40,7 @@ from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
     DayCoverage,
     DayType,
+    PlatformIndex,
     Station,
     haversine_m,
 )
@@ -625,6 +626,7 @@ class Scenario:
         stations_by_id: dict[int, Station],
         stations_path: Path,
         scope_ids: frozenset[int],
+        platforms: PlatformIndex,
         close_lookup: CloseLookup,
     ) -> ScenarioResult:
         rows: list[ODPair] = []
@@ -649,8 +651,8 @@ class Scenario:
 
             effective_origin_routes = self.routes_of(origin)
             effective_dest_routes = self.routes_of(dest)
-            origin_name = origin.display(effective_origin_routes)
-            dest_name = dest.display(effective_dest_routes)
+            origin_name = platforms.display(origin, effective_origin_routes)
+            dest_name = platforms.display(dest, effective_dest_routes)
             one_seat = bool(effective_origin_routes & effective_dest_routes)
 
             both_ends = origin_id in scope_ids and dest_id in scope_ids
@@ -701,7 +703,8 @@ class Scenario:
                     (dest_stats, dest_id, dest),
                 ):
                     e = stats.setdefault(
-                        sid, EndStats(name=station.display(station.routes))
+                        sid,
+                        EndStats(name=platforms.display(station, station.routes)),
                     )
                     e.total += riders
                     if one_seat:
@@ -1085,6 +1088,7 @@ class ScenarioComparison:
         stations_by_id: dict[int, Station],
         stations_path: Path,
         scope_ids: frozenset[int],
+        platforms: PlatformIndex,
         close_lookup_factory: CloseLookupFactory,
     ) -> ScenarioComparisonResult:
         return ScenarioComparisonResult(
@@ -1095,6 +1099,7 @@ class ScenarioComparison:
                     stations_by_id=stations_by_id,
                     stations_path=stations_path,
                     scope_ids=scope_ids,
+                    platforms=platforms,
                     close_lookup=close_lookup_factory(scenario),
                 )
                 for scenario in self.scenarios
@@ -1488,6 +1493,7 @@ def deinterlining(
         f"({coverage.first_month} to {coverage.last_month})"
     )
 
+    platform_index = PlatformIndex.build(individual_stations)
     platforms_by_complex: dict[int, list[Station]] = {}
     for s in individual_stations:
         platforms_by_complex.setdefault(s.complex_id, []).append(s)
@@ -1584,8 +1590,10 @@ def deinterlining(
 
             (dist_m, near_station), walk_at_origin = min(measured, key=walk_dist)
             close = dist_m <= close_threshold_m
-            near_routes = scenario.routes_of(stations_by_id[near_station.complex_id])
-            near_station_name = near_station.display(near_routes)
+            near_complex = stations_by_id[near_station.complex_id]
+            near_station_name = platform_index.display(
+                near_complex, scenario.routes_of(near_complex)
+            )
             return close, dist_m, near_station_name, walk_at_origin
 
         return close_lookup
@@ -1596,6 +1604,7 @@ def deinterlining(
             stations_by_id=stations_by_id,
             stations_path=stations,
             scope_ids=scope_ids,
+            platforms=platform_index,
             close_lookup_factory=make_close_lookup,
         )
     except ScenarioError as e:
