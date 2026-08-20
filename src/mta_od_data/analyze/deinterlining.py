@@ -248,20 +248,18 @@ class Transitions:
             f"{h2} What changed, against {self.baseline_name}",
             "",
             f"Every both-ends rider, and their share of the "
-            f"{self.total:,.0f} of them, by what {self.baseline_name} gives them "
-            f"(rows) and what {self.scenario_name} gives them (columns). "
-            f"Off-diagonal cells are the whole effect of the swap; the "
-            f"diagonal is everyone it leaves alone. `direct` is a one-seat "
-            f"ride, `close` a one-seat ride after a walk of "
-            f"{close_threshold_m:.0f}m or less, `far` neither.",
+            f"{self.total:,.0f} of them: **was** is what "
+            f"{self.baseline_name} gives them, **now** what "
+            f"{self.scenario_name} would. Off-diagonal cells are the whole "
+            f"effect of the swap; the diagonal is everyone it leaves alone. "
+            f"`direct` is a one-seat ride, `close` a one-seat ride after a "
+            f"walk of {close_threshold_m:.0f}m or less, `far` neither.",
             "",
-            "| ↓ "
-            + self.baseline_name
-            + " / "
-            + self.scenario_name
-            + " → | "
-            + " | ".join(str(o) for o in order)
-            + " |",
+            # Each label carries its own axis, rather than a corner cell
+            # naming both and leaving the reader to apply it.
+            # `was`/`now` are the words the changed-pairs table below
+            # already uses for the same two states.
+            "| Riders | " + " | ".join(f"now {o}" for o in order) + " |",
             "| --- " * (len(order) + 1) + "|",
         ]
         for before in order:
@@ -270,7 +268,7 @@ class Transitions:
                 f"({self.pct(self.cell(before, after))})"
                 for after in order
             )
-            lines.append(f"| {before} | {cells} |")
+            lines.append(f"| **was {before}** | {cells} |")
         lines += [
             "",
             f"- **Gained an effective one-seat ride: {self.gained:,.0f} "
