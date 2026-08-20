@@ -85,6 +85,15 @@ def table_rule(alignments: str) -> str:
     return "|" + "|".join(cells[a] for a in alignments) + "|"
 
 
+def table_row(*cells: str) -> str:
+    """One markdown table row, `| |` for an empty cell.
+
+    Not `|  |`: a cell padded on both sides of nothing
+    is trailing whitespace, which markdown linters flag.
+    """
+    return "|" + "|".join(f" {cell} " if cell else " " for cell in cells) + "|"
+
+
 def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_") or "scenario"
 
@@ -279,12 +288,16 @@ class Transitions:
             table_rule("l" + "r" * len(order)),
         ]
         for before in order:
-            cells = " | ".join(
-                f"{self.cell(before, after):,.0f} "
-                f"({self.pct(self.cell(before, after))})"
-                for after in order
+            lines.append(
+                table_row(
+                    f"**was {before}**",
+                    *(
+                        f"{self.cell(before, after):,.0f} "
+                        f"({self.pct(self.cell(before, after))})"
+                        for after in order
+                    ),
+                )
             )
-            lines.append(f"| **was {before}** | {cells} |")
         lines += [
             "",
             f"- **Gained an effective one-seat ride: {self.gained:,.0f} "
@@ -310,8 +323,14 @@ class Transitions:
                 fwd = change.pair.forward
                 dist = "" if fwd.one_seat else f"{fwd.dist_m:.0f}m"
                 lines.append(
-                    f"| {i} | {change.pair.riders:,.0f} | {change.before} "
-                    f"| {change.after} | {dist} | {change.label} |"
+                    table_row(
+                        str(i),
+                        f"{change.pair.riders:,.0f}",
+                        str(change.before),
+                        str(change.after),
+                        dist,
+                        change.label,
+                    )
                 )
             lines.append("")
         return "\n".join(lines)
@@ -874,25 +893,26 @@ class RiderStats:
         def cell(value: float, base: float | None) -> str:
             level = f"{value:,.0f} ({self.pct(value):.1f}%)"
             if base is None:
-                return f"{level} "
+                return level
             # `pct` of the change, not the change in `pct`:
             # identical either way, every scenario classifying the same
             # pairs and so sharing a total, and this one can't drift if
             # that ever stops being true without the subtraction below
             # becoming meaningless first.
             delta = value - base
-            return f"{level}, {delta:+,.0f} ({self.pct(delta):+.1f}%) "
+            return f"{level}, {delta:+,.0f} ({self.pct(delta):+.1f}%)"
 
         one_seat, close, effective = (
             (None, None, None)
             if baseline is None
             else (baseline.one_seat, baseline.close, baseline.effective)
         )
-        return (
-            f"| {label} | {self.total:,.0f} "
-            f"| {cell(self.one_seat, one_seat)}"
-            f"| {cell(self.close, close)}"
-            f"| {cell(self.effective, effective)}|"
+        return table_row(
+            label,
+            f"{self.total:,.0f}",
+            cell(self.one_seat, one_seat),
+            cell(self.close, close),
+            cell(self.effective, effective),
         )
 
     def summary_line(self, label: str) -> str:
@@ -1020,9 +1040,16 @@ class ScenarioResult:
                 end = "origin" if fwd.walk_at_origin else "dest"
                 walk_str = f"{end}: {fwd.near_station}"
             lines.append(
-                f"| {i} | {pr.riders:,.0f} | {self.both_ends.pct(pr.riders):.2f}% | "
-                f"{type_str} | {close_str} | {dist_str} | {walk_str} | "
-                f"{fwd.origin_name} ↔ {fwd.dest_name} |"
+                table_row(
+                    str(i),
+                    f"{pr.riders:,.0f}",
+                    f"{self.both_ends.pct(pr.riders):.2f}%",
+                    type_str,
+                    close_str,
+                    dist_str,
+                    walk_str,
+                    f"{fwd.origin_name} ↔ {fwd.dest_name}",
+                )
             )
         lines.append("")
 
@@ -1053,8 +1080,12 @@ class ScenarioResult:
                     100 * (e.one_seat + e.close) / e.total if e.total else float("nan")
                 )
                 lines.append(
-                    f"| {e.total:,.0f} | {one_seat_pct:.1f}% | "
-                    f"{effective_pct:.1f}% | {e.name} |"
+                    table_row(
+                        f"{e.total:,.0f}",
+                        f"{one_seat_pct:.1f}%",
+                        f"{effective_pct:.1f}%",
+                        e.name,
+                    )
                 )
             lines.append("")
 
