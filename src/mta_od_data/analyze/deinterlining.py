@@ -52,10 +52,14 @@ type Routes = frozenset[str]
 # `(origin, dest, origin routes, dest routes) ->
 #  (close, walk distance, station walked to, walk is at the origin)`.
 # Both ends and both route sets, because the walk can be at either end;
-# see `close_lookup`.
+# see `make_close_lookup`.
 type CloseLookup = Callable[
     [Station, Station, Routes, Routes], tuple[bool, float, str | None, bool]
 ]
+
+# Built per scenario, since which stations serve a corridor
+# is exactly what a scenario changes.
+type CloseLookupFactory = Callable[[Scenario], CloseLookup]
 
 
 class ScenarioError(Exception):
@@ -823,7 +827,7 @@ class ScenarioComparison:
         stations_by_id: dict[int, Station],
         stations_path: Path,
         scope_ids: frozenset[int],
-        close_lookup: CloseLookup,
+        close_lookup_factory: CloseLookupFactory,
     ) -> ScenarioComparisonResult:
         return ScenarioComparisonResult(
             comparison=self,
@@ -833,7 +837,7 @@ class ScenarioComparison:
                     stations_by_id=stations_by_id,
                     stations_path=stations_path,
                     scope_ids=scope_ids,
-                    close_lookup=close_lookup,
+                    close_lookup=close_lookup_factory(scenario),
                 )
                 for scenario in self.scenarios
             ],
@@ -1188,81 +1192,103 @@ def deinterlining(
     for s in individual_stations:
         platforms_by_complex.setdefault(s.complex_id, []).append(s)
 
-    # Local, since both close over per-invocation station data.
-    # The cache is still shared across scenarios:
-    # its keys are (dest, effective routes), nothing scenario-specific.
-    @cache
-    def assigned_points(assigned_routes: Routes) -> list[Station]:
-        return [s for s in individual_stations if s.routes & assigned_routes]
+    # Built per scenario, and local, since these close over
+    # per-invocation station data.
+    # Per scenario is the whole point: which stations serve a corridor
+    # is exactly what a scenario changes, so a lookup shared across
+    # scenarios answers with today's routes under every one of them.
+    def make_close_lookup(scenario: Scenario) -> CloseLookup:
+        @cache
+        def corridor_platforms(corridor_routes: Routes) -> list[Station]:
+            """The platforms a rider could board this corridor at,
+            under this scenario.
 
-    @cache
-    def min_dist_to_corridor(
-        station: Station, corridor_routes: Routes
-    ) -> tuple[float, Station] | None:
-        candidates = assigned_points(corridor_routes)
-        if not candidates:
-            # Either the station has no route in this comparison at all
-            # (so there is no corridor of its own to measure against),
-            # or a route has no individual-station data,
-            # e.g. a synthetic one no scenario uses yet.
-            # `close_lookup` decides what an unmeasurable end means;
-            # here it's just "nothing to measure to".
-            return None
-        points = [
-            s.loc for s in platforms_by_complex.get(station.complex_id, [station])
-        ]
-        best: tuple[float, Station] | None = None
-        for p in points:
-            for c in candidates:
-                dist_m = haversine_m(p, c.loc)
-                if best is None or dist_m < best[0]:
-                    best = (dist_m, c)
-        return best
+            Membership is decided at the *complex* level, since that's
+            the granularity a scenario's overrides are declared and
+            resolved at, but the platforms themselves are what's
+            returned: a complex can span physically separate stations
+            (Times Sq-42 St/Port Authority), and its centroid can sit
+            well away from any actual platform.
+            """
+            return [
+                platform
+                for platform in individual_stations
+                if scenario.routes_of(stations_by_id[platform.complex_id])
+                & corridor_routes
+            ]
 
-    def close_lookup(
-        origin: Station,
-        dest: Station,
-        origin_routes: Routes,
-        dest_routes: Routes,
-    ) -> tuple[bool, float, str | None, bool]:
-        """How far a rider without a one-seat ride would have to walk
-        to turn the trip into one, at whichever end is the shorter walk.
+        @cache
+        def min_dist_to_corridor(
+            station: Station, corridor_routes: Routes
+        ) -> tuple[float, Station] | None:
+            candidates = corridor_platforms(corridor_routes)
+            if not candidates:
+                # Either the station has no route in this comparison at
+                # all (so there is no corridor of its own to measure
+                # against), or a route has no individual-station data,
+                # e.g. a synthetic one no scenario uses yet.
+                # The caller decides what an unmeasurable end means;
+                # here it's just "nothing to measure to".
+                return None
+            points = [
+                s.loc for s in platforms_by_complex.get(station.complex_id, [station])
+            ]
+            best: tuple[float, Station] | None = None
+            for p in points:
+                for c in candidates:
+                    dist_m = haversine_m(p, c.loc)
+                    if best is None or dist_m < best[0]:
+                        best = (dist_m, c)
+            return best
 
-        Two ways to do that, and a rider can take either:
+        def close_lookup(
+            origin: Station,
+            dest: Station,
+            origin_routes: Routes,
+            dest_routes: Routes,
+        ) -> tuple[bool, float, str | None, bool]:
+            """How far a rider without a one-seat ride would have to walk
+            to turn the trip into one, at whichever end is the shorter walk.
 
-        - walk at the destination end: ride your own corridor to the
-          station nearest the destination, and walk from there;
-        - walk at the origin end: walk to the nearest station served by
-          a route that reaches the destination, and ride that.
+            Two ways to do that, and a rider can take either:
 
-        Taking the minimum makes the result symmetric,
-        which the underlying fact is:
-        `A -> B` and `B -> A` offer the same two walks,
-        so they must classify alike.
-        """
-        options = [
-            (min_dist_to_corridor(dest, origin_routes), False),
-            (min_dist_to_corridor(origin, dest_routes), True),
-        ]
-        measured = [
-            (best, at_origin) for best, at_origin in options if best is not None
-        ]
-        # Both ends unmeasurable means neither end is on the comparison's
-        # routes, which `scope_ids` already excluded from the query.
-        # Loud rather than silently `far`, per the same argument as
-        # `one_seat_rides.py`'s `assert candidates`.
-        assert measured, (
-            f"neither {origin.name} nor {dest.name} has a corridor to "
-            f"measure a walk against, but the pair was fetched as in scope"
-        )
+            - walk at the destination end: ride your own corridor to the
+              station nearest the destination, and walk from there;
+            - walk at the origin end: walk to the nearest station served
+              by a route that reaches the destination, and ride that.
 
-        def walk_dist(option: tuple[tuple[float, Station], bool]) -> float:
-            return option[0][0]
+            Taking the minimum makes the result symmetric,
+            which the underlying fact is:
+            `A -> B` and `B -> A` offer the same two walks,
+            so they must classify alike.
+            """
+            options = [
+                (min_dist_to_corridor(dest, origin_routes), False),
+                (min_dist_to_corridor(origin, dest_routes), True),
+            ]
+            measured = [
+                (best, at_origin) for best, at_origin in options if best is not None
+            ]
+            # Both ends unmeasurable means neither end is on the
+            # comparison's routes, which `scope_ids` already excluded
+            # from the query.
+            # Loud rather than silently `far`, per the same argument as
+            # `one_seat_rides.py`'s `assert candidates`.
+            assert measured, (
+                f"neither {origin.name} nor {dest.name} has a corridor to "
+                f"measure a walk against, but the pair was fetched as in scope"
+            )
 
-        (dist_m, near_station), walk_at_origin = min(measured, key=walk_dist)
-        close = dist_m <= close_threshold_m
-        near_station_name = near_station.display(near_station.routes & routes_set)
-        return close, dist_m, near_station_name, walk_at_origin
+            def walk_dist(option: tuple[tuple[float, Station], bool]) -> float:
+                return option[0][0]
+
+            (dist_m, near_station), walk_at_origin = min(measured, key=walk_dist)
+            close = dist_m <= close_threshold_m
+            near_routes = scenario.routes_of(stations_by_id[near_station.complex_id])
+            near_station_name = near_station.display(near_routes)
+            return close, dist_m, near_station_name, walk_at_origin
+
+        return close_lookup
 
     try:
         result = comparison.classify(
@@ -1270,7 +1296,7 @@ def deinterlining(
             stations_by_id=stations_by_id,
             stations_path=stations,
             scope_ids=scope_ids,
-            close_lookup=close_lookup,
+            close_lookup_factory=make_close_lookup,
         )
     except ScenarioError as e:
         print(f"error: {e}", file=sys.stderr)

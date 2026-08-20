@@ -196,9 +196,30 @@ It reported
 `Times Sq-42 St/PABT <-> 59 St-Columbus Circle` as far, 413m,
 when a rider walks 191m to 42 St-Bryant Pk and takes a B or D.
 Taking the shorter of the two raised close one-seat
-from 49,159 to 86,527 riders/weekday among DeKalb's both-ends riders,
-and stopped the two scenarios tying at 79.0% effective
-(now 83.5% against 84.5%).
+from 49,159 to 86,527 riders/weekday among DeKalb's both-ends riders
+under `Current`,
+and stopped the two scenarios tying at 79.0% effective:
+`Current` now reads 83.5% against `B/D 4 Av Express`'s 82.0%,
+so the swap reads as a net loss rather than as no change at all.
+
+Measuring the origin end is also what exposed
+a scenario-blind corridor lookup that had been latent until then.
+`assigned_points` chose corridor stations by their real
+`daytime_routes`, never the scenario's,
+so a walk could be measured to a station
+the scenario had just moved that route away from.
+Nothing caught it while only destinations were measured,
+because for DeKalb no destination-side Manhattan station is overridden,
+and real and effective routes agreed everywhere the lookup looked.
+The origin end is precisely where the overridden stations are.
+The corrected `B/D 4 Av Express` figure above is 82.0%;
+before the fix the same run read 84.5%,
+and reported that not one rider anywhere
+lost a one-seat ride without a walkable substitute.
+The general lesson, since it will recur:
+anything that decides *which stations serve a route*
+has to go through `Scenario.routes_of`,
+because that is the one thing a scenario exists to change.
 
 Measuring both ends is also what makes the metric symmetric,
 which the underlying fact always was:
