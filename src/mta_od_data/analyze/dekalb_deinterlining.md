@@ -8,21 +8,21 @@ Produced by `mta-od-data analyze deinterlining --category DeKalb --markdown-out 
 
 ## Scenario comparison
 
-Total riders is the same 2,332,194 across every scenario below; only how many of those riders get a one-seat ride changes. Close one-seat counts a transfer trip whose destination is within 300m of a station on that scenario's effective origin corridor.
-
-| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
-| --- | --- | --- | --- | --- |
-| Current | 2,332,194 | 612,795 (26.3%) | 111,095 (4.8%) | 723,890 (31.0%) |
-| B/D 4 Av Express | 2,332,194 | 593,038 (25.4%) | 130,686 (5.6%) | 723,724 (31.0%) |
-
-### Both ends on the comparison's routes
-
-The 837,408 riders above whose origin *and* destination are served by B,D,N,Q,R, where a scenario's effect isn't diluted by trips only half in scope.
+Every origin/destination pair with *both* ends served by B,D,N,Q,R: the trips these routes could carry end to end, including the many that keep a one-seat ride whatever the scenario. Total riders is the same 837,408 across every scenario below; only how many of those riders get a one-seat ride changes. Close one-seat counts a transfer trip whose destination is within 300m of a station on that scenario's effective origin corridor.
 
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | --- | --- | --- | --- |
 | Current | 837,408 | 612,795 (73.2%) | 49,159 (5.9%) | 661,953 (79.0%) |
 | B/D 4 Av Express | 837,408 | 593,038 (70.8%) | 68,679 (8.2%) | 661,717 (79.0%) |
+
+### Either end on the comparison's routes
+
+The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above among them. This says how much of the system a plan touches at all; the difference is transfer trips with one end off these routes entirely, which no scenario here can change.
+
+| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
+| --- | --- | --- | --- | --- |
+| Current | 2,332,194 | 612,795 (26.3%) | 111,095 (4.8%) | 723,890 (31.0%) |
+| B/D 4 Av Express | 2,332,194 | 593,038 (25.4%) | 130,686 (5.6%) | 723,724 (31.0%) |
 
 ---
 
