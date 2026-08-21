@@ -50,7 +50,9 @@ from mta_od_data.analyze.common import (
 
 app = Typer()
 
+
 SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json5"
+
 
 type Routes = frozenset[str]
 
@@ -87,6 +89,10 @@ def table_row(*cells: str) -> str:
 
 def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_") or "scenario"
+
+
+def suffixed_path(path: Path, suffix: str) -> Path:
+    return path.with_name(f"{path.stem}_{suffix}{path.suffix}")
 
 
 @dataclass(slots=True, frozen=True)
@@ -230,241 +236,6 @@ class Outcome(StrEnum):
 
 
 @dataclass(slots=True, frozen=True)
-class Change:
-    """One station pair whose outcome a scenario moved."""
-
-    before: Outcome
-    after: Outcome
-    # Classified under the scenario, so its distance is the walk a rider
-    # would face *after* the change.
-    pair: SymmetricPair
-    # `origin ↔ destination` as the baseline names them.
-    label: str
-
-
-@dataclass(slots=True, frozen=True)
-class Transitions:
-    """Where one scenario's riders end up relative to another's.
-
-    Both scenarios classify the same `pairs` list in the same order,
-    so the two `rows` lists are positionally aligned
-    and a transition is a zip, not a join.
-    """
-
-    baseline_name: str
-    scenario_name: str
-    riders: dict[tuple[Outcome, Outcome], float]
-    # Every both-ends rider, what each cell is a share of.
-    total: float
-    # The pairs that moved, most riders first.
-    changed: list[Change]
-
-    @classmethod
-    def between(cls, baseline: ScenarioResult, result: ScenarioResult) -> Transitions:
-        riders: defaultdict[tuple[Outcome, Outcome], float] = defaultdict(float)
-        changed_rows: list[tuple[Outcome, Outcome, ODPair]] = []
-        baseline_labels: dict[tuple[int, int], str] = {}
-        for before_pair, after_pair in zip(baseline.rows, result.rows, strict=True):
-            assert [e.id for e in before_pair.ends] == [
-                e.id for e in after_pair.ends
-            ], "scenario rows are not aligned"
-            if not before_pair.both_ends:
-                continue
-            before = before_pair.outcome
-            after = after_pair.outcome
-            riders[before, after] += after_pair.riders
-            if before is not after:
-                changed_rows.append((before, after, after_pair))
-                baseline_labels[after_pair.origin.id, after_pair.destination.id] = (
-                    " ↔ ".join(
-                        before_end.label(after_end)
-                        for before_end, after_end in zip(
-                            before_pair.ends, after_pair.ends, strict=True
-                        )
-                    )
-                )
-
-        # Grouped the same way the pair tables are, so a reader comparing
-        # the two isn't matching one row against two.
-        by_transition: defaultdict[tuple[Outcome, Outcome], list[ODPair]] = defaultdict(
-            list
-        )
-        for before, after, pair in changed_rows:
-            by_transition[before, after].append(pair)
-        changed = [
-            Change(
-                before=before,
-                after=after,
-                pair=symmetric,
-                # Named from the baseline, since a reader knows the pair
-                # by what serves it today, and a `Was direct` row
-                # labelled with the scenario's routes would assert a
-                # one-seat ride between route sets sharing none. Each end
-                # carries what the scenario does to it (`8 Av (N -> B)`).
-                label=baseline_labels[
-                    symmetric.forward.origin.id,
-                    symmetric.forward.destination.id,
-                ],
-            )
-            for (before, after), pairs in by_transition.items()
-            for symmetric in SymmetricPair.group(pairs)
-        ]
-
-        changed.sort(key=attrgetter("pair.riders"), reverse=True)
-        return cls(
-            baseline_name=baseline.scenario.name,
-            scenario_name=result.scenario.name,
-            # Plain, so that a cell never asked for stays absent
-            # instead of being created by the asking.
-            riders=dict(riders),
-            total=sum(riders.values()),
-            changed=changed,
-        )
-
-    def cell(self, before: Outcome, after: Outcome) -> float:
-        return self.riders.get((before, after), 0.0)
-
-    def pct(self, riders: float) -> str:
-        """Shares of the same both-ends total the comparison table uses,
-        so a matrix cell and a table column are read against the same
-        denominator."""
-        if not self.total:
-            return "0.0%"
-        return f"{100 * riders / self.total:.1f}%"
-
-    @property
-    def gained(self) -> float:
-        return sum(
-            v
-            for (before, after), v in self.riders.items()
-            if not before.effective and after.effective
-        )
-
-    @property
-    def lost(self) -> float:
-        return sum(
-            v
-            for (before, after), v in self.riders.items()
-            if before.effective and not after.effective
-        )
-
-    @property
-    def net(self) -> float:
-        return self.gained - self.lost
-
-    def markdown(self, *, h2: str, top_n: int, close_threshold_m: float) -> str:
-        order = list(Outcome)
-        lines = [
-            f"{h2} What Changed, against {self.baseline_name}",
-            "",
-            f"Every both-ends rider, and their share of the "
-            f"{self.total:,.0f} of them: **was** is what "
-            f"{self.baseline_name} gives them, **now** what "
-            f"{self.scenario_name} would. Off-diagonal cells are the whole "
-            f"effect of the swap; the diagonal is everyone it leaves alone. "
-            f"`direct` is a one-seat ride, `close` a one-seat ride after a "
-            f"walk of {close_threshold_m:.0f}m or less, `far` neither.",
-            "",
-            # Each label carries its own axis, rather than a corner cell
-            # naming both and leaving the reader to apply it.
-            # `was`/`now` are the words the changed-pairs table below
-            # already uses for the same two states.
-            "| Riders | " + " | ".join(f"now {o}" for o in order) + " |",
-            table_rule("l" + "r" * len(order)),
-        ]
-        for before in order:
-            lines.append(
-                table_row(
-                    f"**was {before}**",
-                    *(
-                        f"{self.cell(before, after):,.0f} "
-                        f"({self.pct(self.cell(before, after))})"
-                        for after in order
-                    ),
-                )
-            )
-        lines += [
-            "",
-            f"- **Gained an effective one-seat ride: {self.gained:,.0f} "
-            f"({self.pct(self.gained)})**",
-            f"- **Lost one: {self.lost:,.0f} ({self.pct(self.lost)})**",
-            f"- **Net: {self.net:+,.0f} ({self.pct(self.net)})**",
-            "",
-        ]
-
-        if self.changed:
-            lines += [
-                f"{h2} Biggest Changes, against {self.baseline_name}",
-                "",
-                f"The top {top_n} station pairs by riders whose outcome "
-                f"moved, both directions combined as above. An end reads "
-                f"`today → {self.scenario_name}` where its routes change, "
-                f"and today's alone where they don't; `Dist` is the walk "
-                f"under {self.scenario_name}.",
-                "",
-                "| # | Riders | Was | Now | Dist | Origin ↔ Destination |",
-                table_rule("rrllrl"),
-            ]
-            for i, change in enumerate(self.changed[:top_n], 1):
-                fwd = change.pair.forward
-                dist = "" if fwd.one_seat else f"{fwd.walk.dist_m:.0f}m"
-                lines.append(
-                    table_row(
-                        str(i),
-                        f"{change.pair.riders:,.0f}",
-                        str(change.before),
-                        str(change.after),
-                        dist,
-                        change.label,
-                    )
-                )
-            lines.append("")
-        return "\n".join(lines)
-
-
-@dataclass(slots=True, frozen=True)
-class SymmetricPair:
-    """Both directions of one station pair, as a single row.
-
-    A swap changes a trip the same way whichever way it runs,
-    so listing A->B and B->A separately
-    spent two of the top N slots on one fact,
-    and buried the pair that would otherwise have been last.
-
-    Every classification here is symmetric--`one_seat` because a shared
-    route is a shared route, `close`/`dist_m` because a rider can walk
-    at either end (see `ScenarioWalks`)--so the two directions differ
-    only in their rider counts, and `forward`'s classification stands
-    for the pair.
-
-    `forward` is the busier direction, so the arrow points the way most
-    riders travel; `reverse` is `None` for a pair the data only has one
-    way round, and for a trip that starts and ends at one complex.
-    """
-
-    forward: ODPair
-    reverse: ODPair | None
-
-    @property
-    def riders(self) -> float:
-        return self.forward.riders + (
-            self.reverse.riders if self.reverse is not None else 0.0
-        )
-
-    @classmethod
-    def group(cls, rows: list[ODPair]) -> list[SymmetricPair]:
-        by_ends: defaultdict[frozenset[int], list[ODPair]] = defaultdict(list)
-        for row in rows:
-            by_ends[frozenset(e.id for e in row.ends)].append(row)
-
-        pairs: list[SymmetricPair] = []
-        for directions in by_ends.values():
-            forward, *rest = sorted(directions, key=attrgetter("riders"), reverse=True)
-            pairs.append(cls(forward=forward, reverse=rest[0] if rest else None))
-        return pairs
-
-
-@dataclass(slots=True, frozen=True)
 class RouteDelta:
     add: Routes
     remove: Routes
@@ -550,6 +321,7 @@ class ScenarioEntry(BaseModel):
 SCENARIO_FILE_ADAPTER = TypeAdapter(
     dict[str, Annotated[list[ScenarioEntry], Field(min_length=1)]]
 )
+
 
 SCENARIOS_SCHEMA_FILE = (
     ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.schema.json"
@@ -916,6 +688,98 @@ CURRENT = Scenario(
 )
 
 
+@dataclass(slots=True, frozen=True)
+class ScenarioCategory:
+    name: str
+    scenarios: list[Scenario]
+
+    @classmethod
+    def load(
+        cls,
+        name: str,
+        entries: list[ScenarioEntry],
+        path: Path,
+        station_index: StationIndex,
+    ) -> ScenarioCategory:
+        return cls(
+            name=name,
+            scenarios=[
+                Scenario.load(entry, name, path, station_index) for entry in entries
+            ],
+        )
+
+
+@dataclass(slots=True, frozen=True)
+class ScenarioFile:
+    path: Path
+    categories: list[ScenarioCategory]
+    station_index: StationIndex
+
+    @classmethod
+    def load(cls, path: Path, station_index: StationIndex) -> ScenarioFile:
+        # JSON5, not JSON:
+        # tolerates the trailing comma before a closing `}`/`]`
+        # that's easy to leave when hand-editing.
+        try:
+            data = json5.loads(path.read_text())
+        except ValueError as e:
+            raise ScenarioError(f"scenario file {path} isn't valid JSON: {e}") from e
+        try:
+            by_category = SCENARIO_FILE_ADAPTER.validate_python(data)
+        except ValidationError as e:
+            raise ScenarioError(
+                f"scenario file {path} doesn't match the expected shape:\n{e}"
+            ) from e
+        return cls(
+            path=path,
+            categories=[
+                ScenarioCategory.load(category, entries, path, station_index)
+                for category, entries in by_category.items()
+            ],
+            station_index=station_index,
+        )
+
+    def filter(self, categories: frozenset[str]) -> ScenarioFile:
+        by_name = {c.name: c for c in self.categories}
+        missing = categories - by_name.keys()
+        if missing:
+            available = ", ".join(sorted(by_name)) or "none"
+            raise ScenarioError(
+                f"unknown categories {sorted(missing)!r} in {self.path} "
+                f"(available: {available})"
+            )
+        return ScenarioFile(
+            path=self.path,
+            categories=[c for c in self.categories if c.name in categories],
+            station_index=self.station_index,
+        )
+
+    @property
+    def routes(self) -> Routes:
+        return frozenset(
+            route
+            for category in self.categories
+            for scenario in category.scenarios
+            for route in scenario.routes
+        )
+
+    def combine_scenarios(self, baseline: list[Scenario]) -> list[Scenario]:
+        """`baseline` is an option for *every* category
+        rather than one extra combination alongside them:
+        leaving a category unchanged is itself one of its choices.
+        So two categories with two scenarios each
+        give nine combinations, not four."""
+        if not self.categories:
+            return []
+        routes = self.routes
+        return [
+            Scenario.combine(list(combo), routes, self.station_index.platforms)
+            for combo in itertools.product(
+                *([*baseline, *c.scenarios] for c in self.categories)
+            )
+        ]
+
+
 @dataclass(slots=True, frozen=True, eq=False)
 class Walks:
     """One run's station data, everything measuring a walk needs
@@ -1071,102 +935,6 @@ class ScenarioWalks:
 
 
 @dataclass(slots=True, frozen=True)
-class ScenarioCategory:
-    name: str
-    scenarios: list[Scenario]
-
-    @classmethod
-    def load(
-        cls,
-        name: str,
-        entries: list[ScenarioEntry],
-        path: Path,
-        station_index: StationIndex,
-    ) -> ScenarioCategory:
-        return cls(
-            name=name,
-            scenarios=[
-                Scenario.load(entry, name, path, station_index) for entry in entries
-            ],
-        )
-
-
-@dataclass(slots=True, frozen=True)
-class ScenarioFile:
-    path: Path
-    categories: list[ScenarioCategory]
-    station_index: StationIndex
-
-    @classmethod
-    def load(cls, path: Path, station_index: StationIndex) -> ScenarioFile:
-        # JSON5, not JSON:
-        # tolerates the trailing comma before a closing `}`/`]`
-        # that's easy to leave when hand-editing.
-        try:
-            data = json5.loads(path.read_text())
-        except ValueError as e:
-            raise ScenarioError(f"scenario file {path} isn't valid JSON: {e}") from e
-        try:
-            by_category = SCENARIO_FILE_ADAPTER.validate_python(data)
-        except ValidationError as e:
-            raise ScenarioError(
-                f"scenario file {path} doesn't match the expected shape:\n{e}"
-            ) from e
-        return cls(
-            path=path,
-            categories=[
-                ScenarioCategory.load(category, entries, path, station_index)
-                for category, entries in by_category.items()
-            ],
-            station_index=station_index,
-        )
-
-    def filter(self, categories: frozenset[str]) -> ScenarioFile:
-        by_name = {c.name: c for c in self.categories}
-        missing = categories - by_name.keys()
-        if missing:
-            available = ", ".join(sorted(by_name)) or "none"
-            raise ScenarioError(
-                f"unknown categories {sorted(missing)!r} in {self.path} "
-                f"(available: {available})"
-            )
-        return ScenarioFile(
-            path=self.path,
-            categories=[c for c in self.categories if c.name in categories],
-            station_index=self.station_index,
-        )
-
-    @property
-    def routes(self) -> Routes:
-        return frozenset(
-            route
-            for category in self.categories
-            for scenario in category.scenarios
-            for route in scenario.routes
-        )
-
-    def combine_scenarios(self, baseline: list[Scenario]) -> list[Scenario]:
-        """`baseline` is an option for *every* category
-        rather than one extra combination alongside them:
-        leaving a category unchanged is itself one of its choices.
-        So two categories with two scenarios each
-        give nine combinations, not four."""
-        if not self.categories:
-            return []
-        routes = self.routes
-        return [
-            Scenario.combine(list(combo), routes, self.station_index.platforms)
-            for combo in itertools.product(
-                *([*baseline, *c.scenarios] for c in self.categories)
-            )
-        ]
-
-
-def suffixed_path(path: Path, suffix: str) -> Path:
-    return path.with_name(f"{path.stem}_{suffix}{path.suffix}")
-
-
-@dataclass(slots=True, frozen=True)
 class RiderStats:
     """One-seat split over some set of pairs,
     so the same arithmetic serves the whole comparison
@@ -1293,6 +1061,48 @@ class TripEndStats:
             )
             for station_id, station_rows in by_station.items()
         }
+
+
+@dataclass(slots=True, frozen=True)
+class SymmetricPair:
+    """Both directions of one station pair, as a single row.
+
+    A swap changes a trip the same way whichever way it runs,
+    so listing A->B and B->A separately
+    spent two of the top N slots on one fact,
+    and buried the pair that would otherwise have been last.
+
+    Every classification here is symmetric--`one_seat` because a shared
+    route is a shared route, `close`/`dist_m` because a rider can walk
+    at either end (see `ScenarioWalks`)--so the two directions differ
+    only in their rider counts, and `forward`'s classification stands
+    for the pair.
+
+    `forward` is the busier direction, so the arrow points the way most
+    riders travel; `reverse` is `None` for a pair the data only has one
+    way round, and for a trip that starts and ends at one complex.
+    """
+
+    forward: ODPair
+    reverse: ODPair | None
+
+    @property
+    def riders(self) -> float:
+        return self.forward.riders + (
+            self.reverse.riders if self.reverse is not None else 0.0
+        )
+
+    @classmethod
+    def group(cls, rows: list[ODPair]) -> list[SymmetricPair]:
+        by_ends: defaultdict[frozenset[int], list[ODPair]] = defaultdict(list)
+        for row in rows:
+            by_ends[frozenset(e.id for e in row.ends)].append(row)
+
+        pairs: list[SymmetricPair] = []
+        for directions in by_ends.values():
+            forward, *rest = sorted(directions, key=attrgetter("riders"), reverse=True)
+            pairs.append(cls(forward=forward, reverse=rest[0] if rest else None))
+        return pairs
 
 
 @dataclass(slots=True, frozen=True)
@@ -1465,6 +1275,199 @@ class ScenarioResult:
                 f"not just the top {top_n}): `{csv_out}`, whose `both_ends` "
                 f"column is what the tables above filter on._"
             )
+            lines.append("")
+        return "\n".join(lines)
+
+
+@dataclass(slots=True, frozen=True)
+class Change:
+    """One station pair whose outcome a scenario moved."""
+
+    before: Outcome
+    after: Outcome
+    # Classified under the scenario, so its distance is the walk a rider
+    # would face *after* the change.
+    pair: SymmetricPair
+    # `origin ↔ destination` as the baseline names them.
+    label: str
+
+
+@dataclass(slots=True, frozen=True)
+class Transitions:
+    """Where one scenario's riders end up relative to another's.
+
+    Both scenarios classify the same `pairs` list in the same order,
+    so the two `rows` lists are positionally aligned
+    and a transition is a zip, not a join.
+    """
+
+    baseline_name: str
+    scenario_name: str
+    riders: dict[tuple[Outcome, Outcome], float]
+    # Every both-ends rider, what each cell is a share of.
+    total: float
+    # The pairs that moved, most riders first.
+    changed: list[Change]
+
+    @classmethod
+    def between(cls, baseline: ScenarioResult, result: ScenarioResult) -> Transitions:
+        riders: defaultdict[tuple[Outcome, Outcome], float] = defaultdict(float)
+        changed_rows: list[tuple[Outcome, Outcome, ODPair]] = []
+        baseline_labels: dict[tuple[int, int], str] = {}
+        for before_pair, after_pair in zip(baseline.rows, result.rows, strict=True):
+            assert [e.id for e in before_pair.ends] == [
+                e.id for e in after_pair.ends
+            ], "scenario rows are not aligned"
+            if not before_pair.both_ends:
+                continue
+            before = before_pair.outcome
+            after = after_pair.outcome
+            riders[before, after] += after_pair.riders
+            if before is not after:
+                changed_rows.append((before, after, after_pair))
+                baseline_labels[after_pair.origin.id, after_pair.destination.id] = (
+                    " ↔ ".join(
+                        before_end.label(after_end)
+                        for before_end, after_end in zip(
+                            before_pair.ends, after_pair.ends, strict=True
+                        )
+                    )
+                )
+
+        # Grouped the same way the pair tables are, so a reader comparing
+        # the two isn't matching one row against two.
+        by_transition: defaultdict[tuple[Outcome, Outcome], list[ODPair]] = defaultdict(
+            list
+        )
+        for before, after, pair in changed_rows:
+            by_transition[before, after].append(pair)
+        changed = [
+            Change(
+                before=before,
+                after=after,
+                pair=symmetric,
+                # Named from the baseline, since a reader knows the pair
+                # by what serves it today, and a `Was direct` row
+                # labelled with the scenario's routes would assert a
+                # one-seat ride between route sets sharing none. Each end
+                # carries what the scenario does to it (`8 Av (N -> B)`).
+                label=baseline_labels[
+                    symmetric.forward.origin.id,
+                    symmetric.forward.destination.id,
+                ],
+            )
+            for (before, after), pairs in by_transition.items()
+            for symmetric in SymmetricPair.group(pairs)
+        ]
+
+        changed.sort(key=attrgetter("pair.riders"), reverse=True)
+        return cls(
+            baseline_name=baseline.scenario.name,
+            scenario_name=result.scenario.name,
+            # Plain, so that a cell never asked for stays absent
+            # instead of being created by the asking.
+            riders=dict(riders),
+            total=sum(riders.values()),
+            changed=changed,
+        )
+
+    def cell(self, before: Outcome, after: Outcome) -> float:
+        return self.riders.get((before, after), 0.0)
+
+    def pct(self, riders: float) -> str:
+        """Shares of the same both-ends total the comparison table uses,
+        so a matrix cell and a table column are read against the same
+        denominator."""
+        if not self.total:
+            return "0.0%"
+        return f"{100 * riders / self.total:.1f}%"
+
+    @property
+    def gained(self) -> float:
+        return sum(
+            v
+            for (before, after), v in self.riders.items()
+            if not before.effective and after.effective
+        )
+
+    @property
+    def lost(self) -> float:
+        return sum(
+            v
+            for (before, after), v in self.riders.items()
+            if before.effective and not after.effective
+        )
+
+    @property
+    def net(self) -> float:
+        return self.gained - self.lost
+
+    def markdown(self, *, h2: str, top_n: int, close_threshold_m: float) -> str:
+        order = list(Outcome)
+        lines = [
+            f"{h2} What Changed, against {self.baseline_name}",
+            "",
+            f"Every both-ends rider, and their share of the "
+            f"{self.total:,.0f} of them: **was** is what "
+            f"{self.baseline_name} gives them, **now** what "
+            f"{self.scenario_name} would. Off-diagonal cells are the whole "
+            f"effect of the swap; the diagonal is everyone it leaves alone. "
+            f"`direct` is a one-seat ride, `close` a one-seat ride after a "
+            f"walk of {close_threshold_m:.0f}m or less, `far` neither.",
+            "",
+            # Each label carries its own axis, rather than a corner cell
+            # naming both and leaving the reader to apply it.
+            # `was`/`now` are the words the changed-pairs table below
+            # already uses for the same two states.
+            "| Riders | " + " | ".join(f"now {o}" for o in order) + " |",
+            table_rule("l" + "r" * len(order)),
+        ]
+        for before in order:
+            lines.append(
+                table_row(
+                    f"**was {before}**",
+                    *(
+                        f"{self.cell(before, after):,.0f} "
+                        f"({self.pct(self.cell(before, after))})"
+                        for after in order
+                    ),
+                )
+            )
+        lines += [
+            "",
+            f"- **Gained an effective one-seat ride: {self.gained:,.0f} "
+            f"({self.pct(self.gained)})**",
+            f"- **Lost one: {self.lost:,.0f} ({self.pct(self.lost)})**",
+            f"- **Net: {self.net:+,.0f} ({self.pct(self.net)})**",
+            "",
+        ]
+
+        if self.changed:
+            lines += [
+                f"{h2} Biggest Changes, against {self.baseline_name}",
+                "",
+                f"The top {top_n} station pairs by riders whose outcome "
+                f"moved, both directions combined as above. An end reads "
+                f"`today → {self.scenario_name}` where its routes change, "
+                f"and today's alone where they don't; `Dist` is the walk "
+                f"under {self.scenario_name}.",
+                "",
+                "| # | Riders | Was | Now | Dist | Origin ↔ Destination |",
+                table_rule("rrllrl"),
+            ]
+            for i, change in enumerate(self.changed[:top_n], 1):
+                fwd = change.pair.forward
+                dist = "" if fwd.one_seat else f"{fwd.walk.dist_m:.0f}m"
+                lines.append(
+                    table_row(
+                        str(i),
+                        f"{change.pair.riders:,.0f}",
+                        str(change.before),
+                        str(change.after),
+                        dist,
+                        change.label,
+                    )
+                )
             lines.append("")
         return "\n".join(lines)
 
