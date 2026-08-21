@@ -640,6 +640,26 @@ class Scenario:
             delta = RouteDelta(add=add, remove=remove)
             for station_name in group.stations:
                 station = station_index.resolve(station_name, group.line, path=path)
+                # Removing a route a station doesn't serve is a no-op,
+                # so it can't be caught by reading the numbers,
+                # but it is never what an author meant:
+                # either the station doesn't belong in the group,
+                # or the route named is the wrong one.
+                # The one that prompted this check was the first kind,
+                # and it silently invented service:
+                # `59 St (N,R)` listed under a `remove D` group
+                # also had `add Q`, giving 959 riders a day
+                # a one-seat Q that doesn't stop there.
+                absent = sorted(remove - station.routes)
+                if absent:
+                    raise ScenarioError(
+                        f'scenario {path}: scenario "{entry.name}" removes '
+                        f"route(s) {absent} from "
+                        f'"{station_name}" on line "{group.line}", which '
+                        f"only serves {sorted(station.routes)}. Either the "
+                        f"station doesn't belong in this group, or the "
+                        f"wrong route is named"
+                    )
                 existing = overrides.get(station)
                 overrides[station] = delta if existing is None else existing | delta
         return cls(
