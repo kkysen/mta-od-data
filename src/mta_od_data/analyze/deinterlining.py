@@ -225,6 +225,14 @@ class WalkPoints:
 
     locations: list[Coord]
     by_complex: dict[int, tuple[PlatformId, ...]]
+    # Ids below this are platforms, in `individual_stations` order;
+    # ids at or above it are the centroids standing in for complexes
+    # with no platform rows of their own.
+    n_platforms: int
+
+    def platform(self, point: PlatformId) -> PlatformId | None:
+        """`point` if it is a platform, `None` if it is a centroid."""
+        return point if point < self.n_platforms else None
 
     # Keyed on `PlatformId`s rather than on the `Coord`s themselves,
     # which are dataclasses: a dataclass recomputes its hash on every
@@ -252,6 +260,7 @@ class WalkPoints:
         return cls(
             locations=locations,
             by_complex={cid: tuple(ids) for cid, ids in by_complex.items()},
+            n_platforms=len(individual_stations),
         )
 
 
@@ -368,6 +377,31 @@ class ScenarioWalks:
         ]
 
     @cache  # noqa: B019  (see `corridor_platforms`)
+    def corridor_points(self, complex_id: int) -> tuple[PlatformId, ...]:
+        """Where a rider of this comparison stands at this complex.
+
+        Its platforms that serve one of the comparison's routes, not all
+        of them: a rider walking to or from Times Sq for the N,Q,R is on
+        its Broadway platform, and crediting them with the 7's, 386m
+        away, would measure a walk they don't take. It is the same
+        narrowing the row's own label makes when it reads
+        `Times Sq-42 St (N,Q,R)`.
+
+        All of them when none serves one, which is a complex the other
+        end put in scope: there is no corridor platform to stand on, so
+        the complex is all that is known about where they are.
+        """
+        points = self.walks.points()
+        platforms = self.walks.individual_stations
+        on_corridor = tuple(
+            point
+            for point in points.by_complex[complex_id]
+            if (platform := points.platform(point)) is not None
+            and self.scenario.routes_at(platforms[platform])
+        )
+        return on_corridor or points.by_complex[complex_id]
+
+    @cache  # noqa: B019  (see `corridor_platforms`)
     def min_dist_to_route(
         self, complex_id: int, route: str
     ) -> tuple[float, Station] | None:
@@ -388,7 +422,7 @@ class ScenarioWalks:
         return min(
             (
                 (distance(point, platform_id), platform)
-                for point in points.by_complex[complex_id]
+                for point in self.corridor_points(complex_id)
                 for platform_id, platform in candidates
             ),
             key=itemgetter(0),
