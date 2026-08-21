@@ -13,7 +13,7 @@ import pytest
 
 from mta_od_data import DATA, ROOT
 from mta_od_data.analyze.common import Station
-from mta_od_data.analyze.deinterlining import resolve_scenarios
+from mta_od_data.analyze.deinterlining import NO_WALK, Outcome, Walks, resolve_scenarios
 from mta_od_data.analyze.scenarios import (
     SCENARIOS_FILE,
     ScenarioError,
@@ -34,11 +34,20 @@ pytestmark = pytest.mark.skipif(
 
 
 @pytest.fixture(scope="module")
-def station_index() -> StationIndex:
-    return StationIndex.build(
-        Station.load_complexes(STATIONS),
-        Station.load_individuals(STATIONS_INDIVIDUAL),
-    )
+def stations_by_id() -> dict[int, Station]:
+    return Station.load_complexes(STATIONS)
+
+
+@pytest.fixture(scope="module")
+def individual_stations() -> list[Station]:
+    return Station.load_individuals(STATIONS_INDIVIDUAL)
+
+
+@pytest.fixture(scope="module")
+def station_index(
+    stations_by_id: dict[int, Station], individual_stations: list[Station]
+) -> StationIndex:
+    return StationIndex.build(stations_by_id, individual_stations)
 
 
 @pytest.fixture(scope="module")
@@ -136,3 +145,76 @@ def test_two_categories_cannot_disagree_about_a_route(
             scenario_file=path,
             station_index=station_index,
         )
+
+
+# Every route Kings Hwy has on the Brighton line, so the scenario leaves
+# it with nothing: a station losing its service is a thing a plan can
+# legitimately propose, and the comparison has to classify trips to it
+# rather than fall over.
+STRANDING_SCENARIOS: dict[str, object] = {
+    "Strip": [
+        {
+            "name": "No B/Q at Kings Hwy",
+            "routes": ["B", "Q"],
+            "overrides": [
+                {
+                    "line": "Broadway - Brighton",
+                    "remove": ["B", "Q"],
+                    "stations": ["Kings Hwy"],
+                },
+            ],
+        },
+    ],
+}
+
+
+@pytest.mark.xfail(
+    raises=AssertionError,
+    strict=True,
+    reason=(
+        "`ScenarioWalks.shortest_walk` asserts that a pair reaching it has a "
+        "corridor at one end or the other, on the grounds that `scope_ids` "
+        "excluded the rest. It doesn't: scope is the union across scenarios, "
+        "while a corridor to measure against is per scenario"
+    ),
+)
+def test_a_stranded_pair_is_far_not_a_crash(
+    tmp_path: Path,
+    station_index: StationIndex,
+    stations_by_id: dict[int, Station],
+    individual_stations: list[Station],
+) -> None:
+    """A trip between two stations the scenario leaves with no route in
+    the comparison's universe: no walk at either end turns it into a
+    one-seat ride, which is what `far` means."""
+    path = write_scenarios(tmp_path, STRANDING_SCENARIOS)
+    comparison = resolve_scenarios(
+        categories=["Strip"], scenario_file=path, station_index=station_index
+    )
+    # Stranded under the scenario, and off B/Q entirely to begin with:
+    # the origin is in scope only because today's routing puts it there.
+    origin = station_index.resolve("Kings Hwy", "Broadway - Brighton", path=path)
+    dest = station_index.resolve("Astoria-Ditmars Blvd", "Astoria", path=path)
+    # As `deinterlining()` scopes a run: every complex some scenario
+    # gives one of the comparison's routes.
+    scope_ids = frozenset(
+        station.complex_id
+        for station in stations_by_id.values()
+        if any(s.routes_of(station) for s in comparison.scenarios)
+    )
+    assert origin.complex_id in scope_ids, "the origin should be in scope today"
+
+    result = comparison.classify(
+        pairs=[(origin.complex_id, dest.complex_id, 100.0)],
+        stations_path=STATIONS,
+        scope_ids=scope_ids,
+        walks=Walks(
+            stations_by_id=stations_by_id,
+            individual_stations=individual_stations,
+            platforms=station_index.platforms,
+            close_threshold_m=300.0,
+        ),
+    )
+    stranded = result.results[-1].rows[0]
+    assert stranded.outcome is Outcome.FAR
+    assert stranded.walk == NO_WALK
