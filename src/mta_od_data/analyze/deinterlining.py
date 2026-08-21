@@ -1571,6 +1571,15 @@ def deinterlining(
         FROM read_parquet(?)
         WHERE {day_filter_sql} AND {scope_filter_sql}
         GROUP BY 1, 2
+        -- Not decorative: a bare GROUP BY returns a different row order
+        -- from one run to the next, and that order is load-bearing.
+        -- Every top-N sort is stable, so ties fall out in whatever order
+        -- rows arrived, and `SymmetricPair` picks its forward direction
+        -- by rider count, which two equal directions leave to the same
+        -- coin flip. Reports are committed and diffed against a fresh
+        -- run, so any tie reaching a visible row would flake the
+        -- snapshot tests rather than fail them honestly.
+        ORDER BY 1, 2
     """
     pairs: list[tuple[int, int, float]] = con.execute(
         pairs_query, [str(parquet), *day_params]
