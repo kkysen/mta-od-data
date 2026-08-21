@@ -9,7 +9,13 @@ import duckdb
 from typer import Option, Typer
 
 from mta_od_data import DATA
-from mta_od_data.analyze.common import DAY_TYPE_PRESETS, DayCoverage, DayType, Station
+from mta_od_data.analyze.common import (
+    DAY_TYPE_PRESETS,
+    DayCoverage,
+    DayFilterError,
+    DayType,
+    Station,
+)
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.regions import (
     Region,
@@ -300,7 +306,11 @@ def regional_flow(
         else '"Day of Week" IN (' + ", ".join("?" for _ in days_list) + ")"
     )
 
-    coverage = DayCoverage.query(con, parquet, day_filter_sql, day_params)
+    try:
+        coverage = DayCoverage.query(con, parquet, day_filter_sql, day_params)
+    except DayFilterError as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(1) from e
     n_distinct_days = coverage.n_days
 
     # No origin filter, unlike `one-seat-rides`: every trip has some
