@@ -7,6 +7,7 @@ which resolving a scenario's overrides needs.
 """
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
@@ -84,7 +85,7 @@ CONFLICT_ROUTES = ["B", "D", "N", "Q", "R"]
 CONFLICT_STATION = {"line": "Broadway - Brighton", "stations": ["Kings Hwy"]}
 
 
-def write_scenarios(tmp_path: Path, categories: dict[str, object]) -> Path:
+def write_scenarios(tmp_path: Path, categories: Mapping[str, object]) -> Path:
     path = tmp_path / "scenarios.json5"
     path.write_text(json.dumps(categories))
     return path
@@ -151,7 +152,7 @@ def test_two_categories_cannot_disagree_about_a_route(
 # it with nothing: a station losing its service is a thing a plan can
 # legitimately propose, and the comparison has to classify trips to it
 # rather than fall over.
-STRANDING_SCENARIOS: dict[str, object] = {
+STRANDING_SCENARIOS = {
     "Strip": [
         {
             "name": "No B/Q at Kings Hwy",
