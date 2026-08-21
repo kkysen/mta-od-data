@@ -262,6 +262,12 @@ class Walks:
     individual_stations: list[Station]
     platforms: PlatformIndex
     close_threshold_m: float
+    # Metres between two of `points`, filled in as they are asked for by
+    # `ScenarioWalks.min_dist_to_route`, which reads this dict directly:
+    # it is the innermost loop of a run and a method call around the
+    # lookup costs more than the lookup.
+    # Shared by every scenario, since where a platform is doesn't depend
+    # on which routes stop there.
     # Keyed on `PlatformId`s rather than the `Coord`s themselves, which
     # are dataclasses: a dataclass recomputes its hash on every lookup,
     # where an int is its own.
@@ -273,22 +279,6 @@ class Walks:
     @cache  # noqa: B019  (see `ScenarioWalks.corridor_platforms`)
     def points(self) -> WalkPoints:
         return WalkPoints.build(self.individual_stations, self.stations_by_id)
-
-    def distance(self, point: PlatformId, other: PlatformId) -> float:
-        """Metres between two of `points`, remembered.
-
-        Shared by every scenario: where a platform is doesn't depend on
-        which routes stop there.
-        """
-        key = (point, other)
-        metres = self.distances.get(key)
-        if metres is None:
-            locations = self.points().locations
-            here, there = locations[point], locations[other]
-            metres = self.distances[key] = haversine(
-                here.lat, here.lon, there.lat, there.lon
-            )
-        return metres
 
 
 @dataclass(slots=True, frozen=True, eq=False)
