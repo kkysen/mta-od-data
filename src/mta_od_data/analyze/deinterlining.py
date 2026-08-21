@@ -245,8 +245,8 @@ class ScenarioWalks:
     One of these per scenario rather than one shared: which stations
     serve a corridor is exactly what a scenario changes, so a lookup
     shared across scenarios would answer with today's routes under every
-    one of them. The caches below are per scenario for the same reason,
-    and go when the scenario's results are done with.
+    one of them. The caches below are keyed per scenario for the same
+    reason, `self` being part of every key.
     """
 
     walks: Walks
@@ -256,9 +256,12 @@ class ScenarioWalks:
     def platforms(self) -> PlatformIndex:
         return self.walks.platforms
 
-    # B019 warns that caching a method keeps `self` alive forever, which
-    # is what's wanted here: one of these lives exactly as long as the
-    # scenario it classifies.
+    # B019: `cache` on a method stores its entries on the *function*,
+    # keyed by `self` among the arguments, so every `ScenarioWalks` ever
+    # built stays alive with its measurements until the process ends.
+    # That is what a command wants -- it classifies each scenario once
+    # and exits -- but a long-lived caller comparing scenario after
+    # scenario would grow this without bound, and wants its own cache.
     @cache  # noqa: B019
     def corridor_platforms(self, corridor_routes: Routes) -> list[Station]:
         """The platforms a rider could board this corridor at,
@@ -277,7 +280,7 @@ class ScenarioWalks:
             if self.scenario.routes_at(platform) & corridor_routes
         ]
 
-    @cache  # noqa: B019
+    @cache  # noqa: B019  (see `corridor_platforms`)
     def min_dist_to_corridor(
         self, station: Station, corridor_routes: Routes
     ) -> tuple[float, Station] | None:
