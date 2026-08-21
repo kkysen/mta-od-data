@@ -10,6 +10,7 @@ from typer import Option, Typer
 
 from mta_od_data import DATA
 from mta_od_data.analyze.common import DAY_TYPE_PRESETS, DayCoverage, DayType, Station
+from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.regions import (
     Region,
     RegionPreset,
@@ -94,29 +95,25 @@ class RegionalFlowResult:
         lines.append("")
         lines.append(f"Total: {self.total_riders:,.0f} riders/{day_type}")
         lines.append("")
-        lines.append("| Flow | Riders | % Total |")
-        lines.append("| --- | --- | --- |")
-        lines.append(
-            f"| Outside -> Inside | {self.out_in:,.0f} | {self.pct(self.out_in):.1f}% |"
-        )
-        lines.append(
-            f"| Inside -> Outside | {self.in_out:,.0f} | {self.pct(self.in_out):.1f}% |"
-        )
-        lines.append(
-            f"| Inside -> Inside | {self.in_in:,.0f} | {self.pct(self.in_in):.1f}% |"
-        )
-        lines.append(
-            f"| Outside -> Outside | {self.out_out:,.0f} | "
-            f"{self.pct(self.out_out):.1f}% |"
-        )
-        lines.append(f"| **Inter** | {self.inter:,.0f} | {self.pct(self.inter):.1f}% |")
-        lines.append(f"| **Intra** | {self.intra:,.0f} | {self.pct(self.intra):.1f}% |")
+        lines.append(table_row("Flow", "Riders", "% Total"))
+        lines.append(table_rule("lll"))
+        for label, riders in (
+            ("Outside -> Inside", self.out_in),
+            ("Inside -> Outside", self.in_out),
+            ("Inside -> Inside", self.in_in),
+            ("Outside -> Outside", self.out_out),
+            ("**Inter**", self.inter),
+            ("**Intra**", self.intra),
+        ):
+            lines.append(table_row(label, f"{riders:,.0f}", f"{self.pct(riders):.1f}%"))
         lines.append("")
 
         lines.append(f"## Top {top_n} Origin/Destination Pairs")
         lines.append("")
-        lines.append("| # | Riders | % Total | Flow | Origin -> Destination |")
-        lines.append("| --- | --- | --- | --- | --- |")
+        lines.append(
+            table_row("#", "Riders", "% Total", "Flow", "Origin -> Destination")
+        )
+        lines.append(table_rule("lllll"))
 
         def pair_riders(r: FlowRow) -> float:
             return r.riders
@@ -124,8 +121,13 @@ class RegionalFlowResult:
         top_pairs = sorted(self.rows, key=pair_riders, reverse=True)[:top_n]
         for i, r in enumerate(top_pairs, start=1):
             lines.append(
-                f"| {i} | {r.riders:,.0f} | {self.pct(r.riders):.2f}% | {r.flow} | "
-                f"{r.origin_name} → {r.dest_name} |"
+                table_row(
+                    str(i),
+                    f"{r.riders:,.0f}",
+                    f"{self.pct(r.riders):.2f}%",
+                    r.flow,
+                    f"{r.origin_name} → {r.dest_name}",
+                )
             )
         lines.append("")
 
