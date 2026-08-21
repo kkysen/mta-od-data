@@ -97,7 +97,7 @@ class Walk:
     close: bool
     dist_m: float
     # The station the walk reaches, named under the scenario.
-    near_station: str | None
+    station: str | None
     # Which end the walk is at.
     # Symmetric in the pair, but not a property of it:
     # which end is the shorter walk is exactly what this records.
@@ -106,7 +106,7 @@ class Walk:
 
 # A one-seat ride, where the ridden route stops at both ends
 # and there is no walk to model.
-NO_WALK = Walk(close=False, dist_m=0.0, near_station=None, at_origin=False)
+NO_WALK = Walk(close=False, dist_m=0.0, station=None, at_origin=False)
 
 
 @dataclass(slots=True, frozen=True)
@@ -1098,13 +1098,13 @@ class ScenarioWalks:
         def walk_dist(option: tuple[tuple[float, Station], bool]) -> float:
             return option[0][0]
 
-        (dist_m, near_station), walk_at_origin = min(measured, key=walk_dist)
-        near_complex = self.walks.stations_by_id[near_station.complex_id]
+        (dist_m, platform), walk_at_origin = min(measured, key=walk_dist)
+        complex_station = self.walks.stations_by_id[platform.complex_id]
         return Walk(
             close=dist_m <= self.walks.close_threshold_m,
             dist_m=dist_m,
-            near_station=self.platforms.display(
-                near_complex, self.scenario.routes_of(near_complex)
+            station=self.platforms.display(
+                complex_station, self.scenario.routes_of(complex_station)
             ),
             at_origin=walk_at_origin,
         )
@@ -1382,7 +1382,7 @@ class ScenarioResult:
                 # tagged with the end it's at rather than an arrow, so it
                 # reads the same whichever way the row is oriented.
                 end = "origin" if fwd.walk.at_origin else "dest"
-                walk_str = f"{end}: {fwd.walk.near_station}"
+                walk_str = f"{end}: {fwd.walk.station}"
             lines.append(
                 table_row(
                     str(i),
