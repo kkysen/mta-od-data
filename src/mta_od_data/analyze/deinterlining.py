@@ -614,9 +614,9 @@ class ScenarioResult:
             overall=RiderStats.of(rows),
             both_ends=RiderStats.of(both_ends),
             rows=rows,
-            origin_stats=TripEndStats.by_station(both_ends, attrgetter("origin")),
+            origin_stats=TripEndStats.by_station(both_ends, lambda row: row.origin),
             destination_stats=TripEndStats.by_station(
-                both_ends, attrgetter("destination")
+                both_ends, lambda row: row.destination
             ),
         )
 
