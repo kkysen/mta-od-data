@@ -51,13 +51,10 @@ SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json5"
 
 type Routes = frozenset[str]
 
-# `(origin, dest, origin routes, dest routes) ->
-#  (close, walk distance, station walked to, walk is at the origin)`.
+# `(origin, dest, origin routes, dest routes) -> Walk`.
 # Both ends and both route sets, because the walk can be at either end;
 # see `make_close_lookup`.
-type CloseLookup = Callable[
-    [Station, Station, Routes, Routes], tuple[bool, float, str | None, bool]
-]
+type CloseLookup = Callable[[Station, Station, Routes, Routes], Walk]
 
 # Built per scenario, since which stations serve a corridor
 # is exactly what a scenario changes.
@@ -96,6 +93,27 @@ def table_row(*cells: str) -> str:
 
 def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_") or "scenario"
+
+
+@dataclass(slots=True, frozen=True)
+class Walk:
+    """The shorter of the two walks that would turn a transfer trip into
+    a one-seat ride; see the `close_lookup` `make_close_lookup` returns."""
+
+    # Within the comparison's `--close-threshold-m`.
+    close: bool
+    dist_m: float
+    # The station the walk reaches, named under the scenario.
+    near_station: str | None
+    # Which end the walk is at.
+    # Symmetric in the pair, but not a property of it:
+    # which end is the shorter walk is exactly what this records.
+    at_origin: bool
+
+
+# A one-seat ride, where the ridden route stops at both ends
+# and there is no walk to model.
+NO_WALK = Walk(close=False, dist_m=0.0, near_station=None, at_origin=False)
 
 
 @dataclass(slots=True, frozen=True)
@@ -844,16 +862,15 @@ class Scenario:
                 one_seat_riders += riders
                 if both_ends:
                     both_one_seat += riders
-                close, dist_m, near_station_name = False, 0.0, None
-                walk_at_origin = False
+                walk = NO_WALK
             else:
-                close, dist_m, near_station_name, walk_at_origin = close_lookup(
+                walk = close_lookup(
                     origin,
                     dest,
                     effective_origin_routes,
                     effective_dest_routes,
                 )
-                if close:
+                if walk.close:
                     close_riders += riders
                     if both_ends:
                         both_close += riders
@@ -868,10 +885,10 @@ class Scenario:
                 riders=riders,
                 both_ends=both_ends,
                 one_seat=one_seat,
-                close=close,
-                walk_at_origin=walk_at_origin,
-                dist_m=dist_m,
-                near_station=near_station_name,
+                close=walk.close,
+                walk_at_origin=walk.at_origin,
+                dist_m=walk.dist_m,
+                near_station=walk.near_station,
             )
             rows.append(pair)
 
@@ -893,7 +910,7 @@ class Scenario:
                     e.total += riders
                     if one_seat:
                         e.one_seat += riders
-                    elif close:
+                    elif walk.close:
                         e.close += riders
 
         if not total_riders:
@@ -1761,7 +1778,7 @@ def deinterlining(
             dest: Station,
             origin_routes: Routes,
             dest_routes: Routes,
-        ) -> tuple[bool, float, str | None, bool]:
+        ) -> Walk:
             """How far a rider without a one-seat ride would have to walk
             to turn the trip into one, at whichever end is the shorter walk.
 
@@ -1798,12 +1815,15 @@ def deinterlining(
                 return option[0][0]
 
             (dist_m, near_station), walk_at_origin = min(measured, key=walk_dist)
-            close = dist_m <= close_threshold_m
             near_complex = stations_by_id[near_station.complex_id]
-            near_station_name = platform_index.display(
-                near_complex, scenario.routes_of(near_complex)
+            return Walk(
+                close=dist_m <= close_threshold_m,
+                dist_m=dist_m,
+                near_station=platform_index.display(
+                    near_complex, scenario.routes_of(near_complex)
+                ),
+                at_origin=walk_at_origin,
             )
-            return close, dist_m, near_station_name, walk_at_origin
 
         return close_lookup
 
