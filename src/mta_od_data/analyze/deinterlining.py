@@ -23,10 +23,10 @@ import json
 import re
 import shlex
 import sys
-from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from enum import StrEnum
 from functools import cache
+from operator import itemgetter
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -38,6 +38,7 @@ from typer import Option, Typer
 from mta_od_data import DATA, ROOT
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
+    Coord,
     DayCoverage,
     DayType,
     PlatformIndex,
@@ -50,15 +51,6 @@ app = Typer()
 SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json5"
 
 type Routes = frozenset[str]
-
-# `(origin, dest, origin routes, dest routes) -> Walk`.
-# Both ends and both route sets, because the walk can be at either end;
-# see `make_close_lookup`.
-type CloseLookup = Callable[[Station, Station, Routes, Routes], Walk]
-
-# Built per scenario, since which stations serve a corridor
-# is exactly what a scenario changes.
-type CloseLookupFactory = Callable[[Scenario], CloseLookup]
 
 
 class ScenarioError(Exception):
@@ -98,7 +90,7 @@ def slugify(name: str) -> str:
 @dataclass(slots=True, frozen=True)
 class Walk:
     """The shorter of the two walks that would turn a transfer trip into
-    a one-seat ride; see the `close_lookup` `make_close_lookup` returns."""
+    a one-seat ride; see `ScenarioWalks.__call__`, which measures it."""
 
     # Within the comparison's `--close-threshold-m`.
     # Only meaningful against a pair that isn't already a one-seat ride.
@@ -431,7 +423,7 @@ class SymmetricPair:
 
     Every classification here is symmetric--`one_seat` because a shared
     route is a shared route, `close`/`dist_m` because a rider can walk
-    at either end (see `close_lookup`)--so the two directions differ
+    at either end (see `ScenarioWalks`)--so the two directions differ
     only in their rider counts, and `forward`'s classification stands
     for the pair.
 
@@ -839,7 +831,7 @@ class Scenario:
         stations_path: Path,
         scope_ids: frozenset[int],
         platforms: PlatformIndex,
-        close_lookup: CloseLookup,
+        walks: ScenarioWalks,
     ) -> ScenarioResult:
         rows: list[ODPair] = []
         total_riders = 0.0
@@ -879,7 +871,7 @@ class Scenario:
                     both_one_seat += riders
                 walk = NO_WALK
             else:
-                walk = close_lookup(
+                walk = walks(
                     origin,
                     dest,
                     effective_origin_routes,
@@ -962,6 +954,157 @@ CURRENT = Scenario(
     effective_routes={},
     platform_routes={},
 )
+
+
+@dataclass(slots=True, frozen=True, eq=False)
+class Walks:
+    """One run's station data, everything measuring a walk needs
+    that a scenario doesn't supply.
+
+    Nothing here answers on its own: `for_scenario` binds it to the
+    scenario that says which stations serve what, which is the other
+    half of every question below.
+
+    `eq=False` so both these classes hash by identity, which their
+    `@cache`d methods need: the fields are dicts and lists, and a
+    field-by-field hash of a station table would be neither cheap nor
+    possible.
+    """
+
+    stations_by_id: dict[int, Station]
+    individual_stations: list[Station]
+    platforms: PlatformIndex
+    close_threshold_m: float
+
+    def for_scenario(self, scenario: Scenario) -> ScenarioWalks:
+        return ScenarioWalks(walks=self, scenario=scenario)
+
+    def platform_locations(self, station: Station) -> list[Coord]:
+        """Where a walk to or from this complex is measured from.
+
+        Its platforms', not its centroid's, and the complex itself only
+        when it has no platform rows of its own to use instead.
+        """
+        return [
+            platform.loc
+            for platform in self.platforms.by_complex.get(station.complex_id)
+            or (station,)
+        ]
+
+
+@dataclass(slots=True, frozen=True, eq=False)
+class ScenarioWalks:
+    """How far a rider without a one-seat ride would have to walk under
+    one scenario, and so whether the trip is still effectively one.
+
+    One of these per scenario rather than one shared: which stations
+    serve a corridor is exactly what a scenario changes, so a lookup
+    shared across scenarios would answer with today's routes under every
+    one of them. The caches below are per scenario for the same reason,
+    and go when the scenario's results are done with.
+    """
+
+    walks: Walks
+    scenario: Scenario
+
+    # B019 warns that caching a method keeps `self` alive forever, which
+    # is what's wanted here: one of these lives exactly as long as the
+    # scenario it classifies.
+    @cache  # noqa: B019
+    def corridor_platforms(self, corridor_routes: Routes) -> list[Station]:
+        """The platforms a rider could board this corridor at,
+        under this scenario.
+
+        Per platform, not per complex.
+        The distance is measured to a platform's own coordinates, and
+        a complex can span physically separate stations
+        (Times Sq-42 St and 42 St-Port Authority Bus Terminal are
+        200m apart), so crediting every platform of a complex with
+        every route the complex has understated a walk by up to that.
+        """
+        return [
+            platform
+            for platform in self.walks.individual_stations
+            if self.scenario.routes_at(platform) & corridor_routes
+        ]
+
+    @cache  # noqa: B019
+    def min_dist_to_corridor(
+        self, station: Station, corridor_routes: Routes
+    ) -> tuple[float, Station] | None:
+        candidates = self.corridor_platforms(corridor_routes)
+        if not candidates:
+            # Either the station has no route in this comparison at
+            # all (so there is no corridor of its own to measure
+            # against), or a route has no individual-station data,
+            # e.g. a synthetic one no scenario uses yet.
+            # The caller decides what an unmeasurable end means;
+            # here it's just "nothing to measure to".
+            return None
+
+        # By distance alone: two platforms exactly as far away would
+        # otherwise be compared as `Station`s, which don't order.
+        return min(
+            (
+                (haversine_m(point, platform.loc), platform)
+                for point in self.walks.platform_locations(station)
+                for platform in candidates
+            ),
+            key=itemgetter(0),
+        )
+
+    def __call__(
+        self,
+        origin: Station,
+        dest: Station,
+        origin_routes: Routes,
+        dest_routes: Routes,
+    ) -> Walk:
+        """The shorter of the two walks that would turn this trip into a
+        one-seat ride.
+
+        Two ways to do that, and a rider can take either:
+
+        - walk at the destination end: ride your own corridor to the
+          station nearest the destination, and walk from there;
+        - walk at the origin end: walk to the nearest station served
+          by a route that reaches the destination, and ride that.
+
+        Taking the minimum makes the result symmetric,
+        which the underlying fact is:
+        `A -> B` and `B -> A` offer the same two walks,
+        so they must classify alike.
+        """
+        options = [
+            (self.min_dist_to_corridor(dest, origin_routes), False),
+            (self.min_dist_to_corridor(origin, dest_routes), True),
+        ]
+        measured = [
+            (best, at_origin) for best, at_origin in options if best is not None
+        ]
+        # Both ends unmeasurable means neither end is on the
+        # comparison's routes, which `scope_ids` already excluded
+        # from the query.
+        # Loud rather than silently `far`, per the same argument as
+        # `one_seat_rides.py`'s `assert candidates`.
+        assert measured, (
+            f"neither {origin.name} nor {dest.name} has a corridor to "
+            f"measure a walk against, but the pair was fetched as in scope"
+        )
+
+        def walk_dist(option: tuple[tuple[float, Station], bool]) -> float:
+            return option[0][0]
+
+        (dist_m, near_station), walk_at_origin = min(measured, key=walk_dist)
+        near_complex = self.walks.stations_by_id[near_station.complex_id]
+        return Walk(
+            close=dist_m <= self.walks.close_threshold_m,
+            dist_m=dist_m,
+            near_station=self.walks.platforms.display(
+                near_complex, self.scenario.routes_of(near_complex)
+            ),
+            at_origin=walk_at_origin,
+        )
 
 
 @dataclass(slots=True, frozen=True)
@@ -1319,7 +1462,7 @@ class ScenarioComparison:
         stations_path: Path,
         scope_ids: frozenset[int],
         platforms: PlatformIndex,
-        close_lookup_factory: CloseLookupFactory,
+        walks: Walks,
     ) -> ScenarioComparisonResult:
         return ScenarioComparisonResult(
             comparison=self,
@@ -1330,7 +1473,7 @@ class ScenarioComparison:
                     stations_path=stations_path,
                     scope_ids=scope_ids,
                     platforms=platforms,
-                    close_lookup=close_lookup_factory(scenario),
+                    walks=walks.for_scenario(scenario),
                 )
                 for scenario in self.scenarios
             ],
@@ -1732,112 +1875,12 @@ def deinterlining(
         f"({coverage.first_month} to {coverage.last_month})"
     )
 
-    platform_index = station_index.platforms
-    platforms_by_complex: dict[int, list[Station]] = {}
-    for s in individual_stations:
-        platforms_by_complex.setdefault(s.complex_id, []).append(s)
-
-    # Built per scenario, and local, since these close over
-    # per-invocation station data.
-    # Per scenario is the whole point: which stations serve a corridor
-    # is exactly what a scenario changes, so a lookup shared across
-    # scenarios answers with today's routes under every one of them.
-    def make_close_lookup(scenario: Scenario) -> CloseLookup:
-        @cache
-        def corridor_platforms(corridor_routes: Routes) -> list[Station]:
-            """The platforms a rider could board this corridor at,
-            under this scenario.
-
-            Per platform, not per complex.
-            The distance is measured to a platform's own coordinates, and
-            a complex can span physically separate stations
-            (Times Sq-42 St and 42 St-Port Authority Bus Terminal are
-            200m apart), so crediting every platform of a complex with
-            every route the complex has understated a walk by up to that.
-            """
-            return [
-                platform
-                for platform in individual_stations
-                if scenario.routes_at(platform) & corridor_routes
-            ]
-
-        @cache
-        def min_dist_to_corridor(
-            station: Station, corridor_routes: Routes
-        ) -> tuple[float, Station] | None:
-            candidates = corridor_platforms(corridor_routes)
-            if not candidates:
-                # Either the station has no route in this comparison at
-                # all (so there is no corridor of its own to measure
-                # against), or a route has no individual-station data,
-                # e.g. a synthetic one no scenario uses yet.
-                # The caller decides what an unmeasurable end means;
-                # here it's just "nothing to measure to".
-                return None
-            points = [
-                s.loc for s in platforms_by_complex.get(station.complex_id, [station])
-            ]
-            best: tuple[float, Station] | None = None
-            for p in points:
-                for c in candidates:
-                    dist_m = haversine_m(p, c.loc)
-                    if best is None or dist_m < best[0]:
-                        best = (dist_m, c)
-            return best
-
-        def close_lookup(
-            origin: Station,
-            dest: Station,
-            origin_routes: Routes,
-            dest_routes: Routes,
-        ) -> Walk:
-            """How far a rider without a one-seat ride would have to walk
-            to turn the trip into one, at whichever end is the shorter walk.
-
-            Two ways to do that, and a rider can take either:
-
-            - walk at the destination end: ride your own corridor to the
-              station nearest the destination, and walk from there;
-            - walk at the origin end: walk to the nearest station served
-              by a route that reaches the destination, and ride that.
-
-            Taking the minimum makes the result symmetric,
-            which the underlying fact is:
-            `A -> B` and `B -> A` offer the same two walks,
-            so they must classify alike.
-            """
-            options = [
-                (min_dist_to_corridor(dest, origin_routes), False),
-                (min_dist_to_corridor(origin, dest_routes), True),
-            ]
-            measured = [
-                (best, at_origin) for best, at_origin in options if best is not None
-            ]
-            # Both ends unmeasurable means neither end is on the
-            # comparison's routes, which `scope_ids` already excluded
-            # from the query.
-            # Loud rather than silently `far`, per the same argument as
-            # `one_seat_rides.py`'s `assert candidates`.
-            assert measured, (
-                f"neither {origin.name} nor {dest.name} has a corridor to "
-                f"measure a walk against, but the pair was fetched as in scope"
-            )
-
-            def walk_dist(option: tuple[tuple[float, Station], bool]) -> float:
-                return option[0][0]
-
-            (dist_m, near_station), walk_at_origin = min(measured, key=walk_dist)
-            near_complex = stations_by_id[near_station.complex_id]
-            return Walk(
-                close=dist_m <= close_threshold_m,
-                dist_m=dist_m,
-                near_station=platform_index.display(
-                    near_complex, scenario.routes_of(near_complex)
-                ),
-                at_origin=walk_at_origin,
-            )
-
-        return close_lookup
+    walks = Walks(
+        stations_by_id=stations_by_id,
+        individual_stations=individual_stations,
+        platforms=station_index.platforms,
+        close_threshold_m=close_threshold_m,
+    )
 
     try:
         result = comparison.classify(
@@ -1845,8 +1888,8 @@ def deinterlining(
             stations_by_id=stations_by_id,
             stations_path=stations,
             scope_ids=scope_ids,
-            platforms=platform_index,
-            close_lookup_factory=make_close_lookup,
+            platforms=station_index.platforms,
+            walks=walks,
         )
     except ScenarioError as e:
         print(f"error: {e}", file=sys.stderr)
