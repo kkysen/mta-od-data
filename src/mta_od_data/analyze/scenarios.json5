@@ -64,6 +64,83 @@
         },
       ],
     },
+    {
+      "name": "N/Q 4 Av Express",
+      "description": "N,Q 4 Av express, N Sea Beach, Q West End, B Brighton express, D Brighton local",
+      "routes": [
+        "B",
+        "D",
+        "N",
+        "Q",
+        "R",
+      ],
+      "overrides": [
+        {
+          "line": "4th Av",
+          "add": [
+            "Q"
+          ],
+          "remove": [
+            "D"
+          ],
+          "stations": [
+            "36 St",
+            "59 St",
+          ],
+        },
+        {
+          "line": "West End",
+          "add": [
+            "Q"
+          ],
+          "remove": [
+            "D"
+          ],
+          "stations": [
+            "9 Av",
+            "Fort Hamilton Pkwy",
+            "50 St",
+            "55 St",
+            "62 St",
+            "71 St",
+            "79 St",
+            "18 Av",
+            "20 Av",
+            "Bay Pkwy",
+            "25 Av",
+            "Bay 50 St",
+          ],
+        },
+        {
+          "line": "Broadway - Brighton",
+          "add": [
+            "D"
+          ],
+          "remove": [
+            "Q"
+          ],
+          "stations": [
+            "7 Av",
+            "Prospect Park",
+            "Parkside Av",
+            "Church Av",
+            "Beverley Rd",
+            "Cortelyou Rd",
+            "Newkirk Plaza",
+            "Avenue H",
+            "Avenue J",
+            "Avenue M",
+            "Kings Hwy",
+            "Avenue U",
+            "Neck Rd",
+            "Sheepshead Bay",
+            "Brighton Beach",
+            "Ocean Pkwy",
+            "W 8 St-NY Aquarium",
+          ],
+        },
+      ],
+    },
   ],
   "Columbus": [
     {
