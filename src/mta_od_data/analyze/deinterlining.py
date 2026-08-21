@@ -1209,24 +1209,25 @@ class RiderStats:
             return 0.0
         return 100 * riders / self.total
 
+    def cell(self, value: float, base: float | None) -> str:
+        """One markdown cell: riders and their share of this total,
+        and how both differ from `base` where there is one."""
+        level = f"{value:,.0f} ({self.pct(value):.1f}%)"
+        if base is None:
+            return level
+        # `pct` of the change, not the change in `pct`:
+        # identical either way, every scenario classifying the same
+        # pairs and so sharing a total, and this one can't drift if
+        # that ever stops being true without the subtraction below
+        # becoming meaningless first.
+        delta = value - base
+        return f"{level}, {delta:+,.0f} ({self.pct(delta):+.1f}%)"
+
     def markdown_row(self, label: str, baseline: RiderStats | None = None) -> str:
         """`baseline` adds each column's change against it,
         saving the reader the subtraction.
         `None` for the baseline's own row, which has nothing to differ
         from."""
-
-        def cell(value: float, base: float | None) -> str:
-            level = f"{value:,.0f} ({self.pct(value):.1f}%)"
-            if base is None:
-                return level
-            # `pct` of the change, not the change in `pct`:
-            # identical either way, every scenario classifying the same
-            # pairs and so sharing a total, and this one can't drift if
-            # that ever stops being true without the subtraction below
-            # becoming meaningless first.
-            delta = value - base
-            return f"{level}, {delta:+,.0f} ({self.pct(delta):+.1f}%)"
-
         one_seat, close, effective = (
             (None, None, None)
             if baseline is None
@@ -1235,9 +1236,9 @@ class RiderStats:
         return table_row(
             label,
             f"{self.total:,.0f}",
-            cell(self.one_seat, one_seat),
-            cell(self.close, close),
-            cell(self.effective, effective),
+            self.cell(self.one_seat, one_seat),
+            self.cell(self.close, close),
+            self.cell(self.effective, effective),
         )
 
     def summary_line(self, label: str) -> str:
