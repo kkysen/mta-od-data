@@ -256,6 +256,20 @@ class ScenarioWalks:
     def platforms(self) -> PlatformIndex:
         return self.walks.platforms
 
+    @cache  # noqa: B019  (see `corridor_platforms`)
+    def routes_by_complex(self) -> dict[int, Routes]:
+        """Every complex's routes under this scenario, worked out once.
+
+        `Scenario.routes_of` is a dict lookup and a set intersection,
+        and `classify` asks it twice per OD pair, which on a
+        three-scenario run over 250k pairs is 780k calls for 445
+        distinct answers.
+        """
+        return {
+            complex_id: self.scenario.routes_of(station)
+            for complex_id, station in self.walks.stations_by_id.items()
+        }
+
     # B019: `cache` on a method stores its entries on the *function*,
     # keyed by `self` among the arguments, so every `ScenarioWalks` ever
     # built stays alive with its measurements until the process ends.
@@ -357,7 +371,7 @@ class ScenarioWalks:
             close=dist_m <= self.walks.close_threshold_m,
             dist_m=dist_m,
             station=self.platforms.display(
-                complex_station, self.scenario.routes_of(complex_station)
+                complex_station, self.routes_by_complex()[complex_station.complex_id]
             ),
             at_origin=walk_at_origin,
         )
@@ -370,6 +384,7 @@ class ScenarioWalks:
         scope_ids: frozenset[int],
     ) -> ScenarioResult:
         rows: list[ODPair] = []
+        routes_by_complex = self.routes_by_complex()
         for origin_id, dest_id, riders in pairs:
             origin = self.walks.stations_by_id.get(origin_id)
             dest = self.walks.stations_by_id.get(dest_id)
@@ -381,8 +396,8 @@ class ScenarioWalks:
                     "`mta-od-data prepare --force-stations`"
                 )
 
-            effective_origin_routes = self.scenario.routes_of(origin)
-            effective_dest_routes = self.scenario.routes_of(dest)
+            effective_origin_routes = routes_by_complex[origin_id]
+            effective_dest_routes = routes_by_complex[dest_id]
             one_seat = bool(effective_origin_routes & effective_dest_routes)
 
             walk = (
