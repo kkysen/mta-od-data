@@ -156,6 +156,19 @@ class StationIndex:
             )
         return station
 
+    def routes_on_line(self, station: Station, line: str) -> Routes:
+        """What the complex's platforms *on this line* serve.
+
+        Not the complex's own routes, which are every line's together:
+        a delta names a line and applies to that line's platforms alone.
+        """
+        return frozenset(
+            route
+            for platform in self.platforms.by_complex.get(station.complex_id, ())
+            if platform.line == line
+            for route in platform.routes
+        )
+
     def check_routes(self, routes: Routes, *, name: str, path: Path) -> None:
         unknown = sorted(routes - self.known_routes)
         if unknown:
@@ -268,13 +281,18 @@ class Scenario:
                 # `59 St (N,R)` listed under a `remove D` group
                 # also had `add Q`, giving 959 riders a day
                 # a one-seat Q that doesn't stop there.
-                absent = sorted(remove - station.routes)
+                # Per line, not per complex: a complex can span lines
+                # (62 St/New Utrecht Av is West End and Sea Beach both),
+                # and a route the complex has elsewhere is still absent
+                # from the platforms this group names.
+                on_line = station_index.routes_on_line(station, group.line)
+                absent = sorted(remove - on_line)
                 if absent:
                     raise ScenarioError(
                         f'scenario {path}: scenario "{entry.name}" removes '
                         f"route(s) {absent} from "
                         f'"{station_name}" on line "{group.line}", which '
-                        f"only serves {sorted(station.routes)}. Either the "
+                        f"only serves {sorted(on_line)}. Either the "
                         f"station doesn't belong in this group, or the "
                         f"wrong route is named"
                     )
