@@ -11,7 +11,7 @@ from typing import Any
 
 from mta_od_data import DATA, ROOT
 from mta_od_data.analyze.common import Station
-from mta_od_data.analyze.deinterlining import SCENARIO_FILE_ADAPTER
+from mta_od_data.analyze.scenarios import SCENARIO_FILE_ADAPTER
 
 SCENARIOS_SCHEMA_FILE = (
     ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.schema.json"
