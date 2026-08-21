@@ -166,6 +166,13 @@ class ODPair:
     def ends(self) -> tuple[TripEnd, TripEnd]:
         return self.origin, self.destination
 
+    @property
+    def outcome(self) -> Outcome:
+        """What this scenario leaves the pair's riders with."""
+        if self.one_seat:
+            return Outcome.DIRECT
+        return Outcome.CLOSE if self.walk.close else Outcome.FAR
+
     @classmethod
     def csv_fields(cls) -> list[str]:
         """The columns `csv_row` produces, in its order."""
@@ -215,12 +222,6 @@ class Outcome(StrEnum):
     CLOSE = "close"
     FAR = "far"
 
-    @classmethod
-    def of(cls, pair: ODPair) -> Outcome:
-        if pair.one_seat:
-            return cls.DIRECT
-        return cls.CLOSE if pair.walk.close else cls.FAR
-
     @property
     def effective(self) -> bool:
         """Whether this counts towards effective one-seat."""
@@ -268,8 +269,8 @@ class Transitions:
             ], "scenario rows are not aligned"
             if not before_pair.both_ends:
                 continue
-            before = Outcome.of(before_pair)
-            after = Outcome.of(after_pair)
+            before = before_pair.outcome
+            after = after_pair.outcome
             riders[before, after] = riders.get((before, after), 0.0) + after_pair.riders
             if before is not after:
                 changed_rows.append((before, after, after_pair))
