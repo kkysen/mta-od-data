@@ -23,6 +23,7 @@ import json
 import re
 import shlex
 import sys
+from collections import defaultdict
 from collections.abc import Callable, Sequence
 from dataclasses import asdict, dataclass, fields, is_dataclass
 from enum import StrEnum
@@ -260,7 +261,7 @@ class Transitions:
 
     @classmethod
     def between(cls, baseline: ScenarioResult, result: ScenarioResult) -> Transitions:
-        riders: dict[tuple[Outcome, Outcome], float] = {}
+        riders: defaultdict[tuple[Outcome, Outcome], float] = defaultdict(float)
         changed_rows: list[tuple[Outcome, Outcome, ODPair]] = []
         baseline_labels: dict[tuple[int, int], str] = {}
         for before_pair, after_pair in zip(baseline.rows, result.rows, strict=True):
@@ -271,7 +272,7 @@ class Transitions:
                 continue
             before = before_pair.outcome
             after = after_pair.outcome
-            riders[before, after] = riders.get((before, after), 0.0) + after_pair.riders
+            riders[before, after] += after_pair.riders
             if before is not after:
                 changed_rows.append((before, after, after_pair))
                 baseline_labels[after_pair.origin.id, after_pair.destination.id] = (
@@ -314,7 +315,9 @@ class Transitions:
         return cls(
             baseline_name=baseline.scenario.name,
             scenario_name=result.scenario.name,
-            riders=riders,
+            # Plain, so that a cell never asked for stays absent
+            # instead of being created by the asking.
+            riders=dict(riders),
             total=sum(riders.values()),
             changed=changed,
         )
