@@ -168,16 +168,6 @@ STRANDING_SCENARIOS: dict[str, object] = {
 }
 
 
-@pytest.mark.xfail(
-    raises=AssertionError,
-    strict=True,
-    reason=(
-        "`ScenarioWalks.shortest_walk` asserts that a pair reaching it has a "
-        "corridor at one end or the other, on the grounds that `scope_ids` "
-        "excluded the rest. It doesn't: scope is the union across scenarios, "
-        "while a corridor to measure against is per scenario"
-    ),
-)
 def test_a_stranded_pair_is_far_not_a_crash(
     tmp_path: Path,
     station_index: StationIndex,
