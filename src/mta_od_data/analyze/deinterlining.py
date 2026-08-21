@@ -830,7 +830,6 @@ class Scenario:
         stations_by_id: dict[int, Station],
         stations_path: Path,
         scope_ids: frozenset[int],
-        platforms: PlatformIndex,
         walks: ScenarioWalks,
     ) -> ScenarioResult:
         rows: list[ODPair] = []
@@ -855,8 +854,8 @@ class Scenario:
 
             effective_origin_routes = self.routes_of(origin)
             effective_dest_routes = self.routes_of(dest)
-            origin_station = platforms.name(origin, effective_origin_routes)
-            dest_station = platforms.name(dest, effective_dest_routes)
+            origin_station = walks.platforms.name(origin, effective_origin_routes)
+            dest_station = walks.platforms.name(dest, effective_dest_routes)
             origin_routes = ",".join(sorted(effective_origin_routes))
             dest_routes = ",".join(sorted(effective_dest_routes))
             one_seat = bool(effective_origin_routes & effective_dest_routes)
@@ -1007,6 +1006,10 @@ class ScenarioWalks:
     walks: Walks
     scenario: Scenario
 
+    @property
+    def platforms(self) -> PlatformIndex:
+        return self.walks.platforms
+
     # B019 warns that caching a method keeps `self` alive forever, which
     # is what's wanted here: one of these lives exactly as long as the
     # scenario it classifies.
@@ -1100,7 +1103,7 @@ class ScenarioWalks:
         return Walk(
             close=dist_m <= self.walks.close_threshold_m,
             dist_m=dist_m,
-            near_station=self.walks.platforms.display(
+            near_station=self.platforms.display(
                 near_complex, self.scenario.routes_of(near_complex)
             ),
             at_origin=walk_at_origin,
@@ -1461,7 +1464,6 @@ class ScenarioComparison:
         stations_by_id: dict[int, Station],
         stations_path: Path,
         scope_ids: frozenset[int],
-        platforms: PlatformIndex,
         walks: Walks,
     ) -> ScenarioComparisonResult:
         return ScenarioComparisonResult(
@@ -1472,7 +1474,6 @@ class ScenarioComparison:
                     stations_by_id=stations_by_id,
                     stations_path=stations_path,
                     scope_ids=scope_ids,
-                    platforms=platforms,
                     walks=walks.for_scenario(scenario),
                 )
                 for scenario in self.scenarios
@@ -1888,7 +1889,6 @@ def deinterlining(
             stations_by_id=stations_by_id,
             stations_path=stations,
             scope_ids=scope_ids,
-            platforms=station_index.platforms,
             walks=walks,
         )
     except ScenarioError as e:
