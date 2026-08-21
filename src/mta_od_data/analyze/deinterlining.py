@@ -310,10 +310,7 @@ class Transitions:
             for symmetric in SymmetricPair.group(pairs)
         ]
 
-        def changed_riders(change: Change) -> float:
-            return change.pair.riders
-
-        changed.sort(key=changed_riders, reverse=True)
+        changed.sort(key=attrgetter("pair.riders"), reverse=True)
         return cls(
             baseline_name=baseline.scenario.name,
             scenario_name=result.scenario.name,
@@ -460,12 +457,9 @@ class SymmetricPair:
         for row in rows:
             by_ends[frozenset(e.id for e in row.ends)].append(row)
 
-        def row_riders(row: ODPair) -> float:
-            return row.riders
-
         pairs: list[SymmetricPair] = []
         for directions in by_ends.values():
-            forward, *rest = sorted(directions, key=row_riders, reverse=True)
+            forward, *rest = sorted(directions, key=attrgetter("riders"), reverse=True)
             pairs.append(cls(forward=forward, reverse=rest[0] if rest else None))
         return pairs
 
@@ -1050,7 +1044,7 @@ class ScenarioWalks:
             (self.min_dist_to_corridor(origin, dest_routes), True),
         ]
         measured = [
-            (best, at_origin) for best, at_origin in options if best is not None
+            (*best, at_origin) for best, at_origin in options if best is not None
         ]
         # Both ends unmeasurable means neither end is on the
         # comparison's routes, which `scope_ids` already excluded
@@ -1062,10 +1056,9 @@ class ScenarioWalks:
             f"measure a walk against, but the pair was fetched as in scope"
         )
 
-        def walk_dist(option: tuple[tuple[float, Station], bool]) -> float:
-            return option[0][0]
-
-        (dist_m, platform), walk_at_origin = min(measured, key=walk_dist)
+        # Keyed on the distance alone: two equal walks would otherwise
+        # be compared by the `Station` beside it, which doesn't order.
+        dist_m, platform, walk_at_origin = min(measured, key=itemgetter(0))
         complex_station = self.walks.stations_by_id[platform.complex_id]
         return Walk(
             close=dist_m <= self.walks.close_threshold_m,
@@ -1403,12 +1396,9 @@ class ScenarioResult:
             table_rule("rrrllrll"),
         ]
 
-        def pair_riders(pair: SymmetricPair) -> float:
-            return pair.riders
-
         both_ends_rows = [r for r in self.rows if r.both_ends]
         top_pairs = sorted(
-            SymmetricPair.group(both_ends_rows), key=pair_riders, reverse=True
+            SymmetricPair.group(both_ends_rows), key=attrgetter("riders"), reverse=True
         )[:top_n]
         for i, pr in enumerate(top_pairs, 1):
             fwd = pr.forward
