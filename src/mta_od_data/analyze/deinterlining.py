@@ -23,7 +23,7 @@ import json
 import re
 import shlex
 import sys
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass, fields, is_dataclass
 from enum import StrEnum
 from functools import cache
 from operator import itemgetter
@@ -110,61 +110,23 @@ NO_WALK = Walk(close=False, dist_m=0.0, station=None, at_origin=False)
 
 
 @dataclass(slots=True, frozen=True)
-class ODPair:
-    origin_id: int
+class TripEnd:
+    """One end of an `ODPair`--its origin or its destination--as one
+    scenario names it."""
+
+    id: int
     # Split rather than one display string, so a scenario comparison can
     # say what changed at an end (`8 Av (N -> B)`) without taking the
     # string back apart, and so the CSV can be filtered on either.
-    origin_station: str
-    origin_routes: str
-    dest_id: int
-    dest_station: str
-    dest_routes: str
-    riders: float
-    # Both ends served by the comparison's routes.
-    # The detailed tables are scoped to these
-    # (see `comparison_table_markdown`);
-    # the CSV keeps every row, with this column to filter on.
-    both_ends: bool
-    one_seat: bool
-    # `NO_WALK` when `one_seat`, there being no walk to model then.
-    walk: Walk
-
-    @classmethod
-    def csv_fields(cls) -> list[str]:
-        """The columns `csv_row` produces, in its order."""
-        return [fld.name for fld in fields(cls) if fld.name != "walk"] + [
-            f"walk_{fld.name}" for fld in fields(Walk)
-        ]
+    station: str
+    routes: str
 
     @property
-    def csv_row(self) -> dict[str, Any]:
-        """One flat row: a CSV column can't hold the nested `walk`,
-        so its fields are inlined after the pair's own,
-        under a `walk_` prefix.
+    def name(self) -> str:
+        return f"{self.station} ({self.routes})"
 
-        The prefix rather than their bare names,
-        which is what a nested field loses by being flattened:
-        `at_origin` says nothing beside an `origin_id` column,
-        and a lone `close` doesn't say close to what.
-        """
-        row = asdict(self)
-        walk = row.pop("walk")
-        return row | {f"walk_{name}": value for name, value in walk.items()}
-
-    @property
-    def origin_name(self) -> str:
-        return f"{self.origin_station} ({self.origin_routes})"
-
-    @property
-    def dest_name(self) -> str:
-        return f"{self.dest_station} ({self.dest_routes})"
-
-    @staticmethod
-    def end_label(
-        station: str, routes: str, other_station: str, other_routes: str
-    ) -> str:
-        """One end of a pair as the baseline names it,
+    def label(self, other: TripEnd) -> str:
+        """This end as the baseline names it,
         carrying what a scenario does to it.
 
         `8 Av (N)` against `8 Av (B)` reads `8 Av (N → B)`.
@@ -178,11 +140,62 @@ class ODPair:
         though, and then there is no shared name to factor out
         and both halves are named in full.
         """
-        if (station, routes) == (other_station, other_routes):
-            return f"{station} ({routes})"
-        if station == other_station:
-            return f"{station} ({routes} → {other_routes})"
-        return f"{station} ({routes}) → {other_station} ({other_routes})"
+        if (self.station, self.routes) == (other.station, other.routes):
+            return self.name
+        if self.station == other.station:
+            return f"{self.station} ({self.routes} → {other.routes})"
+        return f"{self.name} → {other.name}"
+
+
+@dataclass(slots=True, frozen=True)
+class ODPair:
+    origin: TripEnd
+    destination: TripEnd
+    riders: float
+    # Both ends served by the comparison's routes.
+    # The detailed tables are scoped to these
+    # (see `comparison_table_markdown`);
+    # the CSV keeps every row, with this column to filter on.
+    both_ends: bool
+    one_seat: bool
+    # `NO_WALK` when `one_seat`, there being no walk to model then.
+    walk: Walk
+
+    @property
+    def ends(self) -> tuple[TripEnd, TripEnd]:
+        return self.origin, self.destination
+
+    @classmethod
+    def csv_fields(cls) -> list[str]:
+        """The columns `csv_row` produces, in its order."""
+        return [
+            name
+            for fld in fields(cls)
+            for name in (
+                [f"{fld.name}_{nested.name}" for nested in fields(fld.type)]
+                if is_dataclass(fld.type)
+                else [fld.name]
+            )
+        ]
+
+    @property
+    def csv_row(self) -> dict[str, Any]:
+        """One flat row: a CSV column can't hold a nested `TripEnd` or
+        `Walk`, so each one's fields are inlined under the field's own
+        name as a prefix (`origin_id`, `walk_dist_m`).
+
+        The prefix rather than their bare names,
+        which is what a nested field loses by being flattened:
+        `at_origin` says nothing beside an `origin_id` column,
+        and a lone `station` doesn't say which end's.
+        """
+        row: dict[str, Any] = {}
+        for name, value in asdict(self).items():
+            if isinstance(value, dict):
+                row |= {f"{name}_{nested}": v for nested, v in value.items()}
+            else:
+                row[name] = value
+        return row
 
 
 class Outcome(StrEnum):
@@ -249,10 +262,9 @@ class Transitions:
         changed_rows: list[tuple[Outcome, Outcome, ODPair]] = []
         baseline_labels: dict[tuple[int, int], str] = {}
         for before_pair, after_pair in zip(baseline.rows, result.rows, strict=True):
-            assert (before_pair.origin_id, before_pair.dest_id) == (
-                after_pair.origin_id,
-                after_pair.dest_id,
-            ), "scenario rows are not aligned"
+            assert [e.id for e in before_pair.ends] == [
+                e.id for e in after_pair.ends
+            ], "scenario rows are not aligned"
             if not before_pair.both_ends:
                 continue
             before = Outcome.of(before_pair)
@@ -260,21 +272,14 @@ class Transitions:
             riders[before, after] = riders.get((before, after), 0.0) + after_pair.riders
             if before is not after:
                 changed_rows.append((before, after, after_pair))
-                baseline_labels[after_pair.origin_id, after_pair.dest_id] = f"{
-                    ODPair.end_label(
-                        before_pair.origin_station,
-                        before_pair.origin_routes,
-                        after_pair.origin_station,
-                        after_pair.origin_routes,
+                baseline_labels[after_pair.origin.id, after_pair.destination.id] = (
+                    " ↔ ".join(
+                        before_end.label(after_end)
+                        for before_end, after_end in zip(
+                            before_pair.ends, after_pair.ends, strict=True
+                        )
                     )
-                } ↔ {
-                    ODPair.end_label(
-                        before_pair.dest_station,
-                        before_pair.dest_routes,
-                        after_pair.dest_station,
-                        after_pair.dest_routes,
-                    )
-                }"
+                )
 
         # Grouped the same way the pair tables are, so a reader comparing
         # the two isn't matching one row against two.
@@ -292,7 +297,8 @@ class Transitions:
                 # one-seat ride between route sets sharing none. Each end
                 # carries what the scenario does to it (`8 Av (N -> B)`).
                 label=baseline_labels[
-                    symmetric.forward.origin_id, symmetric.forward.dest_id
+                    symmetric.forward.origin.id,
+                    symmetric.forward.destination.id,
                 ],
             )
             for (before, after), pairs in by_transition.items()
@@ -445,7 +451,7 @@ class SymmetricPair:
     def group(cls, rows: list[ODPair]) -> list[SymmetricPair]:
         by_ends: dict[frozenset[int], list[ODPair]] = {}
         for row in rows:
-            by_ends.setdefault(frozenset((row.origin_id, row.dest_id)), []).append(row)
+            by_ends.setdefault(frozenset(e.id for e in row.ends), []).append(row)
 
         def row_riders(row: ODPair) -> float:
             return row.riders
@@ -854,10 +860,6 @@ class Scenario:
 
             effective_origin_routes = self.routes_of(origin)
             effective_dest_routes = self.routes_of(dest)
-            origin_station = walks.platforms.name(origin, effective_origin_routes)
-            dest_station = walks.platforms.name(dest, effective_dest_routes)
-            origin_routes = ",".join(sorted(effective_origin_routes))
-            dest_routes = ",".join(sorted(effective_dest_routes))
             one_seat = bool(effective_origin_routes & effective_dest_routes)
 
             both_ends = origin_id in scope_ids and dest_id in scope_ids
@@ -882,12 +884,16 @@ class Scenario:
                         both_close += riders
 
             pair = ODPair(
-                origin_id=origin_id,
-                origin_station=origin_station,
-                origin_routes=origin_routes,
-                dest_id=dest_id,
-                dest_station=dest_station,
-                dest_routes=dest_routes,
+                origin=TripEnd(
+                    id=origin_id,
+                    station=walks.platforms.name(origin, effective_origin_routes),
+                    routes=",".join(sorted(effective_origin_routes)),
+                ),
+                destination=TripEnd(
+                    id=dest_id,
+                    station=walks.platforms.name(dest, effective_dest_routes),
+                    routes=",".join(sorted(effective_dest_routes)),
+                ),
                 riders=riders,
                 both_ends=both_ends,
                 one_seat=one_seat,
@@ -905,11 +911,11 @@ class Scenario:
                 # (`Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W)`) gave
                 # one report two conventions, and named the station by
                 # routes no row in it is about.
-                for stats, sid, name in (
-                    (origin_stats, origin_id, pair.origin_name),
-                    (dest_stats, dest_id, pair.dest_name),
+                for stats, end in (
+                    (origin_stats, pair.origin),
+                    (dest_stats, pair.destination),
                 ):
-                    e = stats.setdefault(sid, EndStats(name=name))
+                    e = stats.setdefault(end.id, EndStats(name=end.name))
                     e.total += riders
                     if one_seat:
                         e.one_seat += riders
@@ -1392,7 +1398,7 @@ class ScenarioResult:
                     close_str,
                     dist_str,
                     walk_str,
-                    f"{fwd.origin_name} ↔ {fwd.dest_name}",
+                    f"{fwd.origin.name} ↔ {fwd.destination.name}",
                 )
             )
         lines.append("")
