@@ -90,7 +90,7 @@ def slugify(name: str) -> str:
 @dataclass(slots=True, frozen=True)
 class Walk:
     """The shorter of the two walks that would turn a transfer trip into
-    a one-seat ride; see `ScenarioWalks.__call__`, which measures it."""
+    a one-seat ride; see `ScenarioWalks.shortest_walk`, which measures it."""
 
     # Within the comparison's `--close-threshold-m`.
     # Only meaningful against a pair that isn't already a one-seat ride.
@@ -871,7 +871,7 @@ class Scenario:
                     both_one_seat += riders
                 walk = NO_WALK
             else:
-                walk = walks(
+                walk = walks.shortest_walk(
                     origin,
                     dest,
                     effective_origin_routes,
@@ -1053,7 +1053,7 @@ class ScenarioWalks:
             key=itemgetter(0),
         )
 
-    def __call__(
+    def shortest_walk(
         self,
         origin: Station,
         dest: Station,
