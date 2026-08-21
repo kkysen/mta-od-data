@@ -453,6 +453,19 @@ class RouteDelta:
     def __or__(self, other: RouteDelta) -> RouteDelta:
         return RouteDelta(add=self.add | other.add, remove=self.remove | other.remove)
 
+    @property
+    def conflict(self) -> Routes:
+        """Routes this delta both adds and removes.
+
+        `apply` removes before it adds, so a route in both survives,
+        and the delta silently means "add" whatever the author intended.
+        Two deltas that disagree about a route
+        have no defensible merge, so callers raise instead:
+        this is the whole of `#5`, a plan combining two junctions
+        where both move the same route at the same platform.
+        """
+        return self.add & self.remove
+
     def apply(self, station: Station) -> Routes:
         return (station.routes - self.remove) | self.add
 
@@ -681,6 +694,12 @@ class Scenario:
                     f"every route it moves"
                 )
             delta = RouteDelta(add=add, remove=remove)
+            if delta.conflict:
+                raise ScenarioError(
+                    f'scenario {path}: scenario "{entry.name}" both adds '
+                    f"and removes route(s) {sorted(delta.conflict)} on line "
+                    f'"{group.line}"'
+                )
             for station_name in group.stations:
                 station = station_index.resolve(station_name, group.line, path=path)
                 # Removing a route a station doesn't serve is a no-op,
@@ -705,6 +724,13 @@ class Scenario:
                     )
                 key = (station, group.line)
                 existing = overrides.get(key)
+                if existing is not None and (existing | delta).conflict:
+                    raise ScenarioError(
+                        f'scenario {path}: scenario "{entry.name}" has two '
+                        f'override groups for "{station_name}" on line '
+                        f'"{group.line}" that disagree about route(s) '
+                        f"{sorted((existing | delta).conflict)}"
+                    )
                 overrides[key] = delta if existing is None else existing | delta
         effective_routes, platform_routes = cls.resolve_routes(
             overrides, station_index.platforms, routes
@@ -729,10 +755,25 @@ class Scenario:
         which is also why a single-element `scenarios` isn't returned
         as-is, its `effective_routes` being narrowed to just its own."""
         overrides: dict[tuple[Station, str], RouteDelta] = {}
+        # Which scenario last touched a key, to name both sides of a
+        # disagreement rather than just the second one.
+        source: dict[tuple[Station, str], str] = {}
         for scenario in scenarios:
             for key, delta in scenario.overrides.items():
                 existing = overrides.get(key)
+                if existing is not None and (existing | delta).conflict:
+                    station, line = key
+                    raise ScenarioError(
+                        f'scenarios "{source[key]}" and "{scenario.name}" '
+                        f"can't be combined: they disagree about route(s) "
+                        f"{sorted((existing | delta).conflict)} at "
+                        f'"{station.name}" on line "{line}". One adds what '
+                        f"the other takes away, and `RouteDelta.apply` "
+                        f"removes before it adds, so combining them would "
+                        f"silently keep the route"
+                    )
                 overrides[key] = delta if existing is None else existing | delta
+                source[key] = scenario.name
         effective_routes, platform_routes = cls.resolve_routes(
             overrides, platforms, routes
         )
