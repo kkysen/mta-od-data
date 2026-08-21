@@ -22,7 +22,7 @@ import shlex
 import sys
 from collections import defaultdict
 from collections.abc import Callable, Sequence
-from dataclasses import asdict, dataclass, fields, is_dataclass
+from dataclasses import asdict, dataclass, field, fields, is_dataclass
 from enum import StrEnum
 from functools import cache
 from operator import attrgetter, itemgetter
@@ -41,7 +41,7 @@ from mta_od_data.analyze.common import (
     DayType,
     PlatformIndex,
     Station,
-    haversine_m,
+    haversine,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.scenarios import (
@@ -201,6 +201,48 @@ class Outcome(StrEnum):
         return self is not Outcome.FAR
 
 
+# An index into `WalkPoints.locations`, naming one platform -- or the
+# centroid of a complex with no platform rows of its own, which is the
+# only other thing a walk is ever measured from.
+# An `int` rather than a type of its own: it is used as a dict key
+# hundreds of thousands of times a run, which is the whole point of it,
+# and anything wrapping it hashes an order of magnitude slower.
+type PlatformId = int
+
+
+@dataclass(slots=True, frozen=True)
+class WalkPoints:
+    """Every location a walk can be measured between, by `PlatformId`.
+
+    Walks run platform to platform: a rider leaves from whichever of
+    their complex's platforms is nearest what they are walking to, so a
+    complex enters as all of its platforms at once, which is what
+    `by_complex` holds.
+    """
+
+    locations: list[Coord]
+    by_complex: dict[int, tuple[PlatformId, ...]]
+
+    @classmethod
+    def build(
+        cls, individual_stations: list[Station], stations_by_id: dict[int, Station]
+    ) -> WalkPoints:
+        locations = [platform.loc for platform in individual_stations]
+        by_complex: defaultdict[int, list[PlatformId]] = defaultdict(list)
+        for platform_id, platform in enumerate(individual_stations):
+            by_complex[platform.complex_id].append(platform_id)
+        for complex_id, station in stations_by_id.items():
+            if complex_id not in by_complex:
+                # No platform rows of its own, so its centroid stands in,
+                # and takes an id past the last platform's.
+                by_complex[complex_id] = [len(locations)]
+                locations.append(station.loc)
+        return cls(
+            locations=locations,
+            by_complex={cid: tuple(ids) for cid, ids in by_complex.items()},
+        )
+
+
 @dataclass(slots=True, frozen=True, eq=False)
 class Walks:
     """One run's station data, everything measuring a walk needs
@@ -220,21 +262,33 @@ class Walks:
     individual_stations: list[Station]
     platforms: PlatformIndex
     close_threshold_m: float
+    # Keyed on `PlatformId`s rather than the `Coord`s themselves, which
+    # are dataclasses: a dataclass recomputes its hash on every lookup,
+    # where an int is its own.
+    distances: dict[tuple[PlatformId, PlatformId], float] = field(default_factory=dict)
 
     def for_scenario(self, scenario: Scenario) -> ScenarioWalks:
         return ScenarioWalks(walks=self, scenario=scenario)
 
-    def platform_locations(self, station: Station) -> list[Coord]:
-        """Where a walk to or from this complex is measured from.
+    @cache  # noqa: B019  (see `ScenarioWalks.corridor_platforms`)
+    def points(self) -> WalkPoints:
+        return WalkPoints.build(self.individual_stations, self.stations_by_id)
 
-        Its platforms', not its centroid's, and the complex itself only
-        when it has no platform rows of its own to use instead.
+    def distance(self, point: PlatformId, other: PlatformId) -> float:
+        """Metres between two of `points`, remembered.
+
+        Shared by every scenario: where a platform is doesn't depend on
+        which routes stop there.
         """
-        return [
-            platform.loc
-            for platform in self.platforms.by_complex.get(station.complex_id)
-            or (station,)
-        ]
+        key = (point, other)
+        metres = self.distances.get(key)
+        if metres is None:
+            locations = self.points().locations
+            here, there = locations[point], locations[other]
+            metres = self.distances[key] = haversine(
+                here.lat, here.lon, there.lat, there.lon
+            )
+        return metres
 
 
 @dataclass(slots=True, frozen=True, eq=False)
@@ -300,7 +354,9 @@ class ScenarioWalks:
     # and exits -- but a long-lived caller comparing scenario after
     # scenario would grow this without bound, and wants its own cache.
     @cache  # noqa: B019
-    def corridor_platforms(self, corridor_routes: Routes) -> list[Station]:
+    def corridor_platforms(
+        self, corridor_routes: Routes
+    ) -> list[tuple[PlatformId, Station]]:
         """The platforms a rider could board this corridor at,
         under this scenario.
 
@@ -312,14 +368,14 @@ class ScenarioWalks:
         every route the complex has understated a walk by up to that.
         """
         return [
-            platform
-            for platform in self.walks.individual_stations
+            (platform_id, platform)
+            for platform_id, platform in enumerate(self.walks.individual_stations)
             if self.scenario.routes_at(platform) & corridor_routes
         ]
 
     @cache  # noqa: B019  (see `corridor_platforms`)
     def min_dist_to_route(
-        self, station: Station, route: str
+        self, complex_id: int, route: str
     ) -> tuple[float, Station] | None:
         """The nearest platform this route stops at, and how far.
 
@@ -331,20 +387,31 @@ class ScenarioWalks:
         if not candidates:
             return None
 
-        # By distance alone: two platforms exactly as far away would
-        # otherwise be compared as `Station`s, which don't order.
-        return min(
-            (
-                (haversine_m(point, platform.loc), platform)
-                for point in self.walks.platform_locations(station)
-                for platform in candidates
-            ),
-            key=itemgetter(0),
-        )
+        # Written out rather than a `min` over a generator: this is the
+        # innermost loop of a run, some 220k platform pairs, and the
+        # generator built a throwaway tuple for every one of them while
+        # the dict lookup below is most of the work.
+        # Strictly nearer, so the first of two equally distant platforms
+        # wins, which is also what `min` would do.
+        distances = self.walks.distances
+        locations = self.walks.points().locations
+        nearest: tuple[float, Station] | None = None
+        for point in self.walks.points().by_complex[complex_id]:
+            for platform_id, platform in candidates:
+                key = (point, platform_id)
+                metres = distances.get(key)
+                if metres is None:
+                    here, there = locations[point], locations[platform_id]
+                    metres = distances[key] = haversine(
+                        here.lat, here.lon, there.lat, there.lon
+                    )
+                if nearest is None or metres < nearest[0]:
+                    nearest = (metres, platform)
+        return nearest
 
     @cache  # noqa: B019  (see `corridor_platforms`)
     def min_dist_to_corridor(
-        self, station: Station, corridor_routes: Routes
+        self, complex_id: int, corridor_routes: Routes
     ) -> tuple[float, Station] | None:
         """The nearest platform a rider could board this corridor at.
 
@@ -364,7 +431,7 @@ class ScenarioWalks:
         measured = [
             nearest
             for route in sorted(corridor_routes)
-            if (nearest := self.min_dist_to_route(station, route)) is not None
+            if (nearest := self.min_dist_to_route(complex_id, route)) is not None
         ]
         return min(measured, key=itemgetter(0)) if measured else None
 
@@ -391,8 +458,8 @@ class ScenarioWalks:
         so they must classify alike.
         """
         options = [
-            (self.min_dist_to_corridor(dest, origin_routes), False),
-            (self.min_dist_to_corridor(origin, dest_routes), True),
+            (self.min_dist_to_corridor(dest.complex_id, origin_routes), False),
+            (self.min_dist_to_corridor(origin.complex_id, dest_routes), True),
         ]
         measured = [
             (*best, at_origin) for best, at_origin in options if best is not None
