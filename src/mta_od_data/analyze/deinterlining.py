@@ -490,6 +490,29 @@ class RouteDelta:
         return (station.routes - self.remove) | self.add
 
 
+# A complex and the line an override named,
+# which is what a delta is keyed by; see `Scenario.overrides` for why both.
+type OverrideKey = tuple[Station, str]
+type Overrides = dict[OverrideKey, RouteDelta]
+
+
+def merge_override(overrides: Overrides, key: OverrideKey, delta: RouteDelta) -> Routes:
+    """Merge `delta` into whatever `key` already holds.
+
+    Returns the routes the two disagree about, empty when they agree.
+    A disagreement leaves `overrides` untouched
+    and is the caller's to report,
+    since who is disagreeing is all that separates the two ways
+    to arrive here: two override groups in one scenario,
+    and two scenarios being combined.
+    """
+    existing = overrides.get(key)
+    merged = delta if existing is None else existing | delta
+    if not merged.conflict:
+        overrides[key] = merged
+    return merged.conflict
+
+
 class OverrideGroup(BaseModel):
     """`line` (e.g. "8th Av - Fulton St") is required
     even where a station name is already unique:
@@ -647,7 +670,7 @@ class Scenario:
     # complex can span lines: 62 St/New Utrecht Av is one complex whose
     # West End and Sea Beach platforms a scenario moves separately, and
     # a delta keyed by the complex alone would apply to both.
-    overrides: dict[tuple[Station, str], RouteDelta]
+    overrides: Overrides
     # A complex's routes are the union of its platforms', which the
     # station data holds to exactly, so these stay derived rather than
     # tracked.
@@ -673,7 +696,7 @@ class Scenario:
 
     @staticmethod
     def resolve_routes(
-        overrides: dict[tuple[Station, str], RouteDelta],
+        overrides: Overrides,
         platforms: PlatformIndex,
         routes: Routes,
     ) -> tuple[dict[Station, Routes], dict[Station, Routes]]:
@@ -701,7 +724,7 @@ class Scenario:
     ) -> Scenario:
         routes = frozenset(entry.routes)
         station_index.check_routes(routes, name=entry.name, path=path)
-        overrides: dict[tuple[Station, str], RouteDelta] = {}
+        overrides: Overrides = {}
         for group in entry.overrides:
             add = frozenset(group.add)
             remove = frozenset(group.remove)
@@ -742,16 +765,14 @@ class Scenario:
                         f"station doesn't belong in this group, or the "
                         f"wrong route is named"
                     )
-                key = (station, group.line)
-                existing = overrides.get(key)
-                if existing is not None and (existing | delta).conflict:
+                conflict = merge_override(overrides, (station, group.line), delta)
+                if conflict:
                     raise ScenarioError(
                         f'scenario {path}: scenario "{entry.name}" has two '
                         f'override groups for "{station_name}" on line '
                         f'"{group.line}" that disagree about route(s) '
-                        f"{sorted((existing | delta).conflict)}"
+                        f"{sorted(conflict)}"
                     )
-                overrides[key] = delta if existing is None else existing | delta
         effective_routes, platform_routes = cls.resolve_routes(
             overrides, station_index.platforms, routes
         )
@@ -774,25 +795,24 @@ class Scenario:
         not these scenarios' own,
         which is also why a single-element `scenarios` isn't returned
         as-is, its `effective_routes` being narrowed to just its own."""
-        overrides: dict[tuple[Station, str], RouteDelta] = {}
+        overrides: Overrides = {}
         # Which scenario last touched a key, to name both sides of a
         # disagreement rather than just the second one.
-        source: dict[tuple[Station, str], str] = {}
+        source: dict[OverrideKey, str] = {}
         for scenario in scenarios:
             for key, delta in scenario.overrides.items():
-                existing = overrides.get(key)
-                if existing is not None and (existing | delta).conflict:
+                conflict = merge_override(overrides, key, delta)
+                if conflict:
                     station, line = key
                     raise ScenarioError(
                         f'scenarios "{source[key]}" and "{scenario.name}" '
                         f"can't be combined: they disagree about route(s) "
-                        f"{sorted((existing | delta).conflict)} at "
+                        f"{sorted(conflict)} at "
                         f'"{station.name}" on line "{line}". One adds what '
                         f"the other takes away, and `RouteDelta.apply` "
                         f"removes before it adds, so combining them would "
                         f"silently keep the route"
                     )
-                overrides[key] = delta if existing is None else existing | delta
                 source[key] = scenario.name
         effective_routes, platform_routes = cls.resolve_routes(
             overrides, platforms, routes
