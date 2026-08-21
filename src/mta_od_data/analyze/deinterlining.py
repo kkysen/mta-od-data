@@ -101,19 +101,26 @@ class Walk:
     a one-seat ride; see the `close_lookup` `make_close_lookup` returns."""
 
     # Within the comparison's `--close-threshold-m`.
+    # Only meaningful against a pair that isn't already a one-seat ride.
     close: bool
-    dist_m: float
-    # The station the walk reaches, named under the scenario.
-    near_station: str | None
     # Which end the walk is at.
     # Symmetric in the pair, but not a property of it:
     # which end is the shorter walk is exactly what this records.
     at_origin: bool
+    dist_m: float
+    # The station the walk reaches, named under the scenario.
+    near_station: str | None
 
 
 # A one-seat ride, where the ridden route stops at both ends
 # and there is no walk to model.
-NO_WALK = Walk(close=False, dist_m=0.0, near_station=None, at_origin=False)
+NO_WALK = Walk(close=False, at_origin=False, dist_m=0.0, near_station=None)
+
+
+# `Walk`'s fields become columns under their own names,
+# except this one: `at_origin` says nothing on its own
+# once it sits alongside the pair's own columns.
+WALK_COLUMNS = {"at_origin": "walk_at_origin"}
 
 
 @dataclass(slots=True, frozen=True)
@@ -134,16 +141,26 @@ class ODPair:
     # the CSV keeps every row, with this column to filter on.
     both_ends: bool
     one_seat: bool
-    # Only meaningful when `one_seat` is false.
-    close: bool
-    # Which end the walk in `dist_m` is at.
-    # Symmetric in the pair, but not a property of it:
-    # which end is the shorter walk is exactly what this records.
-    walk_at_origin: bool
-    # 0.0 for a one-seat ride, where the ridden route stops at both ends
-    # and there is no walk to model.
-    dist_m: float
-    near_station: str | None
+    # `NO_WALK` when `one_seat`, there being no walk to model then.
+    # Last, and flattened in place by `csv_row`,
+    # so its fields stay the last columns of a CSV row.
+    walk: Walk
+
+    @classmethod
+    def csv_fields(cls) -> list[str]:
+        return [
+            WALK_COLUMNS.get(fld.name, fld.name)
+            for fld in (*fields(cls), *fields(Walk))
+            if fld.name != "walk"
+        ]
+
+    @property
+    def csv_row(self) -> dict[str, Any]:
+        """Flat: a CSV column can't hold the nested `walk`,
+        and its fields are what a reader filters on."""
+        row = asdict(self)
+        walk = row.pop("walk")
+        return row | {WALK_COLUMNS.get(k, k): v for k, v in walk.items()}
 
     @property
     def origin_name(self) -> str:
@@ -198,7 +215,7 @@ class Outcome(StrEnum):
     def of(cls, pair: ODPair) -> Outcome:
         if pair.one_seat:
             return cls.DIRECT
-        return cls.CLOSE if pair.close else cls.FAR
+        return cls.CLOSE if pair.walk.close else cls.FAR
 
     @property
     def effective(self) -> bool:
@@ -390,7 +407,7 @@ class Transitions:
             ]
             for i, change in enumerate(self.changed[:top_n], 1):
                 fwd = change.pair.forward
-                dist = "" if fwd.one_seat else f"{fwd.dist_m:.0f}m"
+                dist = "" if fwd.one_seat else f"{fwd.walk.dist_m:.0f}m"
                 lines.append(
                     table_row(
                         str(i),
@@ -885,10 +902,7 @@ class Scenario:
                 riders=riders,
                 both_ends=both_ends,
                 one_seat=one_seat,
-                close=walk.close,
-                walk_at_origin=walk.at_origin,
-                dist_m=walk.dist_m,
-                near_station=walk.near_station,
+                walk=walk,
             )
             rows.append(pair)
 
@@ -1139,9 +1153,9 @@ class ScenarioResult:
 
     def write_csv(self, path: Path) -> None:
         with path.open("w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=[fld.name for fld in fields(ODPair)])
+            writer = csv.DictWriter(f, fieldnames=ODPair.csv_fields())
             writer.writeheader()
-            writer.writerows(asdict(r) for r in self.rows)
+            writer.writerows(r.csv_row for r in self.rows)
         print(f"\nWrote {len(self.rows):,} rows to {path}")
 
     def print_headline(self, *, close_threshold_m: float) -> None:
@@ -1218,13 +1232,13 @@ class ScenarioResult:
                 type_str, close_str, dist_str, walk_str = "1-seat", "", "", ""
             else:
                 type_str = "xfer"
-                close_str = "close" if fwd.close else "far"
-                dist_str = f"{fwd.dist_m:.0f}m"
+                close_str = "close" if fwd.walk.close else "far"
+                dist_str = f"{fwd.walk.dist_m:.0f}m"
                 # The station walked *to*, which is the actionable half,
                 # tagged with the end it's at rather than an arrow, so it
                 # reads the same whichever way the row is oriented.
-                end = "origin" if fwd.walk_at_origin else "dest"
-                walk_str = f"{end}: {fwd.near_station}"
+                end = "origin" if fwd.walk.at_origin else "dest"
+                walk_str = f"{end}: {fwd.walk.near_station}"
             lines.append(
                 table_row(
                     str(i),
