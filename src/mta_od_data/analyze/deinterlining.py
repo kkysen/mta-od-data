@@ -1266,7 +1266,7 @@ class RiderStats:
 
 
 @dataclass(slots=True, frozen=True)
-class EndStats:
+class TripEndStats:
     """One end of a trip--an origin or a destination--summed over every
     trip with the other end anywhere.
     The same shape either way,
@@ -1278,7 +1278,7 @@ class EndStats:
     @classmethod
     def by_station(
         cls, rows: list[ODPair], end: Callable[[ODPair], TripEnd]
-    ) -> dict[int, EndStats]:
+    ) -> dict[int, TripEndStats]:
         """Every station `end` picks out, keyed by complex.
 
         Keyed by first appearance in `rows`,
@@ -1311,8 +1311,8 @@ class ScenarioResult:
     # where a swap shows up undiluted by trips only half in scope.
     both_ends: RiderStats
     rows: list[ODPair]
-    origin_stats: dict[int, EndStats]
-    dest_stats: dict[int, EndStats]
+    origin_stats: dict[int, TripEndStats]
+    destination_stats: dict[int, TripEndStats]
 
     @classmethod
     def of(cls, scenario: Scenario, rows: list[ODPair]) -> ScenarioResult:
@@ -1329,8 +1329,10 @@ class ScenarioResult:
             overall=RiderStats.of(rows),
             both_ends=RiderStats.of(both_ends),
             rows=rows,
-            origin_stats=EndStats.by_station(both_ends, attrgetter("origin")),
-            dest_stats=EndStats.by_station(both_ends, attrgetter("destination")),
+            origin_stats=TripEndStats.by_station(both_ends, attrgetter("origin")),
+            destination_stats=TripEndStats.by_station(
+                both_ends, attrgetter("destination")
+            ),
         )
 
     def write_csv(self, path: Path) -> None:
@@ -1442,7 +1444,7 @@ class ScenarioResult:
         # as a destination.
         for label, end, stats in (
             ("origin", "destinations", self.origin_stats),
-            ("destination", "origins", self.dest_stats),
+            ("destination", "origins", self.destination_stats),
         ):
             lines += [
                 f"{h2} Top {top_n} {label.capitalize()} Stations, "
