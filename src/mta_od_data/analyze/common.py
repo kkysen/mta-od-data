@@ -161,14 +161,22 @@ class PlatformIndex:
         return f"{self.name(station, routes)} ({','.join(sorted(routes))})"
 
 
-@cache
-def haversine_m(c1: Coord, c2: Coord) -> float:
+def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Great-circle metres between two points, in degrees.
+
+    Uncached, for a caller that keys its own cache on something cheaper
+    to hash than a pair of `Coord`s; `haversine_m` is the cached one."""
     r = 6_371_000.0
-    p1, p2 = radians(c1.lat), radians(c2.lat)
-    dphi = radians(c2.lat - c1.lat)
-    dlambda = radians(c2.lon - c1.lon)
+    p1, p2 = radians(lat1), radians(lat2)
+    dphi = radians(lat2 - lat1)
+    dlambda = radians(lon2 - lon1)
     a = sin(dphi / 2) ** 2 + cos(p1) * cos(p2) * sin(dlambda / 2) ** 2
     return 2 * r * asin(sqrt(a))
+
+
+@cache
+def haversine_m(c1: Coord, c2: Coord) -> float:
+    return haversine(c1.lat, c1.lon, c2.lat, c2.lon)
 
 
 class DayFilterError(Exception):
