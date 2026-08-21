@@ -330,15 +330,20 @@ class ScenarioWalks:
         measured = [
             (*best, at_origin) for best, at_origin in options if best is not None
         ]
-        # Both ends unmeasurable means neither end is on the
-        # comparison's routes, which `scope_ids` already excluded
-        # from the query.
-        # Loud rather than silently `far`, per the same argument as
-        # `one_seat_rides.py`'s `assert candidates`.
-        assert measured, (
-            f"neither {origin.name} nor {dest.name} has a corridor to "
-            f"measure a walk against, but the pair was fetched as in scope"
-        )
+        if not measured:
+            # Neither end has a route in this comparison *under this
+            # scenario*, so there is no corridor at either end to walk
+            # to and no walk that would make the trip a one-seat ride:
+            # `far`, which is what `NO_WALK` classifies as.
+            #
+            # Reachable, and not a bug in scoping: a pair is fetched if
+            # either end is in `scope_ids`, which is the union across
+            # scenarios, while a corridor to measure against is per
+            # scenario. A scenario that takes a station's every
+            # comparison route away strands it under that scenario
+            # alone, and a trip from there to somewhere off the routes
+            # entirely has nothing measurable at either end.
+            return NO_WALK
 
         # Keyed on the distance alone: two equal walks would otherwise
         # be compared by the `Station` beside it, which doesn't order.
