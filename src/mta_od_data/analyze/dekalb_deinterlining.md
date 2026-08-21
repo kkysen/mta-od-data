@@ -17,8 +17,8 @@ The 837,408 riders whose origin *and* destination are served by B,D,N,Q,R: the t
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | ---: | ---: | ---: | ---: |
 | Current | 837,408 | 612,795 (73.2%) | 86,527 (10.3%) | 699,321 (83.5%) |
-| B/D 4 Av Express | 837,408 | 593,038 (70.8%), -19,757 (-2.4%) | 93,517 (11.2%), +6,991 (+0.8%) | 686,555 (82.0%), -12,766 (-1.5%) |
-| N/Q 4 Av Express | 837,408 | 579,066 (69.1%), -33,728 (-4.0%) | 96,257 (11.5%), +9,730 (+1.2%) | 675,323 (80.6%), -23,998 (-2.9%) |
+| B/D 4 Av Express | 837,408 | 590,180 (70.5%), -22,615 (-2.7%) | 95,655 (11.4%), +9,129 (+1.1%) | 685,835 (81.9%), -13,486 (-1.6%) |
+| N/Q 4 Av Express | 837,408 | 579,146 (69.2%), -33,649 (-4.0%) | 96,421 (11.5%), +9,895 (+1.2%) | 675,567 (80.7%), -23,754 (-2.8%) |
 
 ### Either End on the Comparison's Routes
 
@@ -27,8 +27,8 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | ---: | ---: | ---: | ---: |
 | Current | 2,332,194 | 612,795 (26.3%) | 229,764 (9.9%) | 842,558 (36.1%) |
-| B/D 4 Av Express | 2,332,194 | 593,038 (25.4%), -19,757 (-0.8%) | 235,698 (10.1%), +5,935 (+0.3%) | 828,736 (35.5%), -13,822 (-0.6%) |
-| N/Q 4 Av Express | 2,332,194 | 579,066 (24.8%), -33,728 (-1.4%) | 238,758 (10.2%), +8,995 (+0.4%) | 817,825 (35.1%), -24,734 (-1.1%) |
+| B/D 4 Av Express | 2,332,194 | 590,180 (25.3%), -22,615 (-1.0%) | 236,274 (10.1%), +6,511 (+0.3%) | 826,454 (35.4%), -16,104 (-0.7%) |
+| N/Q 4 Av Express | 2,332,194 | 579,146 (24.8%), -33,649 (-1.4%) | 238,741 (10.2%), +8,977 (+0.4%) | 817,886 (35.1%), -24,672 (-1.1%) |
 
 ---
 
@@ -140,13 +140,13 @@ Every both-ends rider, and their share of the 837,408 of them: **was** is what C
 
 | Riders | now direct | now close | now far |
 | --- | ---: | ---: | ---: |
-| **was direct** | 585,153 (69.9%) | 9,252 (1.1%) | 18,390 (2.2%) |
+| **was direct** | 582,843 (69.6%) | 11,390 (1.4%) | 18,562 (2.2%) |
 | **was close** | 2,130 (0.3%) | 84,124 (10.0%) | 272 (0.0%) |
-| **was far** | 5,754 (0.7%) | 142 (0.0%) | 132,191 (15.8%) |
+| **was far** | 5,207 (0.6%) | 142 (0.0%) | 132,738 (15.9%) |
 
-- **Gained an effective one-seat ride: 5,896 (0.7%)**
-- **Lost one: 18,662 (2.2%)**
-- **Net: -12,766 (-1.5%)**
+- **Gained an effective one-seat ride: 5,349 (0.6%)**
+- **Lost one: 18,835 (2.2%)**
+- **Net: -13,486 (-1.6%)**
 
 ### Biggest Changes, against Current
 
@@ -156,29 +156,29 @@ The top 25 station pairs by riders whose outcome moved, both directions combined
 | ---: | ---: | --- | --- | ---: | --- |
 | 1 | 919 | direct | far | 518m | Canal St (N,Q,R) ↔ 8 Av (N → B) |
 | 2 | 774 | direct | close | 274m | Kings Hwy (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 3 | 633 | direct | close | 191m | Kings Hwy (B,Q → N,Q) ↔ 42 St-Bryant Pk (B,D) |
-| 4 | 584 | far | direct | | 8 Av (N → B) ↔ Grand St (B,D) |
-| 5 | 575 | direct | close | 274m | Sheepshead Bay (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 6 | 557 | direct | far | 518m | Kings Hwy (B,Q → N,Q) ↔ Grand St (B,D) |
-| 7 | 534 | direct | far | 518m | Fort Hamilton Pkwy (N → B) ↔ Canal St (N,Q,R) |
-| 8 | 509 | direct | far | 518m | Bay Pkwy (N → B) ↔ Canal St (N,Q,R) |
-| 9 | 505 | direct | close | 274m | 7 Av (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 10 | 436 | direct | close | 191m | Times Sq-42 St (N,Q,R) ↔ 8 Av (N → B) |
-| 11 | 435 | direct | close | 191m | Sheepshead Bay (B,Q → N,Q) ↔ 42 St-Bryant Pk (B,D) |
-| 12 | 423 | direct | far | 518m | Sheepshead Bay (B,Q → N,Q) ↔ Grand St (B,D) |
-| 13 | 408 | direct | far | 795m | 7 Av (B,Q → N,Q) ↔ Broadway-Lafayette St (B,D) |
-| 14 | 402 | direct | far | 1429m | Coney Island-Stillwell Av (D,N,Q) ↔ 8 Av (N → B) |
-| 15 | 393 | direct | far | 518m | Kings Hwy (N → B) ↔ Canal St (N,Q,R) |
-| 16 | 349 | direct | far | 518m | 20 Av (N → B) ↔ Canal St (N,Q,R) |
-| 17 | 340 | direct | far | 413m | Kings Hwy (B,Q → N,Q) ↔ 59 St-Columbus Circle (B,D) |
-| 18 | 332 | direct | close | 191m | 7 Av (B,Q → N,Q) ↔ 42 St-Bryant Pk (B,D) |
-| 19 | 318 | direct | close | 274m | Newkirk Plaza (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 20 | 314 | direct | far | 867m | 8 Av (N → B) ↔ 14 St-Union Sq (N,Q,R) |
-| 21 | 312 | direct | close | 274m | Church Av (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 22 | 307 | direct | far | 1720m | Coney Island-Stillwell Av (D,N,Q) ↔ 59 St (N,R → B,R) |
-| 23 | 306 | direct | close | 191m | Fort Hamilton Pkwy (N → B) ↔ Times Sq-42 St (N,Q,R) |
-| 24 | 305 | direct | far | 795m | Church Av (B,Q → N,Q) ↔ Broadway-Lafayette St (B,D) |
-| 25 | 297 | direct | far | 518m | 18 Av (N → B) ↔ Canal St (N,Q,R) |
+| 3 | 707 | direct | close | 274m | DeKalb Av (B,Q,R → N,Q,R) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 4 | 633 | direct | close | 191m | Kings Hwy (B,Q → N,Q) ↔ 42 St-Bryant Pk (B,D) |
+| 5 | 599 | direct | far | 518m | DeKalb Av (B,Q,R → N,Q,R) ↔ Grand St (B,D) |
+| 6 | 584 | far | direct | | 8 Av (N → B) ↔ Grand St (B,D) |
+| 7 | 582 | direct | close | 191m | DeKalb Av (B,Q,R → N,Q,R) ↔ 42 St-Bryant Pk (B,D) |
+| 8 | 575 | direct | close | 274m | Sheepshead Bay (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 9 | 557 | direct | far | 518m | Kings Hwy (B,Q → N,Q) ↔ Grand St (B,D) |
+| 10 | 534 | direct | close | 166m | DeKalb Av (B,Q,R → N,Q,R) ↔ Broadway-Lafayette St (B,D) |
+| 11 | 534 | direct | far | 518m | Fort Hamilton Pkwy (N → B) ↔ Canal St (N,Q,R) |
+| 12 | 509 | direct | far | 518m | Bay Pkwy (N → B) ↔ Canal St (N,Q,R) |
+| 13 | 505 | direct | close | 274m | 7 Av (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 14 | 436 | direct | close | 191m | Times Sq-42 St (N,Q,R) ↔ 8 Av (N → B) |
+| 15 | 435 | direct | close | 191m | Sheepshead Bay (B,Q → N,Q) ↔ 42 St-Bryant Pk (B,D) |
+| 16 | 423 | direct | far | 518m | Sheepshead Bay (B,Q → N,Q) ↔ Grand St (B,D) |
+| 17 | 408 | direct | far | 795m | 7 Av (B,Q → N,Q) ↔ Broadway-Lafayette St (B,D) |
+| 18 | 393 | direct | far | 518m | Kings Hwy (N → B) ↔ Canal St (N,Q,R) |
+| 19 | 381 | direct | far | 699m | W 4 St-Wash Sq (B,D) ↔ DeKalb Av (B,Q,R → N,Q,R) |
+| 20 | 349 | direct | far | 518m | 20 Av (N → B) ↔ Canal St (N,Q,R) |
+| 21 | 340 | direct | far | 413m | Kings Hwy (B,Q → N,Q) ↔ 59 St-Columbus Circle (B,D) |
+| 22 | 332 | direct | close | 191m | 7 Av (B,Q → N,Q) ↔ 42 St-Bryant Pk (B,D) |
+| 23 | 318 | direct | close | 274m | Newkirk Plaza (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 24 | 314 | direct | far | 867m | 8 Av (N → B) ↔ 14 St-Union Sq (N,Q,R) |
+| 25 | 312 | direct | close | 274m | Church Av (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
 
 ### Top 25 Origin/Destination Pairs
 
@@ -221,26 +221,26 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 54,350 | 69.9% | 100.0% | Times Sq-42 St (N,Q,R) |
 | 48,290 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,N,Q,R) |
 | 29,069 | 81.6% | 86.7% | 14 St-Union Sq (N,Q,R) |
-| 22,108 | 50.8% | 93.2% | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 22,108 | 49.3% | 93.2% | 47-50 Sts-Rockefeller Ctr (B,D) |
 | 22,015 | 67.1% | 74.2% | Cortlandt St (R) |
-| 19,234 | 59.3% | 74.7% | 59 St-Columbus Circle (B,D) |
+| 19,234 | 58.6% | 74.1% | 59 St-Columbus Circle (B,D) |
 | 18,461 | 100.0% | 100.0% | Atlantic Av (B,D,N,Q,R) |
 | 18,143 | 61.2% | 78.1% | Jackson Hts-Roosevelt Av (R) |
 | 18,101 | 77.6% | 82.9% | Canal St (N,Q,R) |
-| 17,855 | 50.6% | 100.0% | 42 St-Bryant Pk (B,D) |
+| 17,855 | 49.1% | 100.0% | 42 St-Bryant Pk (B,D) |
 | 16,103 | 92.3% | 100.0% | 57 St-7 Av (N,Q,R) |
-| 15,212 | 47.0% | 61.8% | W 4 St-Wash Sq (B,D) |
+| 15,212 | 45.7% | 60.5% | W 4 St-Wash Sq (B,D) |
 | 14,511 | 64.0% | 66.7% | 72 St (Q) |
-| 14,205 | 77.9% | 87.6% | Lexington Av/59 St (N,R) |
-| 13,206 | 83.1% | 93.6% | 49 St (N,R) |
-| 13,162 | 95.3% | 95.3% | DeKalb Av (B,Q,R) |
-| 12,565 | 49.7% | 86.4% | Broadway-Lafayette St (B,D) |
+| 14,205 | 77.7% | 87.6% | Lexington Av/59 St (N,R) |
+| 13,206 | 82.6% | 93.6% | 49 St (N,R) |
+| 13,162 | 77.8% | 85.9% | DeKalb Av (N,Q,R) |
+| 12,565 | 47.7% | 86.4% | Broadway-Lafayette St (B,D) |
 | 12,290 | 64.7% | 68.1% | 86 St (Q) |
-| 11,900 | 64.7% | 71.7% | Grand St (B,D) |
+| 11,900 | 62.3% | 69.3% | Grand St (B,D) |
 | 10,959 | 69.8% | 77.2% | Kings Hwy (N,Q) |
 | 10,676 | 70.7% | 76.5% | Whitehall St-South Ferry (R) |
 | 10,159 | 59.7% | 68.5% | Jay St-MetroTech (R) |
-| 9,284 | 69.8% | 82.0% | 125 St (B,D) |
+| 9,284 | 69.5% | 81.7% | 125 St (B,D) |
 | 9,225 | 67.9% | 73.7% | 23 St (R) |
 | 9,209 | 59.5% | 81.1% | Forest Hills-71 Av (R) |
 
@@ -253,28 +253,28 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 54,675 | 69.8% | 100.0% | Times Sq-42 St (N,Q,R) |
 | 48,360 | 100.0% | 100.0% | 34 St-Herald Sq (B,D,N,Q,R) |
 | 31,416 | 83.6% | 88.1% | 14 St-Union Sq (N,Q,R) |
-| 23,378 | 50.3% | 92.4% | 47-50 Sts-Rockefeller Ctr (B,D) |
-| 21,158 | 55.0% | 69.4% | 59 St-Columbus Circle (B,D) |
+| 23,378 | 48.6% | 92.4% | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 21,158 | 54.3% | 68.7% | 59 St-Columbus Circle (B,D) |
 | 20,826 | 67.7% | 72.7% | Cortlandt St (R) |
 | 19,376 | 77.7% | 82.5% | Canal St (N,Q,R) |
-| 18,786 | 48.8% | 100.0% | 42 St-Bryant Pk (B,D) |
+| 18,786 | 47.1% | 100.0% | 42 St-Bryant Pk (B,D) |
 | 17,432 | 100.0% | 100.0% | Atlantic Av (B,D,N,Q,R) |
 | 16,993 | 61.0% | 78.2% | Jackson Hts-Roosevelt Av (R) |
 | 16,838 | 87.8% | 100.0% | 57 St-7 Av (N,Q,R) |
-| 15,995 | 47.2% | 60.8% | W 4 St-Wash Sq (B,D) |
-| 14,601 | 80.1% | 89.8% | Lexington Av/59 St (N,R) |
+| 15,995 | 46.1% | 59.7% | W 4 St-Wash Sq (B,D) |
+| 14,601 | 79.8% | 89.8% | Lexington Av/59 St (N,R) |
 | 14,250 | 66.2% | 67.8% | 72 St (Q) |
-| 14,100 | 48.9% | 87.2% | Broadway-Lafayette St (B,D) |
-| 12,855 | 78.6% | 92.6% | 49 St (N,R) |
-| 12,413 | 63.6% | 69.1% | Grand St (B,D) |
-| 12,331 | 95.0% | 95.0% | DeKalb Av (B,Q,R) |
+| 14,100 | 46.9% | 87.2% | Broadway-Lafayette St (B,D) |
+| 12,855 | 78.2% | 92.6% | 49 St (N,R) |
+| 12,413 | 61.0% | 66.6% | Grand St (B,D) |
+| 12,331 | 77.8% | 85.0% | DeKalb Av (N,Q,R) |
 | 11,243 | 64.9% | 67.8% | 86 St (Q) |
 | 11,048 | 70.2% | 77.2% | Kings Hwy (N,Q) |
 | 10,457 | 59.5% | 67.6% | Jay St-MetroTech (R) |
 | 9,785 | 73.8% | 76.5% | Whitehall St-South Ferry (R) |
 | 9,281 | 68.7% | 73.3% | 23 St (R) |
 | 9,136 | 60.2% | 81.8% | Forest Hills-71 Av (R) |
-| 9,112 | 70.9% | 82.6% | 125 St (B,D) |
+| 9,112 | 70.6% | 82.4% | 125 St (B,D) |
 
 ---
 
@@ -286,13 +286,13 @@ Every both-ends rider, and their share of the 837,408 of them: **was** is what C
 
 | Riders | now direct | now close | now far |
 | --- | ---: | ---: | ---: |
-| **was direct** | 569,167 (68.0%) | 11,804 (1.4%) | 31,824 (3.8%) |
+| **was direct** | 570,266 (68.1%) | 11,968 (1.4%) | 30,561 (3.6%) |
 | **was close** | 1,848 (0.2%) | 83,675 (10.0%) | 1,004 (0.1%) |
-| **was far** | 8,052 (1.0%) | 778 (0.1%) | 129,257 (15.4%) |
+| **was far** | 7,032 (0.8%) | 778 (0.1%) | 130,277 (15.6%) |
 
-- **Gained an effective one-seat ride: 8,830 (1.1%)**
-- **Lost one: 32,828 (3.9%)**
-- **Net: -23,998 (-2.9%)**
+- **Gained an effective one-seat ride: 7,810 (0.9%)**
+- **Lost one: 31,564 (3.8%)**
+- **Net: -23,754 (-2.8%)**
 
 ### Biggest Changes, against Current
 
@@ -311,18 +311,18 @@ The top 25 station pairs by riders whose outcome moved, both directions combined
 | 9 | 579 | direct | close | 191m | Church Av (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
 | 10 | 560 | direct | far | 518m | 18 Av (D → Q) ↔ Grand St (B,D) |
 | 11 | 488 | direct | far | 867m | Newkirk Plaza (B,Q → B,D) ↔ 14 St-Union Sq (N,Q,R) |
-| 12 | 485 | direct | far | 518m | Kings Hwy (B,Q → B,D) ↔ Canal St (N,Q,R) |
-| 13 | 476 | direct | close | 191m | Prospect Park (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
-| 14 | 467 | direct | close | 191m | 7 Av (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
-| 15 | 461 | direct | far | 518m | 71 St (D → Q) ↔ Grand St (B,D) |
-| 16 | 460 | direct | far | 518m | 9 Av (D → Q) ↔ Grand St (B,D) |
-| 17 | 459 | direct | far | 518m | Avenue U (Q → D) ↔ Canal St (N,Q,R) |
-| 18 | 450 | direct | close | 191m | Parkside Av (Q → D) ↔ Times Sq-42 St (N,Q,R) |
-| 19 | 437 | direct | far | 518m | 25 Av (D → Q) ↔ Grand St (B,D) |
-| 20 | 422 | direct | far | 518m | Grand St (B,D) ↔ 36 St (D,N,R → N,Q,R) |
-| 21 | 418 | direct | far | 518m | 7 Av (B,Q → B,D) ↔ Canal St (N,Q,R) |
-| 22 | 418 | direct | far | 867m | Cortelyou Rd (Q → D) ↔ 14 St-Union Sq (N,Q,R) |
-| 23 | 416 | direct | far | 544m | DeKalb Av (B,Q,R) ↔ Parkside Av (Q → D) |
+| 12 | 485 | direct | far | 781m | DeKalb Av (B,Q,R → B,D,R) ↔ 72 St (Q) |
+| 13 | 485 | direct | far | 518m | Kings Hwy (B,Q → B,D) ↔ Canal St (N,Q,R) |
+| 14 | 476 | direct | close | 191m | Prospect Park (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
+| 15 | 467 | direct | close | 191m | 7 Av (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
+| 16 | 461 | direct | far | 518m | 71 St (D → Q) ↔ Grand St (B,D) |
+| 17 | 460 | direct | far | 518m | 9 Av (D → Q) ↔ Grand St (B,D) |
+| 18 | 459 | direct | far | 518m | Avenue U (Q → D) ↔ Canal St (N,Q,R) |
+| 19 | 450 | direct | close | 191m | Parkside Av (Q → D) ↔ Times Sq-42 St (N,Q,R) |
+| 20 | 437 | direct | far | 518m | 25 Av (D → Q) ↔ Grand St (B,D) |
+| 21 | 422 | direct | far | 518m | Grand St (B,D) ↔ 36 St (D,N,R → N,Q,R) |
+| 22 | 418 | direct | far | 518m | 7 Av (B,Q → B,D) ↔ Canal St (N,Q,R) |
+| 23 | 418 | direct | far | 867m | Cortelyou Rd (Q → D) ↔ 14 St-Union Sq (N,Q,R) |
 | 24 | 391 | direct | close | 191m | Newkirk Plaza (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
 | 25 | 389 | direct | far | 518m | Grand St (B,D) ↔ 20 Av (D → Q) |
 
@@ -376,12 +376,12 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 17,855 | 50.9% | 100.0% | 42 St-Bryant Pk (B,D) |
 | 16,103 | 86.7% | 100.0% | 57 St-7 Av (N,Q,R) |
 | 15,212 | 47.6% | 62.4% | W 4 St-Wash Sq (B,D) |
-| 14,511 | 57.4% | 60.1% | 72 St (Q) |
+| 14,511 | 55.8% | 58.5% | 72 St (Q) |
 | 14,205 | 78.4% | 88.4% | Lexington Av/59 St (N,R) |
 | 13,206 | 84.4% | 94.3% | 49 St (N,R) |
-| 13,162 | 86.6% | 86.6% | DeKalb Av (B,Q,R) |
+| 13,162 | 87.1% | 87.8% | DeKalb Av (B,D,R) |
 | 12,565 | 51.5% | 89.8% | Broadway-Lafayette St (B,D) |
-| 12,290 | 60.6% | 64.0% | 86 St (Q) |
+| 12,290 | 59.4% | 62.7% | 86 St (Q) |
 | 11,900 | 48.2% | 55.2% | Grand St (B,D) |
 | 10,959 | 71.9% | 76.7% | Kings Hwy (B,D) |
 | 10,676 | 70.7% | 76.5% | Whitehall St-South Ferry (R) |
@@ -409,12 +409,12 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 16,838 | 82.0% | 100.0% | 57 St-7 Av (N,Q,R) |
 | 15,995 | 47.9% | 61.5% | W 4 St-Wash Sq (B,D) |
 | 14,601 | 80.5% | 90.3% | Lexington Av/59 St (N,R) |
-| 14,250 | 58.8% | 60.4% | 72 St (Q) |
+| 14,250 | 56.9% | 58.5% | 72 St (Q) |
 | 14,100 | 51.0% | 90.8% | Broadway-Lafayette St (B,D) |
 | 12,855 | 79.7% | 93.3% | 49 St (N,R) |
 | 12,413 | 48.1% | 53.6% | Grand St (B,D) |
-| 12,331 | 86.5% | 86.5% | DeKalb Av (B,Q,R) |
-| 11,243 | 60.5% | 63.3% | 86 St (Q) |
+| 12,331 | 86.6% | 87.2% | DeKalb Av (B,D,R) |
+| 11,243 | 59.1% | 62.0% | 86 St (Q) |
 | 11,048 | 72.2% | 76.7% | Kings Hwy (B,D) |
 | 10,457 | 59.5% | 67.6% | Jay St-MetroTech (R) |
 | 9,785 | 73.8% | 76.5% | Whitehall St-South Ferry (R) |
