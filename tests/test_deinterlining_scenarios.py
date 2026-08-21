@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 
 from mta_od_data import DATA, ROOT
-from mta_od_data.analyze.common import Station
+from mta_od_data.analyze.common import Coord, Station
 from mta_od_data.analyze.deinterlining import NO_WALK, Outcome, Walks, resolve_scenarios
 from mta_od_data.analyze.scenarios import (
     SCENARIOS_FILE,
@@ -108,6 +108,32 @@ def test_a_group_cannot_add_and_remove_the_same_route(
     )
     with pytest.raises(ScenarioError, match="both adds and removes"):
         ScenarioFile.load(path, station_index)
+
+
+def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> None:
+    """Which complex an override means has no answer then, and the index
+    used to answer with whichever platform row came last.
+
+    Synthetic, because today's reference data has no such pair: the
+    failure would arrive with a station file, silently, as a scenario
+    quietly applying to the wrong complex.
+    """
+
+    def platform(complex_id: int) -> Station:
+        return Station(
+            complex_id=complex_id,
+            name="72 St",
+            routes=frozenset({"B"}),
+            loc=Coord(lat=0.0, lon=0.0),
+            borough="M",
+            cbd=False,
+            line="Central Park West",
+        )
+
+    platforms = [platform(1), platform(2)]
+    index = StationIndex.build({p.complex_id: p for p in platforms}, platforms)
+    with pytest.raises(ScenarioError, match="names 2 station complexes"):
+        index.resolve("72 St", "Central Park West", path=tmp_path / "scenarios.json5")
 
 
 def test_removing_a_route_the_line_does_not_serve_is_an_error(
