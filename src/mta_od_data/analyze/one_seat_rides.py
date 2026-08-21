@@ -248,12 +248,12 @@ class ScenarioResult:
                 f"trip{scenario_note}."
             )
         if headline:
-            lines.append(f"{h2} Headline numbers")
+            lines.append(f"{h2} Headline Numbers")
             lines.append("")
             lines.extend(headline)
             lines.append("")
 
-        lines.append(f"{h2} Top {top_n} origin/destination pairs")
+        lines.append(f"{h2} Top {top_n} Origin/Destination Pairs")
         lines.append("")
         lines.append(
             "| # | Riders | % Total | % 1-Seat | Type | Close? | Dist "
@@ -286,7 +286,7 @@ class ScenarioResult:
         lines.append("")
 
         lines.append(
-            f"{h2} Top {top_n} destination stations, summed across all origins"
+            f"{h2} Top {top_n} Destination Stations, Summed across All Origins"
         )
         lines.append("")
         lines.append(
@@ -650,7 +650,7 @@ def render_scenario_comparison(
     results: list[ScenarioResult], day_type_label: str
 ) -> str:
     lines: list[str] = []
-    lines.append("## Scenario comparison")
+    lines.append("## Scenario Comparison")
     lines.append("")
     lines.append(
         f"Average {day_type_label} ridership is the same "
@@ -676,7 +676,7 @@ def render_scenario_comparison(
 def render_notes(*, close_threshold_m: float) -> str:
     return "\n".join(
         [
-            "## Notes on reading these tables",
+            "## Notes on Reading These Tables",
             "",
             '- "Close?"/"Dist" describe distance from the destination to the '
             "nearest station on the origin's own effective corridor (real "

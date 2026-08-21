@@ -320,7 +320,7 @@ class Transitions:
     def markdown(self, *, h2: str, top_n: int, close_threshold_m: float) -> str:
         order = list(Outcome)
         lines = [
-            f"{h2} What changed, against {self.baseline_name}",
+            f"{h2} What Changed, against {self.baseline_name}",
             "",
             f"Every both-ends rider, and their share of the "
             f"{self.total:,.0f} of them: **was** is what "
@@ -359,7 +359,7 @@ class Transitions:
 
         if self.changed:
             lines += [
-                f"{h2} Biggest changes, against {self.baseline_name}",
+                f"{h2} Biggest Changes, against {self.baseline_name}",
                 "",
                 f"The top {top_n} station pairs by riders whose outcome "
                 f"moved, both directions combined as above. An end reads "
@@ -1038,7 +1038,7 @@ class ScenarioResult:
         # for every scenario at once.
         if not show_label:
             lines += [
-                f"{h2} Headline numbers",
+                f"{h2} Headline Numbers",
                 "",
                 f"- **Total: {t.total:,.0f} riders**",
                 f"- **One-seat: {t.pct(t.one_seat):.1f}%** ({t.one_seat:,.0f})",
@@ -1061,7 +1061,7 @@ class ScenarioResult:
             )
 
         lines += [
-            f"{h2} Top {top_n} origin/destination pairs",
+            f"{h2} Top {top_n} Origin/Destination Pairs",
             "",
             "Both ends on the comparison's routes, per that section of the "
             "comparison above. Each row is both directions of one station "
@@ -1122,7 +1122,8 @@ class ScenarioResult:
             ("destination", "origins", self.dest_stats),
         ):
             lines += [
-                f"{h2} Top {top_n} {label} stations, summed across all {end}",
+                f"{h2} Top {top_n} {label.capitalize()} Stations, "
+                f"Summed across All {end.capitalize()}",
                 "",
                 "Both ends on the comparison's routes, per that section of "
                 "the comparison above.",
@@ -1288,7 +1289,7 @@ class ScenarioComparisonResult:
         # Both-ends comes first because it's the denominator the
         # detailed tables below are scoped to.
         lines = [
-            "## Scenario comparison",
+            "## Scenario Comparison",
             "",
             f"Two cuts of the same classification. Neither is the whole "
             f"answer: the first says what a scenario does to the riders it "
@@ -1299,7 +1300,7 @@ class ScenarioComparisonResult:
             f"{close_threshold_m:.0f}m of a station on that scenario's "
             f"effective origin corridor.",
             "",
-            "### Both ends on the comparison's routes",
+            "### Both Ends on the Comparison's Routes",
             "",
             f"The {self.results[0].both_ends.total:,.0f} riders whose origin "
             f"*and* destination are served by {routes}: the trips these "
@@ -1319,7 +1320,7 @@ class ScenarioComparisonResult:
 
         lines += [
             "",
-            "### Either end on the comparison's routes",
+            "### Either End on the Comparison's Routes",
             "",
             f"The wider {self.results[0].overall.total:,.0f} riders with "
             f"*either* end served by {routes}, the above among them. The "
@@ -1706,7 +1707,7 @@ def deinterlining(
         produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
         preamble = "\n".join(
             [
-                f"# Deinterlining scenario comparison: {','.join(sorted(routes_set))}",
+                f"# Deinterlining Scenario Comparison: {','.join(sorted(routes_set))}",
                 "",
                 f"Average {day_type_label} ridership ({n_distinct_days} distinct "
                 f"days in the data, {coverage.first_month} to "
