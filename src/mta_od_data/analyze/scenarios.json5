@@ -252,18 +252,6 @@
           ],
         },
         {
-          // North of Bedford Park Blvd, where today's Concourse local
-          // (the B) already terminates, so there is no B here to move:
-          // the C simply extends past where the B stops.
-          "line": "Concourse",
-          "add": [
-            "C"
-          ],
-          "stations": [
-            "Norwood-205 St",
-          ],
-        },
-        {
           "line": "8th Av - Fulton St",
           "add": [
             "B"
