@@ -641,12 +641,12 @@ class StationIndex:
         )
 
     def resolve(self, name: str, line: str, *, path: Path) -> Station:
-        key = (name, line)
-        if key not in self.by_name_line:
+        station = self.by_name_line.get((name, line))
+        if station is None:
             raise ScenarioError(
                 f'scenario {path}: no station named "{name}" on line "{line}"'
             )
-        return self.by_name_line[key]
+        return station
 
     def check_routes(self, routes: Routes, *, name: str, path: Path) -> None:
         unknown = sorted(routes - self.known_routes)
