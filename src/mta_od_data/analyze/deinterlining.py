@@ -650,7 +650,7 @@ class SymmetricPair:
         return pairs
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, eq=False)
 class ScenarioResult:
     scenario: Scenario
     overall: RiderStats
@@ -1050,10 +1050,13 @@ class ScenarioComparison:
         )
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, eq=False)
 class ScenarioComparisonResult:
     """Every scenario in a `ScenarioComparison`,
-    classified over the same OD pairs."""
+    classified over the same OD pairs.
+
+    `eq=False` so this and its `ScenarioResult`s hash by identity,
+    which `transitions`' cache keys on."""
 
     comparison: ScenarioComparison
     results: list[ScenarioResult]
@@ -1073,6 +1076,11 @@ class ScenarioComparisonResult:
         )
         return baseline
 
+    # Every `Transitions` walks both scenarios' rows and regroups the
+    # pairs that moved, and both the printed summary and the markdown
+    # want the same one. Cached, rather than passed from one to the
+    # other, since neither reads the other's output.
+    @cache  # noqa: B019  (see `ScenarioWalks.corridor_platforms`)
     def transitions(self, result: ScenarioResult) -> Transitions | None:
         """`None` for the baseline itself, which cannot differ from
         itself."""
