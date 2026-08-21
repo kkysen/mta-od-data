@@ -9,7 +9,7 @@ Skipped without the station reference CSVs, which
 import pytest
 
 from mta_od_data import DATA, ROOT
-from mta_od_data.analyze.deinterlining import (
+from mta_od_data.analyze.scenario_schema import (
     SCENARIOS_SCHEMA_FILE,
     generate_scenario_schema,
 )
@@ -30,7 +30,7 @@ def test_scenarios_schema_matches_models() -> None:
     committed = SCENARIOS_SCHEMA_FILE.read_text()
     assert fresh == committed, (
         f"{SCENARIOS_SCHEMA_FILE} is out of date. Regenerate it with:\n"
-        '  uv run python -c "from mta_od_data.analyze.deinterlining import '
+        '  uv run python -c "from mta_od_data.analyze.scenario_schema import '
         "SCENARIOS_SCHEMA_FILE, generate_scenario_schema; "
         'SCENARIOS_SCHEMA_FILE.write_text(generate_scenario_schema())"\n'
         "and commit the result."
