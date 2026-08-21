@@ -23,10 +23,11 @@ import json
 import re
 import shlex
 import sys
+from collections.abc import Callable, Sequence
 from dataclasses import asdict, dataclass, fields, is_dataclass
 from enum import StrEnum
 from functools import cache
-from operator import itemgetter
+from operator import attrgetter, itemgetter
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -463,19 +464,6 @@ class SymmetricPair:
         return pairs
 
 
-@dataclass(slots=True)
-class EndStats:
-    """One end of a trip--an origin or a destination--summed over every
-    trip with the other end anywhere.
-    The same shape either way,
-    since a pair contributes its one classification to both of its ends."""
-
-    name: str
-    total: float = 0.0
-    one_seat: float = 0.0
-    close: float = 0.0
-
-
 @dataclass(slots=True, frozen=True)
 class RouteDelta:
     add: Routes
@@ -839,14 +827,6 @@ class Scenario:
         walks: ScenarioWalks,
     ) -> ScenarioResult:
         rows: list[ODPair] = []
-        total_riders = 0.0
-        one_seat_riders = 0.0
-        close_riders = 0.0
-        both_total = 0.0
-        both_one_seat = 0.0
-        both_close = 0.0
-        origin_stats: dict[int, EndStats] = {}
-        dest_stats: dict[int, EndStats] = {}
         for origin_id, dest_id, riders in pairs:
             origin = stations_by_id.get(origin_id)
             dest = stations_by_id.get(dest_id)
@@ -862,89 +842,44 @@ class Scenario:
             effective_dest_routes = self.routes_of(dest)
             one_seat = bool(effective_origin_routes & effective_dest_routes)
 
-            both_ends = origin_id in scope_ids and dest_id in scope_ids
-            total_riders += riders
-            if both_ends:
-                both_total += riders
-            if one_seat:
-                one_seat_riders += riders
-                if both_ends:
-                    both_one_seat += riders
-                walk = NO_WALK
-            else:
-                walk = walks.shortest_walk(
+            walk = (
+                NO_WALK
+                if one_seat
+                else walks.shortest_walk(
                     origin,
                     dest,
                     effective_origin_routes,
                     effective_dest_routes,
                 )
-                if walk.close:
-                    close_riders += riders
-                    if both_ends:
-                        both_close += riders
-
-            pair = ODPair(
-                origin=TripEnd(
-                    id=origin_id,
-                    station=walks.platforms.name(origin, effective_origin_routes),
-                    routes=",".join(sorted(effective_origin_routes)),
-                ),
-                destination=TripEnd(
-                    id=dest_id,
-                    station=walks.platforms.name(dest, effective_dest_routes),
-                    routes=",".join(sorted(effective_dest_routes)),
-                ),
-                riders=riders,
-                both_ends=both_ends,
-                one_seat=one_seat,
-                walk=walk,
             )
-            rows.append(pair)
 
-            # Both-ends only, to match the tables these feed:
-            # a station off the comparison's routes has no one-seat
-            # ridership to or from anywhere, so it would only ever add
-            # rows reading 0.0%.
-            if both_ends:
-                # The pair rows' own labels, not a second naming of the
-                # same stations: displaying every real route here
-                # (`Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W)`) gave
-                # one report two conventions, and named the station by
-                # routes no row in it is about.
-                for stats, end in (
-                    (origin_stats, pair.origin),
-                    (dest_stats, pair.destination),
-                ):
-                    e = stats.setdefault(end.id, EndStats(name=end.name))
-                    e.total += riders
-                    if one_seat:
-                        e.one_seat += riders
-                    elif walk.close:
-                        e.close += riders
+            rows.append(
+                ODPair(
+                    origin=TripEnd(
+                        id=origin_id,
+                        station=walks.platforms.name(origin, effective_origin_routes),
+                        routes=",".join(sorted(effective_origin_routes)),
+                    ),
+                    destination=TripEnd(
+                        id=dest_id,
+                        station=walks.platforms.name(dest, effective_dest_routes),
+                        routes=",".join(sorted(effective_dest_routes)),
+                    ),
+                    riders=riders,
+                    both_ends=origin_id in scope_ids and dest_id in scope_ids,
+                    one_seat=one_seat,
+                    walk=walk,
+                )
+            )
 
-        if not total_riders:
+        result = ScenarioResult.of(self, rows)
+        if not result.overall.total:
             raise ScenarioError(
                 f"scenario {self.name!r}: no ridership among the fetched "
                 f"origin/destination pairs, nothing to classify (check "
                 f"the selected scenarios' routes and the day filter)"
             )
-
-        return ScenarioResult(
-            scenario=self,
-            overall=RiderStats(
-                total=total_riders,
-                one_seat=one_seat_riders,
-                close=close_riders,
-            ),
-            both_ends=RiderStats(
-                total=both_total,
-                one_seat=both_one_seat,
-                close=both_close,
-            ),
-            rows=rows,
-            origin_stats=origin_stats,
-            dest_stats=dest_stats,
-        )
+        return result
 
 
 # Today's real routing, which no scenario file has to declare.
@@ -1222,6 +1157,20 @@ class RiderStats:
     one_seat: float
     close: float
 
+    @classmethod
+    def of(cls, rows: Sequence[ODPair]) -> RiderStats:
+        """Summed in row order,
+        the order every scenario classifies the same pairs in,
+        so two scenarios' totals differ only where their classifications
+        do and not in how the floats were added up."""
+        return cls(
+            total=sum(row.riders for row in rows),
+            one_seat=sum(row.riders for row in rows if row.one_seat),
+            # `NO_WALK.close` is false, so a one-seat ride,
+            # which has no walk to be close, never lands in both.
+            close=sum(row.riders for row in rows if row.walk.close),
+        )
+
     @property
     def effective(self) -> float:
         return self.one_seat + self.close
@@ -1290,6 +1239,43 @@ class RiderStats:
 
 
 @dataclass(slots=True, frozen=True)
+class EndStats:
+    """One end of a trip--an origin or a destination--summed over every
+    trip with the other end anywhere.
+    The same shape either way,
+    since a pair contributes its one classification to both of its ends."""
+
+    name: str
+    stats: RiderStats
+
+    @classmethod
+    def by_station(
+        cls, rows: list[ODPair], end: Callable[[ODPair], TripEnd]
+    ) -> dict[int, EndStats]:
+        """Every station `end` picks out, keyed by complex.
+
+        Keyed by first appearance in `rows`,
+        which is the order the report's ties fall out in
+        (see the `ORDER BY` the pairs are fetched with).
+        """
+        by_station: dict[int, list[ODPair]] = {}
+        for row in rows:
+            by_station.setdefault(end(row).id, []).append(row)
+        return {
+            station_id: cls(
+                # The pair rows' own labels, not a second naming of the
+                # same stations: displaying every real route here
+                # (`Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W)`) gave
+                # one report two conventions, and named the station by
+                # routes no row in it is about.
+                name=end(station_rows[0]).name,
+                stats=RiderStats.of(station_rows),
+            )
+            for station_id, station_rows in by_station.items()
+        }
+
+
+@dataclass(slots=True, frozen=True)
 class ScenarioResult:
     scenario: Scenario
     overall: RiderStats
@@ -1300,6 +1286,25 @@ class ScenarioResult:
     rows: list[ODPair]
     origin_stats: dict[int, EndStats]
     dest_stats: dict[int, EndStats]
+
+    @classmethod
+    def of(cls, scenario: Scenario, rows: list[ODPair]) -> ScenarioResult:
+        """Every number in a result is a cut of its rows,
+        so `classify` classifies and this counts,
+        rather than one pass keeping six running totals in step."""
+        # Both-ends only, to match the tables these feed:
+        # a station off the comparison's routes has no one-seat
+        # ridership to or from anywhere, so it would only ever add
+        # rows reading 0.0%.
+        both_ends = [row for row in rows if row.both_ends]
+        return cls(
+            scenario=scenario,
+            overall=RiderStats.of(rows),
+            both_ends=RiderStats.of(both_ends),
+            rows=rows,
+            origin_stats=EndStats.by_station(both_ends, attrgetter("origin")),
+            dest_stats=EndStats.by_station(both_ends, attrgetter("destination")),
+        )
 
     def write_csv(self, path: Path) -> None:
         with path.open("w", newline="") as f:
@@ -1403,9 +1408,6 @@ class ScenarioResult:
             )
         lines.append("")
 
-        def end_total(e: EndStats) -> float:
-            return e.total
-
         # Origins and destinations both, and not one table standing in for
         # the other: a station's one-seat share is not symmetric, since
         # "close one-seat" measures the *destination* against the origin's
@@ -1425,16 +1427,13 @@ class ScenarioResult:
                 f"| Riders | 1-Seat % | Effective % | {label.capitalize()} |",
                 table_rule("rrrl"),
             ]
-            for e in sorted(stats.values(), key=end_total, reverse=True)[:top_n]:
-                one_seat_pct = 100 * e.one_seat / e.total if e.total else float("nan")
-                effective_pct = (
-                    100 * (e.one_seat + e.close) / e.total if e.total else float("nan")
-                )
+            top = sorted(stats.values(), key=attrgetter("stats.total"), reverse=True)
+            for e in top[:top_n]:
                 lines.append(
                     table_row(
-                        f"{e.total:,.0f}",
-                        f"{one_seat_pct:.1f}%",
-                        f"{effective_pct:.1f}%",
+                        f"{e.stats.total:,.0f}",
+                        f"{e.stats.pct(e.stats.one_seat):.1f}%",
+                        f"{e.stats.pct(e.stats.effective):.1f}%",
                         e.name,
                     )
                 )
