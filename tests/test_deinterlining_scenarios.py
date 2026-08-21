@@ -110,6 +110,38 @@ def test_a_group_cannot_add_and_remove_the_same_route(
         ScenarioFile.load(path, station_index)
 
 
+def test_removing_a_route_the_line_does_not_serve_is_an_error(
+    tmp_path: Path, station_index: StationIndex
+) -> None:
+    """The check is per line, not per complex.
+
+    62 St/New Utrecht Av is one complex over two lines: `D` stops at its
+    West End platform, `N` at its Sea Beach one. Removing `D` from the
+    Sea Beach platform is a no-op, and it passed while the check asked
+    the complex, which serves both.
+    """
+    path = write_scenarios(
+        tmp_path,
+        {
+            "X": [
+                {
+                    "name": "Wrong line",
+                    "routes": CONFLICT_ROUTES,
+                    "overrides": [
+                        {
+                            "line": "Sea Beach",
+                            "remove": ["D"],
+                            "stations": ["New Utrecht Av"],
+                        },
+                    ],
+                }
+            ]
+        },
+    )
+    with pytest.raises(ScenarioError, match="only serves"):
+        ScenarioFile.load(path, station_index)
+
+
 def test_two_categories_cannot_disagree_about_a_route(
     tmp_path: Path, station_index: StationIndex
 ) -> None:
