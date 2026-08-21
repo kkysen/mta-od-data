@@ -22,7 +22,7 @@ import shlex
 import sys
 from collections import defaultdict
 from collections.abc import Callable, Sequence
-from dataclasses import asdict, dataclass, field, fields, is_dataclass
+from dataclasses import asdict, dataclass, fields, is_dataclass
 from enum import StrEnum
 from functools import cache
 from operator import attrgetter, itemgetter
@@ -262,16 +262,6 @@ class Walks:
     individual_stations: list[Station]
     platforms: PlatformIndex
     close_threshold_m: float
-    # Metres between two of `points`, filled in as they are asked for by
-    # `ScenarioWalks.min_dist_to_route`, which reads this dict directly:
-    # it is the innermost loop of a run and a method call around the
-    # lookup costs more than the lookup.
-    # Shared by every scenario, since where a platform is doesn't depend
-    # on which routes stop there.
-    # Keyed on `PlatformId`s rather than the `Coord`s themselves, which
-    # are dataclasses: a dataclass recomputes its hash on every lookup,
-    # where an int is its own.
-    distances: dict[tuple[PlatformId, PlatformId], float] = field(default_factory=dict)
 
     def for_scenario(self, scenario: Scenario) -> ScenarioWalks:
         return ScenarioWalks(walks=self, scenario=scenario)
@@ -279,6 +269,19 @@ class Walks:
     @cache  # noqa: B019  (see `ScenarioWalks.corridor_platforms`)
     def points(self) -> WalkPoints:
         return WalkPoints.build(self.individual_stations, self.stations_by_id)
+
+    # Keyed on `PlatformId`s rather than on the `Coord`s themselves,
+    # which are dataclasses: a dataclass recomputes its hash on every
+    # lookup, where an int is its own.
+    # On `Walks` rather than `ScenarioWalks`, so every scenario in a run
+    # shares it: where a platform is doesn't depend on which routes stop
+    # there.
+    @cache  # noqa: B019  (see `ScenarioWalks.corridor_platforms`)
+    def distance(self, point: PlatformId, other: PlatformId) -> float:
+        """Metres between two of `points`."""
+        locations = self.points().locations
+        here, there = locations[point], locations[other]
+        return haversine(here.lat, here.lon, there.lat, there.lon)
 
 
 @dataclass(slots=True, frozen=True, eq=False)
@@ -377,27 +380,17 @@ class ScenarioWalks:
         if not candidates:
             return None
 
-        # Written out rather than a `min` over a generator: this is the
-        # innermost loop of a run, some 220k platform pairs, and the
-        # generator built a throwaway tuple for every one of them while
-        # the dict lookup below is most of the work.
-        # Strictly nearer, so the first of two equally distant platforms
-        # wins, which is also what `min` would do.
-        distances = self.walks.distances
-        locations = self.walks.points().locations
-        nearest: tuple[float, Station] | None = None
-        for point in self.walks.points().by_complex[complex_id]:
-            for platform_id, platform in candidates:
-                key = (point, platform_id)
-                metres = distances.get(key)
-                if metres is None:
-                    here, there = locations[point], locations[platform_id]
-                    metres = distances[key] = haversine(
-                        here.lat, here.lon, there.lat, there.lon
-                    )
-                if nearest is None or metres < nearest[0]:
-                    nearest = (metres, platform)
-        return nearest
+        distance = self.walks.distance
+        # By distance alone: two platforms exactly as far away would
+        # otherwise be compared as `Station`s, which don't order.
+        return min(
+            (
+                (distance(point, platform_id), platform)
+                for point in self.walks.points().by_complex[complex_id]
+                for platform_id, platform in candidates
+            ),
+            key=itemgetter(0),
+        )
 
     @cache  # noqa: B019  (see `corridor_platforms`)
     def min_dist_to_corridor(
