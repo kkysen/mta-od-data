@@ -6,7 +6,7 @@ Produced by `mta-od-data analyze one-seat-rides --routes B,D,N,Q,R --primary-rou
 
 ---
 
-## Scenario comparison
+## Scenario Comparison
 
 Average weekday ridership is the same 163,203/weekday across every scenario below; only how many of those riders get a one-seat ride changes.
 
@@ -20,7 +20,7 @@ Average weekday ridership is the same 163,203/weekday across every scenario belo
 
 ## D,N on 4 Av express, B,Q on Brighton
 
-### Top 25 origin/destination pairs
+### Top 25 Origin/Destination Pairs
 
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -50,7 +50,7 @@ Average weekday ridership is the same 163,203/weekday across every scenario belo
 | 24 | 320 | 0.20% | 0.48% | 1-seat | close | 0m | Parkside Av (Q) → 14 St-Union Sq (Q) |  |
 | 25 | 309 | 0.19% | 0.46% | 1-seat | close | 0m | Sheepshead Bay (B,Q) → DeKalb Av (B,Q) |  |
 
-### Top 25 destination stations, summed across all origins
+### Top 25 Destination Stations, Summed across All Origins
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 67,134/weekday one-seat total).
 
@@ -90,7 +90,7 @@ _Full row-level detail (every origin/destination pair, not just the top 25): `da
 
 Deinterlining scenario: 4 Av express served by B,D; Brighton served by N,Q (each origin's one-seat eligibility swaps in these assigned primary routes in place of its real current primary routes; any non-primary route it already has (e.g. R, which never crosses the junction) is unaffected, and a station touching both corridors keeps access to both).
 
-### Top 25 origin/destination pairs
+### Top 25 Origin/Destination Pairs
 
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -120,7 +120,7 @@ Deinterlining scenario: 4 Av express served by B,D; Brighton served by N,Q (each
 | 24 | 320 | 0.20% | 0.56% | 1-seat | close | 0m | Parkside Av (N,Q) → 14 St-Union Sq (N,Q) |  |
 | 25 | 309 | 0.19% | 0.54% | 1-seat | close | 0m | Sheepshead Bay (Q) → DeKalb Av (Q) |  |
 
-### Top 25 destination stations, summed across all origins
+### Top 25 Destination Stations, Summed across All Origins
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 57,173/weekday one-seat total).
 
@@ -160,7 +160,7 @@ _Full row-level detail (every origin/destination pair, not just the top 25): `da
 
 Deinterlining scenario: 4 Av express served by N,Q; Brighton served by B,D (each origin's one-seat eligibility swaps in these assigned primary routes in place of its real current primary routes; any non-primary route it already has (e.g. R, which never crosses the junction) is unaffected, and a station touching both corridors keeps access to both).
 
-### Top 25 origin/destination pairs
+### Top 25 Origin/Destination Pairs
 
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -190,7 +190,7 @@ Deinterlining scenario: 4 Av express served by N,Q; Brighton served by B,D (each
 | 24 | 320 | 0.20% |  | xfer | far | 867m | Parkside Av (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
 | 25 | 309 | 0.19% | 0.58% | 1-seat | close | 0m | Sheepshead Bay (B) → DeKalb Av (B) |  |
 
-### Top 25 destination stations, summed across all origins
+### Top 25 Destination Stations, Summed across All Origins
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 53,002/weekday one-seat total).
 
@@ -226,7 +226,7 @@ _Full row-level detail (every origin/destination pair, not just the top 25): `da
 
 ---
 
-## Notes on reading these tables
+## Notes on Reading These Tables
 
 - "Close?"/"Dist" describe distance from the destination to the nearest station on the origin's own effective corridor (real routes in baseline, the scenario's assigned routes otherwise), thresholded at 300m, for `xfer` rows, i.e. riders without a direct one-seat ride. A close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination. `1-seat` rows are always `close`/`0m`: the destination is a Complex ID in the source data, not a specific platform, so there's no way to tell which platform a rider actually used; the effective route already stops somewhere in that same complex, the rider's real historical destination either way.
 - In the per-pair table (and CSV), "1-Seat Destination" names the specific station `dist_m` was measured to for a `xfer` row: the nearest station on the origin's own effective corridor, i.e. what the destination would have had to be for this row to be a `1-seat` ride instead. Empty for `1-seat` rows (already true of the actual destination) and omitted from the per-destination table (an average across many pairs, not a single station).

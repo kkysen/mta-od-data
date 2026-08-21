@@ -1,4 +1,4 @@
-# Regional flow: Lower Manhattan (below 60th St / Congestion Relief Zone)
+# Regional Flow: Lower Manhattan (below 60th St / Congestion Relief Zone)
 
 Scenario: average weekday ridership (60 distinct days in the data, 2025-01 to 2025-12), every origin/destination pair classified by whether each end falls inside Lower Manhattan (below 60th St / Congestion Relief Zone).
 
@@ -6,7 +6,7 @@ Produced by `mta-od-data analyze regional-flow --markdown-out src/mta_od_data/an
 
 ---
 
-## Headline numbers
+## Headline Numbers
 
 Total: 3,962,101 riders/weekday
 
@@ -19,7 +19,7 @@ Total: 3,962,101 riders/weekday
 | **Inter** | 1,851,757 | 46.7% |
 | **Intra** | 2,110,344 | 53.3% |
 
-## Top 25 origin/destination pairs
+## Top 25 Origin/Destination Pairs
 
 | # | Riders | % Total | Flow | Origin -> Destination |
 | --- | --- | --- | --- | --- |

@@ -6,7 +6,7 @@ Produced by `mta-od-data analyze one-seat-rides --boundary-complex-id 626 --orig
 
 ---
 
-## Scenario comparison
+## Scenario Comparison
 
 Average weekday ridership is the same 66,992/weekday across every scenario below; only how many of those riders get a one-seat ride changes.
 
@@ -20,7 +20,7 @@ Average weekday ridership is the same 66,992/weekday across every scenario below
 
 ## 2,5 on Nostrand Av Line, 3,4 on Eastern Pkwy/New Lots Line
 
-### Top 25 origin/destination pairs
+### Top 25 Origin/Destination Pairs
 
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -50,7 +50,7 @@ Average weekday ridership is the same 66,992/weekday across every scenario below
 | 24 | 251 | 0.38% | 0.69% | 1-seat | close | 0m | Winthrop St (2,5) → Fulton St (2,5) |  |
 | 25 | 250 | 0.37% | 0.69% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,5) → Franklin Av-Medgar Evers College/Botanic Garden (2,5) |  |
 
-### Top 25 destination stations, summed across all origins
+### Top 25 Destination Stations, Summed across All Origins
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 36,532/weekday one-seat total).
 
@@ -90,7 +90,7 @@ _Full row-level detail (every origin/destination pair, not just the top 25): `da
 
 Deinterlining scenario: Nostrand Av Line served by 2,3; Eastern Pkwy/New Lots Line served by 4,5 (each origin's one-seat eligibility swaps in these assigned primary routes in place of its real current primary routes; any non-primary route it already has (e.g. R, which never crosses the junction) is unaffected, and a station touching both corridors keeps access to both).
 
-### Top 25 origin/destination pairs
+### Top 25 Origin/Destination Pairs
 
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -120,7 +120,7 @@ Deinterlining scenario: Nostrand Av Line served by 2,3; Eastern Pkwy/New Lots Li
 | 24 | 251 | 0.38% | 0.89% | 1-seat | close | 0m | Winthrop St (2,3) → Fulton St (2,3) |  |
 | 25 | 250 | 0.37% | 0.88% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3) → Franklin Av-Medgar Evers College/Botanic Garden (2,3) |  |
 
-### Top 25 destination stations, summed across all origins
+### Top 25 Destination Stations, Summed across All Origins
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 28,332/weekday one-seat total).
 
@@ -160,7 +160,7 @@ _Full row-level detail (every origin/destination pair, not just the top 25): `da
 
 Deinterlining scenario: Nostrand Av Line served by 4,5; Eastern Pkwy/New Lots Line served by 2,3 (each origin's one-seat eligibility swaps in these assigned primary routes in place of its real current primary routes; any non-primary route it already has (e.g. R, which never crosses the junction) is unaffected, and a station touching both corridors keeps access to both).
 
-### Top 25 origin/destination pairs
+### Top 25 Origin/Destination Pairs
 
 | # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -190,7 +190,7 @@ Deinterlining scenario: Nostrand Av Line served by 4,5; Eastern Pkwy/New Lots Li
 | 24 | 251 | 0.38% | 0.93% | 1-seat | close | 0m | Winthrop St (4,5) → Fulton St (4,5) |  |
 | 25 | 250 | 0.37% | 0.92% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5) → Franklin Av-Medgar Evers College/Botanic Garden (4,5) |  |
 
-### Top 25 destination stations, summed across all origins
+### Top 25 Destination Stations, Summed across All Origins
 
 Sorted by each destination's one-seat ridership (i.e. its share of the 27,108/weekday one-seat total).
 
@@ -226,7 +226,7 @@ _Full row-level detail (every origin/destination pair, not just the top 25): `da
 
 ---
 
-## Notes on reading these tables
+## Notes on Reading These Tables
 
 - "Close?"/"Dist" describe distance from the destination to the nearest station on the origin's own effective corridor (real routes in baseline, the scenario's assigned routes otherwise), thresholded at 300m, for `xfer` rows, i.e. riders without a direct one-seat ride. A close `xfer` row is a *close one-seat ride*: no train change, just a short walk to the actual destination. `1-seat` rows are always `close`/`0m`: the destination is a Complex ID in the source data, not a specific platform, so there's no way to tell which platform a rider actually used; the effective route already stops somewhere in that same complex, the rider's real historical destination either way.
 - In the per-pair table (and CSV), "1-Seat Destination" names the specific station `dist_m` was measured to for a `xfer` row: the nearest station on the origin's own effective corridor, i.e. what the destination would have had to be for this row to be a `1-seat` ride instead. Empty for `1-seat` rows (already true of the actual destination) and omitted from the per-destination table (an average across many pairs, not a single station).
