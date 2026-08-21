@@ -270,6 +270,29 @@ class ScenarioWalks:
             for complex_id, station in self.walks.stations_by_id.items()
         }
 
+    @cache  # noqa: B019  (see `corridor_platforms`)
+    def ends_by_complex(self) -> dict[int, TripEnd]:
+        """How every complex reads under this scenario, worked out once.
+
+        Its narrowed platform name and its route list are as fixed for
+        the scenario as its routes are, and `classify` names both ends
+        of every OD pair: another 780k calls for 445 answers, each one
+        sorting a route set and joining it.
+
+        A `TripEnd` rather than the two strings, since that is what a
+        row wants: its `id` is the complex's, so the pair is two
+        lookups.
+        """
+        return {
+            complex_id: TripEnd(
+                id=complex_id,
+                station=self.platforms.name(station, routes),
+                routes=",".join(sorted(routes)),
+            )
+            for complex_id, routes in self.routes_by_complex().items()
+            if (station := self.walks.stations_by_id[complex_id]) is not None
+        }
+
     # B019: `cache` on a method stores its entries on the *function*,
     # keyed by `self` among the arguments, so every `ScenarioWalks` ever
     # built stays alive with its measurements until the process ends.
@@ -392,13 +415,10 @@ class ScenarioWalks:
         # Keyed on the distance alone: two equal walks would otherwise
         # be compared by the `Station` beside it, which doesn't order.
         dist_m, platform, walk_at_origin = min(measured, key=itemgetter(0))
-        complex_station = self.walks.stations_by_id[platform.complex_id]
         return Walk(
             close=dist_m <= self.walks.close_threshold_m,
             dist_m=dist_m,
-            station=self.platforms.display(
-                complex_station, self.routes_by_complex()[complex_station.complex_id]
-            ),
+            station=self.ends_by_complex()[platform.complex_id].name,
             at_origin=walk_at_origin,
         )
 
@@ -411,6 +431,7 @@ class ScenarioWalks:
     ) -> ScenarioResult:
         rows: list[ODPair] = []
         routes_by_complex = self.routes_by_complex()
+        ends_by_complex = self.ends_by_complex()
         for origin_id, dest_id, riders in pairs:
             origin = self.walks.stations_by_id.get(origin_id)
             dest = self.walks.stations_by_id.get(dest_id)
@@ -439,16 +460,8 @@ class ScenarioWalks:
 
             rows.append(
                 ODPair(
-                    origin=TripEnd(
-                        id=origin_id,
-                        station=self.platforms.name(origin, effective_origin_routes),
-                        routes=",".join(sorted(effective_origin_routes)),
-                    ),
-                    destination=TripEnd(
-                        id=dest_id,
-                        station=self.platforms.name(dest, effective_dest_routes),
-                        routes=",".join(sorted(effective_dest_routes)),
-                    ),
+                    origin=ends_by_complex[origin_id],
+                    destination=ends_by_complex[dest_id],
                     riders=riders,
                     both_ends=origin_id in scope_ids and dest_id in scope_ids,
                     one_seat=one_seat,
