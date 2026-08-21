@@ -550,70 +550,6 @@ class Scenario:
             platform_routes=platform_routes,
         )
 
-    def classify(
-        self,
-        *,
-        pairs: list[tuple[int, int, float]],
-        stations_by_id: dict[int, Station],
-        stations_path: Path,
-        scope_ids: frozenset[int],
-        walks: ScenarioWalks,
-    ) -> ScenarioResult:
-        rows: list[ODPair] = []
-        for origin_id, dest_id, riders in pairs:
-            origin = stations_by_id.get(origin_id)
-            dest = stations_by_id.get(dest_id)
-            if origin is None or dest is None:
-                missing_id = origin_id if origin is None else dest_id
-                raise ScenarioError(
-                    f"station complex {missing_id} not found in "
-                    f"{stations_path}; refetch station reference data with "
-                    "`mta-od-data prepare --force-stations`"
-                )
-
-            effective_origin_routes = self.routes_of(origin)
-            effective_dest_routes = self.routes_of(dest)
-            one_seat = bool(effective_origin_routes & effective_dest_routes)
-
-            walk = (
-                NO_WALK
-                if one_seat
-                else walks.shortest_walk(
-                    origin,
-                    dest,
-                    effective_origin_routes,
-                    effective_dest_routes,
-                )
-            )
-
-            rows.append(
-                ODPair(
-                    origin=TripEnd(
-                        id=origin_id,
-                        station=walks.platforms.name(origin, effective_origin_routes),
-                        routes=",".join(sorted(effective_origin_routes)),
-                    ),
-                    destination=TripEnd(
-                        id=dest_id,
-                        station=walks.platforms.name(dest, effective_dest_routes),
-                        routes=",".join(sorted(effective_dest_routes)),
-                    ),
-                    riders=riders,
-                    both_ends=origin_id in scope_ids and dest_id in scope_ids,
-                    one_seat=one_seat,
-                    walk=walk,
-                )
-            )
-
-        result = ScenarioResult.of(self, rows)
-        if not result.overall.total:
-            raise ScenarioError(
-                f"scenario {self.name!r}: no ridership among the fetched "
-                f"origin/destination pairs, nothing to classify (check "
-                f"the selected scenarios' routes and the day filter)"
-            )
-        return result
-
 
 # Today's real routing, which no scenario file has to declare.
 # Its empty `routes` is what makes it adopt the comparison's universe
@@ -873,6 +809,68 @@ class ScenarioWalks:
             ),
             at_origin=walk_at_origin,
         )
+
+    def classify(
+        self,
+        *,
+        pairs: list[tuple[int, int, float]],
+        stations_path: Path,
+        scope_ids: frozenset[int],
+    ) -> ScenarioResult:
+        rows: list[ODPair] = []
+        for origin_id, dest_id, riders in pairs:
+            origin = self.walks.stations_by_id.get(origin_id)
+            dest = self.walks.stations_by_id.get(dest_id)
+            if origin is None or dest is None:
+                missing_id = origin_id if origin is None else dest_id
+                raise ScenarioError(
+                    f"station complex {missing_id} not found in "
+                    f"{stations_path}; refetch station reference data with "
+                    "`mta-od-data prepare --force-stations`"
+                )
+
+            effective_origin_routes = self.scenario.routes_of(origin)
+            effective_dest_routes = self.scenario.routes_of(dest)
+            one_seat = bool(effective_origin_routes & effective_dest_routes)
+
+            walk = (
+                NO_WALK
+                if one_seat
+                else self.shortest_walk(
+                    origin,
+                    dest,
+                    effective_origin_routes,
+                    effective_dest_routes,
+                )
+            )
+
+            rows.append(
+                ODPair(
+                    origin=TripEnd(
+                        id=origin_id,
+                        station=self.platforms.name(origin, effective_origin_routes),
+                        routes=",".join(sorted(effective_origin_routes)),
+                    ),
+                    destination=TripEnd(
+                        id=dest_id,
+                        station=self.platforms.name(dest, effective_dest_routes),
+                        routes=",".join(sorted(effective_dest_routes)),
+                    ),
+                    riders=riders,
+                    both_ends=origin_id in scope_ids and dest_id in scope_ids,
+                    one_seat=one_seat,
+                    walk=walk,
+                )
+            )
+
+        result = ScenarioResult.of(self.scenario, rows)
+        if not result.overall.total:
+            raise ScenarioError(
+                f"scenario {self.scenario.name!r}: no ridership among the fetched "
+                f"origin/destination pairs, nothing to classify (check "
+                f"the selected scenarios' routes and the day filter)"
+            )
+        return result
 
 
 @dataclass(slots=True, frozen=True)
@@ -1429,7 +1427,6 @@ class ScenarioComparison:
         self,
         *,
         pairs: list[tuple[int, int, float]],
-        stations_by_id: dict[int, Station],
         stations_path: Path,
         scope_ids: frozenset[int],
         walks: Walks,
@@ -1437,12 +1434,10 @@ class ScenarioComparison:
         return ScenarioComparisonResult(
             comparison=self,
             results=[
-                scenario.classify(
+                walks.for_scenario(scenario).classify(
                     pairs=pairs,
-                    stations_by_id=stations_by_id,
                     stations_path=stations_path,
                     scope_ids=scope_ids,
-                    walks=walks.for_scenario(scenario),
                 )
                 for scenario in self.scenarios
             ],
@@ -1854,7 +1849,6 @@ def deinterlining(
     try:
         result = comparison.classify(
             pairs=pairs,
-            stations_by_id=stations_by_id,
             stations_path=stations,
             scope_ids=scope_ids,
             walks=walks,
