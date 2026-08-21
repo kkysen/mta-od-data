@@ -42,6 +42,7 @@ from mta_od_data.analyze.common import (
     Station,
     haversine_m,
 )
+from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.scenarios import (
     CURRENT,
     SCENARIOS_FILE,
@@ -53,30 +54,6 @@ from mta_od_data.analyze.scenarios import (
 )
 
 app = Typer()
-
-
-def table_rule(alignments: str) -> str:
-    """A markdown table's header rule, `l`/`r` per column.
-
-    Right-aligned numeric columns so a reader can compare magnitudes
-    down a column at a glance.
-    Alignment markers only, not padding:
-    a rendered table lines up either way,
-    while padding the source to the widest cell
-    means one number gaining a digit repads its whole column
-    and every row of a committed report shows as changed.
-    """
-    cells = {"l": " --- ", "r": " ---: "}
-    return "|" + "|".join(cells[a] for a in alignments) + "|"
-
-
-def table_row(*cells: str) -> str:
-    """One markdown table row, `| |` for an empty cell.
-
-    Not `|  |`: a cell padded on both sides of nothing
-    is trailing whitespace, which markdown linters flag.
-    """
-    return "|" + "|".join(f" {cell} " if cell else " " for cell in cells) + "|"
 
 
 def suffixed_path(path: Path, suffix: str) -> Path:
