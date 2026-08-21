@@ -286,9 +286,11 @@ class Transitions:
 
         # Grouped the same way the pair tables are, so a reader comparing
         # the two isn't matching one row against two.
-        by_transition: dict[tuple[Outcome, Outcome], list[ODPair]] = {}
+        by_transition: defaultdict[tuple[Outcome, Outcome], list[ODPair]] = defaultdict(
+            list
+        )
         for before, after, pair in changed_rows:
-            by_transition.setdefault((before, after), []).append(pair)
+            by_transition[before, after].append(pair)
         changed = [
             Change(
                 before=before,
@@ -454,9 +456,9 @@ class SymmetricPair:
 
     @classmethod
     def group(cls, rows: list[ODPair]) -> list[SymmetricPair]:
-        by_ends: dict[frozenset[int], list[ODPair]] = {}
+        by_ends: defaultdict[frozenset[int], list[ODPair]] = defaultdict(list)
         for row in rows:
-            by_ends.setdefault(frozenset(e.id for e in row.ends), []).append(row)
+            by_ends[frozenset(e.id for e in row.ends)].append(row)
 
         def row_riders(row: ODPair) -> float:
             return row.riders
@@ -1282,9 +1284,9 @@ class EndStats:
         which is the order the report's ties fall out in
         (see the `ORDER BY` the pairs are fetched with).
         """
-        by_station: dict[int, list[ODPair]] = {}
+        by_station: defaultdict[int, list[ODPair]] = defaultdict(list)
         for row in rows:
-            by_station.setdefault(end(row).id, []).append(row)
+            by_station[end(row).id].append(row)
         return {
             station_id: cls(
                 # The pair rows' own labels, not a second naming of the

@@ -1,4 +1,5 @@
 import csv
+from collections import defaultdict
 from dataclasses import dataclass
 from enum import StrEnum
 from functools import cache
@@ -144,9 +145,9 @@ class PlatformIndex:
 
     @classmethod
     def build(cls, individual_stations: list[Station]) -> Self:
-        by_complex: dict[int, list[Station]] = {}
+        by_complex: defaultdict[int, list[Station]] = defaultdict(list)
         for station in individual_stations:
-            by_complex.setdefault(station.complex_id, []).append(station)
+            by_complex[station.complex_id].append(station)
         return cls(
             by_complex={cid: tuple(v) for cid, v in by_complex.items()},
         )
