@@ -210,7 +210,7 @@ class Outcome(StrEnum):
 type PlatformId = int
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True, frozen=True, eq=False)
 class WalkPoints:
     """Every location a walk can be measured between, by `PlatformId`.
 
@@ -218,10 +218,22 @@ class WalkPoints:
     their complex's platforms is nearest what they are walking to, so a
     complex enters as all of its platforms at once, which is what
     `by_complex` holds.
+
+    `eq=False` so it hashes by identity, which `distance`'s cache keys
+    on; a table of coordinates has no cheap hash of its own.
     """
 
     locations: list[Coord]
     by_complex: dict[int, tuple[PlatformId, ...]]
+
+    # Keyed on `PlatformId`s rather than on the `Coord`s themselves,
+    # which are dataclasses: a dataclass recomputes its hash on every
+    # lookup, where an int is its own.
+    @cache  # noqa: B019  (see `ScenarioWalks.corridor_platforms`)
+    def distance(self, point: PlatformId, other: PlatformId) -> float:
+        """Metres between two of these."""
+        here, there = self.locations[point], self.locations[other]
+        return haversine(here.lat, here.lon, there.lat, there.lon)
 
     @classmethod
     def build(
@@ -266,22 +278,11 @@ class Walks:
     def for_scenario(self, scenario: Scenario) -> ScenarioWalks:
         return ScenarioWalks(walks=self, scenario=scenario)
 
+    # One per run, so every scenario shares its distances: where a
+    # platform is doesn't depend on which routes stop there.
     @cache  # noqa: B019  (see `ScenarioWalks.corridor_platforms`)
     def points(self) -> WalkPoints:
         return WalkPoints.build(self.individual_stations, self.stations_by_id)
-
-    # Keyed on `PlatformId`s rather than on the `Coord`s themselves,
-    # which are dataclasses: a dataclass recomputes its hash on every
-    # lookup, where an int is its own.
-    # On `Walks` rather than `ScenarioWalks`, so every scenario in a run
-    # shares it: where a platform is doesn't depend on which routes stop
-    # there.
-    @cache  # noqa: B019  (see `ScenarioWalks.corridor_platforms`)
-    def distance(self, point: PlatformId, other: PlatformId) -> float:
-        """Metres between two of `points`."""
-        locations = self.points().locations
-        here, there = locations[point], locations[other]
-        return haversine(here.lat, here.lon, there.lat, there.lon)
 
 
 @dataclass(slots=True, frozen=True, eq=False)
@@ -380,13 +381,14 @@ class ScenarioWalks:
         if not candidates:
             return None
 
-        distance = self.walks.distance
+        points = self.walks.points()
+        distance = points.distance
         # By distance alone: two platforms exactly as far away would
         # otherwise be compared as `Station`s, which don't order.
         return min(
             (
                 (distance(point, platform_id), platform)
-                for point in self.walks.points().by_complex[complex_id]
+                for point in points.by_complex[complex_id]
                 for platform_id, platform in candidates
             ),
             key=itemgetter(0),
