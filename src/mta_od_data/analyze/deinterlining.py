@@ -103,24 +103,18 @@ class Walk:
     # Within the comparison's `--close-threshold-m`.
     # Only meaningful against a pair that isn't already a one-seat ride.
     close: bool
+    dist_m: float
+    # The station the walk reaches, named under the scenario.
+    near_station: str | None
     # Which end the walk is at.
     # Symmetric in the pair, but not a property of it:
     # which end is the shorter walk is exactly what this records.
     at_origin: bool
-    dist_m: float
-    # The station the walk reaches, named under the scenario.
-    near_station: str | None
 
 
 # A one-seat ride, where the ridden route stops at both ends
 # and there is no walk to model.
-NO_WALK = Walk(close=False, at_origin=False, dist_m=0.0, near_station=None)
-
-
-# `Walk`'s fields become columns under their own names,
-# except this one: `at_origin` says nothing on its own
-# once it sits alongside the pair's own columns.
-WALK_COLUMNS = {"at_origin": "walk_at_origin"}
+NO_WALK = Walk(close=False, dist_m=0.0, near_station=None, at_origin=False)
 
 
 @dataclass(slots=True, frozen=True)
@@ -142,25 +136,29 @@ class ODPair:
     both_ends: bool
     one_seat: bool
     # `NO_WALK` when `one_seat`, there being no walk to model then.
-    # Last, and flattened in place by `csv_row`,
-    # so its fields stay the last columns of a CSV row.
     walk: Walk
 
     @classmethod
     def csv_fields(cls) -> list[str]:
-        return [
-            WALK_COLUMNS.get(fld.name, fld.name)
-            for fld in (*fields(cls), *fields(Walk))
-            if fld.name != "walk"
+        """The columns `csv_row` produces, in its order."""
+        return [fld.name for fld in fields(cls) if fld.name != "walk"] + [
+            f"walk_{fld.name}" for fld in fields(Walk)
         ]
 
     @property
     def csv_row(self) -> dict[str, Any]:
-        """Flat: a CSV column can't hold the nested `walk`,
-        and its fields are what a reader filters on."""
+        """One flat row: a CSV column can't hold the nested `walk`,
+        so its fields are inlined after the pair's own,
+        under a `walk_` prefix.
+
+        The prefix rather than their bare names,
+        which is what a nested field loses by being flattened:
+        `at_origin` says nothing beside an `origin_id` column,
+        and a lone `close` doesn't say close to what.
+        """
         row = asdict(self)
         walk = row.pop("walk")
-        return row | {WALK_COLUMNS.get(k, k): v for k, v in walk.items()}
+        return row | {f"walk_{name}": value for name, value in walk.items()}
 
     @property
     def origin_name(self) -> str:
