@@ -18,6 +18,7 @@ from mta_od_data.analyze.common import (
     Station,
     haversine_m,
 )
+from mta_od_data.analyze.markdown import table_row, table_rule
 
 app = Typer()
 
@@ -256,10 +257,19 @@ class ScenarioResult:
         lines.append(f"{h2} Top {top_n} Origin/Destination Pairs")
         lines.append("")
         lines.append(
-            "| # | Riders | % Total | % 1-Seat | Type | Close? | Dist "
-            "| Origin → Destination | 1-Seat Destination |"
+            table_row(
+                "#",
+                "Riders",
+                "% Total",
+                "% 1-Seat",
+                "Type",
+                "Close?",
+                "Dist",
+                "Origin → Destination",
+                "1-Seat Destination",
+            )
         )
-        lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
+        lines.append(table_rule("l" * 9))
 
         def pair_riders(r: PairRow) -> float:
             return r.riders
@@ -279,9 +289,17 @@ class ScenarioResult:
             dist_str = f"{r.dist_m:.0f}m"
             near_station_str = r.near_station if r.near_station else ""
             lines.append(
-                f"| {i} | {r.riders:,.0f} | {pct_total:.2f}% | {pct_one_seat_str} | "
-                f"{type_str} | {close_str} | {dist_str} | "
-                f"{r.origin_name} → {r.dest_name} | {near_station_str} |"
+                table_row(
+                    str(i),
+                    f"{r.riders:,.0f}",
+                    f"{pct_total:.2f}%",
+                    pct_one_seat_str,
+                    type_str,
+                    close_str,
+                    dist_str,
+                    f"{r.origin_name} → {r.dest_name}",
+                    near_station_str,
+                )
             )
         lines.append("")
 
@@ -295,9 +313,11 @@ class ScenarioResult:
         )
         lines.append("")
         lines.append(
-            "| Riders | 1-Seat % | % All 1-Seat | Close? | Dist | Destination |"
+            table_row(
+                "Riders", "1-Seat %", "% All 1-Seat", "Close?", "Dist", "Destination"
+            )
         )
-        lines.append("| --- | --- | --- | --- | --- | --- |")
+        lines.append(table_rule("l" * 6))
 
         def dest_one_seat(d: DestStats) -> float:
             return d.one_seat
@@ -316,8 +336,14 @@ class ScenarioResult:
             avg_dist = d.many_seat_avg_dist_m
             dist_str = "" if avg_dist is None else f"{avg_dist:.0f}m"
             lines.append(
-                f"| {d.total:,.0f} | {d.one_seat_pct:.1f}% | {pct_all_one_seat:.2f}% | "
-                f"{close_str} | {dist_str} | {d.name} |"
+                table_row(
+                    f"{d.total:,.0f}",
+                    f"{d.one_seat_pct:.1f}%",
+                    f"{pct_all_one_seat:.2f}%",
+                    close_str,
+                    dist_str,
+                    d.name,
+                )
             )
         lines.append("")
 
@@ -659,15 +685,24 @@ def render_scenario_comparison(
     )
     lines.append("")
     lines.append(
-        "| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |"
+        table_row(
+            "Scenario",
+            "Total Riders",
+            "Direct 1-Seat",
+            "Close 1-Seat",
+            "Effective 1-Seat",
+        )
     )
-    lines.append("| --- | --- | --- | --- | --- |")
+    lines.append(table_rule("l" * 5))
     for r in results:
         lines.append(
-            f"| {r.label} | {r.total_riders:,.0f} | "
-            f"{r.one_seat_riders:,.0f} ({r.direct_one_seat_pct:.1f}%) | "
-            f"{r.close_one_seat_riders:,.0f} ({r.close_one_seat_pct:.1f}%) | "
-            f"{r.effective_one_seat_riders:,.0f} ({r.effective_one_seat_pct:.1f}%) |"
+            table_row(
+                r.label,
+                f"{r.total_riders:,.0f}",
+                f"{r.one_seat_riders:,.0f} ({r.direct_one_seat_pct:.1f}%)",
+                f"{r.close_one_seat_riders:,.0f} ({r.close_one_seat_pct:.1f}%)",
+                f"{r.effective_one_seat_riders:,.0f} ({r.effective_one_seat_pct:.1f}%)",
+            )
         )
     lines.append("")
     return "\n".join(lines)
