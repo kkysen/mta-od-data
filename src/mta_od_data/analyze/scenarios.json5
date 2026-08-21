@@ -1,4 +1,100 @@
 {
+  "Nostrand": [
+    {
+      "name": "2/3 Nostrand",
+      "description": "2,3 Nostrand, 4 Eastern Pkwy express, 5 Eastern Pkwy local past Franklin Av",
+      "routes": [
+        "2",
+        "3",
+        "4",
+        "5",
+      ],
+      "overrides": [
+        {
+          "line": "Nostrand",
+          "add": [
+            "3"
+          ],
+          "remove": [
+            "5"
+          ],
+          "stations": [
+            "President St-Medgar Evers College",
+            "Sterling St",
+            "Winthrop St",
+            "Church Av",
+            "Beverly Rd",
+            "Newkirk Av-Little Haiti",
+            "Flatbush Av-Brooklyn College",
+          ],
+        },
+        {
+          "line": "Eastern Pky",
+          "add": [
+            "5"
+          ],
+          "remove": [
+            "3"
+          ],
+          "stations": [
+            "Nostrand Av",
+            "Kingston Av",
+            "Crown Hts-Utica Av",
+            "Sutter Av-Rutland Rd",
+            "Saratoga Av",
+            "Rockaway Av",
+            "Junius St",
+            "Pennsylvania Av",
+            "Pennsylvania Av",
+            "Van Siclen Av",
+            "New Lots Av",
+          ],
+        },
+      ],
+    },
+    {
+      "name": "4/5 Nostrand",
+      "description": "4,5 Nostrand, 2 Eastern Pkwy express, 3 Eastern Pkwy local past Franklin Av",
+      "routes": [
+        "2",
+        "3",
+        "4",
+        "5",
+      ],
+      "overrides": [
+        {
+          "line": "Nostrand",
+          "add": [
+            "4"
+          ],
+          "remove": [
+            "2"
+          ],
+          "stations": [
+            "President St-Medgar Evers College",
+            "Sterling St",
+            "Winthrop St",
+            "Church Av",
+            "Beverly Rd",
+            "Newkirk Av-Little Haiti",
+            "Flatbush Av-Brooklyn College",
+          ],
+        },
+        {
+          "line": "Eastern Pky",
+          "add": [
+            "2"
+          ],
+          "remove": [
+            "4"
+          ],
+          "stations": [
+            "Crown Hts-Utica Av",
+          ],
+        },
+      ],
+    },
+  ],
   "DeKalb": [
     {
       "name": "B/D 4 Av Express",
