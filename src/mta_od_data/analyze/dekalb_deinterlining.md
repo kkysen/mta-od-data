@@ -1,4 +1,4 @@
-# Deinterlining scenario comparison: B,D,N,Q,R
+# Deinterlining Scenario Comparison: B,D,N,Q,R
 
 Average weekday ridership (60 distinct days in the data, 2025-01 to 2025-12), over every origin/destination pair with both ends served by B,D,N,Q,R under any scenario compared here. Pairs with only one end on those routes are reported alongside as context, but can't be a one-seat ride under any of them.
 
@@ -6,11 +6,11 @@ Produced by `mta-od-data analyze deinterlining --category DeKalb --markdown-out 
 
 ---
 
-## Scenario comparison
+## Scenario Comparison
 
 Two cuts of the same classification. Neither is the whole answer: the first says what a scenario does to the riders it can reach, the second how much of the system it reaches at all. In both, only how many riders get a one-seat ride changes between scenarios, never the total. Close one-seat counts a transfer trip whose destination is within 300m of a station on that scenario's effective origin corridor.
 
-### Both ends on the comparison's routes
+### Both Ends on the Comparison's Routes
 
 The 837,408 riders whose origin *and* destination are served by B,D,N,Q,R: the trips these routes could carry end to end, including the many that keep a one-seat ride whatever the scenario. Every table below is scoped to these.
 
@@ -20,7 +20,7 @@ The 837,408 riders whose origin *and* destination are served by B,D,N,Q,R: the t
 | B/D 4 Av Express | 837,408 | 593,038 (70.8%), -19,757 (-2.4%) | 93,517 (11.2%), +6,991 (+0.8%) | 686,555 (82.0%), -12,766 (-1.5%) |
 | N/Q 4 Av Express | 837,408 | 580,025 (69.3%), -32,770 (-3.9%) | 96,231 (11.5%), +9,705 (+1.2%) | 676,256 (80.8%), -23,065 (-2.8%) |
 
-### Either end on the comparison's routes
+### Either End on the Comparison's Routes
 
 The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above among them. The difference is transfer trips with one end off these routes entirely, which no scenario here can change: they can only dilute the rate, which is why a junction's effect washes out against this total.
 
@@ -34,7 +34,7 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 
 ## Current
 
-### Top 25 origin/destination pairs
+### Top 25 Origin/Destination Pairs
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
@@ -66,7 +66,7 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 | 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
 | 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
 
-### Top 25 origin stations, summed across all destinations
+### Top 25 Origin Stations, Summed across All Destinations
 
 Both ends on the comparison's routes, per that section of the comparison above.
 
@@ -98,7 +98,7 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 9,225 | 67.9% | 73.7% | 23 St (R) |
 | 9,209 | 59.5% | 81.1% | Forest Hills-71 Av (R) |
 
-### Top 25 destination stations, summed across all origins
+### Top 25 Destination Stations, Summed across All Origins
 
 Both ends on the comparison's routes, per that section of the comparison above.
 
@@ -134,7 +134,7 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 ## B/D 4 Av Express
 
-### What changed, against Current
+### What Changed, against Current
 
 Every both-ends rider, and their share of the 837,408 of them: **was** is what Current gives them, **now** what B/D 4 Av Express would. Off-diagonal cells are the whole effect of the swap; the diagonal is everyone it leaves alone. `direct` is a one-seat ride, `close` a one-seat ride after a walk of 300m or less, `far` neither.
 
@@ -148,7 +148,7 @@ Every both-ends rider, and their share of the 837,408 of them: **was** is what C
 - **Lost one: 18,662 (2.2%)**
 - **Net: -12,766 (-1.5%)**
 
-### Biggest changes, against Current
+### Biggest Changes, against Current
 
 The top 25 station pairs by riders whose outcome moved, both directions combined as above. An end reads `today → B/D 4 Av Express` where its routes change, and today's alone where they don't; `Dist` is the walk under B/D 4 Av Express.
 
@@ -180,7 +180,7 @@ The top 25 station pairs by riders whose outcome moved, both directions combined
 | 24 | 305 | direct | far | 795m | Church Av (B,Q → N,Q) ↔ Broadway-Lafayette St (B,D) |
 | 25 | 297 | direct | far | 518m | 18 Av (N → B) ↔ Canal St (N,Q,R) |
 
-### Top 25 origin/destination pairs
+### Top 25 Origin/Destination Pairs
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
@@ -212,7 +212,7 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 | 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
 | 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
 
-### Top 25 origin stations, summed across all destinations
+### Top 25 Origin Stations, Summed across All Destinations
 
 Both ends on the comparison's routes, per that section of the comparison above.
 
@@ -244,7 +244,7 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 9,225 | 67.9% | 73.7% | 23 St (R) |
 | 9,209 | 59.5% | 81.1% | Forest Hills-71 Av (R) |
 
-### Top 25 destination stations, summed across all origins
+### Top 25 Destination Stations, Summed across All Origins
 
 Both ends on the comparison's routes, per that section of the comparison above.
 
@@ -280,7 +280,7 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 ## N/Q 4 Av Express
 
-### What changed, against Current
+### What Changed, against Current
 
 Every both-ends rider, and their share of the 837,408 of them: **was** is what Current gives them, **now** what N/Q 4 Av Express would. Off-diagonal cells are the whole effect of the swap; the diagonal is everyone it leaves alone. `direct` is a one-seat ride, `close` a one-seat ride after a walk of 300m or less, `far` neither.
 
@@ -294,7 +294,7 @@ Every both-ends rider, and their share of the 837,408 of them: **was** is what C
 - **Lost one: 32,828 (3.9%)**
 - **Net: -23,065 (-2.8%)**
 
-### Biggest changes, against Current
+### Biggest Changes, against Current
 
 The top 25 station pairs by riders whose outcome moved, both directions combined as above. An end reads `today → N/Q 4 Av Express` where its routes change, and today's alone where they don't; `Dist` is the walk under N/Q 4 Av Express.
 
@@ -326,7 +326,7 @@ The top 25 station pairs by riders whose outcome moved, both directions combined
 | 24 | 391 | direct | close | 191m | Newkirk Plaza (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
 | 25 | 389 | direct | far | 518m | Grand St (B,D) ↔ 20 Av (D → Q) |
 
-### Top 25 origin/destination pairs
+### Top 25 Origin/Destination Pairs
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
@@ -358,7 +358,7 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 | 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
 | 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
 
-### Top 25 origin stations, summed across all destinations
+### Top 25 Origin Stations, Summed across All Destinations
 
 Both ends on the comparison's routes, per that section of the comparison above.
 
@@ -390,7 +390,7 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 9,225 | 67.9% | 73.7% | 23 St (R) |
 | 9,209 | 59.5% | 81.1% | Forest Hills-71 Av (R) |
 
-### Top 25 destination stations, summed across all origins
+### Top 25 Destination Stations, Summed across All Origins
 
 Both ends on the comparison's routes, per that section of the comparison above.
 

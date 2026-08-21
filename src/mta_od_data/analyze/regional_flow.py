@@ -90,7 +90,7 @@ class RegionalFlowResult:
         self, *, day_type: DayType, top_n: int, csv_out: Path | None
     ) -> str:
         lines: list[str] = []
-        lines.append("## Headline numbers")
+        lines.append("## Headline Numbers")
         lines.append("")
         lines.append(f"Total: {self.total_riders:,.0f} riders/{day_type}")
         lines.append("")
@@ -113,7 +113,7 @@ class RegionalFlowResult:
         lines.append(f"| **Intra** | {self.intra:,.0f} | {self.pct(self.intra):.1f}% |")
         lines.append("")
 
-        lines.append(f"## Top {top_n} origin/destination pairs")
+        lines.append(f"## Top {top_n} Origin/Destination Pairs")
         lines.append("")
         lines.append("| # | Riders | % Total | Flow | Origin -> Destination |")
         lines.append("| --- | --- | --- | --- | --- |")
@@ -380,7 +380,7 @@ def regional_flow(
     if markdown_out:
         produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
         preamble_lines = [
-            f"# Regional flow: {result.region_name}",
+            f"# Regional Flow: {result.region_name}",
             "",
             f"Scenario: average {day_type} ridership ({n_distinct_days} distinct "
             f"days in the data, {coverage.first_month} to "
