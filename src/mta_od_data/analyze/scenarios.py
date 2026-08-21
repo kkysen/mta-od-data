@@ -9,6 +9,7 @@ replace `one_seat_rides.py`'s corridor-A/corridor-B machinery.
 
 import itertools
 import re
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated
@@ -125,7 +126,11 @@ SCENARIO_FILE_ADAPTER = TypeAdapter(
 
 @dataclass(slots=True, frozen=True)
 class StationIndex:
-    by_name_line: dict[tuple[str, str], Station]
+    # The complexes a (station name, line) names, which is all of them
+    # rather than the last one seen: a name shared by two complexes on
+    # one line has no right answer, and `resolve` says so instead of
+    # picking whichever the CSV happened to end with.
+    by_name_line: dict[tuple[str, str], frozenset[Station]]
     known_routes: frozenset[str]
     # A scenario's overrides are declared per line and resolved to a
     # complex, so applying them needs the complex's platforms.
@@ -137,11 +142,15 @@ class StationIndex:
         stations_by_id: dict[int, Station],
         individual_stations: list[Station],
     ) -> StationIndex:
-        by_name_line = {
-            (s.name, s.line): stations_by_id[s.complex_id] for s in individual_stations
-        }
+        by_name_line: defaultdict[tuple[str, str], set[Station]] = defaultdict(set)
+        for platform in individual_stations:
+            # By complex, so a complex's several platforms of one name
+            # on one line (which is routine) count once.
+            by_name_line[platform.name, platform.line].add(
+                stations_by_id[platform.complex_id]
+            )
         return cls(
-            by_name_line=by_name_line,
+            by_name_line={key: frozenset(v) for key, v in by_name_line.items()},
             known_routes=frozenset(
                 r for s in stations_by_id.values() for r in s.routes
             ),
@@ -149,12 +158,20 @@ class StationIndex:
         )
 
     def resolve(self, name: str, line: str, *, path: Path) -> Station:
-        station = self.by_name_line.get((name, line))
-        if station is None:
+        stations = self.by_name_line.get((name, line), frozenset())
+        if not stations:
             raise ScenarioError(
                 f'scenario {path}: no station named "{name}" on line "{line}"'
             )
-        return station
+        if len(stations) > 1:
+            ids = sorted(s.complex_id for s in stations)
+            raise ScenarioError(
+                f'scenario {path}: "{name}" on line "{line}" names '
+                f"{len(stations)} station complexes ({ids}), so there is no "
+                f"one station to override. Split the group so each names a "
+                f"line only one of them is on"
+            )
+        return next(iter(stations))
 
     def routes_on_line(self, station: Station, line: str) -> Routes:
         """What the complex's platforms *on this line* serve.
