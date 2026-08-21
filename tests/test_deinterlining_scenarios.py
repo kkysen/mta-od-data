@@ -110,6 +110,24 @@ def test_a_group_cannot_add_and_remove_the_same_route(
         ScenarioFile.load(path, station_index)
 
 
+def test_scenarios_that_slug_alike_are_rejected(
+    tmp_path: Path, station_index: StationIndex
+) -> None:
+    """Two names, one CSV file: `slugify` drops the punctuation that
+    tells them apart, and the second run would overwrite the first."""
+    path = write_scenarios(
+        tmp_path,
+        {
+            "X": [
+                {"name": "A/C CPW Express", "routes": CONFLICT_ROUTES},
+                {"name": "A C CPW Express", "routes": CONFLICT_ROUTES},
+            ]
+        },
+    )
+    with pytest.raises(ScenarioError, match="can't be told apart"):
+        ScenarioFile.load(path, station_index)
+
+
 def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> None:
     """Which complex an override means has no answer then, and the index
     used to answer with whichever platform row came last.
