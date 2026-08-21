@@ -295,17 +295,17 @@ class ScenarioWalks:
         ]
 
     @cache  # noqa: B019  (see `corridor_platforms`)
-    def min_dist_to_corridor(
-        self, station: Station, corridor_routes: Routes
+    def min_dist_to_route(
+        self, station: Station, route: str
     ) -> tuple[float, Station] | None:
-        candidates = self.corridor_platforms(corridor_routes)
+        """The nearest platform this route stops at, and how far.
+
+        `None` when the route stops nowhere under this scenario, e.g. a
+        synthetic one no scenario uses yet, or one every scenario in the
+        comparison takes off the map.
+        """
+        candidates = self.corridor_platforms(frozenset({route}))
         if not candidates:
-            # Either the station has no route in this comparison at
-            # all (so there is no corridor of its own to measure
-            # against), or a route has no individual-station data,
-            # e.g. a synthetic one no scenario uses yet.
-            # The caller decides what an unmeasurable end means;
-            # here it's just "nothing to measure to".
             return None
 
         # By distance alone: two platforms exactly as far away would
@@ -318,6 +318,32 @@ class ScenarioWalks:
             ),
             key=itemgetter(0),
         )
+
+    @cache  # noqa: B019  (see `corridor_platforms`)
+    def min_dist_to_corridor(
+        self, station: Station, corridor_routes: Routes
+    ) -> tuple[float, Station] | None:
+        """The nearest platform a rider could board this corridor at.
+
+        The nearest of a set of routes is the nearest of each route's
+        own nearest, so the sweep is keyed per route: one per (station,
+        route), a few thousand, where keying it on the set swept once
+        per distinct set, which is every combination of routes the
+        scenarios put on a station.
+
+        `None` when there is nothing to measure to: either the station
+        has no route in this comparison at all, so there is no corridor
+        of its own to measure against, or none of these routes stops
+        anywhere. The caller decides what an unmeasurable end means.
+        """
+        # Sorted, so which of two equally distant platforms wins doesn't
+        # depend on a `frozenset`'s iteration order.
+        measured = [
+            nearest
+            for route in sorted(corridor_routes)
+            if (nearest := self.min_dist_to_route(station, route)) is not None
+        ]
+        return min(measured, key=itemgetter(0)) if measured else None
 
     def shortest_walk(
         self,
