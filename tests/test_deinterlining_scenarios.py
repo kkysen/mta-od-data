@@ -12,13 +12,13 @@ from pathlib import Path
 import pytest
 
 from mta_od_data import DATA, ROOT
-from mta_od_data.analyze.deinterlining import (
+from mta_od_data.analyze.common import Station
+from mta_od_data.analyze.deinterlining import resolve_scenarios
+from mta_od_data.analyze.scenarios import (
     SCENARIOS_FILE,
     ScenarioError,
     ScenarioFile,
-    Station,
     StationIndex,
-    resolve_scenarios,
 )
 
 STATIONS = DATA / "stations_complexes.csv"
