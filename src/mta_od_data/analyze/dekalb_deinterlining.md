@@ -26,9 +26,9 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 
 | Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
 | --- | ---: | ---: | ---: | ---: |
-| Current | 2,332,194 | 612,795 (26.3%) | 229,764 (9.9%) | 842,558 (36.1%) |
-| B/D 4 Av Express | 2,332,194 | 590,180 (25.3%), -22,615 (-1.0%) | 236,274 (10.1%), +6,511 (+0.3%) | 826,454 (35.4%), -16,104 (-0.7%) |
-| N/Q 4 Av Express | 2,332,194 | 579,146 (24.8%), -33,649 (-1.4%) | 238,741 (10.2%), +8,977 (+0.4%) | 817,886 (35.1%), -24,672 (-1.1%) |
+| Current | 2,332,194 | 612,795 (26.3%) | 205,453 (8.8%) | 818,248 (35.1%) |
+| B/D 4 Av Express | 2,332,194 | 590,180 (25.3%), -22,615 (-1.0%) | 213,129 (9.1%), +7,676 (+0.3%) | 803,309 (34.4%), -14,938 (-0.6%) |
+| N/Q 4 Av Express | 2,332,194 | 579,146 (24.8%), -33,649 (-1.4%) | 214,339 (9.2%), +8,886 (+0.4%) | 793,485 (34.0%), -24,763 (-1.1%) |
 
 ---
 
@@ -158,19 +158,19 @@ The top 25 station pairs by riders whose outcome moved, both directions combined
 | 2 | 774 | direct | close | 274m | Kings Hwy (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
 | 3 | 707 | direct | close | 274m | DeKalb Av (B,Q,R → N,Q,R) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
 | 4 | 633 | direct | close | 191m | Kings Hwy (B,Q → N,Q) ↔ 42 St-Bryant Pk (B,D) |
-| 5 | 599 | direct | far | 518m | DeKalb Av (B,Q,R → N,Q,R) ↔ Grand St (B,D) |
+| 5 | 599 | direct | far | 565m | DeKalb Av (B,Q,R → N,Q,R) ↔ Grand St (B,D) |
 | 6 | 584 | far | direct | | 8 Av (N → B) ↔ Grand St (B,D) |
 | 7 | 582 | direct | close | 191m | DeKalb Av (B,Q,R → N,Q,R) ↔ 42 St-Bryant Pk (B,D) |
 | 8 | 575 | direct | close | 274m | Sheepshead Bay (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 9 | 557 | direct | far | 518m | Kings Hwy (B,Q → N,Q) ↔ Grand St (B,D) |
+| 9 | 557 | direct | far | 565m | Kings Hwy (B,Q → N,Q) ↔ Grand St (B,D) |
 | 10 | 534 | direct | close | 166m | DeKalb Av (B,Q,R → N,Q,R) ↔ Broadway-Lafayette St (B,D) |
 | 11 | 534 | direct | far | 518m | Fort Hamilton Pkwy (N → B) ↔ Canal St (N,Q,R) |
 | 12 | 509 | direct | far | 518m | Bay Pkwy (N → B) ↔ Canal St (N,Q,R) |
 | 13 | 505 | direct | close | 274m | 7 Av (B,Q → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
 | 14 | 436 | direct | close | 191m | Times Sq-42 St (N,Q,R) ↔ 8 Av (N → B) |
 | 15 | 435 | direct | close | 191m | Sheepshead Bay (B,Q → N,Q) ↔ 42 St-Bryant Pk (B,D) |
-| 16 | 423 | direct | far | 518m | Sheepshead Bay (B,Q → N,Q) ↔ Grand St (B,D) |
-| 17 | 408 | direct | far | 795m | 7 Av (B,Q → N,Q) ↔ Broadway-Lafayette St (B,D) |
+| 16 | 423 | direct | far | 565m | Sheepshead Bay (B,Q → N,Q) ↔ Grand St (B,D) |
+| 17 | 408 | direct | far | 848m | 7 Av (B,Q → N,Q) ↔ Broadway-Lafayette St (B,D) |
 | 18 | 393 | direct | far | 518m | Kings Hwy (N → B) ↔ Canal St (N,Q,R) |
 | 19 | 381 | direct | far | 699m | W 4 St-Wash Sq (B,D) ↔ DeKalb Av (B,Q,R → N,Q,R) |
 | 20 | 349 | direct | far | 518m | 20 Av (N → B) ↔ Canal St (N,Q,R) |
@@ -305,26 +305,26 @@ The top 25 station pairs by riders whose outcome moved, both directions combined
 | 3 | 682 | direct | far | 867m | 14 St-Union Sq (N,Q,R) ↔ Prospect Park (B,Q → B,D) |
 | 4 | 668 | direct | close | 191m | Kings Hwy (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
 | 5 | 628 | direct | far | 867m | Parkside Av (Q → D) ↔ 14 St-Union Sq (N,Q,R) |
-| 6 | 600 | direct | far | 518m | 79 St (D → Q) ↔ Grand St (B,D) |
-| 7 | 595 | direct | far | 518m | Bay Pkwy (D → Q) ↔ Grand St (B,D) |
+| 6 | 600 | direct | far | 565m | 79 St (D → Q) ↔ Grand St (B,D) |
+| 7 | 595 | direct | far | 565m | Bay Pkwy (D → Q) ↔ Grand St (B,D) |
 | 8 | 590 | direct | far | 867m | Kings Hwy (B,Q → B,D) ↔ 14 St-Union Sq (N,Q,R) |
 | 9 | 579 | direct | close | 191m | Church Av (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
-| 10 | 560 | direct | far | 518m | 18 Av (D → Q) ↔ Grand St (B,D) |
+| 10 | 560 | direct | far | 565m | 18 Av (D → Q) ↔ Grand St (B,D) |
 | 11 | 488 | direct | far | 867m | Newkirk Plaza (B,Q → B,D) ↔ 14 St-Union Sq (N,Q,R) |
-| 12 | 485 | direct | far | 781m | DeKalb Av (B,Q,R → B,D,R) ↔ 72 St (Q) |
+| 12 | 485 | direct | far | 803m | DeKalb Av (B,Q,R → B,D,R) ↔ 72 St (Q) |
 | 13 | 485 | direct | far | 518m | Kings Hwy (B,Q → B,D) ↔ Canal St (N,Q,R) |
 | 14 | 476 | direct | close | 191m | Prospect Park (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
 | 15 | 467 | direct | close | 191m | 7 Av (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
-| 16 | 461 | direct | far | 518m | 71 St (D → Q) ↔ Grand St (B,D) |
-| 17 | 460 | direct | far | 518m | 9 Av (D → Q) ↔ Grand St (B,D) |
+| 16 | 461 | direct | far | 565m | 71 St (D → Q) ↔ Grand St (B,D) |
+| 17 | 460 | direct | far | 565m | 9 Av (D → Q) ↔ Grand St (B,D) |
 | 18 | 459 | direct | far | 518m | Avenue U (Q → D) ↔ Canal St (N,Q,R) |
 | 19 | 450 | direct | close | 191m | Parkside Av (Q → D) ↔ Times Sq-42 St (N,Q,R) |
-| 20 | 437 | direct | far | 518m | 25 Av (D → Q) ↔ Grand St (B,D) |
-| 21 | 422 | direct | far | 518m | Grand St (B,D) ↔ 36 St (D,N,R → N,Q,R) |
+| 20 | 437 | direct | far | 565m | 25 Av (D → Q) ↔ Grand St (B,D) |
+| 21 | 422 | direct | far | 565m | Grand St (B,D) ↔ 36 St (D,N,R → N,Q,R) |
 | 22 | 418 | direct | far | 518m | 7 Av (B,Q → B,D) ↔ Canal St (N,Q,R) |
 | 23 | 418 | direct | far | 867m | Cortelyou Rd (Q → D) ↔ 14 St-Union Sq (N,Q,R) |
 | 24 | 391 | direct | close | 191m | Newkirk Plaza (B,Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
-| 25 | 389 | direct | far | 518m | Grand St (B,D) ↔ 20 Av (D → Q) |
+| 25 | 389 | direct | far | 565m | Grand St (B,D) ↔ 20 Av (D → Q) |
 
 ### Top 25 Origin/Destination Pairs
 
