@@ -45,9 +45,6 @@
           ],
         },
         {
-          // The Sea Beach terminal, whose complex the line column names
-          // for all four lines meeting there. Only Sea Beach moves: the
-          // D still arrives over the West End and the Q over Brighton.
           "line": "Sea Beach / West End / Culver / Brighton",
           "add": [
             "B"
@@ -68,9 +65,6 @@
             "B"
           ],
           "stations": [
-            // North of the junction, but a Brighton stop, so it follows
-            // the Brighton express: the B leaves for the 4 Av express,
-            // which bypasses DeKalb Av entirely, and the N arrives.
             "DeKalb Av",
             "7 Av",
             "Prospect Park",
@@ -138,9 +132,6 @@
             "Q"
           ],
           "stations": [
-            // As above, mirrored: the Q leaves for the 4 Av express and
-            // the D takes over the Brighton local, so DeKalb Av keeps
-            // the Brighton express (still the B here) and swaps Q for D.
             "DeKalb Av",
             "7 Av",
             "Prospect Park",
