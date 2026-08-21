@@ -171,6 +171,13 @@ def haversine_m(c1: Coord, c2: Coord) -> float:
     return 2 * r * asin(sqrt(a))
 
 
+class DayFilterError(Exception):
+    """A day filter that selects nothing.
+
+    Raised rather than exiting, so `DayCoverage.query` stays usable as a
+    library function; every `analyze` command catches it and exits."""
+
+
 @dataclass(slots=True, frozen=True)
 class DayCoverage:
     """How much of the extract a day filter selects.
@@ -205,6 +212,17 @@ class DayCoverage:
         ).fetchone()
         assert result is not None, "aggregate query always returns exactly one row"
         n_days, first, last = result
+        if not n_days:
+            # Before anything divides by it: every command averages its
+            # ridership over `n_days`, and `MIN`/`MAX` over no rows are
+            # NULL, so an unguarded empty filter is a division by zero
+            # or a `None` where a month should be.
+            selected = ", ".join(day_params) or "all days"
+            raise DayFilterError(
+                f"no rows in {parquet} match the day filter ({selected}); "
+                f"check --days against the extract's 'Day of Week' values, "
+                f"which are full names like 'Monday'"
+            )
         return cls(
             n_days=n_days,
             first_month=cls.format_month(first),

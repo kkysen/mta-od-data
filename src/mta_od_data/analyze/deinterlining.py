@@ -37,6 +37,7 @@ from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
     Coord,
     DayCoverage,
+    DayFilterError,
     DayType,
     PlatformIndex,
     Station,
@@ -1358,7 +1359,11 @@ def deinterlining(
         f' OR "Destination Station Complex ID" IN ({scope_id_list}))'
     )
 
-    coverage = DayCoverage.query(con, parquet, day_filter_sql, day_params)
+    try:
+        coverage = DayCoverage.query(con, parquet, day_filter_sql, day_params)
+    except DayFilterError as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(1) from e
     n_distinct_days = coverage.n_days
 
     pairs_query = f"""
