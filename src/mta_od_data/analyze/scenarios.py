@@ -443,14 +443,41 @@ class ScenarioFile:
             raise ScenarioError(
                 f"scenario file {path} doesn't match the expected shape:\n{e}"
             ) from e
-        return cls(
-            path=path,
-            categories=[
-                ScenarioCategory.load(category, entries, path, station_index)
-                for category, entries in by_category.items()
-            ],
-            station_index=station_index,
-        )
+        categories = [
+            ScenarioCategory.load(category, entries, path, station_index)
+            for category, entries in by_category.items()
+        ]
+        cls.check_names(categories, path)
+        return cls(path=path, categories=categories, station_index=station_index)
+
+    @staticmethod
+    def check_names(categories: list[ScenarioCategory], path: Path) -> None:
+        """No two scenarios may share a name, or a slug.
+
+        A name heads its section of the report and a slug names its CSV,
+        so two scenarios that agree on either are two sections a reader
+        can't tell apart, and one file silently overwriting the other.
+        Slugs, since `slugify` drops punctuation:
+        "A/C CPW Express" and "A C CPW Express" are two names
+        and one `a_c_cpw_express.csv`.
+        """
+        by_slug: defaultdict[str, list[str]] = defaultdict(list)
+        for category in categories:
+            for scenario in category.scenarios:
+                by_slug[scenario.slug()].append(
+                    f'"{scenario.name}" in "{category.name}"'
+                )
+        collisions = {slug: names for slug, names in by_slug.items() if len(names) > 1}
+        if collisions:
+            listed = "; ".join(
+                f"{slug}: {', '.join(names)}"
+                for slug, names in sorted(collisions.items())
+            )
+            raise ScenarioError(
+                f"scenario file {path} has scenarios that can't be told "
+                f"apart ({listed}). A name heads a report section and names "
+                f"that section's CSV, once punctuation is dropped"
+            )
 
     def filter(self, categories: frozenset[str]) -> ScenarioFile:
         by_name = {c.name: c for c in self.categories}
