@@ -30,3 +30,13 @@ def table_row(*cells: str) -> str:
     is trailing whitespace, which markdown linters flag.
     """
     return "|" + "|".join(f" {cell} " if cell else " " for cell in cells) + "|"
+
+
+def collapsed(summary: str, body: list[str]) -> list[str]:
+    """A section a reader opens by clicking its `summary`.
+
+    Markdown has no such thing, so this is the HTML both GitHub and most
+    viewers render for it. The blank lines are what makes the markdown
+    inside it markdown: without them a table renders as its own source.
+    """
+    return ["<details>", f"<summary>{summary}</summary>", "", *body, "</details>", ""]

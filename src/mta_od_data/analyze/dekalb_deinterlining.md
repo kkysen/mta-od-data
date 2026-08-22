@@ -34,7 +34,8 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 
 ## Current
 
-### Top 25 Origin/Destination Pairs
+<details>
+<summary>Top 25 Origin/Destination Pairs</summary>
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
@@ -66,7 +67,10 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 | 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
 | 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
 
-### Top 25 Origin Stations, Summed across All Destinations
+</details>
+
+<details>
+<summary>Top 25 Origin Stations, Summed across All Destinations</summary>
 
 Both ends on the comparison's routes, per that section of the comparison above.
 
@@ -98,7 +102,10 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 9,225 | 67.9% | 73.7% | 23 St (R) |
 | 9,209 | 59.5% | 81.1% | Forest Hills-71 Av (R) |
 
-### Top 25 Destination Stations, Summed across All Origins
+</details>
+
+<details>
+<summary>Top 25 Destination Stations, Summed across All Origins</summary>
 
 Both ends on the comparison's routes, per that section of the comparison above.
 
@@ -129,6 +136,8 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 9,281 | 68.7% | 73.3% | 23 St (R) |
 | 9,136 | 60.2% | 81.8% | Forest Hills-71 Av (R) |
 | 9,112 | 71.8% | 83.6% | 125 St (B,D) |
+
+</details>
 
 ---
 
@@ -212,7 +221,8 @@ The same changed pairs as above, added up at the stations they run between: the 
 | 24 | 1,021 | -290 | 233 | 497 | 64 | 10 | 210 | 7 | Avenue U (N→B) |
 | 25 | 438 | -236 | | 337 | | | 101 | | Queensboro Plaza (N) |
 
-### Top 25 Origin/Destination Pairs
+<details>
+<summary>Top 25 Origin/Destination Pairs</summary>
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
@@ -244,7 +254,10 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 | 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
 | 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
 
-### Top 25 Origin Stations, Summed across All Destinations
+</details>
+
+<details>
+<summary>Top 25 Origin Stations, Summed across All Destinations</summary>
 
 Both ends on the comparison's routes, per that section of the comparison above.
 
@@ -276,7 +289,10 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 9,225 | 67.9% | 73.7% | 23 St (R) |
 | 9,209 | 59.5% | 81.1% | Forest Hills-71 Av (R) |
 
-### Top 25 Destination Stations, Summed across All Origins
+</details>
+
+<details>
+<summary>Top 25 Destination Stations, Summed across All Origins</summary>
 
 Both ends on the comparison's routes, per that section of the comparison above.
 
@@ -307,6 +323,8 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 9,281 | 68.7% | 73.3% | 23 St (R) |
 | 9,136 | 60.2% | 81.8% | Forest Hills-71 Av (R) |
 | 9,112 | 70.6% | 82.4% | 125 St (B,D) |
+
+</details>
 
 ---
 
@@ -390,7 +408,8 @@ The same changed pairs as above, added up at the stations they run between: the 
 | 24 | 1,768 | -811 | 228 | 1,094 | 107 | 28 | 275 | 36 | 71 St (D→Q) |
 | 25 | 1,595 | -756 | | 1,176 | | | 420 | | 59 St-Columbus Circle (B,D) |
 
-### Top 25 Origin/Destination Pairs
+<details>
+<summary>Top 25 Origin/Destination Pairs</summary>
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
@@ -422,7 +441,10 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 | 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
 | 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
 
-### Top 25 Origin Stations, Summed across All Destinations
+</details>
+
+<details>
+<summary>Top 25 Origin Stations, Summed across All Destinations</summary>
 
 Both ends on the comparison's routes, per that section of the comparison above.
 
@@ -454,7 +476,10 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 9,225 | 67.9% | 73.7% | 23 St (R) |
 | 9,209 | 59.5% | 81.1% | Forest Hills-71 Av (R) |
 
-### Top 25 Destination Stations, Summed across All Origins
+</details>
+
+<details>
+<summary>Top 25 Destination Stations, Summed across All Origins</summary>
 
 Both ends on the comparison's routes, per that section of the comparison above.
 
@@ -485,3 +510,5 @@ Both ends on the comparison's routes, per that section of the comparison above.
 | 9,281 | 68.7% | 73.3% | 23 St (R) |
 | 9,136 | 60.2% | 81.8% | Forest Hills-71 Av (R) |
 | 9,112 | 70.7% | 82.5% | 125 St (B,D) |
+
+</details>
