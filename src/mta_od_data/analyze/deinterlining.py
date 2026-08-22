@@ -22,7 +22,7 @@ import shlex
 import sys
 from collections import defaultdict
 from collections.abc import Callable, Sequence
-from dataclasses import asdict, dataclass, fields, is_dataclass
+from dataclasses import asdict, dataclass, field, fields, is_dataclass
 from enum import StrEnum
 from functools import cache
 from operator import attrgetter, itemgetter
@@ -229,19 +229,30 @@ class WalkPoints:
     # ids at or above it are the centroids standing in for complexes
     # with no platform rows of their own.
     n_platforms: int
+    # `measure`, cached. Held here rather than as `@cache` on the method
+    # itself, which is a store on the function, keyed by `self` and kept
+    # for the life of the process; this one is the table's own and goes
+    # when it does.
+    distance: Callable[[PlatformId, PlatformId], float] = field(
+        init=False, repr=False, compare=False
+    )
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "distance", cache(self.measure))
+
+    def measure(self, point: PlatformId, other: PlatformId) -> float:
+        """Metres between two of these; `distance` is this, remembered.
+
+        Ids rather than the `Coord`s themselves, which are dataclasses:
+        a dataclass recomputes its hash on every lookup, where an int is
+        its own.
+        """
+        here, there = self.locations[point], self.locations[other]
+        return haversine(here.lat, here.lon, there.lat, there.lon)
 
     def platform(self, point: PlatformId) -> PlatformId | None:
         """`point` if it is a platform, `None` if it is a centroid."""
         return point if point < self.n_platforms else None
-
-    # Keyed on `PlatformId`s rather than on the `Coord`s themselves,
-    # which are dataclasses: a dataclass recomputes its hash on every
-    # lookup, where an int is its own.
-    @cache  # noqa: B019  (see `ScenarioWalks.corridor_platforms`)
-    def distance(self, point: PlatformId, other: PlatformId) -> float:
-        """Metres between two of these."""
-        here, there = self.locations[point], self.locations[other]
-        return haversine(here.lat, here.lon, there.lat, there.lon)
 
     @classmethod
     def build(
