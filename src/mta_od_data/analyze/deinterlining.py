@@ -1011,11 +1011,13 @@ class Transitions:
                     ),
                 )
             )
+        # Of an effective one-seat ride, which the paragraph above the
+        # matrix has just said in full; three labels are enough to read
+        # the three numbers by.
         lines += [
             "",
-            f"- **Gained an effective one-seat ride: {self.gained:,.0f} "
-            f"({self.pct(self.gained)})**",
-            f"- **Lost one: {self.lost:,.0f} ({self.pct(self.lost)})**",
+            f"- **Gained: {self.gained:,.0f} ({self.pct(self.gained)})**",
+            f"- **Lost: {self.lost:,.0f} ({self.pct(self.lost)})**",
             f"- **Net: {self.net:+,.0f} ({self.pct(self.net)})**",
             "",
         ]
