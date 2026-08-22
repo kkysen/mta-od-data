@@ -252,18 +252,6 @@ class WalkPoints:
         )
 
 
-@cache
-def haversine_cached(c1: Coord, c2: Coord) -> float:
-    """`haversine`, remembered, for a caller with no cheaper key than
-    the coordinates themselves.
-
-    Hashing a `Coord` costs several times what the dict lookup does, a
-    dataclass recomputing its hash every time, so a caller that can name
-    its points is better off keying on those; see
-    `deinterlining.WalkPoints`."""
-    return haversine(c1, c2)
-
-
 class DayFilterError(Exception):
     """A day filter that selects nothing.
 

@@ -16,8 +16,9 @@ from mta_od_data.analyze.common import (
     DayCoverage,
     DayFilterError,
     DayType,
+    PlatformId,
     Station,
-    haversine_cached,
+    WalkPoints,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 
@@ -1153,6 +1154,9 @@ def one_seat_rides(
     platforms_by_complex: dict[int, list[Station]] = {}
     for s in individual_stations:
         platforms_by_complex.setdefault(s.complex_id, []).append(s)
+    # Numbers those platforms, so a sweep can key its distances on a
+    # pair of ids rather than on a pair of `Coord`s.
+    walk_points = WalkPoints.build(individual_stations, stations_by_id)
 
     # Keyed by borough too,
     # since a `line` label can span physically distinct segments:
@@ -1197,9 +1201,10 @@ def one_seat_rides(
     # Fixed anyway: nothing in the types or the call enforces that,
     # and `--origin-side north` alone would break it.
     #
-    # Local, not cached at its own definition like `haversine_cached`:
+    # Local, not cached at module level:
     # these close over `individual_stations`, loaded per invocation,
     # so a longer-lived cache could serve another invocation's data.
+    # (`WalkPoints` has the same property by holding its own cache.)
     def make_min_dist_to_corridor(
         effective_origin_routes: dict[int, frozenset[str]],
     ) -> Callable[[Station, frozenset[str]], tuple[float, Station]]:
@@ -1207,21 +1212,23 @@ def one_seat_rides(
         # since "close" is about walking to whichever trunk a corridor
         # got assigned, and assignments repeat across scenarios.
         @cache
-        def assigned_points(assigned_routes: frozenset[str]) -> list[Station]:
+        def assigned_points(
+            assigned_routes: frozenset[str],
+        ) -> list[tuple[PlatformId, Station]]:
             # Membership is decided at the complex level,
             # the granularity a reassignment is keyed at,
             # while the platforms are what's returned and measured
             # between, a complex being able to span physically separate
             # stations.
             return [
-                platform
-                for platform in individual_stations
+                (platform_id, platform)
+                for platform_id, platform in enumerate(individual_stations)
                 if effective_origin_routes.get(platform.complex_id, platform.routes)
                 & assigned_routes
             ]
 
         # (dest, route set) repeats constantly across rows,
-        # and skipping a whole sweep beats `haversine_cached`'s own
+        # and skipping a whole sweep beats `WalkPoints.distance`'s own
         # per-point-pair cache,
         # which still catches the overlap between two different sweeps.
         # On the default DeKalb scenario the two layers together
@@ -1234,11 +1241,10 @@ def one_seat_rides(
             # The checks above rule out an empty route set,
             # but not a gap in `stations_individual.csv` itself.
             assert candidates, "no individual station serves this route set"
-            points = [s.loc for s in platforms_by_complex.get(dest.complex_id, [dest])]
             best: tuple[float, Station] | None = None
-            for p in points:
-                for c in candidates:
-                    dist_m = haversine_cached(p, c.loc)
+            for point in walk_points.by_complex[dest.complex_id]:
+                for platform_id, c in candidates:
+                    dist_m = walk_points.distance(point, platform_id)
                     if best is None or dist_m < best[0]:
                         best = (dist_m, c)
             assert best is not None
