@@ -17,7 +17,7 @@ from mta_od_data.analyze.common import (
     DayFilterError,
     DayType,
     Station,
-    haversine_m,
+    haversine_cached,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 
@@ -1197,7 +1197,7 @@ def one_seat_rides(
     # Fixed anyway: nothing in the types or the call enforces that,
     # and `--origin-side north` alone would break it.
     #
-    # Local, not cached at its own definition like `haversine_m`:
+    # Local, not cached at its own definition like `haversine_cached`:
     # these close over `individual_stations`, loaded per invocation,
     # so a longer-lived cache could serve another invocation's data.
     def make_min_dist_to_corridor(
@@ -1221,7 +1221,7 @@ def one_seat_rides(
             ]
 
         # (dest, route set) repeats constantly across rows,
-        # and skipping a whole sweep beats `haversine_m`'s own
+        # and skipping a whole sweep beats `haversine_cached`'s own
         # per-point-pair cache,
         # which still catches the overlap between two different sweeps.
         # On the default DeKalb scenario the two layers together
@@ -1238,7 +1238,7 @@ def one_seat_rides(
             best: tuple[float, Station] | None = None
             for p in points:
                 for c in candidates:
-                    dist_m = haversine_m(p, c.loc)
+                    dist_m = haversine_cached(p, c.loc)
                     if best is None or dist_m < best[0]:
                         best = (dist_m, c)
             assert best is not None
