@@ -223,8 +223,11 @@ class WalkPoints:
     complex enters as all of its platforms at once, which is what
     `by_complex` holds.
 
-    `eq=False` so it hashes by identity, which `distance`'s cache keys
-    on; a table of coordinates has no cheap hash of its own.
+    `eq=False` because a table of coordinates has no meaningful equality
+    and no cheap hash: two of them holding the same numbers still aren't
+    interchangeable, and a frozen dataclass's generated hash would raise
+    on the `list` anyway. `distance`'s cache doesn't key on it -- it
+    wraps a bound method, so the table is the closure, not the key.
     """
 
     locations: list[Coord]
