@@ -22,7 +22,7 @@ import shlex
 import sys
 from collections import defaultdict
 from collections.abc import Callable, Sequence
-from dataclasses import asdict, dataclass, field, fields, is_dataclass
+from dataclasses import asdict, dataclass, fields, is_dataclass
 from enum import StrEnum
 from functools import cache
 from operator import attrgetter, itemgetter
@@ -210,7 +210,11 @@ class Outcome(StrEnum):
 type PlatformId = int
 
 
-@dataclass(slots=True, frozen=True, eq=False)
+# Not `slots=True`, alone among this module's dataclasses: `distance`
+# below is a method each instance replaces with a cached one of its own,
+# and a slot of that name would collide with the method -- silently, the
+# slot winning and the method disappearing.
+@dataclass(frozen=True, eq=False)
 class WalkPoints:
     """Every location a walk can be measured between, by `PlatformId`.
 
@@ -229,19 +233,19 @@ class WalkPoints:
     # ids at or above it are the centroids standing in for complexes
     # with no platform rows of their own.
     n_platforms: int
-    # `measure`, cached. Held here rather than as `@cache` on the method
-    # itself, which is a store on the function, keyed by `self` and kept
-    # for the life of the process; this one is the table's own and goes
-    # when it does.
-    distance: Callable[[PlatformId, PlatformId], float] = field(
-        init=False, repr=False, compare=False
-    )
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "distance", cache(self.measure))
+        # Each table remembers its own distances, shadowing the method
+        # below with a cached one. `@cache` on the method itself would
+        # be a store on the *function*, keyed by `self` and kept for the
+        # life of the process, however briefly the table was wanted.
+        # `object.__setattr__` because the dataclass is frozen: normal
+        # assignment raises, and this is how a frozen one fills in what
+        # it derives from its fields.
+        object.__setattr__(self, "distance", cache(self.distance))
 
-    def measure(self, point: PlatformId, other: PlatformId) -> float:
-        """Metres between two of these; `distance` is this, remembered.
+    def distance(self, point: PlatformId, other: PlatformId) -> float:
+        """Metres between two of these, remembered per table.
 
         Ids rather than the `Coord`s themselves, which are dataclasses:
         a dataclass recomputes its hash on every lookup, where an int is
