@@ -43,7 +43,7 @@ from mta_od_data.analyze.common import (
     Station,
     WalkPoints,
 )
-from mta_od_data.analyze.markdown import table_row, table_rule
+from mta_od_data.analyze.markdown import collapsed, table_row, table_rule
 from mta_od_data.analyze.scenarios import (
     CURRENT,
     SCENARIOS_FILE,
@@ -800,9 +800,7 @@ class ScenarioResult:
                 )
             )
 
-        lines += [
-            f"{h2} Top {top_n} Origin/Destination Pairs",
-            "",
+        pairs: list[str] = [
             "Both ends on the comparison's routes, per that section of the "
             "comparison above. Each row is both directions of one station "
             "pair, their riders summed, oriented so the arrow points the "
@@ -821,7 +819,7 @@ class ScenarioResult:
         )[:top_n]
         for i, pr in enumerate(top_pairs, 1):
             fwd = pr.forward
-            lines.append(
+            pairs.append(
                 table_row(
                     str(i),
                     f"{pr.riders:,.0f}",
@@ -833,7 +831,10 @@ class ScenarioResult:
                     f"{fwd.origin.name} ↔ {fwd.destination.name}",
                 )
             )
-        lines.append("")
+        pairs.append("")
+        # Collapsed, being the detail behind the sections above rather
+        # than something a reader passes through on the way down.
+        lines += collapsed(f"Top {top_n} Origin/Destination Pairs", pairs)
 
         # Origins and destinations both, and not one table standing in for
         # the other: a station's one-seat share is not symmetric, since
@@ -844,10 +845,7 @@ class ScenarioResult:
             ("origin", "destinations", self.origin_stats),
             ("destination", "origins", self.destination_stats),
         ):
-            lines += [
-                f"{h2} Top {top_n} {label.capitalize()} Stations, "
-                f"Summed across All {end.capitalize()}",
-                "",
+            section = [
                 "Both ends on the comparison's routes, per that section of "
                 "the comparison above.",
                 "",
@@ -856,7 +854,7 @@ class ScenarioResult:
             ]
             top = sorted(stats.values(), key=attrgetter("stats.total"), reverse=True)
             for e in top[:top_n]:
-                lines.append(
+                section.append(
                     table_row(
                         f"{e.stats.total:,.0f}",
                         f"{e.stats.pct(e.stats.one_seat):.1f}%",
@@ -864,7 +862,12 @@ class ScenarioResult:
                         e.name,
                     )
                 )
-            lines.append("")
+            section.append("")
+            lines += collapsed(
+                f"Top {top_n} {label.capitalize()} Stations, "
+                f"Summed across All {end.capitalize()}",
+                section,
+            )
 
         if csv_out:
             lines.append(
