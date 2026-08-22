@@ -35,13 +35,13 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
-    Coord,
     DayCoverage,
     DayFilterError,
     DayType,
+    PlatformId,
     PlatformIndex,
     Station,
-    haversine,
+    WalkPoints,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.scenarios import (
@@ -199,87 +199,6 @@ class Outcome(StrEnum):
     def effective(self) -> bool:
         """Whether this counts towards effective one-seat."""
         return self is not Outcome.FAR
-
-
-# An index into `WalkPoints.locations`, naming one platform -- or the
-# centroid of a complex with no platform rows of its own, which is the
-# only other thing a walk is ever measured from.
-# An `int` rather than a type of its own: it is used as a dict key
-# hundreds of thousands of times a run, which is the whole point of it,
-# and anything wrapping it hashes an order of magnitude slower.
-type PlatformId = int
-
-
-# No `slots=True`: a slot named `distance` would collide with the method
-# of that name below, silently, the slot winning and the method
-# disappearing. Nothing is given up for it, there being one of these per
-# run: slots are worth having on `ODPair` and `Walk`, of which a
-# comparison builds hundreds of thousands, and worth nothing here.
-@dataclass(frozen=True, eq=False)
-class WalkPoints:
-    """Every location a walk can be measured between, by `PlatformId`.
-
-    Walks run platform to platform: a rider leaves from whichever of
-    their complex's platforms is nearest what they are walking to, so a
-    complex enters as all of its platforms at once, which is what
-    `by_complex` holds.
-
-    `eq=False` because a table of coordinates has no meaningful equality
-    and no cheap hash: two of them holding the same numbers still aren't
-    interchangeable, and a frozen dataclass's generated hash would raise
-    on the `list` anyway. `distance`'s cache doesn't key on it -- it
-    wraps a bound method, so the table is the closure, not the key.
-    """
-
-    locations: list[Coord]
-    by_complex: dict[int, tuple[PlatformId, ...]]
-    # Ids below this are platforms, in `individual_stations` order;
-    # ids at or above it are the centroids standing in for complexes
-    # with no platform rows of their own.
-    n_platforms: int
-
-    def __post_init__(self) -> None:
-        # Each table remembers its own distances, shadowing the method
-        # below with a cached one. `@cache` on the method itself would
-        # be a store on the *function*, keyed by `self` and kept for the
-        # life of the process, however briefly the table was wanted.
-        # `object.__setattr__` because the dataclass is frozen: normal
-        # assignment raises, and this is how a frozen one fills in what
-        # it derives from its fields.
-        object.__setattr__(self, "distance", cache(self.distance))
-
-    def distance(self, point: PlatformId, other: PlatformId) -> float:
-        """Metres between two of these, remembered per table.
-
-        Ids rather than the `Coord`s themselves, which are dataclasses:
-        a dataclass recomputes its hash on every lookup, where an int is
-        its own.
-        """
-        return haversine(self.locations[point], self.locations[other])
-
-    def platform(self, point: PlatformId) -> PlatformId | None:
-        """`point` if it is a platform, `None` if it is a centroid."""
-        return point if point < self.n_platforms else None
-
-    @classmethod
-    def build(
-        cls, individual_stations: list[Station], stations_by_id: dict[int, Station]
-    ) -> WalkPoints:
-        locations = [platform.loc for platform in individual_stations]
-        by_complex: defaultdict[int, list[PlatformId]] = defaultdict(list)
-        for platform_id, platform in enumerate(individual_stations):
-            by_complex[platform.complex_id].append(platform_id)
-        for complex_id, station in stations_by_id.items():
-            if complex_id not in by_complex:
-                # No platform rows of its own, so its centroid stands in,
-                # and takes an id past the last platform's.
-                by_complex[complex_id] = [len(locations)]
-                locations.append(station.loc)
-        return cls(
-            locations=locations,
-            by_complex={cid: tuple(ids) for cid, ids in by_complex.items()},
-            n_platforms=len(individual_stations),
-        )
 
 
 @dataclass(slots=True, frozen=True, eq=False)
