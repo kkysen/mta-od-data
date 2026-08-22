@@ -255,8 +255,7 @@ class WalkPoints:
         a dataclass recomputes its hash on every lookup, where an int is
         its own.
         """
-        here, there = self.locations[point], self.locations[other]
-        return haversine(here.lat, here.lon, there.lat, there.lon)
+        return haversine(self.locations[point], self.locations[other])
 
     def platform(self, point: PlatformId) -> PlatformId | None:
         """`point` if it is a platform, `None` if it is a centroid."""
