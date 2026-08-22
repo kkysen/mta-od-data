@@ -762,15 +762,14 @@ class ScenarioResult:
             lines += [
                 f"{h2} Headline Numbers",
                 "",
-                f"- **Total: {t.total:,.0f} riders**",
-                f"- **One-seat: {t.pct(t.one_seat):.1f}%** ({t.one_seat:,.0f})",
-                f"- **Close one-seat: {t.pct(t.close):.1f}%** "
+                f"- Total: {t.total:,.0f} riders",
+                f"- One-seat: {t.pct(t.one_seat):.1f}% ({t.one_seat:,.0f})",
+                f"- Close one-seat: {t.pct(t.close):.1f}% "
                 f"({t.close:,.0f}), within {close_threshold_m:.0f}m of a "
                 f"station on the scenario-effective origin corridor",
-                f"- **Effective one-seat: {t.pct(t.effective):.1f}%** "
-                f"({t.effective:,.0f})",
-                f"- **Either end on the routes: {self.overall.total:,.0f} "
-                f"riders**, {self.overall.pct(self.overall.effective):.1f}% "
+                f"- Effective one-seat: {t.pct(t.effective):.1f}% ({t.effective:,.0f})",
+                f"- Either end on the routes: {self.overall.total:,.0f} "
+                f"riders, {self.overall.pct(self.overall.effective):.1f}% "
                 f"effective one-seat",
                 "",
             ]
@@ -1029,9 +1028,9 @@ class Transitions:
         # the three numbers by.
         lines += [
             "",
-            f"- **Gained: {self.gained:,.0f} ({self.pct(self.gained)})**",
-            f"- **Lost: {self.lost:,.0f} ({self.pct(self.lost)})**",
-            f"- **Net: {self.net:+,.0f} ({self.pct(self.net)})**",
+            f"- Gained: {self.gained:,.0f} ({self.pct(self.gained)})",
+            f"- Lost: {self.lost:,.0f} ({self.pct(self.lost)})",
+            f"- Net: {self.net:+,.0f} ({self.pct(self.net)})",
             "",
         ]
 
