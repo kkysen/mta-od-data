@@ -916,6 +916,17 @@ class StationChanges:
         return sum(self.riders.values())
 
     @property
+    def magnitude(self) -> float:
+        """How much `net` is worth, whichever way it went.
+
+        What the table sorts on: a station that costs 5,000 riders their
+        one-seat ride and one that wins 5,000 theirs are the same size
+        of thing to a reader, and one of them would sort last by `net`
+        itself.
+        """
+        return abs(self.net)
+
+    @property
     def net(self) -> float:
         """Riders who gain an effective one-seat ride here, less those
         who lose one."""
@@ -1016,7 +1027,11 @@ class Transitions:
                 StationChanges(label=end_labels[station_id], riders=dict(moved))
                 for station_id, moved in by_station.items()
             ),
-            key=attrgetter("total"),
+            # By what the scenario does to a station, not by how much
+            # it stirs there: a station whose riders only move between
+            # `direct` and `close` keeps every one of them effective,
+            # and sorts by the `total` behind it once that is said.
+            key=attrgetter("magnitude", "total"),
             reverse=True,
         )
 
@@ -1138,11 +1153,13 @@ class Transitions:
                 f"{h2} Biggest Changes by Station, against {self.baseline_name}",
                 "",
                 f"The same changed pairs as above, added up at the stations "
-                f"they run between: the top {top_n} by riders whose outcome "
-                f"moved with an end there. A pair is a change at both of "
-                f"its ends and counts at each, so these run to twice the "
-                f"riders the matrix counts. `Net` is riders gaining an "
-                f"effective one-seat ride here less those losing one.",
+                f"they run between: the top {top_n} by `Net`, which is "
+                f"riders gaining an effective one-seat ride here less those "
+                f"losing one, taken either way round. A station whose "
+                f"riders only move between `direct` and `close` keeps them "
+                f"all effective and nets nothing, however many moved. A "
+                f"pair is a change at both of its ends and counts at each, "
+                f"so `Riders` runs to twice what the matrix counts.",
                 "",
                 "| # | Riders | Net | "
                 + " | ".join(f"{before}→{after}" for before, after in TRANSITIONS)
