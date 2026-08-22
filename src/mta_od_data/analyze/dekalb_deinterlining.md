@@ -144,9 +144,9 @@ Every both-ends rider, and their share of the 837,408 of them: **was** is what C
 | **was close** | 2,130 (0.3%) | 84,124 (10.0%) | 272 (0.0%) |
 | **was far** | 5,207 (0.6%) | 142 (0.0%) | 132,738 (15.9%) |
 
-- **Gained: 5,349 (0.6%)**
-- **Lost: 18,835 (2.2%)**
-- **Net: -13,486 (-1.6%)**
+- Gained: 5,349 (0.6%)
+- Lost: 18,835 (2.2%)
+- Net: -13,486 (-1.6%)
 
 ### Biggest Changes, against Current
 
@@ -290,9 +290,9 @@ Every both-ends rider, and their share of the 837,408 of them: **was** is what C
 | **was close** | 1,848 (0.2%) | 83,675 (10.0%) | 1,004 (0.1%) |
 | **was far** | 7,032 (0.8%) | 778 (0.1%) | 130,277 (15.6%) |
 
-- **Gained: 7,810 (0.9%)**
-- **Lost: 31,564 (3.8%)**
-- **Net: -23,754 (-2.8%)**
+- Gained: 7,810 (0.9%)
+- Lost: 31,564 (3.8%)
+- Net: -23,754 (-2.8%)
 
 ### Biggest Changes, against Current
 
