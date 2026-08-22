@@ -210,10 +210,11 @@ class Outcome(StrEnum):
 type PlatformId = int
 
 
-# Not `slots=True`, alone among this module's dataclasses: `distance`
-# below is a method each instance replaces with a cached one of its own,
-# and a slot of that name would collide with the method -- silently, the
-# slot winning and the method disappearing.
+# No `slots=True`: a slot named `distance` would collide with the method
+# of that name below, silently, the slot winning and the method
+# disappearing. Nothing is given up for it, there being one of these per
+# run: slots are worth having on `ODPair` and `Walk`, of which a
+# comparison builds hundreds of thousands, and worth nothing here.
 @dataclass(frozen=True, eq=False)
 class WalkPoints:
     """Every location a walk can be measured between, by `PlatformId`.
