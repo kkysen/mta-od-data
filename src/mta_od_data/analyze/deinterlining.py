@@ -780,7 +780,7 @@ class ScenarioResult:
             "station the shorter walk reaches, and the end it is at.",
             "",
             "| # | Riders | % Total | Type | Close? | Dist | Walk | "
-            "Origin↔Destination |",
+            "Origin ↔ Destination |",
             table_rule("rrrllrll"),
         ]
 
@@ -810,7 +810,7 @@ class ScenarioResult:
                     close_str,
                     dist_str,
                     walk_str,
-                    f"{fwd.origin.name}↔{fwd.destination.name}",
+                    f"{fwd.origin.name} ↔ {fwd.destination.name}",
                 )
             )
         lines.append("")
@@ -866,7 +866,7 @@ class Change:
     # Classified under the scenario, so its distance is the walk a rider
     # would face *after* the change.
     pair: SymmetricPair
-    # `origin↔destination` as the baseline names them.
+    # `origin ↔ destination` as the baseline names them.
     label: str
 
 
@@ -904,7 +904,7 @@ class Transitions:
             if before is not after:
                 changed_rows.append((before, after, after_pair))
                 baseline_labels[after_pair.origin.id, after_pair.destination.id] = (
-                    "↔".join(
+                    " ↔ ".join(
                         before_end.label(after_end)
                         for before_end, after_end in zip(
                             before_pair.ends, after_pair.ends, strict=True
@@ -1030,7 +1030,7 @@ class Transitions:
                 f"and today's alone where they don't; `Dist` is the walk "
                 f"under {self.scenario_name}.",
                 "",
-                "| # | Riders | Was | Now | Dist | Origin↔Destination |",
+                "| # | Riders | Was | Now | Dist | Origin ↔ Destination |",
                 table_rule("rrllrl"),
             ]
             for i, change in enumerate(self.changed[:top_n], 1):
