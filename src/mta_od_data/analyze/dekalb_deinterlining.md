@@ -8,27 +8,27 @@ Produced by `mta-od-data analyze deinterlining --category DeKalb --markdown-out 
 
 ## Scenario Comparison
 
-Two cuts of the same classification. Neither is the whole answer: the first says what a scenario does to the riders it can reach, the second how much of the system it reaches at all. In both, only how many riders get a one-seat ride changes between scenarios, never the total. Close one-seat counts a transfer trip whose destination is within 300m of a station on that scenario's effective origin corridor.
+Two cuts of the same classification. Neither is the whole answer: the first says what a scenario does to the riders it can reach, the second how much of the system it reaches at all. In both, only how many riders get a one-seat ride changes between scenarios, never the total. Each `Δ` is against Current. Close one-seat counts a transfer trip whose destination is within 300m of a station on that scenario's effective origin corridor.
 
 ### Both Ends on the Comparison's Routes
 
 The 837,408 riders whose origin *and* destination are served by B,D,N,Q,R: the trips these routes could carry end to end, including the many that keep a one-seat ride whatever the scenario. Every table below is scoped to these.
 
-| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
-| --- | ---: | ---: | ---: | ---: |
-| Current | 837,408 | 612,795 (73.2%) | 86,527 (10.3%) | 699,321 (83.5%) |
-| B/D 4 Av Express | 837,408 | 590,180 (70.5%), -22,615 (-2.7%) | 95,655 (11.4%), +9,129 (+1.1%) | 685,835 (81.9%), -13,486 (-1.6%) |
-| N/Q 4 Av Express | 837,408 | 579,146 (69.2%), -33,649 (-4.0%) | 96,421 (11.5%), +9,895 (+1.2%) | 675,567 (80.7%), -23,754 (-2.8%) |
+| Scenario | Total Riders | Direct 1-Seat | Δ | Close 1-Seat | Δ | Effective 1-Seat | Δ |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Current | 837,408 | 612,795 (73.2%) | | 86,527 (10.3%) | | 699,321 (83.5%) | |
+| B/D 4 Av Express | 837,408 | 590,180 (70.5%) | -22,615 (-2.7%) | 95,655 (11.4%) | +9,129 (+1.1%) | 685,835 (81.9%) | -13,486 (-1.6%) |
+| N/Q 4 Av Express | 837,408 | 579,146 (69.2%) | -33,649 (-4.0%) | 96,421 (11.5%) | +9,895 (+1.2%) | 675,567 (80.7%) | -23,754 (-2.8%) |
 
 ### Either End on the Comparison's Routes
 
 The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above among them. The difference is transfer trips with one end off these routes entirely, which no scenario here can change: they can only dilute the rate, which is why a junction's effect washes out against this total.
 
-| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | Effective 1-Seat |
-| --- | ---: | ---: | ---: | ---: |
-| Current | 2,332,194 | 612,795 (26.3%) | 205,453 (8.8%) | 818,248 (35.1%) |
-| B/D 4 Av Express | 2,332,194 | 590,180 (25.3%), -22,615 (-1.0%) | 213,129 (9.1%), +7,676 (+0.3%) | 803,309 (34.4%), -14,938 (-0.6%) |
-| N/Q 4 Av Express | 2,332,194 | 579,146 (24.8%), -33,649 (-1.4%) | 214,339 (9.2%), +8,886 (+0.4%) | 793,485 (34.0%), -24,763 (-1.1%) |
+| Scenario | Total Riders | Direct 1-Seat | Δ | Close 1-Seat | Δ | Effective 1-Seat | Δ |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Current | 2,332,194 | 612,795 (26.3%) | | 205,453 (8.8%) | | 818,248 (35.1%) | |
+| B/D 4 Av Express | 2,332,194 | 590,180 (25.3%) | -22,615 (-1.0%) | 213,129 (9.1%) | +7,676 (+0.3%) | 803,309 (34.4%) | -14,938 (-0.6%) |
+| N/Q 4 Av Express | 2,332,194 | 579,146 (24.8%) | -33,649 (-1.4%) | 214,339 (9.2%) | +8,886 (+0.4%) | 793,485 (34.0%) | -24,763 (-1.1%) |
 
 ---
 
