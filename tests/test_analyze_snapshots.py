@@ -123,9 +123,13 @@ def test_snapshot_matches_fresh_run(snapshot: Snapshot, tmp_path: Path) -> None:
     # which would otherwise be a spurious diff on that line alone.
     rel_path = snapshot.path.relative_to(ROOT)
     fresh = tmp_out.read_text().replace(str(tmp_out), str(rel_path))
-    committed = snapshot.path.read_text()
+    # A missing snapshot is just the empty case of an out-of-date one:
+    # read it as such so it gets the same "regenerate it with" message
+    # instead of an opaque `FileNotFoundError`.
+    committed = snapshot.path.read_text() if snapshot.path.exists() else None
     assert fresh == committed, (
-        f"{rel_path} is out of date. Regenerate it with:\n"
+        f"{rel_path} is {'out of date' if committed is not None else 'missing'}. "
+        "Regenerate it with:\n"
         f"  uv run {' '.join(snapshot.cmd)} --markdown-out {rel_path}\n"
         "and commit the result."
     )
