@@ -890,6 +890,42 @@ class Change:
     label: str
 
 
+# Every way an outcome can move, in the order the matrix reads:
+# what a rider had, then what they are left with.
+TRANSITIONS = tuple(
+    (before, after) for before in Outcome for after in Outcome if before is not after
+)
+
+
+@dataclass(slots=True, frozen=True)
+class StationChanges:
+    """What a scenario does at one station, over every changed pair with
+    an end there.
+
+    A pair counts at both of its ends, being a change at each, so these
+    add up to twice the riders the matrix counts.
+    """
+
+    # As the baseline names it, carrying what the scenario does to it,
+    # like the ends of a changed pair (`Kings Hwy (B→N,Q)`).
+    label: str
+    riders: dict[tuple[Outcome, Outcome], float]
+
+    @property
+    def total(self) -> float:
+        return sum(self.riders.values())
+
+    @property
+    def net(self) -> float:
+        """Riders who gain an effective one-seat ride here, less those
+        who lose one."""
+        return sum(
+            value if after.effective else -value
+            for (before, after), value in self.riders.items()
+            if before.effective is not after.effective
+        )
+
+
 @dataclass(slots=True, frozen=True)
 class Transitions:
     """Where one scenario's riders end up relative to another's.
@@ -906,12 +942,15 @@ class Transitions:
     total: float
     # The pairs that moved, most riders first.
     changed: list[Change]
+    # The stations they moved at, most riders first.
+    stations: list[StationChanges]
 
     @classmethod
     def between(cls, baseline: ScenarioResult, result: ScenarioResult) -> Transitions:
         riders: defaultdict[tuple[Outcome, Outcome], float] = defaultdict(float)
         changed_rows: list[tuple[Outcome, Outcome, ODPair]] = []
         baseline_labels: dict[tuple[int, int], str] = {}
+        end_labels: dict[int, str] = {}
         for before_pair, after_pair in zip(baseline.rows, result.rows, strict=True):
             assert [e.id for e in before_pair.ends] == [
                 e.id for e in after_pair.ends
@@ -923,6 +962,10 @@ class Transitions:
             riders[before, after] += after_pair.riders
             if before is not after:
                 changed_rows.append((before, after, after_pair))
+                for before_end, after_end in zip(
+                    before_pair.ends, after_pair.ends, strict=True
+                ):
+                    end_labels[after_end.id] = before_end.label(after_end)
                 baseline_labels[after_pair.origin.id, after_pair.destination.id] = (
                     " ↔ ".join(
                         before_end.label(after_end)
@@ -959,6 +1002,24 @@ class Transitions:
         ]
 
         changed.sort(key=attrgetter("pair.riders"), reverse=True)
+
+        by_station: defaultdict[int, defaultdict[tuple[Outcome, Outcome], float]] = (
+            defaultdict(lambda: defaultdict(float))
+        )
+        for change in changed:
+            # A set, so a trip that starts and ends at one complex
+            # counts there once rather than twice.
+            for end_id in {end.id for end in change.pair.forward.ends}:
+                by_station[end_id][change.before, change.after] += change.pair.riders
+        stations = sorted(
+            (
+                StationChanges(label=end_labels[station_id], riders=dict(moved))
+                for station_id, moved in by_station.items()
+            ),
+            key=attrgetter("total"),
+            reverse=True,
+        )
+
         return cls(
             baseline_name=baseline.scenario.name,
             scenario_name=result.scenario.name,
@@ -967,6 +1028,7 @@ class Transitions:
             riders=dict(riders),
             total=sum(riders.values()),
             changed=changed,
+            stations=stations,
         )
 
     def cell(self, before: Outcome, after: Outcome) -> float:
@@ -1067,6 +1129,40 @@ class Transitions:
                         fwd.dist_label,
                         fwd.walk_label,
                         change.label,
+                    )
+                )
+            lines.append("")
+
+        if self.stations:
+            lines += [
+                f"{h2} Biggest Changes by Station, against {self.baseline_name}",
+                "",
+                f"The same changed pairs as above, added up at the stations "
+                f"they run between: the top {top_n} by riders whose outcome "
+                f"moved with an end there. A pair is a change at both of "
+                f"its ends and counts at each, so these run to twice the "
+                f"riders the matrix counts. `Net` is riders gaining an "
+                f"effective one-seat ride here less those losing one.",
+                "",
+                "| # | Riders | Net | "
+                + " | ".join(f"{before}→{after}" for before, after in TRANSITIONS)
+                + " | Station |",
+                table_rule("rr" + "r" * (1 + len(TRANSITIONS)) + "l"),
+            ]
+            for i, station in enumerate(self.stations[:top_n], 1):
+                lines.append(
+                    table_row(
+                        str(i),
+                        f"{station.total:,.0f}",
+                        # Signed, except when it's nothing to sign: a
+                        # station whose riders all stay effective, moving
+                        # only between `direct` and `close`, nets zero.
+                        f"{station.net:+,.0f}" if station.net else "0",
+                        *(
+                            f"{moved:,.0f}" if (moved := station.riders.get(t)) else ""
+                            for t in TRANSITIONS
+                        ),
+                        station.label,
                     )
                 )
             lines.append("")
