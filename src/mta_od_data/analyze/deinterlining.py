@@ -548,26 +548,35 @@ class RiderStats:
             return 0.0
         return 100 * riders / self.total
 
-    def cell(self, value: float, base: float | None) -> str:
-        """One markdown cell: riders and their share of this total,
-        and how both differ from `base` where there is one."""
-        level = f"{value:,.0f} ({self.pct(value):.1f}%)"
+    def level(self, value: float) -> str:
+        """One markdown cell: riders and their share of this total."""
+        return f"{value:,.0f} ({self.pct(value):.1f}%)"
+
+    def delta(self, value: float, base: float | None) -> str:
+        """How `value` differs from `base`, empty where there is none.
+
+        Its own cell rather than trailing the level in that one, so that
+        a column holds one kind of number: levels line up under levels
+        down the table, and the baseline's row, which has no change to
+        show, leaves a blank instead of ending where the others' changes
+        begin.
+        """
         if base is None:
-            return level
+            return ""
         # `pct` of the change, not the change in `pct`:
         # identical either way, every scenario classifying the same
         # pairs and so sharing a total, and this one can't drift if
-        # that ever stops being true without the subtraction below
+        # that ever stops being true without the subtraction above
         # becoming meaningless first.
-        delta = value - base
-        return f"{level}, {delta:+,.0f} ({self.pct(delta):+.1f}%)"
+        change = value - base
+        return f"{change:+,.0f} ({self.pct(change):+.1f}%)"
 
     def markdown_row(self, label: str, baseline: RiderStats | None = None) -> str:
         """`baseline` adds each column's change against it,
         saving the reader the subtraction.
         `None` for the baseline's own row, which has nothing to differ
         from."""
-        one_seat, close, effective = (
+        against: tuple[float | None, ...] = (
             (None, None, None)
             if baseline is None
             else (baseline.one_seat, baseline.close, baseline.effective)
@@ -575,9 +584,13 @@ class RiderStats:
         return table_row(
             label,
             f"{self.total:,.0f}",
-            self.cell(self.one_seat, one_seat),
-            self.cell(self.close, close),
-            self.cell(self.effective, effective),
+            *(
+                cell
+                for value, base in zip(
+                    (self.one_seat, self.close, self.effective), against, strict=True
+                )
+                for cell in (self.level(value), self.delta(value, base))
+            ),
         )
 
     def summary_line(self, label: str) -> str:
@@ -1171,8 +1184,8 @@ class ScenarioComparisonResult:
     def comparison_table_markdown(self, *, close_threshold_m: float) -> str:
         routes = ",".join(sorted(self.comparison.routes))
         header = (
-            "| Scenario | Total Riders | Direct 1-Seat | Close 1-Seat | "
-            "Effective 1-Seat |\n" + table_rule("lrrrr")
+            "| Scenario | Total Riders | Direct 1-Seat | Δ | Close 1-Seat | Δ | "
+            "Effective 1-Seat | Δ |\n" + table_rule("l" + "r" * 7)
         )
 
         # Both ends first, and every detailed table below scoped to it:
@@ -1193,7 +1206,8 @@ class ScenarioComparisonResult:
             f"answer: the first says what a scenario does to the riders it "
             f"can reach, the second how much of the system it reaches at "
             f"all. In both, only how many riders get a one-seat ride "
-            f"changes between scenarios, never the total. Close one-seat "
+            f"changes between scenarios, never the total. Each `Δ` is "
+            f"against {self.baseline.scenario.name}. Close one-seat "
             f"counts a transfer trip whose destination is within "
             f"{close_threshold_m:.0f}m of a station on that scenario's "
             f"effective origin corridor.",
