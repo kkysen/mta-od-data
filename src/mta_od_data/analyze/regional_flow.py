@@ -69,19 +69,19 @@ class RegionalFlowResult:
         print(f"\n=== Regional flow: {self.region_name} ===")
         print(f"Average {day_type} ridership: {self.total_riders:,.0f}")
         print(
-            f"Outside -> Inside  (entering the region):   "
+            f"Outside→Inside  (entering the region):    "
             f"{self.out_in:>12,.0f} ({self.pct(self.out_in):5.1f}%)"
         )
         print(
-            f"Inside  -> Outside (leaving the region):    "
+            f"Inside→Outside  (leaving the region):     "
             f"{self.in_out:>12,.0f} ({self.pct(self.in_out):5.1f}%)"
         )
         print(
-            f"Inside  -> Inside  (internal to the region): "
+            f"Inside→Inside   (internal to the region): "
             f"{self.in_in:>12,.0f} ({self.pct(self.in_in):5.1f}%)"
         )
         print(
-            f"Outside -> Outside (never touches the region): "
+            f"Outside→Outside (never touches the region): "
             f"{self.out_out:>12,.0f} ({self.pct(self.out_out):5.1f}%)"
         )
         print(
@@ -104,10 +104,10 @@ class RegionalFlowResult:
         lines.append(table_row("Flow", "Riders", "% Total"))
         lines.append(table_rule("lll"))
         for label, riders in (
-            ("Outside -> Inside", self.out_in),
-            ("Inside -> Outside", self.in_out),
-            ("Inside -> Inside", self.in_in),
-            ("Outside -> Outside", self.out_out),
+            ("Outside→Inside", self.out_in),
+            ("Inside→Outside", self.in_out),
+            ("Inside→Inside", self.in_in),
+            ("Outside→Outside", self.out_out),
             ("**Inter**", self.inter),
             ("**Intra**", self.intra),
         ):
@@ -116,9 +116,7 @@ class RegionalFlowResult:
 
         lines.append(f"## Top {top_n} Origin/Destination Pairs")
         lines.append("")
-        lines.append(
-            table_row("#", "Riders", "% Total", "Flow", "Origin -> Destination")
-        )
+        lines.append(table_row("#", "Riders", "% Total", "Flow", "Origin→Destination"))
         lines.append(table_rule("lllll"))
 
         def pair_riders(r: FlowRow) -> float:
@@ -132,7 +130,7 @@ class RegionalFlowResult:
                     f"{r.riders:,.0f}",
                     f"{self.pct(r.riders):.2f}%",
                     r.flow,
-                    f"{r.origin_name} → {r.dest_name}",
+                    f"{r.origin_name}→{r.dest_name}",
                 )
             )
         lines.append("")

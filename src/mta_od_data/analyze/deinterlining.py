@@ -90,7 +90,7 @@ class TripEnd:
 
     id: int
     # Split rather than one display string, so a scenario comparison can
-    # say what changed at an end (`8 Av (N -> B)`) without taking the
+    # say what changed at an end (`8 Av (N->B)`) without taking the
     # string back apart, and so the CSV can be filtered on either.
     station: str
     routes: str
@@ -103,15 +103,15 @@ class TripEnd:
         """This end as the baseline names it,
         carrying what a scenario does to it.
 
-        `8 Av (N)` against `8 Av (B)` reads `8 Av (N → B)`.
+        `8 Av (N)` against `8 Av (B)` reads `8 Av (N→B)`.
         A changed-pairs row is about the change,
         and naming only today's routes
         left a reader to look up what the scenario does to that station,
         which is the one thing the row is for.
 
         The routes it loses, not all the routes it had:
-        `8 Av (N → B)` is the whole of what the scenario does there, and
-        `B,Q → N,Q` spent its left-hand side restating a `Q` that stayed
+        `8 Av (N→B)` is the whole of what the scenario does there, and
+        `B,Q→N,Q` spent its left-hand side restating a `Q` that stayed
         put, which the right-hand side says anyway.
         Everything it has after, though, since that is what a rider
         boards. Where it loses nothing -- a station gaining a route --
@@ -127,8 +127,8 @@ class TripEnd:
         if self.station == other.station:
             kept = other.routes.split(",")
             lost = ",".join(r for r in self.routes.split(",") if r not in kept)
-            return f"{self.station} ({lost or self.routes} → {other.routes})"
-        return f"{self.name} → {other.name}"
+            return f"{self.station} ({lost or self.routes}→{other.routes})"
+        return f"{self.name}→{other.name}"
 
 
 @dataclass(slots=True, frozen=True)
@@ -780,7 +780,7 @@ class ScenarioResult:
             "station the shorter walk reaches, and the end it is at.",
             "",
             "| # | Riders | % Total | Type | Close? | Dist | Walk | "
-            "Origin ↔ Destination |",
+            "Origin↔Destination |",
             table_rule("rrrllrll"),
         ]
 
@@ -810,7 +810,7 @@ class ScenarioResult:
                     close_str,
                     dist_str,
                     walk_str,
-                    f"{fwd.origin.name} ↔ {fwd.destination.name}",
+                    f"{fwd.origin.name}↔{fwd.destination.name}",
                 )
             )
         lines.append("")
@@ -866,7 +866,7 @@ class Change:
     # Classified under the scenario, so its distance is the walk a rider
     # would face *after* the change.
     pair: SymmetricPair
-    # `origin ↔ destination` as the baseline names them.
+    # `origin↔destination` as the baseline names them.
     label: str
 
 
@@ -904,7 +904,7 @@ class Transitions:
             if before is not after:
                 changed_rows.append((before, after, after_pair))
                 baseline_labels[after_pair.origin.id, after_pair.destination.id] = (
-                    " ↔ ".join(
+                    "↔".join(
                         before_end.label(after_end)
                         for before_end, after_end in zip(
                             before_pair.ends, after_pair.ends, strict=True
@@ -928,7 +928,7 @@ class Transitions:
                 # by what serves it today, and a `Was direct` row
                 # labelled with the scenario's routes would assert a
                 # one-seat ride between route sets sharing none. Each end
-                # carries what the scenario does to it (`8 Av (N -> B)`).
+                # carries what the scenario does to it (`8 Av (N->B)`).
                 label=baseline_labels[
                     symmetric.forward.origin.id,
                     symmetric.forward.destination.id,
@@ -1026,11 +1026,11 @@ class Transitions:
                 "",
                 f"The top {top_n} station pairs by riders whose outcome "
                 f"moved, both directions combined as above. An end reads "
-                f"`today → {self.scenario_name}` where its routes change, "
+                f"`today→{self.scenario_name}` where its routes change, "
                 f"and today's alone where they don't; `Dist` is the walk "
                 f"under {self.scenario_name}.",
                 "",
-                "| # | Riders | Was | Now | Dist | Origin ↔ Destination |",
+                "| # | Riders | Was | Now | Dist | Origin↔Destination |",
                 table_rule("rrllrl"),
             ]
             for i, change in enumerate(self.changed[:top_n], 1):

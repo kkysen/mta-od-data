@@ -267,7 +267,7 @@ class ScenarioResult:
                 "Type",
                 "Close?",
                 "Dist",
-                "Origin → Destination",
+                "Origin→Destination",
                 "1-Seat Destination",
             )
         )
@@ -299,7 +299,7 @@ class ScenarioResult:
                     type_str,
                     close_str,
                     dist_str,
-                    f"{r.origin_name} → {r.dest_name}",
+                    f"{r.origin_name}→{r.dest_name}",
                     near_station_str,
                 )
             )
