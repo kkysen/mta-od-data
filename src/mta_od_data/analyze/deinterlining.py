@@ -150,6 +150,25 @@ class ODPair:
         return self.origin, self.destination
 
     @property
+    def dist_label(self) -> str:
+        """How far the walk is, empty where there is none to make."""
+        return "" if self.one_seat else f"{self.walk.dist_m:.0f}m"
+
+    @property
+    def walk_label(self) -> str:
+        """The station the walk reaches, and which end of the trip it is
+        at, empty where there is none to make.
+
+        The station walked *to*, which is the actionable half, tagged
+        with the end it is at rather than an arrow, so it reads the same
+        whichever way round the row is oriented.
+        """
+        if self.one_seat:
+            return ""
+        end = "origin" if self.walk.at_origin else "dest"
+        return f"{end}: {self.walk.station}"
+
+    @property
     def outcome(self) -> Outcome:
         """What this scenario leaves the pair's riders with."""
         if self.one_seat:
@@ -802,26 +821,15 @@ class ScenarioResult:
         )[:top_n]
         for i, pr in enumerate(top_pairs, 1):
             fwd = pr.forward
-            if fwd.one_seat:
-                type_str, close_str, dist_str, walk_str = "1-seat", "", "", ""
-            else:
-                type_str = "xfer"
-                close_str = "close" if fwd.walk.close else "far"
-                dist_str = f"{fwd.walk.dist_m:.0f}m"
-                # The station walked *to*, which is the actionable half,
-                # tagged with the end it's at rather than an arrow, so it
-                # reads the same whichever way the row is oriented.
-                end = "origin" if fwd.walk.at_origin else "dest"
-                walk_str = f"{end}: {fwd.walk.station}"
             lines.append(
                 table_row(
                     str(i),
                     f"{pr.riders:,.0f}",
                     f"{self.both_ends.pct(pr.riders):.2f}%",
-                    type_str,
-                    close_str,
-                    dist_str,
-                    walk_str,
+                    "1-seat" if fwd.one_seat else "xfer",
+                    "" if fwd.one_seat else ("close" if fwd.walk.close else "far"),
+                    fwd.dist_label,
+                    fwd.walk_label,
                     f"{fwd.origin.name} ↔ {fwd.destination.name}",
                 )
             )
@@ -1041,22 +1049,23 @@ class Transitions:
                 f"The top {top_n} station pairs by riders whose outcome "
                 f"moved, both directions combined as above. An end reads "
                 f"`today→{self.scenario_name}` where its routes change, "
-                f"and today's alone where they don't; `Dist` is the walk "
-                f"under {self.scenario_name}.",
+                f"and today's alone where they don't; `Dist` and `Walk` "
+                f"are the walk under {self.scenario_name}, as in the "
+                f"pairs table below.",
                 "",
-                "| # | Riders | Was | Now | Dist | Origin ↔ Destination |",
-                table_rule("rrllrl"),
+                "| # | Riders | Was | Now | Dist | Walk | Origin ↔ Destination |",
+                table_rule("rrllrll"),
             ]
             for i, change in enumerate(self.changed[:top_n], 1):
                 fwd = change.pair.forward
-                dist = "" if fwd.one_seat else f"{fwd.walk.dist_m:.0f}m"
                 lines.append(
                     table_row(
                         str(i),
                         f"{change.pair.riders:,.0f}",
                         str(change.before),
                         str(change.after),
-                        dist,
+                        fwd.dist_label,
+                        fwd.walk_label,
                         change.label,
                     )
                 )
