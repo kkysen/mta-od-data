@@ -38,33 +38,33 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
-| # | Riders | % Total | Type | Close? | Dist | Walk | Origin ↔ Destination |
+| # | Riders | % Total | Type | Close? | Dist | Walk | Origin↔Destination |
 | ---: | ---: | ---: | --- | --- | ---: | --- | --- |
-| 1 | 5,828 | 0.70% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ Cortlandt St (R) |
-| 2 | 5,414 | 0.65% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
-| 3 | 5,330 | 0.64% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R) ↔ 59 St-Columbus Circle (B,D) |
-| 4 | 5,074 | 0.61% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 5 | 4,620 | 0.55% | 1-seat | | | | 72 St (Q) ↔ Times Sq-42 St (N,Q,R) |
-| 6 | 4,597 | 0.55% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 72 St (Q) |
-| 7 | 4,337 | 0.52% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
-| 8 | 3,658 | 0.44% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R) ↔ W 4 St-Wash Sq (B,D) |
-| 9 | 3,522 | 0.42% | 1-seat | | | | 86 St (Q) ↔ Times Sq-42 St (N,Q,R) |
-| 10 | 3,356 | 0.40% | 1-seat | | | | 86 St (Q) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 11 | 3,293 | 0.39% | 1-seat | | | | Jackson Hts-Roosevelt Av (R) ↔ Times Sq-42 St (N,Q,R) |
-| 12 | 3,166 | 0.38% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ Whitehall St-South Ferry (R) |
-| 13 | 2,822 | 0.34% | 1-seat | | | | Canal St (N,Q,R) ↔ Times Sq-42 St (N,Q,R) |
-| 14 | 2,779 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 15 | 2,755 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ Lexington Av/59 St (N,R) |
-| 16 | 2,622 | 0.31% | 1-seat | | | | 86 St (Q) ↔ 57 St-7 Av (N,Q,R) |
-| 17 | 2,378 | 0.28% | 1-seat | | | | 23 St (R) ↔ Times Sq-42 St (N,Q,R) |
-| 18 | 2,365 | 0.28% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ Canal St (N,Q,R) |
-| 19 | 2,362 | 0.28% | 1-seat | | | | 96 St (Q) ↔ Times Sq-42 St (N,Q,R) |
-| 20 | 2,273 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 59 St-Columbus Circle (B,D) |
-| 21 | 2,257 | 0.27% | 1-seat | | | | 96 St (Q) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 22 | 2,251 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ Lexington Av/59 St (N,R) |
-| 23 | 2,189 | 0.26% | 1-seat | | | | Jackson Hts-Roosevelt Av (R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
+| 1 | 5,828 | 0.70% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔Cortlandt St (R) |
+| 2 | 5,414 | 0.65% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔14 St-Union Sq (N,Q,R) |
+| 3 | 5,330 | 0.64% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R)↔59 St-Columbus Circle (B,D) |
+| 4 | 5,074 | 0.61% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔47-50 Sts-Rockefeller Ctr (B,D) |
+| 5 | 4,620 | 0.55% | 1-seat | | | | 72 St (Q)↔Times Sq-42 St (N,Q,R) |
+| 6 | 4,597 | 0.55% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔72 St (Q) |
+| 7 | 4,337 | 0.52% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔14 St-Union Sq (N,Q,R) |
+| 8 | 3,658 | 0.44% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R)↔W 4 St-Wash Sq (B,D) |
+| 9 | 3,522 | 0.42% | 1-seat | | | | 86 St (Q)↔Times Sq-42 St (N,Q,R) |
+| 10 | 3,356 | 0.40% | 1-seat | | | | 86 St (Q)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 11 | 3,293 | 0.39% | 1-seat | | | | Jackson Hts-Roosevelt Av (R)↔Times Sq-42 St (N,Q,R) |
+| 12 | 3,166 | 0.38% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔Whitehall St-South Ferry (R) |
+| 13 | 2,822 | 0.34% | 1-seat | | | | Canal St (N,Q,R)↔Times Sq-42 St (N,Q,R) |
+| 14 | 2,779 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 15 | 2,755 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔Lexington Av/59 St (N,R) |
+| 16 | 2,622 | 0.31% | 1-seat | | | | 86 St (Q)↔57 St-7 Av (N,Q,R) |
+| 17 | 2,378 | 0.28% | 1-seat | | | | 23 St (R)↔Times Sq-42 St (N,Q,R) |
+| 18 | 2,365 | 0.28% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔Canal St (N,Q,R) |
+| 19 | 2,362 | 0.28% | 1-seat | | | | 96 St (Q)↔Times Sq-42 St (N,Q,R) |
+| 20 | 2,273 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔59 St-Columbus Circle (B,D) |
+| 21 | 2,257 | 0.27% | 1-seat | | | | 96 St (Q)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 22 | 2,251 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔Lexington Av/59 St (N,R) |
+| 23 | 2,189 | 0.26% | 1-seat | | | | Jackson Hts-Roosevelt Av (R)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R)↔14 St-Union Sq (N,Q,R) |
 
 ### Top 25 Origin Stations, Summed across All Destinations
 
@@ -150,67 +150,67 @@ Every both-ends rider, and their share of the 837,408 of them: **was** is what C
 
 ### Biggest Changes, against Current
 
-The top 25 station pairs by riders whose outcome moved, both directions combined as above. An end reads `today → B/D 4 Av Express` where its routes change, and today's alone where they don't; `Dist` is the walk under B/D 4 Av Express.
+The top 25 station pairs by riders whose outcome moved, both directions combined as above. An end reads `today→B/D 4 Av Express` where its routes change, and today's alone where they don't; `Dist` is the walk under B/D 4 Av Express.
 
-| # | Riders | Was | Now | Dist | Origin ↔ Destination |
+| # | Riders | Was | Now | Dist | Origin↔Destination |
 | ---: | ---: | --- | --- | ---: | --- |
-| 1 | 919 | direct | far | 565m | Canal St (N,Q,R) ↔ 8 Av (N → B) |
-| 2 | 774 | direct | close | 274m | Kings Hwy (B → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 3 | 707 | direct | close | 274m | DeKalb Av (B → N,Q,R) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 4 | 633 | direct | close | 191m | Kings Hwy (B → N,Q) ↔ 42 St-Bryant Pk (B,D) |
-| 5 | 599 | direct | far | 565m | DeKalb Av (B → N,Q,R) ↔ Grand St (B,D) |
-| 6 | 584 | far | direct | | 8 Av (N → B) ↔ Grand St (B,D) |
-| 7 | 582 | direct | close | 191m | DeKalb Av (B → N,Q,R) ↔ 42 St-Bryant Pk (B,D) |
-| 8 | 575 | direct | close | 274m | Sheepshead Bay (B → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 9 | 557 | direct | far | 565m | Kings Hwy (B → N,Q) ↔ Grand St (B,D) |
-| 10 | 534 | direct | close | 166m | DeKalb Av (B → N,Q,R) ↔ Broadway-Lafayette St (B,D) |
-| 11 | 534 | direct | far | 565m | Fort Hamilton Pkwy (N → B) ↔ Canal St (N,Q,R) |
-| 12 | 509 | direct | far | 565m | Bay Pkwy (N → B) ↔ Canal St (N,Q,R) |
-| 13 | 505 | direct | close | 274m | 7 Av (B → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 14 | 436 | direct | close | 191m | Times Sq-42 St (N,Q,R) ↔ 8 Av (N → B) |
-| 15 | 435 | direct | close | 191m | Sheepshead Bay (B → N,Q) ↔ 42 St-Bryant Pk (B,D) |
-| 16 | 423 | direct | far | 565m | Sheepshead Bay (B → N,Q) ↔ Grand St (B,D) |
-| 17 | 408 | direct | far | 848m | 7 Av (B → N,Q) ↔ Broadway-Lafayette St (B,D) |
-| 18 | 393 | direct | far | 565m | Kings Hwy (N → B) ↔ Canal St (N,Q,R) |
-| 19 | 381 | direct | far | 699m | W 4 St-Wash Sq (B,D) ↔ DeKalb Av (B → N,Q,R) |
-| 20 | 349 | direct | far | 565m | 20 Av (N → B) ↔ Canal St (N,Q,R) |
-| 21 | 340 | direct | far | 414m | Kings Hwy (B → N,Q) ↔ 59 St-Columbus Circle (B,D) |
-| 22 | 332 | direct | close | 191m | 7 Av (B → N,Q) ↔ 42 St-Bryant Pk (B,D) |
-| 23 | 318 | direct | close | 274m | Newkirk Plaza (B → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 24 | 314 | direct | far | 872m | 8 Av (N → B) ↔ 14 St-Union Sq (N,Q,R) |
-| 25 | 312 | direct | close | 274m | Church Av (B → N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
+| 1 | 919 | direct | far | 565m | Canal St (N,Q,R)↔8 Av (N→B) |
+| 2 | 774 | direct | close | 274m | Kings Hwy (B→N,Q)↔47-50 Sts-Rockefeller Ctr (B,D) |
+| 3 | 707 | direct | close | 274m | DeKalb Av (B→N,Q,R)↔47-50 Sts-Rockefeller Ctr (B,D) |
+| 4 | 633 | direct | close | 191m | Kings Hwy (B→N,Q)↔42 St-Bryant Pk (B,D) |
+| 5 | 599 | direct | far | 565m | DeKalb Av (B→N,Q,R)↔Grand St (B,D) |
+| 6 | 584 | far | direct | | 8 Av (N→B)↔Grand St (B,D) |
+| 7 | 582 | direct | close | 191m | DeKalb Av (B→N,Q,R)↔42 St-Bryant Pk (B,D) |
+| 8 | 575 | direct | close | 274m | Sheepshead Bay (B→N,Q)↔47-50 Sts-Rockefeller Ctr (B,D) |
+| 9 | 557 | direct | far | 565m | Kings Hwy (B→N,Q)↔Grand St (B,D) |
+| 10 | 534 | direct | close | 166m | DeKalb Av (B→N,Q,R)↔Broadway-Lafayette St (B,D) |
+| 11 | 534 | direct | far | 565m | Fort Hamilton Pkwy (N→B)↔Canal St (N,Q,R) |
+| 12 | 509 | direct | far | 565m | Bay Pkwy (N→B)↔Canal St (N,Q,R) |
+| 13 | 505 | direct | close | 274m | 7 Av (B→N,Q)↔47-50 Sts-Rockefeller Ctr (B,D) |
+| 14 | 436 | direct | close | 191m | Times Sq-42 St (N,Q,R)↔8 Av (N→B) |
+| 15 | 435 | direct | close | 191m | Sheepshead Bay (B→N,Q)↔42 St-Bryant Pk (B,D) |
+| 16 | 423 | direct | far | 565m | Sheepshead Bay (B→N,Q)↔Grand St (B,D) |
+| 17 | 408 | direct | far | 848m | 7 Av (B→N,Q)↔Broadway-Lafayette St (B,D) |
+| 18 | 393 | direct | far | 565m | Kings Hwy (N→B)↔Canal St (N,Q,R) |
+| 19 | 381 | direct | far | 699m | W 4 St-Wash Sq (B,D)↔DeKalb Av (B→N,Q,R) |
+| 20 | 349 | direct | far | 565m | 20 Av (N→B)↔Canal St (N,Q,R) |
+| 21 | 340 | direct | far | 414m | Kings Hwy (B→N,Q)↔59 St-Columbus Circle (B,D) |
+| 22 | 332 | direct | close | 191m | 7 Av (B→N,Q)↔42 St-Bryant Pk (B,D) |
+| 23 | 318 | direct | close | 274m | Newkirk Plaza (B→N,Q)↔47-50 Sts-Rockefeller Ctr (B,D) |
+| 24 | 314 | direct | far | 872m | 8 Av (N→B)↔14 St-Union Sq (N,Q,R) |
+| 25 | 312 | direct | close | 274m | Church Av (B→N,Q)↔47-50 Sts-Rockefeller Ctr (B,D) |
 
 ### Top 25 Origin/Destination Pairs
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
-| # | Riders | % Total | Type | Close? | Dist | Walk | Origin ↔ Destination |
+| # | Riders | % Total | Type | Close? | Dist | Walk | Origin↔Destination |
 | ---: | ---: | ---: | --- | --- | ---: | --- | --- |
-| 1 | 5,828 | 0.70% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ Cortlandt St (R) |
-| 2 | 5,414 | 0.65% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
-| 3 | 5,330 | 0.64% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R) ↔ 59 St-Columbus Circle (B,D) |
-| 4 | 5,074 | 0.61% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 5 | 4,620 | 0.55% | 1-seat | | | | 72 St (Q) ↔ Times Sq-42 St (N,Q,R) |
-| 6 | 4,597 | 0.55% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 72 St (Q) |
-| 7 | 4,337 | 0.52% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
-| 8 | 3,658 | 0.44% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R) ↔ W 4 St-Wash Sq (B,D) |
-| 9 | 3,522 | 0.42% | 1-seat | | | | 86 St (Q) ↔ Times Sq-42 St (N,Q,R) |
-| 10 | 3,356 | 0.40% | 1-seat | | | | 86 St (Q) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 11 | 3,293 | 0.39% | 1-seat | | | | Jackson Hts-Roosevelt Av (R) ↔ Times Sq-42 St (N,Q,R) |
-| 12 | 3,166 | 0.38% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ Whitehall St-South Ferry (R) |
-| 13 | 2,822 | 0.34% | 1-seat | | | | Canal St (N,Q,R) ↔ Times Sq-42 St (N,Q,R) |
-| 14 | 2,779 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 15 | 2,755 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ Lexington Av/59 St (N,R) |
-| 16 | 2,622 | 0.31% | 1-seat | | | | 86 St (Q) ↔ 57 St-7 Av (N,Q,R) |
-| 17 | 2,378 | 0.28% | 1-seat | | | | 23 St (R) ↔ Times Sq-42 St (N,Q,R) |
-| 18 | 2,365 | 0.28% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ Canal St (N,Q,R) |
-| 19 | 2,362 | 0.28% | 1-seat | | | | 96 St (Q) ↔ Times Sq-42 St (N,Q,R) |
-| 20 | 2,273 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 59 St-Columbus Circle (B,D) |
-| 21 | 2,257 | 0.27% | 1-seat | | | | 96 St (Q) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 22 | 2,251 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ Lexington Av/59 St (N,R) |
-| 23 | 2,189 | 0.26% | 1-seat | | | | Jackson Hts-Roosevelt Av (R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
+| 1 | 5,828 | 0.70% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔Cortlandt St (R) |
+| 2 | 5,414 | 0.65% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔14 St-Union Sq (N,Q,R) |
+| 3 | 5,330 | 0.64% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R)↔59 St-Columbus Circle (B,D) |
+| 4 | 5,074 | 0.61% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔47-50 Sts-Rockefeller Ctr (B,D) |
+| 5 | 4,620 | 0.55% | 1-seat | | | | 72 St (Q)↔Times Sq-42 St (N,Q,R) |
+| 6 | 4,597 | 0.55% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔72 St (Q) |
+| 7 | 4,337 | 0.52% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔14 St-Union Sq (N,Q,R) |
+| 8 | 3,658 | 0.44% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R)↔W 4 St-Wash Sq (B,D) |
+| 9 | 3,522 | 0.42% | 1-seat | | | | 86 St (Q)↔Times Sq-42 St (N,Q,R) |
+| 10 | 3,356 | 0.40% | 1-seat | | | | 86 St (Q)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 11 | 3,293 | 0.39% | 1-seat | | | | Jackson Hts-Roosevelt Av (R)↔Times Sq-42 St (N,Q,R) |
+| 12 | 3,166 | 0.38% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔Whitehall St-South Ferry (R) |
+| 13 | 2,822 | 0.34% | 1-seat | | | | Canal St (N,Q,R)↔Times Sq-42 St (N,Q,R) |
+| 14 | 2,779 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 15 | 2,755 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔Lexington Av/59 St (N,R) |
+| 16 | 2,622 | 0.31% | 1-seat | | | | 86 St (Q)↔57 St-7 Av (N,Q,R) |
+| 17 | 2,378 | 0.28% | 1-seat | | | | 23 St (R)↔Times Sq-42 St (N,Q,R) |
+| 18 | 2,365 | 0.28% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔Canal St (N,Q,R) |
+| 19 | 2,362 | 0.28% | 1-seat | | | | 96 St (Q)↔Times Sq-42 St (N,Q,R) |
+| 20 | 2,273 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔59 St-Columbus Circle (B,D) |
+| 21 | 2,257 | 0.27% | 1-seat | | | | 96 St (Q)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 22 | 2,251 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔Lexington Av/59 St (N,R) |
+| 23 | 2,189 | 0.26% | 1-seat | | | | Jackson Hts-Roosevelt Av (R)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R)↔14 St-Union Sq (N,Q,R) |
 
 ### Top 25 Origin Stations, Summed across All Destinations
 
@@ -296,67 +296,67 @@ Every both-ends rider, and their share of the 837,408 of them: **was** is what C
 
 ### Biggest Changes, against Current
 
-The top 25 station pairs by riders whose outcome moved, both directions combined as above. An end reads `today → N/Q 4 Av Express` where its routes change, and today's alone where they don't; `Dist` is the walk under N/Q 4 Av Express.
+The top 25 station pairs by riders whose outcome moved, both directions combined as above. An end reads `today→N/Q 4 Av Express` where its routes change, and today's alone where they don't; `Dist` is the walk under N/Q 4 Av Express.
 
-| # | Riders | Was | Now | Dist | Origin ↔ Destination |
+| # | Riders | Was | Now | Dist | Origin↔Destination |
 | ---: | ---: | --- | --- | ---: | --- |
-| 1 | 1,058 | direct | far | 906m | 7 Av (Q → B,D) ↔ 14 St-Union Sq (N,Q,R) |
-| 2 | 715 | direct | far | 918m | 14 St-Union Sq (N,Q,R) ↔ Church Av (Q → B,D) |
-| 3 | 682 | direct | far | 918m | 14 St-Union Sq (N,Q,R) ↔ Prospect Park (Q → B,D) |
-| 4 | 668 | direct | close | 191m | Kings Hwy (Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
-| 5 | 628 | direct | far | 918m | Parkside Av (Q → D) ↔ 14 St-Union Sq (N,Q,R) |
-| 6 | 600 | direct | far | 565m | 79 St (D → Q) ↔ Grand St (B,D) |
-| 7 | 595 | direct | far | 565m | Bay Pkwy (D → Q) ↔ Grand St (B,D) |
-| 8 | 590 | direct | far | 918m | Kings Hwy (Q → B,D) ↔ 14 St-Union Sq (N,Q,R) |
-| 9 | 579 | direct | close | 191m | Church Av (Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
-| 10 | 560 | direct | far | 565m | 18 Av (D → Q) ↔ Grand St (B,D) |
-| 11 | 488 | direct | far | 918m | Newkirk Plaza (Q → B,D) ↔ 14 St-Union Sq (N,Q,R) |
-| 12 | 485 | direct | far | 803m | DeKalb Av (Q → B,D,R) ↔ 72 St (Q) |
-| 13 | 485 | direct | far | 565m | Kings Hwy (Q → B,D) ↔ Canal St (N,Q,R) |
-| 14 | 476 | direct | close | 191m | Prospect Park (Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
-| 15 | 467 | direct | close | 191m | 7 Av (Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
-| 16 | 461 | direct | far | 565m | 71 St (D → Q) ↔ Grand St (B,D) |
-| 17 | 460 | direct | far | 565m | 9 Av (D → Q) ↔ Grand St (B,D) |
-| 18 | 459 | direct | far | 565m | Avenue U (Q → D) ↔ Canal St (N,Q,R) |
-| 19 | 450 | direct | close | 191m | Parkside Av (Q → D) ↔ Times Sq-42 St (N,Q,R) |
-| 20 | 437 | direct | far | 565m | 25 Av (D → Q) ↔ Grand St (B,D) |
-| 21 | 422 | direct | far | 565m | Grand St (B,D) ↔ 36 St (D → N,Q,R) |
-| 22 | 418 | direct | far | 565m | 7 Av (Q → B,D) ↔ Canal St (N,Q,R) |
-| 23 | 418 | direct | far | 918m | Cortelyou Rd (Q → D) ↔ 14 St-Union Sq (N,Q,R) |
-| 24 | 391 | direct | close | 191m | Newkirk Plaza (Q → B,D) ↔ Times Sq-42 St (N,Q,R) |
-| 25 | 389 | direct | far | 565m | Grand St (B,D) ↔ 20 Av (D → Q) |
+| 1 | 1,058 | direct | far | 906m | 7 Av (Q→B,D)↔14 St-Union Sq (N,Q,R) |
+| 2 | 715 | direct | far | 918m | 14 St-Union Sq (N,Q,R)↔Church Av (Q→B,D) |
+| 3 | 682 | direct | far | 918m | 14 St-Union Sq (N,Q,R)↔Prospect Park (Q→B,D) |
+| 4 | 668 | direct | close | 191m | Kings Hwy (Q→B,D)↔Times Sq-42 St (N,Q,R) |
+| 5 | 628 | direct | far | 918m | Parkside Av (Q→D)↔14 St-Union Sq (N,Q,R) |
+| 6 | 600 | direct | far | 565m | 79 St (D→Q)↔Grand St (B,D) |
+| 7 | 595 | direct | far | 565m | Bay Pkwy (D→Q)↔Grand St (B,D) |
+| 8 | 590 | direct | far | 918m | Kings Hwy (Q→B,D)↔14 St-Union Sq (N,Q,R) |
+| 9 | 579 | direct | close | 191m | Church Av (Q→B,D)↔Times Sq-42 St (N,Q,R) |
+| 10 | 560 | direct | far | 565m | 18 Av (D→Q)↔Grand St (B,D) |
+| 11 | 488 | direct | far | 918m | Newkirk Plaza (Q→B,D)↔14 St-Union Sq (N,Q,R) |
+| 12 | 485 | direct | far | 803m | DeKalb Av (Q→B,D,R)↔72 St (Q) |
+| 13 | 485 | direct | far | 565m | Kings Hwy (Q→B,D)↔Canal St (N,Q,R) |
+| 14 | 476 | direct | close | 191m | Prospect Park (Q→B,D)↔Times Sq-42 St (N,Q,R) |
+| 15 | 467 | direct | close | 191m | 7 Av (Q→B,D)↔Times Sq-42 St (N,Q,R) |
+| 16 | 461 | direct | far | 565m | 71 St (D→Q)↔Grand St (B,D) |
+| 17 | 460 | direct | far | 565m | 9 Av (D→Q)↔Grand St (B,D) |
+| 18 | 459 | direct | far | 565m | Avenue U (Q→D)↔Canal St (N,Q,R) |
+| 19 | 450 | direct | close | 191m | Parkside Av (Q→D)↔Times Sq-42 St (N,Q,R) |
+| 20 | 437 | direct | far | 565m | 25 Av (D→Q)↔Grand St (B,D) |
+| 21 | 422 | direct | far | 565m | Grand St (B,D)↔36 St (D→N,Q,R) |
+| 22 | 418 | direct | far | 565m | 7 Av (Q→B,D)↔Canal St (N,Q,R) |
+| 23 | 418 | direct | far | 918m | Cortelyou Rd (Q→D)↔14 St-Union Sq (N,Q,R) |
+| 24 | 391 | direct | close | 191m | Newkirk Plaza (Q→B,D)↔Times Sq-42 St (N,Q,R) |
+| 25 | 389 | direct | far | 565m | Grand St (B,D)↔20 Av (D→Q) |
 
 ### Top 25 Origin/Destination Pairs
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
-| # | Riders | % Total | Type | Close? | Dist | Walk | Origin ↔ Destination |
+| # | Riders | % Total | Type | Close? | Dist | Walk | Origin↔Destination |
 | ---: | ---: | ---: | --- | --- | ---: | --- | --- |
-| 1 | 5,828 | 0.70% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ Cortlandt St (R) |
-| 2 | 5,414 | 0.65% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
-| 3 | 5,330 | 0.64% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R) ↔ 59 St-Columbus Circle (B,D) |
-| 4 | 5,074 | 0.61% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
-| 5 | 4,620 | 0.55% | 1-seat | | | | 72 St (Q) ↔ Times Sq-42 St (N,Q,R) |
-| 6 | 4,597 | 0.55% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 72 St (Q) |
-| 7 | 4,337 | 0.52% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
-| 8 | 3,658 | 0.44% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R) ↔ W 4 St-Wash Sq (B,D) |
-| 9 | 3,522 | 0.42% | 1-seat | | | | 86 St (Q) ↔ Times Sq-42 St (N,Q,R) |
-| 10 | 3,356 | 0.40% | 1-seat | | | | 86 St (Q) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 11 | 3,293 | 0.39% | 1-seat | | | | Jackson Hts-Roosevelt Av (R) ↔ Times Sq-42 St (N,Q,R) |
-| 12 | 3,166 | 0.38% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ Whitehall St-South Ferry (R) |
-| 13 | 2,822 | 0.34% | 1-seat | | | | Canal St (N,Q,R) ↔ Times Sq-42 St (N,Q,R) |
-| 14 | 2,779 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 15 | 2,755 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R) ↔ Lexington Av/59 St (N,R) |
-| 16 | 2,622 | 0.31% | 1-seat | | | | 86 St (Q) ↔ 57 St-7 Av (N,Q,R) |
-| 17 | 2,378 | 0.28% | 1-seat | | | | 23 St (R) ↔ Times Sq-42 St (N,Q,R) |
-| 18 | 2,365 | 0.28% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ Canal St (N,Q,R) |
-| 19 | 2,362 | 0.28% | 1-seat | | | | 96 St (Q) ↔ Times Sq-42 St (N,Q,R) |
-| 20 | 2,273 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ 59 St-Columbus Circle (B,D) |
-| 21 | 2,257 | 0.27% | 1-seat | | | | 96 St (Q) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 22 | 2,251 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R) ↔ Lexington Av/59 St (N,R) |
-| 23 | 2,189 | 0.26% | 1-seat | | | | Jackson Hts-Roosevelt Av (R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R) ↔ 34 St-Herald Sq (B,D,N,Q,R) |
-| 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R) ↔ 14 St-Union Sq (N,Q,R) |
+| 1 | 5,828 | 0.70% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔Cortlandt St (R) |
+| 2 | 5,414 | 0.65% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔14 St-Union Sq (N,Q,R) |
+| 3 | 5,330 | 0.64% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R)↔59 St-Columbus Circle (B,D) |
+| 4 | 5,074 | 0.61% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔47-50 Sts-Rockefeller Ctr (B,D) |
+| 5 | 4,620 | 0.55% | 1-seat | | | | 72 St (Q)↔Times Sq-42 St (N,Q,R) |
+| 6 | 4,597 | 0.55% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔72 St (Q) |
+| 7 | 4,337 | 0.52% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔14 St-Union Sq (N,Q,R) |
+| 8 | 3,658 | 0.44% | xfer | close | 191m | origin: 42 St-Bryant Pk (B,D) | Times Sq-42 St (N,Q,R)↔W 4 St-Wash Sq (B,D) |
+| 9 | 3,522 | 0.42% | 1-seat | | | | 86 St (Q)↔Times Sq-42 St (N,Q,R) |
+| 10 | 3,356 | 0.40% | 1-seat | | | | 86 St (Q)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 11 | 3,293 | 0.39% | 1-seat | | | | Jackson Hts-Roosevelt Av (R)↔Times Sq-42 St (N,Q,R) |
+| 12 | 3,166 | 0.38% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔Whitehall St-South Ferry (R) |
+| 13 | 2,822 | 0.34% | 1-seat | | | | Canal St (N,Q,R)↔Times Sq-42 St (N,Q,R) |
+| 14 | 2,779 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 15 | 2,755 | 0.33% | 1-seat | | | | Times Sq-42 St (N,Q,R)↔Lexington Av/59 St (N,R) |
+| 16 | 2,622 | 0.31% | 1-seat | | | | 86 St (Q)↔57 St-7 Av (N,Q,R) |
+| 17 | 2,378 | 0.28% | 1-seat | | | | 23 St (R)↔Times Sq-42 St (N,Q,R) |
+| 18 | 2,365 | 0.28% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔Canal St (N,Q,R) |
+| 19 | 2,362 | 0.28% | 1-seat | | | | 96 St (Q)↔Times Sq-42 St (N,Q,R) |
+| 20 | 2,273 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔59 St-Columbus Circle (B,D) |
+| 21 | 2,257 | 0.27% | 1-seat | | | | 96 St (Q)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 22 | 2,251 | 0.27% | 1-seat | | | | 34 St-Herald Sq (B,D,N,Q,R)↔Lexington Av/59 St (N,R) |
+| 23 | 2,189 | 0.26% | 1-seat | | | | Jackson Hts-Roosevelt Av (R)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 24 | 2,128 | 0.25% | 1-seat | | | | 49 St (N,R)↔34 St-Herald Sq (B,D,N,Q,R) |
+| 25 | 2,072 | 0.25% | 1-seat | | | | 57 St-7 Av (N,Q,R)↔14 St-Union Sq (N,Q,R) |
 
 ### Top 25 Origin Stations, Summed across All Destinations
 

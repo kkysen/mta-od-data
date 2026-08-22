@@ -22,33 +22,33 @@ Average weekday ridership is the same 66,992/weekday across every scenario below
 
 ### Top 25 Origin/Destination Pairs
 
-| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
+| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin→Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 896 | 1.34% | 2.45% | 1-seat | close | 0m | Crown Hts-Utica Av (3,4) → Atlantic Av (3,4) | |
-| 2 | 753 | 1.12% | 2.06% | 1-seat | close | 0m | Crown Hts-Utica Av (3,4) → Borough Hall/Court St (3,4) | |
-| 3 | 680 | 1.02% | 1.86% | 1-seat | close | 0m | Crown Hts-Utica Av (4) → Grand Central-42 St (4) | |
-| 4 | 655 | 0.98% | 1.79% | 1-seat | close | 0m | Crown Hts-Utica Av (3,4) → Fulton St (3,4) | |
-| 5 | 595 | 0.89% | 1.63% | 1-seat | close | 0m | Crown Hts-Utica Av (4) → 14 St-Union Sq (4) | |
-| 6 | 562 | 0.84% | 1.54% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,5) → Borough Hall/Court St (2,5) | |
-| 7 | 546 | 0.81% | 1.49% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,5) → Atlantic Av (2,5) | |
-| 8 | 531 | 0.79% | 1.45% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,5) → Fulton St (2,5) | |
-| 9 | 479 | 0.72% | 1.31% | 1-seat | close | 0m | Crown Hts-Utica Av (3,4) → Franklin Av-Medgar Evers College/Botanic Garden (3,4) | |
-| 10 | 454 | 0.68% | 1.24% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (5) → Grand Central-42 St (5) | |
-| 11 | 448 | 0.67% | 1.23% | 1-seat | close | 0m | Crown Hts-Utica Av (3,4) → Nevins St (3,4) | |
-| 12 | 436 | 0.65% | 1.19% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2) → Times Sq-42 St/PABT (2) | |
-| 13 | 406 | 0.61% | 1.11% | 1-seat | close | 0m | Crown Hts-Utica Av (3) → Times Sq-42 St/PABT (3) | |
-| 14 | 387 | 0.58% | 1.06% | 1-seat | close | 0m | Crown Hts-Utica Av (4) → Bowling Green (4) | |
-| 15 | 364 | 0.54% | 1.00% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2) → 34 St-Penn Station (2) | |
-| 16 | 317 | 0.47% | 0.87% | 1-seat | close | 0m | Church Av (2,5) → Atlantic Av (2,5) | |
-| 17 | 313 | 0.47% | 0.86% | 1-seat | close | 0m | Crown Hts-Utica Av (3) → 34 St-Penn Station (3) | |
-| 18 | 308 | 0.46% | 0.84% | 1-seat | close | 0m | Winthrop St (2,5) → Atlantic Av (2,5) | |
-| 19 | 290 | 0.43% | 0.79% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (5) → 14 St-Union Sq (5) | |
-| 20 | 283 | 0.42% | 0.77% | 1-seat | close | 0m | Crown Hts-Utica Av (4) → Lexington Av/59 St (4) | |
-| 21 | 276 | 0.41% | 0.75% | 1-seat | close | 0m | Church Av (2,5) → Borough Hall/Court St (2,5) | |
-| 22 | 267 | 0.40% | 0.73% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (5) → Bowling Green (5) | |
-| 23 | 266 | 0.40% | 0.73% | 1-seat | close | 0m | Crown Hts-Utica Av (4) → 86 St (4) | |
-| 24 | 251 | 0.38% | 0.69% | 1-seat | close | 0m | Winthrop St (2,5) → Fulton St (2,5) | |
-| 25 | 250 | 0.37% | 0.69% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,5) → Franklin Av-Medgar Evers College/Botanic Garden (2,5) | |
+| 1 | 896 | 1.34% | 2.45% | 1-seat | close | 0m | Crown Hts-Utica Av (3,4)→Atlantic Av (3,4) | |
+| 2 | 753 | 1.12% | 2.06% | 1-seat | close | 0m | Crown Hts-Utica Av (3,4)→Borough Hall/Court St (3,4) | |
+| 3 | 680 | 1.02% | 1.86% | 1-seat | close | 0m | Crown Hts-Utica Av (4)→Grand Central-42 St (4) | |
+| 4 | 655 | 0.98% | 1.79% | 1-seat | close | 0m | Crown Hts-Utica Av (3,4)→Fulton St (3,4) | |
+| 5 | 595 | 0.89% | 1.63% | 1-seat | close | 0m | Crown Hts-Utica Av (4)→14 St-Union Sq (4) | |
+| 6 | 562 | 0.84% | 1.54% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,5)→Borough Hall/Court St (2,5) | |
+| 7 | 546 | 0.81% | 1.49% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,5)→Atlantic Av (2,5) | |
+| 8 | 531 | 0.79% | 1.45% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,5)→Fulton St (2,5) | |
+| 9 | 479 | 0.72% | 1.31% | 1-seat | close | 0m | Crown Hts-Utica Av (3,4)→Franklin Av-Medgar Evers College/Botanic Garden (3,4) | |
+| 10 | 454 | 0.68% | 1.24% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (5)→Grand Central-42 St (5) | |
+| 11 | 448 | 0.67% | 1.23% | 1-seat | close | 0m | Crown Hts-Utica Av (3,4)→Nevins St (3,4) | |
+| 12 | 436 | 0.65% | 1.19% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2)→Times Sq-42 St/PABT (2) | |
+| 13 | 406 | 0.61% | 1.11% | 1-seat | close | 0m | Crown Hts-Utica Av (3)→Times Sq-42 St/PABT (3) | |
+| 14 | 387 | 0.58% | 1.06% | 1-seat | close | 0m | Crown Hts-Utica Av (4)→Bowling Green (4) | |
+| 15 | 364 | 0.54% | 1.00% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2)→34 St-Penn Station (2) | |
+| 16 | 317 | 0.47% | 0.87% | 1-seat | close | 0m | Church Av (2,5)→Atlantic Av (2,5) | |
+| 17 | 313 | 0.47% | 0.86% | 1-seat | close | 0m | Crown Hts-Utica Av (3)→34 St-Penn Station (3) | |
+| 18 | 308 | 0.46% | 0.84% | 1-seat | close | 0m | Winthrop St (2,5)→Atlantic Av (2,5) | |
+| 19 | 290 | 0.43% | 0.79% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (5)→14 St-Union Sq (5) | |
+| 20 | 283 | 0.42% | 0.77% | 1-seat | close | 0m | Crown Hts-Utica Av (4)→Lexington Av/59 St (4) | |
+| 21 | 276 | 0.41% | 0.75% | 1-seat | close | 0m | Church Av (2,5)→Borough Hall/Court St (2,5) | |
+| 22 | 267 | 0.40% | 0.73% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (5)→Bowling Green (5) | |
+| 23 | 266 | 0.40% | 0.73% | 1-seat | close | 0m | Crown Hts-Utica Av (4)→86 St (4) | |
+| 24 | 251 | 0.38% | 0.69% | 1-seat | close | 0m | Winthrop St (2,5)→Fulton St (2,5) | |
+| 25 | 250 | 0.37% | 0.69% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,5)→Franklin Av-Medgar Evers College/Botanic Garden (2,5) | |
 
 ### Top 25 Destination Stations, Summed across All Origins
 
@@ -92,33 +92,33 @@ Deinterlining scenario: Nostrand Av Line served by 2,3; Eastern Pkwy/New Lots Li
 
 ### Top 25 Origin/Destination Pairs
 
-| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
+| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin→Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 896 | 1.34% | 3.16% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5) → Atlantic Av (4,5) | |
-| 2 | 753 | 1.12% | 2.66% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5) → Borough Hall/Court St (4,5) | |
-| 3 | 680 | 1.02% | 2.40% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5) → Grand Central-42 St (4,5) | |
-| 4 | 655 | 0.98% | 2.31% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5) → Fulton St (4,5) | |
-| 5 | 595 | 0.89% | 2.10% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5) → 14 St-Union Sq (4,5) | |
-| 6 | 562 | 0.84% | 1.98% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3) → Borough Hall/Court St (2,3) | |
-| 7 | 546 | 0.81% | 1.93% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3) → Atlantic Av (2,3) | |
-| 8 | 531 | 0.79% | 1.87% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3) → Fulton St (2,3) | |
-| 9 | 479 | 0.72% | 1.69% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5) → Franklin Av-Medgar Evers College/Botanic Garden (4,5) | |
-| 10 | 454 | 0.68% | | xfer | far | 754m | Flatbush Av-Brooklyn College (2,3) → Grand Central-42 St (4,5) | Times Sq-42 St (2,3) |
-| 11 | 448 | 0.67% | 1.58% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5) → Nevins St (4,5) | |
-| 12 | 436 | 0.65% | 1.54% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3) → Times Sq-42 St/PABT (2,3) | |
-| 13 | 406 | 0.61% | | xfer | far | 894m | Crown Hts-Utica Av (4,5) → Times Sq-42 St/PABT (2,3) | Grand Central-42 St (4,5) |
-| 14 | 387 | 0.58% | 1.37% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5) → Bowling Green (4,5) | |
-| 15 | 364 | 0.54% | 1.28% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3) → 34 St-Penn Station (2,3) | |
-| 16 | 317 | 0.47% | 1.12% | 1-seat | close | 0m | Church Av (2,3) → Atlantic Av (2,3) | |
-| 17 | 313 | 0.47% | | xfer | far | 1207m | Crown Hts-Utica Av (4,5) → 34 St-Penn Station (2,3) | Grand Central-42 St (4,5) |
-| 18 | 308 | 0.46% | 1.09% | 1-seat | close | 0m | Winthrop St (2,3) → Atlantic Av (2,3) | |
-| 19 | 290 | 0.43% | | xfer | far | 844m | Flatbush Av-Brooklyn College (2,3) → 14 St-Union Sq (4,5) | 14 St (2,3) |
-| 20 | 283 | 0.42% | 1.00% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5) → Lexington Av/59 St (4,5) | |
-| 21 | 276 | 0.41% | 0.97% | 1-seat | close | 0m | Church Av (2,3) → Borough Hall/Court St (2,3) | |
-| 22 | 267 | 0.40% | | xfer | far | 474m | Flatbush Av-Brooklyn College (2,3) → Bowling Green (4,5) | Wall St (2,3) |
-| 23 | 266 | 0.40% | 0.94% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5) → 86 St (4,5) | |
-| 24 | 251 | 0.38% | 0.89% | 1-seat | close | 0m | Winthrop St (2,3) → Fulton St (2,3) | |
-| 25 | 250 | 0.37% | 0.88% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3) → Franklin Av-Medgar Evers College/Botanic Garden (2,3) | |
+| 1 | 896 | 1.34% | 3.16% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5)→Atlantic Av (4,5) | |
+| 2 | 753 | 1.12% | 2.66% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5)→Borough Hall/Court St (4,5) | |
+| 3 | 680 | 1.02% | 2.40% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5)→Grand Central-42 St (4,5) | |
+| 4 | 655 | 0.98% | 2.31% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5)→Fulton St (4,5) | |
+| 5 | 595 | 0.89% | 2.10% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5)→14 St-Union Sq (4,5) | |
+| 6 | 562 | 0.84% | 1.98% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3)→Borough Hall/Court St (2,3) | |
+| 7 | 546 | 0.81% | 1.93% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3)→Atlantic Av (2,3) | |
+| 8 | 531 | 0.79% | 1.87% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3)→Fulton St (2,3) | |
+| 9 | 479 | 0.72% | 1.69% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5)→Franklin Av-Medgar Evers College/Botanic Garden (4,5) | |
+| 10 | 454 | 0.68% | | xfer | far | 754m | Flatbush Av-Brooklyn College (2,3)→Grand Central-42 St (4,5) | Times Sq-42 St (2,3) |
+| 11 | 448 | 0.67% | 1.58% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5)→Nevins St (4,5) | |
+| 12 | 436 | 0.65% | 1.54% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3)→Times Sq-42 St/PABT (2,3) | |
+| 13 | 406 | 0.61% | | xfer | far | 894m | Crown Hts-Utica Av (4,5)→Times Sq-42 St/PABT (2,3) | Grand Central-42 St (4,5) |
+| 14 | 387 | 0.58% | 1.37% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5)→Bowling Green (4,5) | |
+| 15 | 364 | 0.54% | 1.28% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3)→34 St-Penn Station (2,3) | |
+| 16 | 317 | 0.47% | 1.12% | 1-seat | close | 0m | Church Av (2,3)→Atlantic Av (2,3) | |
+| 17 | 313 | 0.47% | | xfer | far | 1207m | Crown Hts-Utica Av (4,5)→34 St-Penn Station (2,3) | Grand Central-42 St (4,5) |
+| 18 | 308 | 0.46% | 1.09% | 1-seat | close | 0m | Winthrop St (2,3)→Atlantic Av (2,3) | |
+| 19 | 290 | 0.43% | | xfer | far | 844m | Flatbush Av-Brooklyn College (2,3)→14 St-Union Sq (4,5) | 14 St (2,3) |
+| 20 | 283 | 0.42% | 1.00% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5)→Lexington Av/59 St (4,5) | |
+| 21 | 276 | 0.41% | 0.97% | 1-seat | close | 0m | Church Av (2,3)→Borough Hall/Court St (2,3) | |
+| 22 | 267 | 0.40% | | xfer | far | 474m | Flatbush Av-Brooklyn College (2,3)→Bowling Green (4,5) | Wall St (2,3) |
+| 23 | 266 | 0.40% | 0.94% | 1-seat | close | 0m | Crown Hts-Utica Av (4,5)→86 St (4,5) | |
+| 24 | 251 | 0.38% | 0.89% | 1-seat | close | 0m | Winthrop St (2,3)→Fulton St (2,3) | |
+| 25 | 250 | 0.37% | 0.88% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (2,3)→Franklin Av-Medgar Evers College/Botanic Garden (2,3) | |
 
 ### Top 25 Destination Stations, Summed across All Origins
 
@@ -162,33 +162,33 @@ Deinterlining scenario: Nostrand Av Line served by 4,5; Eastern Pkwy/New Lots Li
 
 ### Top 25 Origin/Destination Pairs
 
-| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
+| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin→Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 896 | 1.34% | 3.30% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3) → Atlantic Av (2,3) | |
-| 2 | 753 | 1.12% | 2.78% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3) → Borough Hall/Court St (2,3) | |
-| 3 | 680 | 1.02% | | xfer | far | 754m | Crown Hts-Utica Av (2,3) → Grand Central-42 St (4,5) | Times Sq-42 St (2,3) |
-| 4 | 655 | 0.98% | 2.42% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3) → Fulton St (2,3) | |
-| 5 | 595 | 0.89% | | xfer | far | 844m | Crown Hts-Utica Av (2,3) → 14 St-Union Sq (4,5) | 14 St (2,3) |
-| 6 | 562 | 0.84% | 2.07% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5) → Borough Hall/Court St (4,5) | |
-| 7 | 546 | 0.81% | 2.01% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5) → Atlantic Av (4,5) | |
-| 8 | 531 | 0.79% | 1.96% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5) → Fulton St (4,5) | |
-| 9 | 479 | 0.72% | 1.77% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3) → Franklin Av-Medgar Evers College/Botanic Garden (2,3) | |
-| 10 | 454 | 0.68% | 1.67% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5) → Grand Central-42 St (4,5) | |
-| 11 | 448 | 0.67% | 1.65% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3) → Nevins St (2,3) | |
-| 12 | 436 | 0.65% | | xfer | far | 894m | Flatbush Av-Brooklyn College (4,5) → Times Sq-42 St/PABT (2,3) | Grand Central-42 St (4,5) |
-| 13 | 406 | 0.61% | 1.50% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3) → Times Sq-42 St/PABT (2,3) | |
-| 14 | 387 | 0.58% | | xfer | far | 474m | Crown Hts-Utica Av (2,3) → Bowling Green (4,5) | Wall St (2,3) |
-| 15 | 364 | 0.54% | | xfer | far | 1207m | Flatbush Av-Brooklyn College (4,5) → 34 St-Penn Station (2,3) | Grand Central-42 St (4,5) |
-| 16 | 317 | 0.47% | 1.17% | 1-seat | close | 0m | Church Av (4,5) → Atlantic Av (4,5) | |
-| 17 | 313 | 0.47% | 1.16% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3) → 34 St-Penn Station (2,3) | |
-| 18 | 308 | 0.46% | 1.14% | 1-seat | close | 0m | Winthrop St (4,5) → Atlantic Av (4,5) | |
-| 19 | 290 | 0.43% | 1.07% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5) → 14 St-Union Sq (4,5) | |
-| 20 | 283 | 0.42% | | xfer | far | 1831m | Crown Hts-Utica Av (2,3) → Lexington Av/59 St (4,5) | Times Sq-42 St (2,3) |
-| 21 | 276 | 0.41% | 1.02% | 1-seat | close | 0m | Church Av (4,5) → Borough Hall/Court St (4,5) | |
-| 22 | 267 | 0.40% | 0.98% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5) → Bowling Green (4,5) | |
-| 23 | 266 | 0.40% | | xfer | far | 2135m | Crown Hts-Utica Av (2,3) → 86 St (4,5) | 96 St (2,3) |
-| 24 | 251 | 0.38% | 0.93% | 1-seat | close | 0m | Winthrop St (4,5) → Fulton St (4,5) | |
-| 25 | 250 | 0.37% | 0.92% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5) → Franklin Av-Medgar Evers College/Botanic Garden (4,5) | |
+| 1 | 896 | 1.34% | 3.30% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3)→Atlantic Av (2,3) | |
+| 2 | 753 | 1.12% | 2.78% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3)→Borough Hall/Court St (2,3) | |
+| 3 | 680 | 1.02% | | xfer | far | 754m | Crown Hts-Utica Av (2,3)→Grand Central-42 St (4,5) | Times Sq-42 St (2,3) |
+| 4 | 655 | 0.98% | 2.42% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3)→Fulton St (2,3) | |
+| 5 | 595 | 0.89% | | xfer | far | 844m | Crown Hts-Utica Av (2,3)→14 St-Union Sq (4,5) | 14 St (2,3) |
+| 6 | 562 | 0.84% | 2.07% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5)→Borough Hall/Court St (4,5) | |
+| 7 | 546 | 0.81% | 2.01% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5)→Atlantic Av (4,5) | |
+| 8 | 531 | 0.79% | 1.96% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5)→Fulton St (4,5) | |
+| 9 | 479 | 0.72% | 1.77% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3)→Franklin Av-Medgar Evers College/Botanic Garden (2,3) | |
+| 10 | 454 | 0.68% | 1.67% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5)→Grand Central-42 St (4,5) | |
+| 11 | 448 | 0.67% | 1.65% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3)→Nevins St (2,3) | |
+| 12 | 436 | 0.65% | | xfer | far | 894m | Flatbush Av-Brooklyn College (4,5)→Times Sq-42 St/PABT (2,3) | Grand Central-42 St (4,5) |
+| 13 | 406 | 0.61% | 1.50% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3)→Times Sq-42 St/PABT (2,3) | |
+| 14 | 387 | 0.58% | | xfer | far | 474m | Crown Hts-Utica Av (2,3)→Bowling Green (4,5) | Wall St (2,3) |
+| 15 | 364 | 0.54% | | xfer | far | 1207m | Flatbush Av-Brooklyn College (4,5)→34 St-Penn Station (2,3) | Grand Central-42 St (4,5) |
+| 16 | 317 | 0.47% | 1.17% | 1-seat | close | 0m | Church Av (4,5)→Atlantic Av (4,5) | |
+| 17 | 313 | 0.47% | 1.16% | 1-seat | close | 0m | Crown Hts-Utica Av (2,3)→34 St-Penn Station (2,3) | |
+| 18 | 308 | 0.46% | 1.14% | 1-seat | close | 0m | Winthrop St (4,5)→Atlantic Av (4,5) | |
+| 19 | 290 | 0.43% | 1.07% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5)→14 St-Union Sq (4,5) | |
+| 20 | 283 | 0.42% | | xfer | far | 1831m | Crown Hts-Utica Av (2,3)→Lexington Av/59 St (4,5) | Times Sq-42 St (2,3) |
+| 21 | 276 | 0.41% | 1.02% | 1-seat | close | 0m | Church Av (4,5)→Borough Hall/Court St (4,5) | |
+| 22 | 267 | 0.40% | 0.98% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5)→Bowling Green (4,5) | |
+| 23 | 266 | 0.40% | | xfer | far | 2135m | Crown Hts-Utica Av (2,3)→86 St (4,5) | 96 St (2,3) |
+| 24 | 251 | 0.38% | 0.93% | 1-seat | close | 0m | Winthrop St (4,5)→Fulton St (4,5) | |
+| 25 | 250 | 0.37% | 0.92% | 1-seat | close | 0m | Flatbush Av-Brooklyn College (4,5)→Franklin Av-Medgar Evers College/Botanic Garden (4,5) | |
 
 ### Top 25 Destination Stations, Summed across All Origins
 

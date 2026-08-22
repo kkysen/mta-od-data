@@ -22,33 +22,33 @@ Average weekday ridership is the same 163,203/weekday across every scenario belo
 
 ### Top 25 Origin/Destination Pairs
 
-| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
+| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin→Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 727 | 0.45% | 1.08% | 1-seat | close | 0m | Kings Hwy (B,Q) → 34 St-Herald Sq (B,Q) | |
-| 2 | 621 | 0.38% | 0.92% | 1-seat | close | 0m | 36 St (D,N) → Atlantic Av (D,N) | |
-| 3 | 583 | 0.36% | 0.87% | 1-seat | close | 0m | 7 Av (Q) → 14 St-Union Sq (Q) | |
-| 4 | 471 | 0.29% | 0.70% | 1-seat | close | 0m | Kings Hwy (B,Q) → DeKalb Av (B,Q) | |
-| 5 | 455 | 0.28% | 0.68% | 1-seat | close | 0m | 8 Av (N) → Canal St (N) | |
-| 6 | 449 | 0.28% | 0.67% | 1-seat | close | 0m | 59 St (N) → Atlantic Av (N) | |
-| 7 | 416 | 0.25% | 0.62% | 1-seat | close | 0m | Church Av (B,Q) → 34 St-Herald Sq (B,Q) | |
-| 8 | 403 | 0.25% | 0.60% | 1-seat | close | 0m | Sheepshead Bay (B,Q) → 34 St-Herald Sq (B,Q) | |
-| 9 | 396 | 0.24% | 0.59% | 1-seat | close | 0m | Church Av (B,Q) → Atlantic Av (B,Q) | |
-| 10 | 396 | 0.24% | 0.59% | 1-seat | close | 0m | Kings Hwy (B) → 47-50 Sts-Rockefeller Ctr (B) | |
-| 11 | 363 | 0.22% | 0.54% | 1-seat | close | 0m | Kings Hwy (B,Q) → Atlantic Av (B,Q) | |
-| 12 | 356 | 0.22% | 0.53% | 1-seat | close | 0m | Church Av (Q) → 14 St-Union Sq (Q) | |
-| 13 | 346 | 0.21% | 0.52% | 1-seat | close | 0m | 36 St (D,N) → 34 St-Herald Sq (D,N) | |
-| 14 | 343 | 0.21% | 0.51% | 1-seat | close | 0m | 59 St (N) → 34 St-Herald Sq (N) | |
-| 15 | 338 | 0.21% | 0.50% | 1-seat | close | 0m | Kings Hwy (Q) → Times Sq-42 St/PABT (Q) | |
-| 16 | 338 | 0.21% | 0.50% | 1-seat | close | 0m | Prospect Park (B,Q) → 34 St-Herald Sq (B,Q) | |
-| 17 | 334 | 0.20% | 0.50% | 1-seat | close | 0m | Prospect Park (Q) → 14 St-Union Sq (Q) | |
-| 18 | 330 | 0.20% | 0.49% | 1-seat | close | 0m | Newkirk Plaza (B,Q) → 34 St-Herald Sq (B,Q) | |
-| 19 | 329 | 0.20% | | xfer | close | 0m | 86 St (R) → Atlantic Av (D,N) | Atlantic Av (D,N,R) |
-| 20 | 328 | 0.20% | 0.49% | 1-seat | close | 0m | 8 Av (N) → Atlantic Av (N) | |
-| 21 | 325 | 0.20% | 0.48% | 1-seat | close | 0m | Church Av (B,Q) → DeKalb Av (B,Q) | |
-| 22 | 321 | 0.20% | 0.48% | 1-seat | close | 0m | Kings Hwy (B) → 42 St-Bryant Pk/5 Av (B) | |
-| 23 | 321 | 0.20% | 0.48% | 1-seat | close | 0m | 7 Av (B,Q) → 34 St-Herald Sq (B,Q) | |
-| 24 | 320 | 0.20% | 0.48% | 1-seat | close | 0m | Parkside Av (Q) → 14 St-Union Sq (Q) | |
-| 25 | 309 | 0.19% | 0.46% | 1-seat | close | 0m | Sheepshead Bay (B,Q) → DeKalb Av (B,Q) | |
+| 1 | 727 | 0.45% | 1.08% | 1-seat | close | 0m | Kings Hwy (B,Q)→34 St-Herald Sq (B,Q) | |
+| 2 | 621 | 0.38% | 0.92% | 1-seat | close | 0m | 36 St (D,N)→Atlantic Av (D,N) | |
+| 3 | 583 | 0.36% | 0.87% | 1-seat | close | 0m | 7 Av (Q)→14 St-Union Sq (Q) | |
+| 4 | 471 | 0.29% | 0.70% | 1-seat | close | 0m | Kings Hwy (B,Q)→DeKalb Av (B,Q) | |
+| 5 | 455 | 0.28% | 0.68% | 1-seat | close | 0m | 8 Av (N)→Canal St (N) | |
+| 6 | 449 | 0.28% | 0.67% | 1-seat | close | 0m | 59 St (N)→Atlantic Av (N) | |
+| 7 | 416 | 0.25% | 0.62% | 1-seat | close | 0m | Church Av (B,Q)→34 St-Herald Sq (B,Q) | |
+| 8 | 403 | 0.25% | 0.60% | 1-seat | close | 0m | Sheepshead Bay (B,Q)→34 St-Herald Sq (B,Q) | |
+| 9 | 396 | 0.24% | 0.59% | 1-seat | close | 0m | Church Av (B,Q)→Atlantic Av (B,Q) | |
+| 10 | 396 | 0.24% | 0.59% | 1-seat | close | 0m | Kings Hwy (B)→47-50 Sts-Rockefeller Ctr (B) | |
+| 11 | 363 | 0.22% | 0.54% | 1-seat | close | 0m | Kings Hwy (B,Q)→Atlantic Av (B,Q) | |
+| 12 | 356 | 0.22% | 0.53% | 1-seat | close | 0m | Church Av (Q)→14 St-Union Sq (Q) | |
+| 13 | 346 | 0.21% | 0.52% | 1-seat | close | 0m | 36 St (D,N)→34 St-Herald Sq (D,N) | |
+| 14 | 343 | 0.21% | 0.51% | 1-seat | close | 0m | 59 St (N)→34 St-Herald Sq (N) | |
+| 15 | 338 | 0.21% | 0.50% | 1-seat | close | 0m | Kings Hwy (Q)→Times Sq-42 St/PABT (Q) | |
+| 16 | 338 | 0.21% | 0.50% | 1-seat | close | 0m | Prospect Park (B,Q)→34 St-Herald Sq (B,Q) | |
+| 17 | 334 | 0.20% | 0.50% | 1-seat | close | 0m | Prospect Park (Q)→14 St-Union Sq (Q) | |
+| 18 | 330 | 0.20% | 0.49% | 1-seat | close | 0m | Newkirk Plaza (B,Q)→34 St-Herald Sq (B,Q) | |
+| 19 | 329 | 0.20% | | xfer | close | 0m | 86 St (R)→Atlantic Av (D,N) | Atlantic Av (D,N,R) |
+| 20 | 328 | 0.20% | 0.49% | 1-seat | close | 0m | 8 Av (N)→Atlantic Av (N) | |
+| 21 | 325 | 0.20% | 0.48% | 1-seat | close | 0m | Church Av (B,Q)→DeKalb Av (B,Q) | |
+| 22 | 321 | 0.20% | 0.48% | 1-seat | close | 0m | Kings Hwy (B)→42 St-Bryant Pk/5 Av (B) | |
+| 23 | 321 | 0.20% | 0.48% | 1-seat | close | 0m | 7 Av (B,Q)→34 St-Herald Sq (B,Q) | |
+| 24 | 320 | 0.20% | 0.48% | 1-seat | close | 0m | Parkside Av (Q)→14 St-Union Sq (Q) | |
+| 25 | 309 | 0.19% | 0.46% | 1-seat | close | 0m | Sheepshead Bay (B,Q)→DeKalb Av (B,Q) | |
 
 ### Top 25 Destination Stations, Summed across All Origins
 
@@ -92,33 +92,33 @@ Deinterlining scenario: 4 Av express served by B,D; Brighton served by N,Q (each
 
 ### Top 25 Origin/Destination Pairs
 
-| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
+| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin→Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 727 | 0.45% | 1.27% | 1-seat | close | 0m | Kings Hwy (N,Q) → 34 St-Herald Sq (N,Q) | |
-| 2 | 621 | 0.38% | 1.09% | 1-seat | close | 0m | 36 St (B,D) → Atlantic Av (B,D) | |
-| 3 | 583 | 0.36% | 1.02% | 1-seat | close | 0m | 7 Av (N,Q) → 14 St-Union Sq (N,Q) | |
-| 4 | 471 | 0.29% | 0.82% | 1-seat | close | 0m | Kings Hwy (Q) → DeKalb Av (Q) | |
-| 5 | 455 | 0.28% | | xfer | far | 518m | 8 Av (B,D) → Canal St (N,Q) | Grand St (B,D) |
-| 6 | 449 | 0.28% | 0.79% | 1-seat | close | 0m | 59 St (B,D) → Atlantic Av (B,D) | |
-| 7 | 416 | 0.25% | 0.73% | 1-seat | close | 0m | Church Av (N,Q) → 34 St-Herald Sq (N,Q) | |
-| 8 | 403 | 0.25% | 0.71% | 1-seat | close | 0m | Sheepshead Bay (N,Q) → 34 St-Herald Sq (N,Q) | |
-| 9 | 396 | 0.24% | 0.69% | 1-seat | close | 0m | Church Av (N,Q) → Atlantic Av (N,Q) | |
-| 10 | 396 | 0.24% | | xfer | close | 274m | Kings Hwy (N,Q) → 47-50 Sts-Rockefeller Ctr (B,D) | 49 St (N,R) |
-| 11 | 363 | 0.22% | 0.63% | 1-seat | close | 0m | Kings Hwy (N,Q) → Atlantic Av (N,Q) | |
-| 12 | 356 | 0.22% | 0.62% | 1-seat | close | 0m | Church Av (N,Q) → 14 St-Union Sq (N,Q) | |
-| 13 | 346 | 0.21% | 0.61% | 1-seat | close | 0m | 36 St (B,D) → 34 St-Herald Sq (B,D) | |
-| 14 | 343 | 0.21% | 0.60% | 1-seat | close | 0m | 59 St (B,D) → 34 St-Herald Sq (B,D) | |
-| 15 | 338 | 0.21% | 0.59% | 1-seat | close | 0m | Kings Hwy (N,Q) → Times Sq-42 St/PABT (N,Q) | |
-| 16 | 338 | 0.21% | 0.59% | 1-seat | close | 0m | Prospect Park (N,Q) → 34 St-Herald Sq (N,Q) | |
-| 17 | 334 | 0.20% | 0.58% | 1-seat | close | 0m | Prospect Park (N,Q) → 14 St-Union Sq (N,Q) | |
-| 18 | 330 | 0.20% | 0.58% | 1-seat | close | 0m | Newkirk Plaza (N,Q) → 34 St-Herald Sq (N,Q) | |
-| 19 | 329 | 0.20% | | xfer | close | 0m | 86 St (R) → Atlantic Av (D,N) | Atlantic Av (D,N,R) |
-| 20 | 328 | 0.20% | 0.57% | 1-seat | close | 0m | 8 Av (B,D) → Atlantic Av (B,D) | |
-| 21 | 325 | 0.20% | 0.57% | 1-seat | close | 0m | Church Av (Q) → DeKalb Av (Q) | |
-| 22 | 321 | 0.20% | | xfer | close | 191m | Kings Hwy (N,Q) → 42 St-Bryant Pk/5 Av (B,D) | Times Sq-42 St (N,Q,R) |
-| 23 | 321 | 0.20% | 0.56% | 1-seat | close | 0m | 7 Av (N,Q) → 34 St-Herald Sq (N,Q) | |
-| 24 | 320 | 0.20% | 0.56% | 1-seat | close | 0m | Parkside Av (N,Q) → 14 St-Union Sq (N,Q) | |
-| 25 | 309 | 0.19% | 0.54% | 1-seat | close | 0m | Sheepshead Bay (Q) → DeKalb Av (Q) | |
+| 1 | 727 | 0.45% | 1.27% | 1-seat | close | 0m | Kings Hwy (N,Q)→34 St-Herald Sq (N,Q) | |
+| 2 | 621 | 0.38% | 1.09% | 1-seat | close | 0m | 36 St (B,D)→Atlantic Av (B,D) | |
+| 3 | 583 | 0.36% | 1.02% | 1-seat | close | 0m | 7 Av (N,Q)→14 St-Union Sq (N,Q) | |
+| 4 | 471 | 0.29% | 0.82% | 1-seat | close | 0m | Kings Hwy (Q)→DeKalb Av (Q) | |
+| 5 | 455 | 0.28% | | xfer | far | 518m | 8 Av (B,D)→Canal St (N,Q) | Grand St (B,D) |
+| 6 | 449 | 0.28% | 0.79% | 1-seat | close | 0m | 59 St (B,D)→Atlantic Av (B,D) | |
+| 7 | 416 | 0.25% | 0.73% | 1-seat | close | 0m | Church Av (N,Q)→34 St-Herald Sq (N,Q) | |
+| 8 | 403 | 0.25% | 0.71% | 1-seat | close | 0m | Sheepshead Bay (N,Q)→34 St-Herald Sq (N,Q) | |
+| 9 | 396 | 0.24% | 0.69% | 1-seat | close | 0m | Church Av (N,Q)→Atlantic Av (N,Q) | |
+| 10 | 396 | 0.24% | | xfer | close | 274m | Kings Hwy (N,Q)→47-50 Sts-Rockefeller Ctr (B,D) | 49 St (N,R) |
+| 11 | 363 | 0.22% | 0.63% | 1-seat | close | 0m | Kings Hwy (N,Q)→Atlantic Av (N,Q) | |
+| 12 | 356 | 0.22% | 0.62% | 1-seat | close | 0m | Church Av (N,Q)→14 St-Union Sq (N,Q) | |
+| 13 | 346 | 0.21% | 0.61% | 1-seat | close | 0m | 36 St (B,D)→34 St-Herald Sq (B,D) | |
+| 14 | 343 | 0.21% | 0.60% | 1-seat | close | 0m | 59 St (B,D)→34 St-Herald Sq (B,D) | |
+| 15 | 338 | 0.21% | 0.59% | 1-seat | close | 0m | Kings Hwy (N,Q)→Times Sq-42 St/PABT (N,Q) | |
+| 16 | 338 | 0.21% | 0.59% | 1-seat | close | 0m | Prospect Park (N,Q)→34 St-Herald Sq (N,Q) | |
+| 17 | 334 | 0.20% | 0.58% | 1-seat | close | 0m | Prospect Park (N,Q)→14 St-Union Sq (N,Q) | |
+| 18 | 330 | 0.20% | 0.58% | 1-seat | close | 0m | Newkirk Plaza (N,Q)→34 St-Herald Sq (N,Q) | |
+| 19 | 329 | 0.20% | | xfer | close | 0m | 86 St (R)→Atlantic Av (D,N) | Atlantic Av (D,N,R) |
+| 20 | 328 | 0.20% | 0.57% | 1-seat | close | 0m | 8 Av (B,D)→Atlantic Av (B,D) | |
+| 21 | 325 | 0.20% | 0.57% | 1-seat | close | 0m | Church Av (Q)→DeKalb Av (Q) | |
+| 22 | 321 | 0.20% | | xfer | close | 191m | Kings Hwy (N,Q)→42 St-Bryant Pk/5 Av (B,D) | Times Sq-42 St (N,Q,R) |
+| 23 | 321 | 0.20% | 0.56% | 1-seat | close | 0m | 7 Av (N,Q)→34 St-Herald Sq (N,Q) | |
+| 24 | 320 | 0.20% | 0.56% | 1-seat | close | 0m | Parkside Av (N,Q)→14 St-Union Sq (N,Q) | |
+| 25 | 309 | 0.19% | 0.54% | 1-seat | close | 0m | Sheepshead Bay (Q)→DeKalb Av (Q) | |
 
 ### Top 25 Destination Stations, Summed across All Origins
 
@@ -162,33 +162,33 @@ Deinterlining scenario: 4 Av express served by N,Q; Brighton served by B,D (each
 
 ### Top 25 Origin/Destination Pairs
 
-| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin → Destination | 1-Seat Destination |
+| # | Riders | % Total | % 1-Seat | Type | Close? | Dist | Origin→Destination | 1-Seat Destination |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 727 | 0.45% | 1.37% | 1-seat | close | 0m | Kings Hwy (B,D) → 34 St-Herald Sq (B,D) | |
-| 2 | 621 | 0.38% | 1.17% | 1-seat | close | 0m | 36 St (N,Q) → Atlantic Av (N,Q) | |
-| 3 | 583 | 0.36% | | xfer | far | 867m | 7 Av (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
-| 4 | 471 | 0.29% | 0.89% | 1-seat | close | 0m | Kings Hwy (B) → DeKalb Av (B) | |
-| 5 | 455 | 0.28% | 0.86% | 1-seat | close | 0m | 8 Av (N,Q) → Canal St (N,Q) | |
-| 6 | 449 | 0.28% | 0.85% | 1-seat | close | 0m | 59 St (N,Q) → Atlantic Av (N,Q) | |
-| 7 | 416 | 0.25% | 0.78% | 1-seat | close | 0m | Church Av (B,D) → 34 St-Herald Sq (B,D) | |
-| 8 | 403 | 0.25% | 0.76% | 1-seat | close | 0m | Sheepshead Bay (B,D) → 34 St-Herald Sq (B,D) | |
-| 9 | 396 | 0.24% | 0.75% | 1-seat | close | 0m | Church Av (B,D) → Atlantic Av (B,D) | |
-| 10 | 396 | 0.24% | 0.75% | 1-seat | close | 0m | Kings Hwy (B,D) → 47-50 Sts-Rockefeller Ctr (B,D) | |
-| 11 | 363 | 0.22% | 0.68% | 1-seat | close | 0m | Kings Hwy (B,D) → Atlantic Av (B,D) | |
-| 12 | 356 | 0.22% | | xfer | far | 867m | Church Av (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
-| 13 | 346 | 0.21% | 0.65% | 1-seat | close | 0m | 36 St (N,Q) → 34 St-Herald Sq (N,Q) | |
-| 14 | 343 | 0.21% | 0.65% | 1-seat | close | 0m | 59 St (N,Q) → 34 St-Herald Sq (N,Q) | |
-| 15 | 338 | 0.21% | | xfer | close | 191m | Kings Hwy (B,D) → Times Sq-42 St/PABT (N,Q) | 42 St-Bryant Pk (B,D) |
-| 16 | 338 | 0.21% | 0.64% | 1-seat | close | 0m | Prospect Park (B,D) → 34 St-Herald Sq (B,D) | |
-| 17 | 334 | 0.20% | | xfer | far | 867m | Prospect Park (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
-| 18 | 330 | 0.20% | 0.62% | 1-seat | close | 0m | Newkirk Plaza (B,D) → 34 St-Herald Sq (B,D) | |
-| 19 | 329 | 0.20% | | xfer | close | 0m | 86 St (R) → Atlantic Av (D,N) | Atlantic Av (D,N,R) |
-| 20 | 328 | 0.20% | 0.62% | 1-seat | close | 0m | 8 Av (N,Q) → Atlantic Av (N,Q) | |
-| 21 | 325 | 0.20% | 0.61% | 1-seat | close | 0m | Church Av (B) → DeKalb Av (B) | |
-| 22 | 321 | 0.20% | 0.61% | 1-seat | close | 0m | Kings Hwy (B,D) → 42 St-Bryant Pk/5 Av (B,D) | |
-| 23 | 321 | 0.20% | 0.61% | 1-seat | close | 0m | 7 Av (B,D) → 34 St-Herald Sq (B,D) | |
-| 24 | 320 | 0.20% | | xfer | far | 867m | Parkside Av (B,D) → 14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
-| 25 | 309 | 0.19% | 0.58% | 1-seat | close | 0m | Sheepshead Bay (B) → DeKalb Av (B) | |
+| 1 | 727 | 0.45% | 1.37% | 1-seat | close | 0m | Kings Hwy (B,D)→34 St-Herald Sq (B,D) | |
+| 2 | 621 | 0.38% | 1.17% | 1-seat | close | 0m | 36 St (N,Q)→Atlantic Av (N,Q) | |
+| 3 | 583 | 0.36% | | xfer | far | 867m | 7 Av (B,D)→14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
+| 4 | 471 | 0.29% | 0.89% | 1-seat | close | 0m | Kings Hwy (B)→DeKalb Av (B) | |
+| 5 | 455 | 0.28% | 0.86% | 1-seat | close | 0m | 8 Av (N,Q)→Canal St (N,Q) | |
+| 6 | 449 | 0.28% | 0.85% | 1-seat | close | 0m | 59 St (N,Q)→Atlantic Av (N,Q) | |
+| 7 | 416 | 0.25% | 0.78% | 1-seat | close | 0m | Church Av (B,D)→34 St-Herald Sq (B,D) | |
+| 8 | 403 | 0.25% | 0.76% | 1-seat | close | 0m | Sheepshead Bay (B,D)→34 St-Herald Sq (B,D) | |
+| 9 | 396 | 0.24% | 0.75% | 1-seat | close | 0m | Church Av (B,D)→Atlantic Av (B,D) | |
+| 10 | 396 | 0.24% | 0.75% | 1-seat | close | 0m | Kings Hwy (B,D)→47-50 Sts-Rockefeller Ctr (B,D) | |
+| 11 | 363 | 0.22% | 0.68% | 1-seat | close | 0m | Kings Hwy (B,D)→Atlantic Av (B,D) | |
+| 12 | 356 | 0.22% | | xfer | far | 867m | Church Av (B,D)→14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
+| 13 | 346 | 0.21% | 0.65% | 1-seat | close | 0m | 36 St (N,Q)→34 St-Herald Sq (N,Q) | |
+| 14 | 343 | 0.21% | 0.65% | 1-seat | close | 0m | 59 St (N,Q)→34 St-Herald Sq (N,Q) | |
+| 15 | 338 | 0.21% | | xfer | close | 191m | Kings Hwy (B,D)→Times Sq-42 St/PABT (N,Q) | 42 St-Bryant Pk (B,D) |
+| 16 | 338 | 0.21% | 0.64% | 1-seat | close | 0m | Prospect Park (B,D)→34 St-Herald Sq (B,D) | |
+| 17 | 334 | 0.20% | | xfer | far | 867m | Prospect Park (B,D)→14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
+| 18 | 330 | 0.20% | 0.62% | 1-seat | close | 0m | Newkirk Plaza (B,D)→34 St-Herald Sq (B,D) | |
+| 19 | 329 | 0.20% | | xfer | close | 0m | 86 St (R)→Atlantic Av (D,N) | Atlantic Av (D,N,R) |
+| 20 | 328 | 0.20% | 0.62% | 1-seat | close | 0m | 8 Av (N,Q)→Atlantic Av (N,Q) | |
+| 21 | 325 | 0.20% | 0.61% | 1-seat | close | 0m | Church Av (B)→DeKalb Av (B) | |
+| 22 | 321 | 0.20% | 0.61% | 1-seat | close | 0m | Kings Hwy (B,D)→42 St-Bryant Pk/5 Av (B,D) | |
+| 23 | 321 | 0.20% | 0.61% | 1-seat | close | 0m | 7 Av (B,D)→34 St-Herald Sq (B,D) | |
+| 24 | 320 | 0.20% | | xfer | far | 867m | Parkside Av (B,D)→14 St-Union Sq (N,Q) | W 4 St-Wash Sq (B,D) |
+| 25 | 309 | 0.19% | 0.58% | 1-seat | close | 0m | Sheepshead Bay (B)→DeKalb Av (B) | |
 
 ### Top 25 Destination Stations, Summed across All Origins
 
