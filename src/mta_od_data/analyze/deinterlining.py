@@ -109,6 +109,14 @@ class TripEnd:
         left a reader to look up what the scenario does to that station,
         which is the one thing the row is for.
 
+        The routes it loses, not all the routes it had:
+        `8 Av (N → B)` is the whole of what the scenario does there, and
+        `B,Q → N,Q` spent its left-hand side restating a `Q` that stayed
+        put, which the right-hand side says anyway.
+        Everything it has after, though, since that is what a rider
+        boards. Where it loses nothing -- a station gaining a route --
+        there is nothing to factor out and the left is what it had.
+
         Usually only the routes differ.
         A route move can take the narrowed platform name with it,
         though, and then there is no shared name to factor out
@@ -117,7 +125,9 @@ class TripEnd:
         if (self.station, self.routes) == (other.station, other.routes):
             return self.name
         if self.station == other.station:
-            return f"{self.station} ({self.routes} → {other.routes})"
+            kept = other.routes.split(",")
+            lost = ",".join(r for r in self.routes.split(",") if r not in kept)
+            return f"{self.station} ({lost or self.routes} → {other.routes})"
         return f"{self.name} → {other.name}"
 
 
