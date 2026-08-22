@@ -36,10 +36,10 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 
 ### Top 25 Origin/Destination Pairs
 
-Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
-
 <details>
 <summary>Show 25 rows</summary>
+
+Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
 | # | Riders | % Total | Type | Close? | Dist | Walk | Origin ↔ Destination |
 | ---: | ---: | ---: | --- | --- | ---: | --- | --- |
@@ -73,10 +73,10 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 
 ### Top 25 Origin Stations, Summed across All Destinations
 
-Both ends on the comparison's routes, per that section of the comparison above.
-
 <details>
 <summary>Show 25 rows</summary>
+
+Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Origin |
 | ---: | ---: | ---: | --- |
@@ -110,10 +110,10 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 ### Top 25 Destination Stations, Summed across All Origins
 
-Both ends on the comparison's routes, per that section of the comparison above.
-
 <details>
 <summary>Show 25 rows</summary>
+
+Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Destination |
 | ---: | ---: | ---: | --- |
@@ -229,10 +229,10 @@ The same changed pairs as above, added up at the stations they run between: the 
 
 ### Top 25 Origin/Destination Pairs
 
-Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
-
 <details>
 <summary>Show 25 rows</summary>
+
+Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
 | # | Riders | % Total | Type | Close? | Dist | Walk | Origin ↔ Destination |
 | ---: | ---: | ---: | --- | --- | ---: | --- | --- |
@@ -266,10 +266,10 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 
 ### Top 25 Origin Stations, Summed across All Destinations
 
-Both ends on the comparison's routes, per that section of the comparison above.
-
 <details>
 <summary>Show 25 rows</summary>
+
+Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Origin |
 | ---: | ---: | ---: | --- |
@@ -303,10 +303,10 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 ### Top 25 Destination Stations, Summed across All Origins
 
-Both ends on the comparison's routes, per that section of the comparison above.
-
 <details>
 <summary>Show 25 rows</summary>
+
+Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Destination |
 | ---: | ---: | ---: | --- |
@@ -422,10 +422,10 @@ The same changed pairs as above, added up at the stations they run between: the 
 
 ### Top 25 Origin/Destination Pairs
 
-Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
-
 <details>
 <summary>Show 25 rows</summary>
+
+Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
 
 | # | Riders | % Total | Type | Close? | Dist | Walk | Origin ↔ Destination |
 | ---: | ---: | ---: | --- | --- | ---: | --- | --- |
@@ -459,10 +459,10 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 
 ### Top 25 Origin Stations, Summed across All Destinations
 
-Both ends on the comparison's routes, per that section of the comparison above.
-
 <details>
 <summary>Show 25 rows</summary>
+
+Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Origin |
 | ---: | ---: | ---: | --- |
@@ -496,10 +496,10 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 ### Top 25 Destination Stations, Summed across All Origins
 
-Both ends on the comparison's routes, per that section of the comparison above.
-
 <details>
 <summary>Show 25 rows</summary>
+
+Both ends on the comparison's routes, per that section of the comparison above.
 
 | Riders | 1-Seat % | Effective % | Destination |
 | ---: | ---: | ---: | --- |

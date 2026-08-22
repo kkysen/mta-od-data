@@ -800,9 +800,8 @@ class ScenarioResult:
                 )
             )
 
-        lines += [
-            f"{h2} Top {top_n} Origin/Destination Pairs",
-            "",
+        lines += [f"{h2} Top {top_n} Origin/Destination Pairs", ""]
+        pairs: list[str] = [
             "Both ends on the comparison's routes, per that section of the "
             "comparison above. Each row is both directions of one station "
             "pair, their riders summed, oriented so the arrow points the "
@@ -810,8 +809,6 @@ class ScenarioResult:
             "symmetric, so one value covers both directions; `Walk` names the "
             "station the shorter walk reaches, and the end it is at.",
             "",
-        ]
-        pairs: list[str] = [
             "| # | Riders | % Total | Type | Close? | Dist | Walk | "
             "Origin ↔ Destination |",
             table_rule("rrrllrll"),
@@ -836,9 +833,10 @@ class ScenarioResult:
                 )
             )
         pairs.append("")
-        # The rows themselves fold away, being the detail behind the
-        # sections above rather than something a reader passes through
-        # on the way down. The heading and what it means stay put.
+        # Folded away, being the detail behind the sections above rather
+        # than something a reader passes through on the way down.
+        # The heading stays out, so that the report's outline still says
+        # what is here; everything under it is what unfolds.
         lines += collapsed(f"Show {top_n} rows", pairs)
 
         # Origins and destinations both, and not one table standing in for
@@ -854,11 +852,11 @@ class ScenarioResult:
                 f"{h2} Top {top_n} {label.capitalize()} Stations, "
                 f"Summed across All {end.capitalize()}",
                 "",
+            ]
+            section = [
                 "Both ends on the comparison's routes, per that section of "
                 "the comparison above.",
                 "",
-            ]
-            section = [
                 f"| Riders | 1-Seat % | Effective % | {label.capitalize()} |",
                 table_rule("rrrl"),
             ]
