@@ -34,10 +34,12 @@ The wider 2,332,194 riders with *either* end served by B,D,N,Q,R, the above amon
 
 ## Current
 
-<details>
-<summary>Top 25 Origin/Destination Pairs</summary>
+### Top 25 Origin/Destination Pairs
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
+
+<details>
+<summary>Show 25 rows</summary>
 
 | # | Riders | % Total | Type | Close? | Dist | Walk | Origin ↔ Destination |
 | ---: | ---: | ---: | --- | --- | ---: | --- | --- |
@@ -69,10 +71,12 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 
 </details>
 
-<details>
-<summary>Top 25 Origin Stations, Summed across All Destinations</summary>
+### Top 25 Origin Stations, Summed across All Destinations
 
 Both ends on the comparison's routes, per that section of the comparison above.
+
+<details>
+<summary>Show 25 rows</summary>
 
 | Riders | 1-Seat % | Effective % | Origin |
 | ---: | ---: | ---: | --- |
@@ -104,10 +108,12 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 </details>
 
-<details>
-<summary>Top 25 Destination Stations, Summed across All Origins</summary>
+### Top 25 Destination Stations, Summed across All Origins
 
 Both ends on the comparison's routes, per that section of the comparison above.
+
+<details>
+<summary>Show 25 rows</summary>
 
 | Riders | 1-Seat % | Effective % | Destination |
 | ---: | ---: | ---: | --- |
@@ -221,10 +227,12 @@ The same changed pairs as above, added up at the stations they run between: the 
 | 24 | 1,021 | -290 | 233 | 497 | 64 | 10 | 210 | 7 | Avenue U (N→B) |
 | 25 | 438 | -236 | | 337 | | | 101 | | Queensboro Plaza (N) |
 
-<details>
-<summary>Top 25 Origin/Destination Pairs</summary>
+### Top 25 Origin/Destination Pairs
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
+
+<details>
+<summary>Show 25 rows</summary>
 
 | # | Riders | % Total | Type | Close? | Dist | Walk | Origin ↔ Destination |
 | ---: | ---: | ---: | --- | --- | ---: | --- | --- |
@@ -256,10 +264,12 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 
 </details>
 
-<details>
-<summary>Top 25 Origin Stations, Summed across All Destinations</summary>
+### Top 25 Origin Stations, Summed across All Destinations
 
 Both ends on the comparison's routes, per that section of the comparison above.
+
+<details>
+<summary>Show 25 rows</summary>
 
 | Riders | 1-Seat % | Effective % | Origin |
 | ---: | ---: | ---: | --- |
@@ -291,10 +301,12 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 </details>
 
-<details>
-<summary>Top 25 Destination Stations, Summed across All Origins</summary>
+### Top 25 Destination Stations, Summed across All Origins
 
 Both ends on the comparison's routes, per that section of the comparison above.
+
+<details>
+<summary>Show 25 rows</summary>
 
 | Riders | 1-Seat % | Effective % | Destination |
 | ---: | ---: | ---: | --- |
@@ -408,10 +420,12 @@ The same changed pairs as above, added up at the stations they run between: the 
 | 24 | 1,768 | -811 | 228 | 1,094 | 107 | 28 | 275 | 36 | 71 St (D→Q) |
 | 25 | 1,595 | -756 | | 1,176 | | | 420 | | 59 St-Columbus Circle (B,D) |
 
-<details>
-<summary>Top 25 Origin/Destination Pairs</summary>
+### Top 25 Origin/Destination Pairs
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
+
+<details>
+<summary>Show 25 rows</summary>
 
 | # | Riders | % Total | Type | Close? | Dist | Walk | Origin ↔ Destination |
 | ---: | ---: | ---: | --- | --- | ---: | --- | --- |
@@ -443,10 +457,12 @@ Both ends on the comparison's routes, per that section of the comparison above. 
 
 </details>
 
-<details>
-<summary>Top 25 Origin Stations, Summed across All Destinations</summary>
+### Top 25 Origin Stations, Summed across All Destinations
 
 Both ends on the comparison's routes, per that section of the comparison above.
+
+<details>
+<summary>Show 25 rows</summary>
 
 | Riders | 1-Seat % | Effective % | Origin |
 | ---: | ---: | ---: | --- |
@@ -478,10 +494,12 @@ Both ends on the comparison's routes, per that section of the comparison above.
 
 </details>
 
-<details>
-<summary>Top 25 Destination Stations, Summed across All Origins</summary>
+### Top 25 Destination Stations, Summed across All Origins
 
 Both ends on the comparison's routes, per that section of the comparison above.
+
+<details>
+<summary>Show 25 rows</summary>
 
 | Riders | 1-Seat % | Effective % | Destination |
 | ---: | ---: | ---: | --- |
