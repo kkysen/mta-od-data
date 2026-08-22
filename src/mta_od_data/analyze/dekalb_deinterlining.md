@@ -180,6 +180,38 @@ The top 25 station pairs by riders whose outcome moved, both directions combined
 | 24 | 314 | direct | far | 872m | origin: 59 St (B,R) | 8 Av (N→B) ↔ 14 St-Union Sq (N,Q,R) |
 | 25 | 312 | direct | close | 274m | dest: 49 St (N,R) | Church Av (B→N,Q) ↔ 47-50 Sts-Rockefeller Ctr (B,D) |
 
+### Biggest Changes by Station, against Current
+
+The same changed pairs as above, added up at the stations they run between: the top 25 by riders whose outcome moved with an end there. A pair is a change at both of its ends and counts at each, so these run to twice the riders the matrix counts. `Net` is riders gaining an effective one-seat ride here less those losing one.
+
+| # | Riders | Net | direct→close | direct→far | close→direct | close→far | far→direct | far→close | Station |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 1 | 4,310 | -574 | | 2,442 | | | 1,868 | | Grand St (B,D) |
+| 2 | 4,285 | 0 | 3,734 | | 551 | | | | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 3 | 4,057 | -1,943 | 1,581 | 2,093 | 185 | 24 | 174 | | Kings Hwy (B→N,Q) |
+| 4 | 4,042 | -1,570 | 1,957 | 1,828 | | | 257 | | DeKalb Av (B→N,Q,R) |
+| 5 | 3,559 | -3,559 | | 3,559 | | | | | Canal St (N,Q,R) |
+| 6 | 3,357 | -579 | 704 | 1,529 | 150 | 13 | 919 | 43 | 8 Av (N→B) |
+| 7 | 3,220 | 0 | 2,826 | | 394 | | | | 42 St-Bryant Pk (B,D) |
+| 8 | 2,763 | -1,278 | 1,149 | 1,367 | 130 | 14 | 103 | | Sheepshead Bay (B→N,Q) |
+| 9 | 2,732 | -1,502 | 534 | 1,790 | 119 | | 289 | | Broadway-Lafayette St (B,D) |
+| 10 | 2,517 | -1,186 | 922 | 1,286 | 149 | 31 | 130 | | 7 Av (B→N,Q) |
+| 11 | 2,415 | -1,420 | | 1,917 | | | 497 | | W 4 St-Wash Sq (B,D) |
+| 12 | 2,299 | -1,287 | 602 | 1,375 | 171 | 32 | 120 | | Church Av (B→N,Q) |
+| 13 | 2,222 | -557 | 539 | 1,055 | 106 | 11 | 483 | 27 | Fort Hamilton Pkwy (N→B) |
+| 14 | 2,154 | -639 | 524 | 1,045 | 139 | 20 | 403 | 23 | Bay Pkwy (N→B) |
+| 15 | 1,983 | -1,316 | | 1,649 | | | 334 | | 59 St-Columbus Circle (B,D) |
+| 16 | 1,957 | -1,015 | 603 | 1,104 | 127 | 16 | 105 | | Newkirk Plaza (B→N,Q) |
+| 17 | 1,905 | 0 | 1,905 | | | | | | Times Sq-42 St (N,Q,R) |
+| 18 | 1,866 | -1,028 | 503 | 1,098 | 137 | 29 | 99 | | Prospect Park (B→N,Q) |
+| 19 | 1,724 | -486 | 431 | 814 | 120 | 15 | 331 | 13 | Kings Hwy (N→B) |
+| 20 | 1,692 | -1,692 | | 1,692 | | | | | 14 St-Union Sq (N,Q,R) |
+| 21 | 1,631 | -799 | 552 | 883 | 82 | 15 | 99 | | Brighton Beach (B→N,Q) |
+| 22 | 1,379 | 0 | 899 | | 480 | | | | 49 St (N,R) |
+| 23 | 1,378 | +629 | | 192 | 365 | | 821 | | 59 St (N→B,R) |
+| 24 | 1,373 | -328 | 313 | 633 | 92 | 14 | 308 | 12 | 18 Av (N→B) |
+| 25 | 1,270 | -348 | 291 | 616 | 74 | 10 | 264 | 15 | 20 Av (N→B) |
+
 ### Top 25 Origin/Destination Pairs
 
 Both ends on the comparison's routes, per that section of the comparison above. Each row is both directions of one station pair, their riders summed, oriented so the arrow points the way more of them travel. Every column but the riders is symmetric, so one value covers both directions; `Walk` names the station the shorter walk reaches, and the end it is at.
@@ -325,6 +357,38 @@ The top 25 station pairs by riders whose outcome moved, both directions combined
 | 23 | 418 | direct | far | 918m | dest: W 4 St-Wash Sq (B,D) | Cortelyou Rd (Q→D) ↔ 14 St-Union Sq (N,Q,R) |
 | 24 | 391 | direct | close | 191m | dest: 42 St-Bryant Pk (B,D) | Newkirk Plaza (Q→B,D) ↔ Times Sq-42 St (N,Q,R) |
 | 25 | 389 | direct | far | 565m | origin: Canal St (N,Q,R) | Grand St (B,D) ↔ 20 Av (D→Q) |
+
+### Biggest Changes by Station, against Current
+
+The same changed pairs as above, added up at the stations they run between: the top 25 by riders whose outcome moved with an end there. A pair is a change at both of its ends and counts at each, so these run to twice the riders the matrix counts. `Net` is riders gaining an effective one-seat ride here less those losing one.
+
+| # | Riders | Net | direct→close | direct→far | close→direct | close→far | far→direct | far→close | Station |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 1 | 7,542 | -5,773 | | 6,658 | | | 885 | | 14 St-Union Sq (N,Q,R) |
+| 2 | 6,552 | 0 | 5,638 | | 914 | | | | Times Sq-42 St (N,Q,R) |
+| 3 | 5,446 | -3,860 | | 4,653 | | | 793 | | Grand St (B,D) |
+| 4 | 5,206 | -3,389 | | 4,297 | | | 908 | | Canal St (N,Q,R) |
+| 5 | 3,590 | -2,503 | | 3,046 | | | 543 | | 72 St (Q) |
+| 6 | 3,202 | -843 | 369 | 1,838 | | | 995 | | 47-50 Sts-Rockefeller Ctr (B,D) |
+| 7 | 2,999 | -2,062 | 912 | 1,970 | | 104 | 12 | | Kings Hwy (Q→B,D) |
+| 8 | 2,944 | -2,154 | 783 | 2,085 | | 72 | 4 | | 7 Av (Q→B,D) |
+| 9 | 2,914 | -816 | 679 | 1,417 | 102 | 58 | 566 | 92 | Parkside Av (Q→D) |
+| 10 | 2,882 | 0 | 2,259 | | 623 | | | | 42 St-Bryant Pk (B,D) |
+| 11 | 2,758 | 0 | 2,636 | | 122 | | | | 57 St-7 Av (N,Q,R) |
+| 12 | 2,691 | -1,839 | 842 | 1,769 | | 75 | 5 | | Church Av (Q→B,D) |
+| 13 | 2,572 | -1,108 | 914 | 1,369 | 29 | | 261 | | 36 St (D→N,Q,R) |
+| 14 | 2,546 | -253 | 507 | 1,044 | 141 | 32 | 757 | 66 | Avenue U (Q→D) |
+| 15 | 2,516 | -1,038 | 387 | 1,484 | 140 | 30 | 420 | 55 | Bay Pkwy (D→Q) |
+| 16 | 2,323 | -1,583 | 727 | 1,524 | | 66 | 6 | | Prospect Park (Q→B,D) |
+| 17 | 2,197 | -913 | 317 | 1,311 | 124 | 24 | 384 | 37 | 18 Av (D→Q) |
+| 18 | 2,192 | -925 | 345 | 1,307 | 111 | 24 | 364 | 42 | 79 St (D→Q) |
+| 19 | 2,176 | -548 | 514 | 1,028 | 70 | 42 | 455 | 67 | Cortelyou Rd (Q→D) |
+| 20 | 2,052 | -831 | 253 | 1,210 | 142 | 34 | 372 | 41 | 9 Av (D→Q) |
+| 21 | 2,007 | -1,302 | | 1,655 | | | 352 | | 86 St (Q) |
+| 22 | 1,962 | -848 | | 1,405 | | | 557 | | W 4 St-Wash Sq (B,D) |
+| 23 | 1,900 | -578 | 284 | 1,097 | | | 519 | | Broadway-Lafayette St (B,D) |
+| 24 | 1,841 | -1,220 | 164 | 1,427 | 43 | | 207 | | Lexington Av/63 St (Q) |
+| 25 | 1,825 | -1,261 | 557 | 1,208 | | 56 | 4 | | Newkirk Plaza (Q→B,D) |
 
 ### Top 25 Origin/Destination Pairs
 
