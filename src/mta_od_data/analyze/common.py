@@ -5,6 +5,7 @@ from dataclasses import dataclass, fields
 from enum import StrEnum
 from functools import cache
 from math import asin, cos, radians, sin, sqrt
+from operator import attrgetter
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, Protocol, Self
 
@@ -272,20 +273,18 @@ def station_name(
 class ComplexStations:
     """The `Station`s in each complex, for `display`."""
 
-    by_complex: dict[int, tuple[Station, ...]]
+    by_complex: dict[Complex, tuple[Station, ...]]
 
     @classmethod
     def build(cls, individual_stations: list[Station]) -> Self:
-        by_complex: defaultdict[int, list[Station]] = defaultdict(list)
+        by_complex: defaultdict[Complex, list[Station]] = defaultdict(list)
         for station in individual_stations:
-            by_complex[station.complex_id].append(station)
-        return cls(
-            by_complex={cid: tuple(v) for cid, v in by_complex.items()},
-        )
+            by_complex[station.complex].append(station)
+        return cls(by_complex={c: tuple(v) for c, v in by_complex.items()})
 
     def name(self, complex_station: Complex, routes: frozenset[str]) -> str:
         return station_name(
-            self.by_complex.get(complex_station.complex_id, ()),
+            self.by_complex.get(complex_station, ()),
             complex_station.name,
             routes,
         )
@@ -325,7 +324,7 @@ class WalkPoints:
     not the key.
     """
 
-    by_complex: dict[int, tuple[Station, ...]]
+    by_complex: dict[Complex, tuple[Station, ...]]
 
     def __post_init__(self) -> None:
         # Each table remembers its own distances, shadowing the method
@@ -350,22 +349,25 @@ class WalkPoints:
     def build(
         cls, individual_stations: list[Station], complexes_by_id: dict[int, Complex]
     ) -> WalkPoints:
-        by_complex: defaultdict[int, list[Station]] = defaultdict(list)
+        by_complex: defaultdict[Complex, list[Station]] = defaultdict(list)
         for station in individual_stations:
-            by_complex[station.complex_id].append(station)
+            by_complex[station.complex].append(station)
         # Every one of the 445 real complexes has stations of its own,
         # and a walk is only ever measured between stations, so a
         # complex without any is a station file this can't answer for.
         # It used to fall back to the complex's centroid, silently
         # measuring to a point no rider stands at.
-        without = sorted(set(complexes_by_id) - set(by_complex))
+        without = sorted(
+            set(complexes_by_id.values()) - set(by_complex),
+            key=attrgetter("complex_id"),
+        )
         if without:
             raise ValueError(
                 f"{len(without)} complexes have no stations of their own "
-                f"({without[:5]}...): a walk is measured between stations, "
-                "so there is nowhere to measure from"
+                f"({[c.name for c in without[:5]]}...): a walk is measured "
+                "between stations, so there is nowhere to measure from"
             )
-        return cls(by_complex={cid: tuple(v) for cid, v in by_complex.items()})
+        return cls(by_complex={c: tuple(v) for c, v in by_complex.items()})
 
 
 class DayFilterError(Exception):

@@ -255,7 +255,7 @@ class StationIndex:
         """
         return frozenset(
             route
-            for station in self.stations.by_complex.get(complex_station.complex_id, ())
+            for station in self.stations.by_complex.get(complex_station, ())
             if station.line == line
             for route in station.routes
         )
@@ -354,7 +354,7 @@ class Scenario:
         station_routes: dict[Station, Routes] = {}
         for complex_station in {c for c, _line in overrides}:
             union: Routes = frozenset()
-            for station in stations.by_complex.get(complex_station.complex_id, ()):
+            for station in stations.by_complex.get(complex_station, ()):
                 delta = overrides.get((complex_station, station.line))
                 at = (delta.apply(station) if delta else station.routes) & routes
                 station_routes[station] = at

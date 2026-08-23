@@ -341,7 +341,7 @@ class ScenarioWalks:
         ]
 
     @cache  # noqa: B019  (see `corridor_stations`)
-    def corridor_points(self, complex_id: int) -> tuple[Station, ...]:
+    def corridor_points(self, complex_station: Complex) -> tuple[Station, ...]:
         """Where a rider of this comparison stands at this complex.
 
         Its stations that serve one of the comparison's routes, not all
@@ -355,7 +355,7 @@ class ScenarioWalks:
         end put in scope: there is no corridor station to stand on, so
         the complex is all that is known about where they are.
         """
-        stations = self.walks.points().by_complex[complex_id]
+        stations = self.walks.points().by_complex[complex_station]
         on_corridor = tuple(
             station for station in stations if self.scenario.routes_at(station)
         )
@@ -363,7 +363,7 @@ class ScenarioWalks:
 
     @cache  # noqa: B019  (see `corridor_stations`)
     def min_dist_to_route(
-        self, complex_id: int, route: str
+        self, complex_station: Complex, route: str
     ) -> tuple[float, Station] | None:
         """The nearest station this route stops at, and how far.
 
@@ -382,7 +382,7 @@ class ScenarioWalks:
         return min(
             (
                 (distance(here, station), station)
-                for here in self.corridor_points(complex_id)
+                for here in self.corridor_points(complex_station)
                 for station in candidates
             ),
             key=itemgetter(0),
@@ -390,7 +390,7 @@ class ScenarioWalks:
 
     @cache  # noqa: B019  (see `corridor_stations`)
     def min_dist_to_corridor(
-        self, complex_id: int, corridor_routes: Routes
+        self, complex_station: Complex, corridor_routes: Routes
     ) -> tuple[float, Station] | None:
         """The nearest station a rider could board this corridor at.
 
@@ -410,7 +410,7 @@ class ScenarioWalks:
         measured = [
             nearest
             for route in sorted(corridor_routes)
-            if (nearest := self.min_dist_to_route(complex_id, route)) is not None
+            if (nearest := self.min_dist_to_route(complex_station, route)) is not None
         ]
         return min(measured, key=itemgetter(0)) if measured else None
 
@@ -437,8 +437,8 @@ class ScenarioWalks:
         so they must classify alike.
         """
         options = [
-            (self.min_dist_to_corridor(dest.complex_id, origin_routes), False),
-            (self.min_dist_to_corridor(origin.complex_id, dest_routes), True),
+            (self.min_dist_to_corridor(dest, origin_routes), False),
+            (self.min_dist_to_corridor(origin, dest_routes), True),
         ]
         measured = [
             (*best, at_origin) for best, at_origin in options if best is not None

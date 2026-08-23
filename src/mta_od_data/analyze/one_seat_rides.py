@@ -1242,7 +1242,7 @@ def one_seat_rides(
             # but not a gap in `stations_individual.csv` itself.
             assert candidates, "no individual station serves this route set"
             best: tuple[float, Station] | None = None
-            for here in walk_points.by_complex[dest.complex_id]:
+            for here in walk_points.by_complex[dest]:
                 for c in candidates:
                     dist_m = walk_points.distance(here, c)
                     if best is None or dist_m < best[0]:
