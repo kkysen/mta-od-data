@@ -79,7 +79,8 @@
             ]
           },
           "title": "Add",
-          "type": "array"
+          "type": "array",
+          "uniqueItems": true
         },
         "remove": {
           "items": {
@@ -112,7 +113,8 @@
             ]
           },
           "title": "Remove",
-          "type": "array"
+          "type": "array",
+          "uniqueItems": true
         },
         "stations": {
           "items": {
@@ -499,7 +501,8 @@
           },
           "minItems": 1,
           "title": "Stations",
-          "type": "array"
+          "type": "array",
+          "uniqueItems": true
         }
       },
       "required": [
@@ -562,7 +565,8 @@
           },
           "minItems": 1,
           "title": "Routes",
-          "type": "array"
+          "type": "array",
+          "uniqueItems": true
         },
         "overrides": {
           "items": {
