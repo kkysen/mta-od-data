@@ -13,6 +13,7 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
+    Complex,
     DayCoverage,
     DayFilterError,
     DayType,
@@ -165,7 +166,7 @@ class ScenarioResult:
 
     def print_details(
         self,
-        stations_by_id: dict[int, Station],
+        stations_by_id: dict[int, Complex],
         origin_ids: list[int],
     ) -> None:
         print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
@@ -430,13 +431,13 @@ def run_scenario(
     label: str,
     scoped: list[tuple[int, int, float]],
     total_riders: float,
-    stations_by_id: dict[int, Station],
+    stations_by_id: dict[int, Complex],
     origin_ids: list[int],
     routes_set: frozenset[str],
     primary_routes_set: frozenset[str],
     make_min_dist_to_corridor: Callable[
         [dict[int, frozenset[str]]],
-        Callable[[Station, frozenset[str]], tuple[float, Station]],
+        Callable[[Complex, frozenset[str]], tuple[float, Station]],
     ],
     origin_express_partners: dict[int, frozenset[str]],
     close_threshold_m: float,
@@ -1067,7 +1068,7 @@ def one_seat_rides(
             )
             raise SystemExit(1)
 
-    stations_by_id = Station.load_complexes(stations)
+    stations_by_id = Complex.load_all(stations)
     boundary_lat = stations_by_id[boundary_complex_id].loc.lat
     boundary_station = stations_by_id[boundary_complex_id]
     boundary_name = boundary_station.display(boundary_station.routes & routes_set)
@@ -1207,7 +1208,7 @@ def one_seat_rides(
     # (`WalkPoints` has the same property by holding its own cache.)
     def make_min_dist_to_corridor(
         effective_origin_routes: dict[int, frozenset[str]],
-    ) -> Callable[[Station, frozenset[str]], tuple[float, Station]]:
+    ) -> Callable[[Complex, frozenset[str]], tuple[float, Station]]:
         # Keyed by route set rather than by corridor,
         # since "close" is about walking to whichever trunk a corridor
         # got assigned, and assignments repeat across scenarios.
@@ -1235,7 +1236,7 @@ def one_seat_rides(
         # take 2.19M haversine calls down to ~39K distinct point pairs.
         @cache
         def min_dist_to_corridor(
-            dest: Station, assigned_routes: frozenset[str]
+            dest: Complex, assigned_routes: frozenset[str]
         ) -> tuple[float, Station]:
             candidates = assigned_points(assigned_routes)
             # The checks above rule out an empty route set,

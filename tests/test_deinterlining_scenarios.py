@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 
 from mta_od_data import DATA, ROOT
-from mta_od_data.analyze.common import Coord, Station
+from mta_od_data.analyze.common import Complex, Coord, Station
 from mta_od_data.analyze.deinterlining import NO_WALK, Outcome, Walks, resolve_scenarios
 from mta_od_data.analyze.scenarios import (
     SCENARIOS_FILE,
@@ -35,8 +35,8 @@ pytestmark = pytest.mark.skipif(
 
 
 @pytest.fixture(scope="module")
-def stations_by_id() -> dict[int, Station]:
-    return Station.load_complexes(STATIONS)
+def stations_by_id() -> dict[int, Complex]:
+    return Complex.load_all(STATIONS)
 
 
 @pytest.fixture(scope="module")
@@ -46,7 +46,7 @@ def individual_stations() -> list[Station]:
 
 @pytest.fixture(scope="module")
 def station_index(
-    stations_by_id: dict[int, Station], individual_stations: list[Station]
+    stations_by_id: dict[int, Complex], individual_stations: list[Station]
 ) -> StationIndex:
     return StationIndex.build(stations_by_id, individual_stations)
 
@@ -280,6 +280,16 @@ def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> 
     quietly applying to the wrong complex.
     """
 
+    def complex_station(complex_id: int) -> Complex:
+        return Complex(
+            complex_id=complex_id,
+            name="72 St",
+            routes=frozenset({"B"}),
+            loc=Coord(lat=0.0, lon=0.0),
+            borough="M",
+            cbd=False,
+        )
+
     def platform(complex_id: int) -> Station:
         return Station(
             complex_id=complex_id,
@@ -292,7 +302,9 @@ def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> 
         )
 
     platforms = [platform(1), platform(2)]
-    index = StationIndex.build({p.complex_id: p for p in platforms}, platforms)
+    index = StationIndex.build(
+        {p.complex_id: complex_station(p.complex_id) for p in platforms}, platforms
+    )
     with pytest.raises(ScenarioError, match="names 2 station complexes"):
         index.resolve("72 St", "Central Park West", path=tmp_path / "scenarios.json5")
 
@@ -391,7 +403,7 @@ STRANDING_SCENARIOS = {
 def test_a_stranded_pair_is_far_not_a_crash(
     tmp_path: Path,
     station_index: StationIndex,
-    stations_by_id: dict[int, Station],
+    stations_by_id: dict[int, Complex],
     individual_stations: list[Station],
 ) -> None:
     """A trip between two stations the scenario leaves with no route in
