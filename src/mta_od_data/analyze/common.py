@@ -319,18 +319,18 @@ class WalkPoints:
 
     @classmethod
     def build(
-        cls, individual_stations: list[Station], stations_by_id: dict[int, Complex]
+        cls, individual_stations: list[Station], complexes_by_id: dict[int, Complex]
     ) -> WalkPoints:
         locations = [station.loc for station in individual_stations]
         by_complex: defaultdict[int, list[WalkPointId]] = defaultdict(list)
         for point_id, station in enumerate(individual_stations):
             by_complex[station.complex_id].append(point_id)
-        for complex_id, station in stations_by_id.items():
+        for complex_id, complex_station in complexes_by_id.items():
             if complex_id not in by_complex:
                 # No station rows of its own, so its centroid stands in,
                 # and takes an id past the last station's.
                 by_complex[complex_id] = [len(locations)]
-                locations.append(station.loc)
+                locations.append(complex_station.loc)
         return cls(
             locations=locations,
             by_complex={cid: tuple(ids) for cid, ids in by_complex.items()},

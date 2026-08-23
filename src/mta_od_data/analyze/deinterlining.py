@@ -246,7 +246,7 @@ class Walks:
     possible.
     """
 
-    stations_by_id: dict[int, Complex]
+    complexes_by_id: dict[int, Complex]
     individual_stations: list[Station]
     stations: ComplexStations
     close_threshold_m: float
@@ -258,7 +258,7 @@ class Walks:
     # station is doesn't depend on which routes stop there.
     @cache  # noqa: B019  (see `ScenarioWalks.corridor_stations`)
     def points(self) -> WalkPoints:
-        return WalkPoints.build(self.individual_stations, self.stations_by_id)
+        return WalkPoints.build(self.individual_stations, self.complexes_by_id)
 
 
 @dataclass(slots=True, frozen=True, eq=False)
@@ -291,7 +291,7 @@ class ScenarioWalks:
         """
         return {
             complex_id: self.scenario.routes_of(complex_station)
-            for complex_id, complex_station in self.walks.stations_by_id.items()
+            for complex_id, complex_station in self.walks.complexes_by_id.items()
         }
 
     @cache  # noqa: B019  (see `corridor_stations`)
@@ -314,7 +314,7 @@ class ScenarioWalks:
                 routes=",".join(sorted(routes)),
             )
             for complex_id, routes in self.routes_by_complex().items()
-            if (complex_station := self.walks.stations_by_id[complex_id]) is not None
+            if (complex_station := self.walks.complexes_by_id[complex_id]) is not None
         }
 
     # B019: `cache` on a method stores its entries on the *function*,
@@ -486,8 +486,8 @@ class ScenarioWalks:
         routes_by_complex = self.routes_by_complex()
         ends_by_complex = self.ends_by_complex()
         for origin_id, dest_id, riders in pairs:
-            origin = self.walks.stations_by_id.get(origin_id)
-            dest = self.walks.stations_by_id.get(dest_id)
+            origin = self.walks.complexes_by_id.get(origin_id)
+            dest = self.walks.complexes_by_id.get(dest_id)
             if origin is None or dest is None:
                 missing_id = origin_id if origin is None else dest_id
                 raise ScenarioError(
@@ -1558,9 +1558,9 @@ def deinterlining(
     day_type_label = (
         "/".join(d.strip() for d in days.split(",")) if days else str(day_type)
     )
-    stations_by_id = Complex.load_all(stations)
-    individual_stations = Station.load_all(stations_individual, stations_by_id)
-    station_index = StationIndex.build(stations_by_id, individual_stations)
+    complexes_by_id = Complex.load_all(stations)
+    individual_stations = Station.load_all(stations_individual, complexes_by_id)
+    station_index = StationIndex.build(complexes_by_id, individual_stations)
     try:
         comparison = resolve_scenarios(
             categories=categories,
@@ -1584,10 +1584,10 @@ def deinterlining(
     # the same way whichever direction it runs.
     scope_ids = frozenset(
         s.complex_id
-        for s in stations_by_id.values()
+        for s in complexes_by_id.values()
         if any(sc.routes_of(s) for sc in scenarios)
     )
-    print(f"Stations in scope: {len(scope_ids):,} of {len(stations_by_id):,}")
+    print(f"Stations in scope: {len(scope_ids):,} of {len(complexes_by_id):,}")
 
     con = duckdb.connect()
     day_params: list[str] = list(days_list) if days_list else []
@@ -1636,7 +1636,7 @@ def deinterlining(
     )
 
     walks = Walks(
-        stations_by_id=stations_by_id,
+        complexes_by_id=complexes_by_id,
         individual_stations=individual_stations,
         stations=station_index.stations,
         close_threshold_m=close_threshold_m,

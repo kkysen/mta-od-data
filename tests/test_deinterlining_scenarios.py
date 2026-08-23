@@ -35,20 +35,20 @@ pytestmark = pytest.mark.skipif(
 
 
 @pytest.fixture(scope="module")
-def stations_by_id() -> dict[int, Complex]:
+def complexes_by_id() -> dict[int, Complex]:
     return Complex.load_all(STATIONS)
 
 
 @pytest.fixture(scope="module")
-def individual_stations(stations_by_id: dict[int, Complex]) -> list[Station]:
-    return Station.load_all(STATIONS_INDIVIDUAL, stations_by_id)
+def individual_stations(complexes_by_id: dict[int, Complex]) -> list[Station]:
+    return Station.load_all(STATIONS_INDIVIDUAL, complexes_by_id)
 
 
 @pytest.fixture(scope="module")
 def station_index(
-    stations_by_id: dict[int, Complex], individual_stations: list[Station]
+    complexes_by_id: dict[int, Complex], individual_stations: list[Station]
 ) -> StationIndex:
-    return StationIndex.build(stations_by_id, individual_stations)
+    return StationIndex.build(complexes_by_id, individual_stations)
 
 
 @pytest.fixture(scope="module")
@@ -401,7 +401,7 @@ STRANDING_SCENARIOS = {
 def test_a_stranded_pair_is_far_not_a_crash(
     tmp_path: Path,
     station_index: StationIndex,
-    stations_by_id: dict[int, Complex],
+    complexes_by_id: dict[int, Complex],
     individual_stations: list[Station],
 ) -> None:
     """A trip between two stations the scenario leaves with no route in
@@ -419,7 +419,7 @@ def test_a_stranded_pair_is_far_not_a_crash(
     # gives one of the comparison's routes.
     scope_ids = frozenset(
         complex_station.complex_id
-        for complex_station in stations_by_id.values()
+        for complex_station in complexes_by_id.values()
         if any(s.routes_of(complex_station) for s in comparison.scenarios)
     )
     assert origin.complex_id in scope_ids, "the origin should be in scope today"
@@ -429,7 +429,7 @@ def test_a_stranded_pair_is_far_not_a_crash(
         stations_path=STATIONS,
         scope_ids=scope_ids,
         walks=Walks(
-            stations_by_id=stations_by_id,
+            complexes_by_id=complexes_by_id,
             individual_stations=individual_stations,
             stations=station_index.stations,
             close_threshold_m=300.0,
