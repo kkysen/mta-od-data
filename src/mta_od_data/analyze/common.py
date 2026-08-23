@@ -7,7 +7,7 @@ from functools import cache
 from math import asin, cos, radians, sin, sqrt
 from operator import attrgetter
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Protocol, Self
+from typing import TYPE_CHECKING, ClassVar, Protocol, Self, override
 
 import duckdb
 
@@ -53,7 +53,34 @@ class Coord:
     lon: float
 
 
-def intern[T: DataclassInstance](pool: dict[tuple[Hashable, ...], T], value: T) -> T:
+@dataclass(slots=True, frozen=True, eq=False)
+class HashByField[T: DataclassInstance]:
+    """A dataclass wrapped so that it hashes and compares by its fields,
+    whatever it does itself.
+
+    For `intern`, whose whole job is to find the object a value is
+    already equal to, on types that answer `==` by identity.
+    The type is part of the key, so one pool can hold several kinds
+    without two of them colliding on equal fields.
+    """
+
+    value: T
+
+    @property
+    def key(self) -> tuple[type[T], tuple[Hashable, ...]]:
+        value = self.value
+        return type(value), tuple(getattr(value, f.name) for f in fields(value))
+
+    @override
+    def __hash__(self) -> int:
+        return hash(self.key)
+
+    @override
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, HashByField) and self.key == other.key
+
+
+def intern[T: DataclassInstance](pool: dict[HashByField[T], T], value: T) -> T:
     """`value`, or whatever equal thing was interned before it.
 
     What lets `Complex` and `Station` be compared by identity: a run
@@ -61,18 +88,14 @@ def intern[T: DataclassInstance](pool: dict[tuple[Hashable, ...], T], value: T) 
     objects of equal value have to be one object for `eq=False` to
     mean what it says.
 
-    Keyed on the field values, not on the id: ids are unique only
-    within one station file, so keying on them would hand a run with
-    its own `--stations` the rows of whichever file was read first.
+    By the fields, not by the id: ids are unique only within one
+    station file, so keying on them would hand a run with its own
+    `--stations` the rows of whichever file was read first.
 
     Loading is the only way in, so a directly constructed one isn't
     interned; the tests build a few, and never two of equal value.
-
-    Any dataclass, since `fields` is all this needs of one, and the key
-    is a tuple of whatever those fields hold: `Hashable`, which is what
-    a `dict` key requires of them, and all a pool ever asks.
     """
-    return pool.setdefault(tuple(getattr(value, f.name) for f in fields(value)), value)
+    return pool.setdefault(HashByField(value), value)
 
 
 class Place(Protocol):
@@ -139,7 +162,7 @@ class Complex:
     # them are equal exactly when they are the same object, which is
     # what `eq=False` above assumes. Never emptied, which costs one
     # entry per complex per distinct station file: 445 for the real one.
-    _interned: ClassVar[dict[tuple[Hashable, ...], Complex]] = {}
+    _interned: ClassVar[dict[HashByField[Complex], Complex]] = {}
 
     @classmethod
     def load(cls, row: dict[str, str]) -> Complex:
@@ -223,7 +246,7 @@ class Station:
     def display(self, routes: frozenset[str] | None = None) -> str:
         return display_station(self.name, self.routes if routes is None else routes)
 
-    _interned: ClassVar[dict[tuple[Hashable, ...], Station]] = {}
+    _interned: ClassVar[dict[HashByField[Station], Station]] = {}
 
     @classmethod
     def load(cls, row: dict[str, str], complexes: dict[int, Complex]) -> Station:
