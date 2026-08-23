@@ -247,7 +247,7 @@ class StationIndex:
             )
         return next(iter(stations))
 
-    def routes_on_line(self, complex_station: Complex, line: str) -> Routes:
+    def routes_on_line(self, complex: Complex, line: str) -> Routes:
         """What the complex's stations *on this line* serve.
 
         Not the complex's own routes, which are every line's together:
@@ -255,7 +255,7 @@ class StationIndex:
         """
         return frozenset(
             route
-            for station in self.stations.by_complex.get(complex_station, ())
+            for station in self.stations.by_complex.get(complex, ())
             if station.line == line
             for route in station.routes
         )
@@ -326,11 +326,9 @@ class Scenario:
     def slug(self) -> str:
         return slugify(self.name)
 
-    def routes_of(self, complex_station: Complex) -> Routes:
+    def routes_of(self, complex: Complex) -> Routes:
         """A complex's routes under this scenario."""
-        return self.effective_routes.get(
-            complex_station, complex_station.routes & self.routes
-        )
+        return self.effective_routes.get(complex, complex.routes & self.routes)
 
     def routes_at(self, station: Station) -> Routes:
         """One station's routes under this scenario.
@@ -352,14 +350,14 @@ class Scenario:
         complexes; everything else falls back to its real routes."""
         effective: dict[Complex, Routes] = {}
         station_routes: dict[Station, Routes] = {}
-        for complex_station in {c for c, _line in overrides}:
+        for complex in {c for c, _line in overrides}:
             union: Routes = frozenset()
-            for station in stations.by_complex.get(complex_station, ()):
-                delta = overrides.get((complex_station, station.line))
+            for station in stations.by_complex.get(complex, ()):
+                delta = overrides.get((complex, station.line))
                 at = (delta.apply(station) if delta else station.routes) & routes
                 station_routes[station] = at
                 union |= at
-            effective[complex_station] = union
+            effective[complex] = union
         return effective, station_routes
 
     @classmethod

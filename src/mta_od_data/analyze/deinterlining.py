@@ -289,8 +289,8 @@ class ScenarioWalks:
         distinct answers.
         """
         return {
-            complex_station: self.scenario.routes_of(complex_station)
-            for complex_station in self.walks.complexes_by_id.values()
+            complex: self.scenario.routes_of(complex)
+            for complex in self.walks.complexes_by_id.values()
         }
 
     @cache  # noqa: B019  (see `corridor_stations`)
@@ -307,12 +307,12 @@ class ScenarioWalks:
         lookups.
         """
         return {
-            complex_station: TripEnd(
-                id=complex_station.complex_id,
-                station=self.stations.name(complex_station, routes),
+            complex: TripEnd(
+                id=complex.complex_id,
+                station=self.stations.name(complex, routes),
                 routes=",".join(sorted(routes)),
             )
-            for complex_station, routes in self.routes_by_complex().items()
+            for complex, routes in self.routes_by_complex().items()
         }
 
     # B019: `cache` on a method stores its entries on the *function*,
@@ -340,7 +340,7 @@ class ScenarioWalks:
         ]
 
     @cache  # noqa: B019  (see `corridor_stations`)
-    def corridor_points(self, complex_station: Complex) -> tuple[Station, ...]:
+    def corridor_points(self, complex: Complex) -> tuple[Station, ...]:
         """Where a rider of this comparison stands at this complex.
 
         Its stations that serve one of the comparison's routes, not all
@@ -354,7 +354,7 @@ class ScenarioWalks:
         end put in scope: there is no corridor station to stand on, so
         the complex is all that is known about where they are.
         """
-        stations = self.walks.points().by_complex[complex_station]
+        stations = self.walks.points().by_complex[complex]
         on_corridor = tuple(
             station for station in stations if self.scenario.routes_at(station)
         )
@@ -362,7 +362,7 @@ class ScenarioWalks:
 
     @cache  # noqa: B019  (see `corridor_stations`)
     def min_dist_to_route(
-        self, complex_station: Complex, route: str
+        self, complex: Complex, route: str
     ) -> tuple[float, Station] | None:
         """The nearest station this route stops at, and how far.
 
@@ -381,7 +381,7 @@ class ScenarioWalks:
         return min(
             (
                 (distance(here, station), station)
-                for here in self.corridor_points(complex_station)
+                for here in self.corridor_points(complex)
                 for station in candidates
             ),
             key=itemgetter(0),
@@ -389,7 +389,7 @@ class ScenarioWalks:
 
     @cache  # noqa: B019  (see `corridor_stations`)
     def min_dist_to_corridor(
-        self, complex_station: Complex, corridor_routes: Routes
+        self, complex: Complex, corridor_routes: Routes
     ) -> tuple[float, Station] | None:
         """The nearest station a rider could board this corridor at.
 
@@ -409,7 +409,7 @@ class ScenarioWalks:
         measured = [
             nearest
             for route in sorted(corridor_routes)
-            if (nearest := self.min_dist_to_route(complex_station, route)) is not None
+            if (nearest := self.min_dist_to_route(complex, route)) is not None
         ]
         return min(measured, key=itemgetter(0)) if measured else None
 

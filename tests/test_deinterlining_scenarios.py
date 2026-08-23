@@ -280,7 +280,7 @@ def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> 
     quietly applying to the wrong complex.
     """
 
-    def complex_station(complex_id: int) -> Complex:
+    def complex(complex_id: int) -> Complex:
         return Complex(
             complex_id=complex_id,
             name="72 St",
@@ -290,17 +290,17 @@ def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> 
             cbd=False,
         )
 
-    def station(complex_station: Complex) -> Station:
+    def station(complex: Complex) -> Station:
         return Station(
-            complex=complex_station,
+            complex=complex,
             name="72 St",
             routes=frozenset({"B"}),
             loc=Coord(lat=0.0, lon=0.0),
             line="Central Park West",
-            station_id=complex_station.complex_id,
+            station_id=complex.complex_id,
         )
 
-    complexes = {cid: complex_station(cid) for cid in (1, 2)}
+    complexes = {cid: complex(cid) for cid in (1, 2)}
     stations = [station(c) for c in complexes.values()]
     index = StationIndex.build(complexes, stations)
     with pytest.raises(ScenarioError, match="names 2 station complexes"):
@@ -418,9 +418,9 @@ def test_a_stranded_pair_is_far_not_a_crash(
     # As `deinterlining()` scopes a run: every complex some scenario
     # gives one of the comparison's routes.
     scope_ids = frozenset(
-        complex_station.complex_id
-        for complex_station in complexes_by_id.values()
-        if any(s.routes_of(complex_station) for s in comparison.scenarios)
+        complex.complex_id
+        for complex in complexes_by_id.values()
+        if any(s.routes_of(complex) for s in comparison.scenarios)
     )
     assert origin.complex_id in scope_ids, "the origin should be in scope today"
 
