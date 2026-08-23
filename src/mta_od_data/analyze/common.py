@@ -85,7 +85,7 @@ class Complex:
     Its `name`, `routes`, and `loc` are the merge of the `Station`s in
     it, and differ from every one of them where the complex has more
     than one: the name lists them all, the routes are the union, and
-    the point is a centroid that can sit well off any of the platforms.
+    the point is a centroid that can sit well off any of the stations.
     """
 
     complex_id: int
@@ -132,7 +132,7 @@ class Station:
     station: `62 St` on the Sea Beach line, as against the
     `62 St/New Utrecht Av` complex it belongs to.
 
-    Not a platform, though the code used to call it one: the source has
+    Not a station, though the code used to call it one: the source has
     a row per (complex, line), both directions together, and express
     and local tracks together (`59 St-Columbus Circle` on `8th Av -
     Fulton St` is one row reading `A C B D`).
@@ -199,10 +199,10 @@ class Station:
 
 
 @cache
-def platform_name(
-    platforms: tuple[Station, ...], complex_name: str, routes: frozenset[str]
+def station_name(
+    stations: tuple[Station, ...], complex_name: str, routes: frozenset[str]
 ) -> str:
-    """`complex_name` narrowed to the platforms `routes` actually stops at.
+    """`complex_name` narrowed to the stations `routes` actually stops at.
 
     A complex's name lists every station merged into it
     ("Chambers St/WTC/Park Pl/Cortlandt St"),
@@ -210,20 +210,20 @@ def platform_name(
     and mostly about routes the row has nothing to do with.
     The R stops only at Cortlandt St there, so an `(R)` row says that.
 
-    Only when the routes land on exactly one *named* platform.
+    Only when the routes land on exactly one *named* station.
     Two names means the complex really is the smallest thing
     that covers them
     (Times Sq-42 St and 42 St-Port Authority Bus Terminal, for A,C,N),
-    and several platforms sharing one name collapse to it anyway
-    (34 St-Herald Sq's 6 Av and Broadway platforms).
+    and several stations sharing one name collapse to it anyway
+    (34 St-Herald Sq's 6 Av and Broadway stations).
     """
-    names = {p.name for p in platforms if p.routes & routes}
+    names = {p.name for p in stations if p.routes & routes}
     return names.pop() if len(names) == 1 else complex_name
 
 
 @dataclass(slots=True, frozen=True)
-class PlatformIndex:
-    """Per-platform stations grouped by complex, for `display`."""
+class ComplexStations:
+    """The `Station`s in each complex, for `display`."""
 
     by_complex: dict[int, tuple[Station, ...]]
 
@@ -236,13 +236,15 @@ class PlatformIndex:
             by_complex={cid: tuple(v) for cid, v in by_complex.items()},
         )
 
-    def name(self, station: Complex, routes: frozenset[str]) -> str:
-        return platform_name(
-            self.by_complex.get(station.complex_id, ()), station.name, routes
+    def name(self, complex_station: Complex, routes: frozenset[str]) -> str:
+        return station_name(
+            self.by_complex.get(complex_station.complex_id, ()),
+            complex_station.name,
+            routes,
         )
 
-    def display(self, station: Complex, routes: frozenset[str]) -> str:
-        return f"{self.name(station, routes)} ({','.join(sorted(routes))})"
+    def display(self, complex_station: Complex, routes: frozenset[str]) -> str:
+        return f"{self.name(complex_station, routes)} ({','.join(sorted(routes))})"
 
 
 def haversine(c1: Coord, c2: Coord) -> float:
@@ -255,13 +257,13 @@ def haversine(c1: Coord, c2: Coord) -> float:
     return 2 * r * asin(sqrt(a))
 
 
-# An index into `WalkPoints.locations`, naming one platform -- or the
-# centroid of a complex with no platform rows of its own, which is the
+# An index into `WalkPoints.locations`, naming one station -- or the
+# centroid of a complex with no station rows of its own, which is the
 # only other thing a walk is ever measured from.
 # An `int` rather than a type of its own: it is used as a dict key
 # hundreds of thousands of times a run, which is the whole point of it,
 # and anything wrapping it hashes an order of magnitude slower.
-type PlatformId = int
+type WalkPointId = int
 
 
 # No `slots=True`: a slot named `distance` would collide with the method
@@ -271,11 +273,11 @@ type PlatformId = int
 # comparison builds hundreds of thousands, and worth nothing here.
 @dataclass(frozen=True, eq=False)
 class WalkPoints:
-    """Every location a walk can be measured between, by `PlatformId`.
+    """Every location a walk can be measured between, by `WalkPointId`.
 
-    Walks run platform to platform: a rider leaves from whichever of
-    their complex's platforms is nearest what they are walking to, so a
-    complex enters as all of its platforms at once, which is what
+    Walks run station to station: a rider leaves from whichever of
+    their complex's stations is nearest what they are walking to, so a
+    complex enters as all of its stations at once, which is what
     `by_complex` holds.
 
     `eq=False` because a table of coordinates has no meaningful equality
@@ -286,11 +288,11 @@ class WalkPoints:
     """
 
     locations: list[Coord]
-    by_complex: dict[int, tuple[PlatformId, ...]]
-    # Ids below this are platforms, in `individual_stations` order;
+    by_complex: dict[int, tuple[WalkPointId, ...]]
+    # Ids below this are stations, in `individual_stations` order;
     # ids at or above it are the centroids standing in for complexes
-    # with no platform rows of their own.
-    n_platforms: int
+    # with no station rows of their own.
+    n_stations: int
 
     def __post_init__(self) -> None:
         # Each table remembers its own distances, shadowing the method
@@ -302,7 +304,7 @@ class WalkPoints:
         # it derives from its fields.
         object.__setattr__(self, "distance", cache(self.distance))
 
-    def distance(self, point: PlatformId, other: PlatformId) -> float:
+    def distance(self, point: WalkPointId, other: WalkPointId) -> float:
         """Metres between two of these, remembered per table.
 
         Ids rather than the `Coord`s themselves, which are dataclasses:
@@ -311,28 +313,28 @@ class WalkPoints:
         """
         return haversine(self.locations[point], self.locations[other])
 
-    def platform(self, point: PlatformId) -> PlatformId | None:
-        """`point` if it is a platform, `None` if it is a centroid."""
-        return point if point < self.n_platforms else None
+    def station(self, point: WalkPointId) -> WalkPointId | None:
+        """`point` if it is a station, `None` if it is a centroid."""
+        return point if point < self.n_stations else None
 
     @classmethod
     def build(
         cls, individual_stations: list[Station], stations_by_id: dict[int, Complex]
     ) -> WalkPoints:
-        locations = [platform.loc for platform in individual_stations]
-        by_complex: defaultdict[int, list[PlatformId]] = defaultdict(list)
-        for platform_id, platform in enumerate(individual_stations):
-            by_complex[platform.complex_id].append(platform_id)
+        locations = [station.loc for station in individual_stations]
+        by_complex: defaultdict[int, list[WalkPointId]] = defaultdict(list)
+        for point_id, station in enumerate(individual_stations):
+            by_complex[station.complex_id].append(point_id)
         for complex_id, station in stations_by_id.items():
             if complex_id not in by_complex:
-                # No platform rows of its own, so its centroid stands in,
-                # and takes an id past the last platform's.
+                # No station rows of its own, so its centroid stands in,
+                # and takes an id past the last station's.
                 by_complex[complex_id] = [len(locations)]
                 locations.append(station.loc)
         return cls(
             locations=locations,
             by_complex={cid: tuple(ids) for cid, ids in by_complex.items()},
-            n_platforms=len(individual_stations),
+            n_stations=len(individual_stations),
         )
 
 

@@ -26,7 +26,7 @@ from pydantic import (
 )
 
 from mta_od_data import ROOT
-from mta_od_data.analyze.common import Complex, PlatformIndex, Station
+from mta_od_data.analyze.common import Complex, ComplexStations, Station
 
 SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json5"
 
@@ -61,7 +61,7 @@ class RouteDelta:
         Two deltas that disagree about a route
         have no defensible merge, so callers raise instead:
         this is the whole of `#5`, a plan combining two junctions
-        where both move the same route at the same platform.
+        where both move the same route at the same station.
         """
         return self.add & self.remove
 
@@ -81,7 +81,7 @@ def merge_override(overrides: Overrides, key: OverrideKey, delta: RouteDelta) ->
     Returns the routes the two disagree about, empty when they agree.
     A disagreement leaves `overrides` untouched
     and is the caller's to report.
-    Only `combine_scenarios` merges: within one scenario a platform is
+    Only `combine_scenarios` merges: within one scenario a station is
     named once (`Scenario.load` raises otherwise), so there is nothing
     to merge it with.
     """
@@ -201,10 +201,10 @@ class StationIndex:
     by_name_line: dict[tuple[str, str], frozenset[Complex]]
     known_routes: frozenset[str]
     # A scenario's overrides are declared per line and resolved to a
-    # complex, so applying them needs the complex's platforms.
-    platforms: PlatformIndex
+    # complex, so applying them needs the complex's stations.
+    stations: ComplexStations
     # The `station_id` a (name, line) is at, for `check_station_order`.
-    # The lowest, for the rare complex whose platforms of one name on
+    # The lowest, for the rare complex whose stations of one name on
     # one line are several rows: they're adjacent in the source data,
     # so which one represents them can't change an order.
     station_id_by_name_line: dict[tuple[str, str], int]
@@ -217,17 +217,17 @@ class StationIndex:
     ) -> StationIndex:
         by_name_line: defaultdict[tuple[str, str], set[Complex]] = defaultdict(set)
         station_ids: defaultdict[tuple[str, str], list[int]] = defaultdict(list)
-        for platform in individual_stations:
-            station_ids[platform.name, platform.line].append(platform.station_id)
-            # By complex, so a complex's several platforms of one name
+        for station in individual_stations:
+            station_ids[station.name, station.line].append(station.station_id)
+            # By complex, so a complex's several stations of one name
             # on one line (which is routine) count once.
-            by_name_line[platform.name, platform.line].add(platform.complex)
+            by_name_line[station.name, station.line].add(station.complex)
         return cls(
             by_name_line={key: frozenset(v) for key, v in by_name_line.items()},
             known_routes=frozenset(
                 r for s in stations_by_id.values() for r in s.routes
             ),
-            platforms=PlatformIndex.build(individual_stations),
+            stations=ComplexStations.build(individual_stations),
             station_id_by_name_line={key: min(ids) for key, ids in station_ids.items()},
         )
 
@@ -247,17 +247,17 @@ class StationIndex:
             )
         return next(iter(stations))
 
-    def routes_on_line(self, station: Complex, line: str) -> Routes:
-        """What the complex's platforms *on this line* serve.
+    def routes_on_line(self, complex_station: Complex, line: str) -> Routes:
+        """What the complex's stations *on this line* serve.
 
         Not the complex's own routes, which are every line's together:
-        a delta names a line and applies to that line's platforms alone.
+        a delta names a line and applies to that line's stations alone.
         """
         return frozenset(
             route
-            for platform in self.platforms.by_complex.get(station.complex_id, ())
-            if platform.line == line
-            for route in platform.routes
+            for station in self.stations.by_complex.get(complex_station.complex_id, ())
+            if station.line == line
+            for route in station.routes
         )
 
     def check_station_order(
@@ -314,51 +314,53 @@ class Scenario:
     routes: Routes
     # Keyed by the complex *and the line the override named*, because a
     # complex can span lines: 62 St/New Utrecht Av is one complex whose
-    # West End and Sea Beach platforms a scenario moves separately, and
+    # West End and Sea Beach stations a scenario moves separately, and
     # a delta keyed by the complex alone would apply to both.
     overrides: Overrides
-    # A complex's routes are the union of its platforms', which the
+    # A complex's routes are the union of its stations', which the
     # station data holds to exactly, so these stay derived rather than
     # tracked.
     effective_routes: dict[Complex, Routes]
-    platform_routes: dict[Station, Routes]
+    station_routes: dict[Station, Routes]
 
     def slug(self) -> str:
         return slugify(self.name)
 
-    def routes_of(self, station: Complex) -> Routes:
+    def routes_of(self, complex_station: Complex) -> Routes:
         """A complex's routes under this scenario."""
-        return self.effective_routes.get(station, station.routes & self.routes)
+        return self.effective_routes.get(
+            complex_station, complex_station.routes & self.routes
+        )
 
-    def routes_at(self, platform: Station) -> Routes:
-        """One platform's routes under this scenario.
+    def routes_at(self, station: Station) -> Routes:
+        """One station's routes under this scenario.
 
         What decides whether a rider can board a corridor *here*, as
-        opposed to somewhere else in the same complex: `corridor_platforms`
-        measures a walk to a platform's own coordinates, and a complex can
+        opposed to somewhere else in the same complex: `corridor_stations`
+        measures a walk to a station's own coordinates, and a complex can
         span 200m.
         """
-        return self.platform_routes.get(platform, platform.routes & self.routes)
+        return self.station_routes.get(station, station.routes & self.routes)
 
     @staticmethod
     def resolve_routes(
         overrides: Overrides,
-        platforms: PlatformIndex,
+        stations: ComplexStations,
         routes: Routes,
     ) -> tuple[dict[Complex, Routes], dict[Station, Routes]]:
-        """`(complex -> routes, platform -> routes)` for the overridden
+        """`(complex -> routes, station -> routes)` for the overridden
         complexes; everything else falls back to its real routes."""
         effective: dict[Complex, Routes] = {}
-        platform_routes: dict[Station, Routes] = {}
+        station_routes: dict[Station, Routes] = {}
         for complex_station in {c for c, _line in overrides}:
             union: Routes = frozenset()
-            for platform in platforms.by_complex.get(complex_station.complex_id, ()):
-                delta = overrides.get((complex_station, platform.line))
-                at = (delta.apply(platform) if delta else platform.routes) & routes
-                platform_routes[platform] = at
+            for station in stations.by_complex.get(complex_station.complex_id, ()):
+                delta = overrides.get((complex_station, station.line))
+                at = (delta.apply(station) if delta else station.routes) & routes
+                station_routes[station] = at
                 union |= at
             effective[complex_station] = union
-        return effective, platform_routes
+        return effective, station_routes
 
     @classmethod
     def load(
@@ -404,7 +406,7 @@ class Scenario:
                 # Per line, not per complex: a complex can span lines
                 # (62 St/New Utrecht Av is West End and Sea Beach both),
                 # and a route the complex has elsewhere is still absent
-                # from the platforms this group names.
+                # from the stations this group names.
                 on_line = station_index.routes_on_line(station, group.line)
                 absent = sorted(remove - on_line)
                 if absent:
@@ -416,9 +418,9 @@ class Scenario:
                         f"station doesn't belong in this group, or the "
                         f"wrong route is named"
                     )
-                # One platform, one delta, so two groups naming it are
+                # One station, one delta, so two groups naming it are
                 # an error even where they agree: the two say different
-                # things about the same platform, and merging them
+                # things about the same station, and merging them
                 # picks a routing neither group is written to describe.
                 # A `line` repeated across groups is still fine, since
                 # a line's express and local stops legitimately move
@@ -435,8 +437,8 @@ class Scenario:
             # as the unknown station it is rather than as a `KeyError`
             # from the ordering lookup.
             station_index.check_station_order(group, name=entry.name, path=path)
-        effective_routes, platform_routes = cls.resolve_routes(
-            overrides, station_index.platforms, routes
+        effective_routes, station_routes = cls.resolve_routes(
+            overrides, station_index.stations, routes
         )
         return cls(
             name=entry.name,
@@ -445,12 +447,12 @@ class Scenario:
             routes=routes,
             overrides=overrides,
             effective_routes=effective_routes,
-            platform_routes=platform_routes,
+            station_routes=station_routes,
         )
 
     @classmethod
     def combine(
-        cls, scenarios: list[Scenario], routes: Routes, platforms: PlatformIndex
+        cls, scenarios: list[Scenario], routes: Routes, stations: ComplexStations
     ) -> Scenario:
         """`routes` is the whole comparison's universe
         (`ScenarioComparison`),
@@ -476,8 +478,8 @@ class Scenario:
                         f"silently keep the route"
                     )
                 source[key] = scenario.name
-        effective_routes, platform_routes = cls.resolve_routes(
-            overrides, platforms, routes
+        effective_routes, station_routes = cls.resolve_routes(
+            overrides, stations, routes
         )
         # A category left unchanged contributes nothing to the name:
         # "Current + A/C CPW Express" and "A/C CPW Express" describe the
@@ -497,7 +499,7 @@ class Scenario:
             routes=routes,
             overrides=overrides,
             effective_routes=effective_routes,
-            platform_routes=platform_routes,
+            station_routes=station_routes,
         )
 
 
@@ -511,7 +513,7 @@ CURRENT = Scenario(
     routes=frozenset(),
     overrides={},
     effective_routes={},
-    platform_routes={},
+    station_routes={},
 )
 
 
@@ -631,7 +633,7 @@ class ScenarioFile:
             return []
         routes = self.routes
         return [
-            Scenario.combine(list(combo), routes, self.station_index.platforms)
+            Scenario.combine(list(combo), routes, self.station_index.stations)
             for combo in itertools.product(
                 *([*baseline, *c.scenarios] for c in self.categories)
             )

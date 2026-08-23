@@ -17,8 +17,8 @@ from mta_od_data.analyze.common import (
     DayCoverage,
     DayFilterError,
     DayType,
-    PlatformId,
     Station,
+    WalkPointId,
     WalkPoints,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
@@ -537,7 +537,7 @@ def run_scenario(
             close = dist_m <= close_threshold_m
             if dist_m == 0.0:
                 # The origin's own corridor stops right here,
-                # so the rider is exiting rather than changing platforms.
+                # so the rider is exiting rather than changing stations.
                 # A rider with an express option on their own line
                 # (e.g. R's 4th Av line also carries D and N)
                 # is assumed to have ridden that instead, being faster.
@@ -550,12 +550,12 @@ def run_scenario(
         else:
             # A one-seat ride's own route already stops somewhere in
             # this complex, so there's no walk to model,
-            # and no way to tell which platform of a merged complex
+            # and no way to tell which station of a merged complex
             # a rider used anyway, the source data being per-complex.
             close, dist_m = True, 0.0
 
         if is_one_seat:
-            # The routes actually ridden pin down which platform
+            # The routes actually ridden pin down which station
             # of a merged complex the rider lands on, at both ends.
             # An `xfer` ride's arrival route isn't in the data at all,
             # so it contributes nothing here rather than its full list.
@@ -1152,10 +1152,10 @@ def one_seat_rides(
     total_riders = sum(r for _, _, r in scoped)
 
     individual_stations = Station.load_all(stations_individual, stations_by_id)
-    platforms_by_complex: dict[int, list[Station]] = {}
+    stations_by_complex: dict[int, list[Station]] = {}
     for s in individual_stations:
-        platforms_by_complex.setdefault(s.complex_id, []).append(s)
-    # Numbers those platforms, so a sweep can key its distances on a
+        stations_by_complex.setdefault(s.complex_id, []).append(s)
+    # Numbers those stations, so a sweep can key its distances on a
     # pair of ids rather than on a pair of `Coord`s.
     walk_points = WalkPoints.build(individual_stations, stations_by_id)
 
@@ -1163,7 +1163,7 @@ def one_seat_rides(
     # since a `line` label can span physically distinct segments:
     # "6th Av - Culver" covers both the Manhattan 6th Av trunk (B,D,F,M)
     # and the Brooklyn Culver local (F,G),
-    # and by `line` alone a Culver platform would get B,D
+    # and by `line` alone a Culver station would get B,D
     # as express partners it can't reach.
     # A coarse split, since one borough can still hold two branches
     # of a composite line, but it fixes the case that shows up.
@@ -1179,7 +1179,7 @@ def one_seat_rides(
     origin_express_partners: dict[int, frozenset[str]] = {
         cid: frozenset(
             route
-            for s in platforms_by_complex.get(cid, [])
+            for s in stations_by_complex.get(cid, [])
             for route in routes_by_line.get((s.line, s.borough), set())
             & primary_routes_set
         )
@@ -1215,16 +1215,16 @@ def one_seat_rides(
         @cache
         def assigned_points(
             assigned_routes: frozenset[str],
-        ) -> list[tuple[PlatformId, Station]]:
+        ) -> list[tuple[WalkPointId, Station]]:
             # Membership is decided at the complex level,
             # the granularity a reassignment is keyed at,
-            # while the platforms are what's returned and measured
+            # while the stations are what's returned and measured
             # between, a complex being able to span physically separate
             # stations.
             return [
-                (platform_id, platform)
-                for platform_id, platform in enumerate(individual_stations)
-                if effective_origin_routes.get(platform.complex_id, platform.routes)
+                (point_id, station)
+                for point_id, station in enumerate(individual_stations)
+                if effective_origin_routes.get(station.complex_id, station.routes)
                 & assigned_routes
             ]
 
@@ -1244,8 +1244,8 @@ def one_seat_rides(
             assert candidates, "no individual station serves this route set"
             best: tuple[float, Station] | None = None
             for point in walk_points.by_complex[dest.complex_id]:
-                for platform_id, c in candidates:
-                    dist_m = walk_points.distance(point, platform_id)
+                for point_id, c in candidates:
+                    dist_m = walk_points.distance(point, point_id)
                     if best is None or dist_m < best[0]:
                         best = (dist_m, c)
             assert best is not None
