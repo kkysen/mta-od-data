@@ -746,9 +746,7 @@ def render_notes(*, close_threshold_m: float) -> str:
 @app.command()
 def one_seat_rides(
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
-    complexes_path: Annotated[Path, Option("--complexes")] = (
-        DATA / "stations_complexes.csv"
-    ),
+    complexes_path: Annotated[Path, Option("--complexes")] = (DATA / "complexes.csv"),
     stations_path: Annotated[
         Path,
         Option(
@@ -758,7 +756,7 @@ def one_seat_rides(
                 "a complex), used for accurate nearest-other-trunk distances"
             ),
         ),
-    ] = DATA / "stations_individual.csv",
+    ] = DATA / "stations.csv",
     day_type: Annotated[DayType, Option()] = DayType.WEEKDAY,
     days: Annotated[
         str | None,
@@ -1243,7 +1241,7 @@ def one_seat_rides(
         ) -> tuple[float, Station]:
             candidates = assigned_points(assigned_routes)
             # The checks above rule out an empty route set,
-            # but not a gap in `stations_individual.csv` itself.
+            # but not a gap in `stations.csv` itself.
             assert candidates, "no individual station serves this route set"
             best: tuple[float, Station] | None = None
             for here in complex_stations.by_complex[dest]:

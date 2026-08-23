@@ -20,8 +20,8 @@ SCENARIOS_SCHEMA_FILE = (
 
 def generate_scenario_schema(
     *,
-    complexes_path: Path = DATA / "stations_complexes.csv",
-    stations_path: Path = DATA / "stations_individual.csv",
+    complexes_path: Path = DATA / "complexes.csv",
+    stations_path: Path = DATA / "stations.csv",
 ) -> str:
     """The JSON Schema for a scenario file,
     with real line, station, and route values baked in as `enum`s

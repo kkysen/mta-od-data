@@ -12,8 +12,8 @@ data/*
 
 # Small (~150K total) and needed by the analyze tests,
 # so checked in rather than refetched from `data.ny.gov` by `mta-od-data prepare`.
-!data/stations_complexes.csv
-!data/stations_individual.csv
+!data/complexes.csv
+!data/stations.csv
 
 # Contains useful settings for JSON schemas.
 !.vscode/

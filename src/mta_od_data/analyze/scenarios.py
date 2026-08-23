@@ -154,7 +154,7 @@ class OverrideGroup(BaseModel):
     even where a station name is already unique:
     names are shared by several complexes ("72 St" is three),
     and it says which physical line a group is about
-    without cross-referencing `stations_individual.csv`."""
+    without cross-referencing `stations.csv`."""
 
     model_config = ConfigDict(extra="forbid")
 

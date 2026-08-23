@@ -1474,9 +1474,7 @@ def deinterlining(
         ),
     ] = SCENARIOS_FILE,
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
-    complexes_path: Annotated[Path, Option("--complexes")] = (
-        DATA / "stations_complexes.csv"
-    ),
+    complexes_path: Annotated[Path, Option("--complexes")] = (DATA / "complexes.csv"),
     stations_path: Annotated[
         Path,
         Option(
@@ -1486,7 +1484,7 @@ def deinterlining(
                 "a complex), used for accurate nearest-other-trunk distances"
             ),
         ),
-    ] = DATA / "stations_individual.csv",
+    ] = DATA / "stations.csv",
     day_type: Annotated[DayType, Option()] = DayType.WEEKDAY,
     days: Annotated[
         str | None,

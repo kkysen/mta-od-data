@@ -11,11 +11,11 @@ app = Typer()
 
 DEFAULT_CSV_GLOB = "data/MTA_Subway_Origin-Destination_Ridership_Estimate__2025_*.csv"
 DEFAULT_PARQUET = DATA / "mta_od.parquet"
-DEFAULT_STATIONS_CSV = DATA / "stations_complexes.csv"
-DEFAULT_STATIONS_INDIVIDUAL_CSV = DATA / "stations_individual.csv"
-STATIONS_URL = "https://data.ny.gov/resource/5f5g-n3cz.csv?$limit=1000"
+DEFAULT_COMPLEXES_CSV = DATA / "complexes.csv"
+DEFAULT_STATIONS_CSV = DATA / "stations.csv"
+COMPLEXES_URL = "https://data.ny.gov/resource/5f5g-n3cz.csv?$limit=1000"
 # Per-station coordinates; see `Station.load_individual`.
-STATIONS_INDIVIDUAL_URL = "https://data.ny.gov/resource/39hk-dx4f.csv?$limit=1000"
+STATIONS_URL = "https://data.ny.gov/resource/39hk-dx4f.csv?$limit=1000"
 
 # Every one of these is functionally determined by the complex ID next to it
 # (verified over all 121M rows: one distinct value per ID), so they're the
@@ -130,14 +130,14 @@ def prepare(
     complexes_out: Annotated[
         Path,
         Option("--complexes-out", help="Output path for the complex reference CSV"),
-    ] = DEFAULT_STATIONS_CSV,
+    ] = DEFAULT_COMPLEXES_CSV,
     stations_out: Annotated[
         Path,
         Option(
             "--stations-out",
             help="Output path for the per-station (a line's stop) reference CSV",
         ),
-    ] = DEFAULT_STATIONS_INDIVIDUAL_CSV,
+    ] = DEFAULT_STATIONS_CSV,
     force_stations: Annotated[
         bool, Option(help="Refetch station reference data even if it exists")
     ] = False,
@@ -178,8 +178,8 @@ def prepare(
     """
     DATA.mkdir(exist_ok=True)
     force_stations = force_stations or stations_only
-    fetch_csv(STATIONS_URL, complexes_out, force=force_stations)
-    fetch_csv(STATIONS_INDIVIDUAL_URL, stations_out, force=force_stations)
+    fetch_csv(COMPLEXES_URL, complexes_out, force=force_stations)
+    fetch_csv(STATIONS_URL, stations_out, force=force_stations)
     if stations_only:
         return
     convert_od_to_parquet(

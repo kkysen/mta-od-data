@@ -22,13 +22,13 @@ from mta_od_data.analyze.scenarios import (
     StationIndex,
 )
 
-STATIONS = DATA / "stations_complexes.csv"
-STATIONS_INDIVIDUAL = DATA / "stations_individual.csv"
+COMPLEXES = DATA / "complexes.csv"
+STATIONS = DATA / "stations.csv"
 
 pytestmark = pytest.mark.skipif(
-    not (STATIONS.exists() and STATIONS_INDIVIDUAL.exists()),
+    not (COMPLEXES.exists() and STATIONS.exists()),
     reason=(
-        f"{STATIONS.relative_to(ROOT)}/{STATIONS_INDIVIDUAL.relative_to(ROOT)} not "
+        f"{COMPLEXES.relative_to(ROOT)}/{STATIONS.relative_to(ROOT)} not "
         "found (run `uv run mta-od-data prepare` first)"
     ),
 )
@@ -36,12 +36,12 @@ pytestmark = pytest.mark.skipif(
 
 @pytest.fixture(scope="module")
 def complexes_by_id() -> dict[int, Complex]:
-    return Complex.load_all(STATIONS)
+    return Complex.load_all(COMPLEXES)
 
 
 @pytest.fixture(scope="module")
 def stations(complexes_by_id: dict[int, Complex]) -> list[Station]:
-    return Station.load_all(STATIONS_INDIVIDUAL, complexes_by_id)
+    return Station.load_all(STATIONS, complexes_by_id)
 
 
 @pytest.fixture(scope="module")
