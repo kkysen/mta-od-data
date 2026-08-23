@@ -1,6 +1,6 @@
 import csv
 from collections import defaultdict
-from collections.abc import Hashable
+from collections.abc import Collection, Hashable
 from dataclasses import dataclass, fields
 from enum import StrEnum
 from functools import cache
@@ -370,7 +370,7 @@ class WalkPoints:
 
     @classmethod
     def build(
-        cls, individual_stations: list[Station], complexes_by_id: dict[int, Complex]
+        cls, individual_stations: list[Station], complexes: Collection[Complex]
     ) -> WalkPoints:
         by_complex: defaultdict[Complex, list[Station]] = defaultdict(list)
         for station in individual_stations:
@@ -380,10 +380,7 @@ class WalkPoints:
         # complex without any is a station file this can't answer for.
         # It used to fall back to the complex's centroid, silently
         # measuring to a point no rider stands at.
-        without = sorted(
-            set(complexes_by_id.values()) - set(by_complex),
-            key=attrgetter("complex_id"),
-        )
+        without = sorted(set(complexes) - set(by_complex), key=attrgetter("complex_id"))
         if without:
             raise ValueError(
                 f"{len(without)} complexes have no stations of their own "

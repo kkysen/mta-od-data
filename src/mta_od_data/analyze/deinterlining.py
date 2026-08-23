@@ -257,7 +257,7 @@ class Walks:
     # station is doesn't depend on which routes stop there.
     @cache  # noqa: B019  (see `ScenarioWalks.corridor_stations`)
     def points(self) -> WalkPoints:
-        return WalkPoints.build(self.individual_stations, self.complexes_by_id)
+        return WalkPoints.build(self.individual_stations, self.complexes_by_id.values())
 
 
 @dataclass(slots=True, frozen=True, eq=False)
