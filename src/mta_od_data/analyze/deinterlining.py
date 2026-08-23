@@ -1559,7 +1559,7 @@ def deinterlining(
         "/".join(d.strip() for d in days.split(",")) if days else str(day_type)
     )
     stations_by_id = Complex.load_all(stations)
-    individual_stations = Station.load_individuals(stations_individual)
+    individual_stations = Station.load_all(stations_individual, stations_by_id)
     station_index = StationIndex.build(stations_by_id, individual_stations)
     try:
         comparison = resolve_scenarios(

@@ -128,51 +128,74 @@ class Complex:
 
 @dataclass(slots=True, frozen=True)
 class Station:
-    complex_id: int
+    """One line's stop, which is what the reference data calls a
+    station: `62 St` on the Sea Beach line, as against the
+    `62 St/New Utrecht Av` complex it belongs to.
+
+    Not a platform, though the code used to call it one: the source has
+    a row per (complex, line), both directions together, and express
+    and local tracks together (`59 St-Columbus Circle` on `8th Av -
+    Fulton St` is one row reading `A C B D`).
+    """
+
+    # The complex this is part of, rather than its id: `Complex.load_all`
+    # interns them, so this is the one object for that complex, and the
+    # code that used to look one up by id has it in hand.
+    complex: Complex
+    # This stop's own name and routes, which are the complex's only
+    # where the complex is a single station: 86 of the 496 stations
+    # serve routes their complex has more of, and 38 are named
+    # differently.
     name: str
     routes: frozenset[str]
+    # This stop's own point, not the complex's centroid, which for a
+    # merged complex (e.g. Times Sq-42 St/PABT) can sit well away from
+    # any of its stations and throw off a nearest-station distance.
     loc: Coord
-    # "M"/"Bk"/"Bx"/"Q"/"SI", as given by the source data.
-    borough: str
-    # In Manhattan's Congestion Relief Zone; see `regions.cbd_region`.
-    cbd: bool
-    # Physical line name (e.g. "4th Av"), per-platform stations only;
-    # empty for a complex, which can span several lines.
-    line: str = ""
-    # The source data's own per-platform id, which runs along the line,
+    # Physical line name, e.g. "4th Av".
+    line: str
+    # The source data's own per-station id, which runs along the line,
     # so sorting by it puts a line's stations in the order they're
-    # passed. Per-platform only, 0 for a complex, like `line`.
-    # Not `gtfs_stop_id`, which also identifies a platform but doesn't
+    # passed.
+    # Not `gtfs_stop_id`, which also identifies a station but doesn't
     # sort the same way (its prefixes are per-service, so the Brighton
-    # line's platforms interleave `D` and `R` ids).
-    station_id: int = 0
+    # line's stations interleave `D` and `R` ids).
+    station_id: int
+
+    @property
+    def complex_id(self) -> int:
+        return self.complex.complex_id
+
+    # Where a station is, is where its complex is: the two agree on
+    # `borough` and `cbd` for all 496 of them, being the same place.
+    @property
+    def borough(self) -> str:
+        return self.complex.borough
+
+    @property
+    def cbd(self) -> bool:
+        return self.complex.cbd
 
     def display(self, routes: frozenset[str] | None = None) -> str:
         return display_station(self.name, self.routes if routes is None else routes)
 
     @classmethod
-    def load_individual(cls, row: dict[str, str]) -> Self:
-        """Per-platform rows, not complex centroids:
-        a merged complex (e.g. Times Sq-42 St/Port Authority Bus Terminal)
-        has a centroid that can sit well away from any of its actual
-        platforms, which would throw off a nearest-station distance."""
+    def load(cls, row: dict[str, str], complexes: dict[int, Complex]) -> Self:
         return cls(
-            complex_id=int(row["complex_id"]),
+            complex=complexes[int(row["complex_id"])],
             name=abbreviate_name(row["stop_name"]),
             routes=frozenset(row["daytime_routes"].split()),
             loc=Coord(
                 lat=float(row["gtfs_latitude"]), lon=float(row["gtfs_longitude"])
             ),
-            borough=row["borough"],
-            cbd=row["cbd"] == "true",
             line=row["line"],
             station_id=int(row["station_id"]),
         )
 
     @classmethod
-    def load_individuals(cls, path: Path) -> list[Self]:
+    def load_all(cls, path: Path, complexes: dict[int, Complex]) -> list[Self]:
         with path.open(newline="") as f:
-            return [cls.load_individual(row) for row in csv.DictReader(f)]
+            return [cls.load(row, complexes) for row in csv.DictReader(f)]
 
 
 @cache

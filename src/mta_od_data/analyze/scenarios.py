@@ -221,9 +221,7 @@ class StationIndex:
             station_ids[platform.name, platform.line].append(platform.station_id)
             # By complex, so a complex's several platforms of one name
             # on one line (which is routine) count once.
-            by_name_line[platform.name, platform.line].add(
-                stations_by_id[platform.complex_id]
-            )
+            by_name_line[platform.name, platform.line].add(platform.complex)
         return cls(
             by_name_line={key: frozenset(v) for key, v in by_name_line.items()},
             known_routes=frozenset(

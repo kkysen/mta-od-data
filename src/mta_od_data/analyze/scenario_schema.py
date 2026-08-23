@@ -42,7 +42,7 @@ def generate_scenario_schema(
             SCENARIOS_SCHEMA_FILE.write_text(generate_scenario_schema())"
     """
     stations_by_id = Complex.load_all(stations_path)
-    individual_stations = Station.load_individuals(individual_stations_path)
+    individual_stations = Station.load_all(individual_stations_path, stations_by_id)
     known_lines = sorted({s.line for s in individual_stations if s.line})
     # Platform names, not a complex's merged name (e.g. "62 St/New
     # Utrecht Av"): that's what a `stations` entry resolves against.
