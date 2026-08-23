@@ -300,9 +300,9 @@ def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> 
             station_id=complex.complex_id,
         )
 
-    complexes = {cid: complex(cid) for cid in (1, 2)}
-    stations = [station(c) for c in complexes.values()]
-    index = StationIndex.build(complexes.values(), stations)
+    complexes_by_id = {cid: complex(cid) for cid in (1, 2)}
+    stations = [station(c) for c in complexes_by_id.values()]
+    index = StationIndex.build(complexes_by_id.values(), stations)
     with pytest.raises(ScenarioError, match="names 2 station complexes"):
         index.resolve("72 St", "Central Park West", path=tmp_path / "scenarios.json5")
 

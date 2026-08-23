@@ -27,11 +27,11 @@ def test_loading_twice_yields_the_same_objects() -> None:
     """A run loads each file once, but nothing enforces that, and a
     second load handing back equal-but-distinct objects would make
     every `==` and every dict lookup on them silently wrong."""
-    complexes = Complex.load_all(COMPLEXES)
+    complexes_by_id = Complex.load_all(COMPLEXES)
     again = Complex.load_all(COMPLEXES)
-    assert all(complexes[cid] is again[cid] for cid in complexes)
+    assert all(complexes_by_id[cid] is again[cid] for cid in complexes_by_id)
 
-    stations = Station.load_all(STATIONS, complexes)
+    stations = Station.load_all(STATIONS, complexes_by_id)
     # Against the *other* load's complexes, since a `Station` interns
     # by its fields and its complex is one of them.
     stations_again = Station.load_all(STATIONS, again)
@@ -44,8 +44,10 @@ def test_a_different_file_is_a_different_station(tmp_path: Path) -> None:
     handed the rows of whichever file happened to be read first."""
     edited = tmp_path / "complexes.csv"
     edited.write_text(COMPLEXES.read_text().replace("Astoria-Ditmars Blvd", "Ditmars"))
-    complexes = Complex.load_all(COMPLEXES)
+    complexes_by_id = Complex.load_all(COMPLEXES)
     others = Complex.load_all(edited)
-    changed = [cid for cid in complexes if complexes[cid] is not others[cid]]
-    assert [complexes[cid].name for cid in changed] == ["Astoria-Ditmars Blvd"]
+    changed = [
+        cid for cid in complexes_by_id if complexes_by_id[cid] is not others[cid]
+    ]
+    assert [complexes_by_id[cid].name for cid in changed] == ["Astoria-Ditmars Blvd"]
     assert [others[cid].name for cid in changed] == ["Ditmars"]
