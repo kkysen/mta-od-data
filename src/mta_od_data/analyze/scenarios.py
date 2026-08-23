@@ -9,7 +9,7 @@ replace `one_seat_rides.py`'s corridor-A/corridor-B machinery.
 
 import itertools
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 from collections.abc import Hashable
 from dataclasses import dataclass
 from pathlib import Path
@@ -107,8 +107,8 @@ def check_unique[T: Hashable](values: list[T]) -> list[T]:
     since both collapse to the same set before anything is computed.
     """
     # In the order the file has them, since that's where a reader
-    # goes looking, and `T` need only be hashable to be counted.
-    duplicates = list(dict.fromkeys(v for v in values if values.count(v) > 1))
+    # goes looking, which a `Counter` keeps by being a `dict`.
+    duplicates = [value for value, n in Counter(values).items() if n > 1]
     if duplicates:
         raise ValueError(f"duplicate entries: {duplicates}")
     return values
