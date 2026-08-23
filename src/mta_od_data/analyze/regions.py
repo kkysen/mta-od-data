@@ -2,13 +2,13 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 
-from mta_od_data.analyze.common import Station
+from mta_od_data.analyze.common import Place
 
 
 @dataclass(slots=True, frozen=True)
 class Region:
     name: str
-    contains: Callable[[Station], bool]
+    contains: Callable[[Place], bool]
 
 
 def borough_region(name: str, boroughs: frozenset[str]) -> Region:

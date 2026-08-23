@@ -5,7 +5,7 @@ from enum import StrEnum
 from functools import cache
 from math import asin, cos, radians, sin, sqrt
 from pathlib import Path
-from typing import Self
+from typing import Protocol, Self
 
 import duckdb
 
@@ -48,6 +48,84 @@ class Coord:
     lon: float
 
 
+class Place(Protocol):
+    """Somewhere a `regions.Region` can be asked about.
+
+    A `Complex` and a `Station` are both one, and share nothing else:
+    a region is about where a station is and which borough it's in,
+    which is the one question that doesn't care whether it's being
+    asked about a whole complex or one line's stop within it.
+    """
+
+    @property
+    def loc(self) -> Coord: ...
+    @property
+    def borough(self) -> str: ...
+    @property
+    def cbd(self) -> bool: ...
+
+
+@cache
+def display_station(name: str, routes: frozenset[str]) -> str:
+    """A station's name with the routes serving it, `"DeKalb Av (B,Q,R)"`.
+
+    Shared by `Complex` and `Station` rather than inherited:
+    the two agree on how a station reads, and on nothing else,
+    since a complex's name and routes are the merge of its stations'
+    (`"62 St/New Utrecht Av (D,N,W)"` over `"62 St (N,W)"`).
+    """
+    return f"{name} ({','.join(sorted(routes))})"
+
+
+@dataclass(slots=True, frozen=True)
+class Complex:
+    """A station complex: everything a rider can reach without a
+    MetroCard, which is what the OD data counts trips between.
+
+    Its `name`, `routes`, and `loc` are the merge of the `Station`s in
+    it, and differ from every one of them where the complex has more
+    than one: the name lists them all, the routes are the union, and
+    the point is a centroid that can sit well off any of the platforms.
+    """
+
+    complex_id: int
+    name: str
+    routes: frozenset[str]
+    # The complex's centroid, which is not any station's own point;
+    # see `Station.loc` for when that difference matters.
+    loc: Coord
+    # "M"/"Bk"/"Bx"/"Q"/"SI", as given by the source data.
+    borough: str
+    # In Manhattan's Congestion Relief Zone; see `regions.cbd_region`.
+    cbd: bool
+
+    def display(self, routes: frozenset[str] | None = None) -> str:
+        return display_station(self.name, self.routes if routes is None else routes)
+
+    @classmethod
+    def load(cls, row: dict[str, str]) -> Self:
+        return cls(
+            complex_id=int(row["complex_id"]),
+            name=abbreviate_name(row["stop_name"]),
+            routes=frozenset(row["daytime_routes"].split()),
+            loc=Coord(lat=float(row["latitude"]), lon=float(row["longitude"])),
+            borough=row["borough"],
+            cbd=row["cbd"] == "true",
+        )
+
+    @classmethod
+    def load_all(cls, path: Path) -> dict[int, Self]:
+        """By id, which is also what interns them:
+        one object per complex for the process's lifetime,
+        so a `Station` can hold its own rather than an id to look up.
+        """
+        with path.open(newline="") as f:
+            return {
+                (complex_station := cls.load(row)).complex_id: complex_station
+                for row in csv.DictReader(f)
+            }
+
+
 @dataclass(slots=True, frozen=True)
 class Station:
     complex_id: int
@@ -69,33 +147,8 @@ class Station:
     # line's platforms interleave `D` and `R` ids).
     station_id: int = 0
 
-    # B019 warns that caching a method keeps `self` alive forever,
-    # but `load_complexes`/`load_individuals` already hold every `Station`
-    # for the process's lifetime.
-    @cache  # noqa: B019
     def display(self, routes: frozenset[str] | None = None) -> str:
-        shown_routes = self.routes if routes is None else routes
-        return f"{self.name} ({','.join(sorted(shown_routes))})"
-
-    @classmethod
-    def load_complex(cls, row: dict[str, str]) -> Self:
-        cid = int(row["complex_id"])
-        return cls(
-            complex_id=cid,
-            name=abbreviate_name(row["stop_name"]),
-            routes=frozenset(row["daytime_routes"].split()),
-            loc=Coord(lat=float(row["latitude"]), lon=float(row["longitude"])),
-            borough=row["borough"],
-            cbd=row["cbd"] == "true",
-        )
-
-    @classmethod
-    def load_complexes(cls, path: Path) -> dict[int, Self]:
-        with path.open(newline="") as f:
-            return {
-                (station := cls.load_complex(row)).complex_id: station
-                for row in csv.DictReader(f)
-            }
+        return display_station(self.name, self.routes if routes is None else routes)
 
     @classmethod
     def load_individual(cls, row: dict[str, str]) -> Self:
@@ -160,12 +213,12 @@ class PlatformIndex:
             by_complex={cid: tuple(v) for cid, v in by_complex.items()},
         )
 
-    def name(self, station: Station, routes: frozenset[str]) -> str:
+    def name(self, station: Complex, routes: frozenset[str]) -> str:
         return platform_name(
             self.by_complex.get(station.complex_id, ()), station.name, routes
         )
 
-    def display(self, station: Station, routes: frozenset[str]) -> str:
+    def display(self, station: Complex, routes: frozenset[str]) -> str:
         return f"{self.name(station, routes)} ({','.join(sorted(routes))})"
 
 
@@ -241,7 +294,7 @@ class WalkPoints:
 
     @classmethod
     def build(
-        cls, individual_stations: list[Station], stations_by_id: dict[int, Station]
+        cls, individual_stations: list[Station], stations_by_id: dict[int, Complex]
     ) -> WalkPoints:
         locations = [platform.loc for platform in individual_stations]
         by_complex: defaultdict[int, list[PlatformId]] = defaultdict(list)

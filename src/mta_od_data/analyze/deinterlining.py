@@ -35,6 +35,7 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
+    Complex,
     DayCoverage,
     DayFilterError,
     DayType,
@@ -245,7 +246,7 @@ class Walks:
     possible.
     """
 
-    stations_by_id: dict[int, Station]
+    stations_by_id: dict[int, Complex]
     individual_stations: list[Station]
     platforms: PlatformIndex
     close_threshold_m: float
@@ -422,8 +423,8 @@ class ScenarioWalks:
 
     def shortest_walk(
         self,
-        origin: Station,
-        dest: Station,
+        origin: Complex,
+        dest: Complex,
         origin_routes: Routes,
         dest_routes: Routes,
     ) -> Walk:
@@ -1557,7 +1558,7 @@ def deinterlining(
     day_type_label = (
         "/".join(d.strip() for d in days.split(",")) if days else str(day_type)
     )
-    stations_by_id = Station.load_complexes(stations)
+    stations_by_id = Complex.load_all(stations)
     individual_stations = Station.load_individuals(stations_individual)
     station_index = StationIndex.build(stations_by_id, individual_stations)
     try:

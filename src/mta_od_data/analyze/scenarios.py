@@ -26,7 +26,7 @@ from pydantic import (
 )
 
 from mta_od_data import ROOT
-from mta_od_data.analyze.common import PlatformIndex, Station
+from mta_od_data.analyze.common import Complex, PlatformIndex, Station
 
 SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json5"
 
@@ -71,7 +71,7 @@ class RouteDelta:
 
 # A complex and the line an override named,
 # which is what a delta is keyed by; see `Scenario.overrides` for why both.
-type OverrideKey = tuple[Station, str]
+type OverrideKey = tuple[Complex, str]
 type Overrides = dict[OverrideKey, RouteDelta]
 
 
@@ -198,7 +198,7 @@ class StationIndex:
     # rather than the last one seen: a name shared by two complexes on
     # one line has no right answer, and `resolve` says so instead of
     # picking whichever the CSV happened to end with.
-    by_name_line: dict[tuple[str, str], frozenset[Station]]
+    by_name_line: dict[tuple[str, str], frozenset[Complex]]
     known_routes: frozenset[str]
     # A scenario's overrides are declared per line and resolved to a
     # complex, so applying them needs the complex's platforms.
@@ -212,10 +212,10 @@ class StationIndex:
     @classmethod
     def build(
         cls,
-        stations_by_id: dict[int, Station],
+        stations_by_id: dict[int, Complex],
         individual_stations: list[Station],
     ) -> StationIndex:
-        by_name_line: defaultdict[tuple[str, str], set[Station]] = defaultdict(set)
+        by_name_line: defaultdict[tuple[str, str], set[Complex]] = defaultdict(set)
         station_ids: defaultdict[tuple[str, str], list[int]] = defaultdict(list)
         for platform in individual_stations:
             station_ids[platform.name, platform.line].append(platform.station_id)
@@ -233,7 +233,7 @@ class StationIndex:
             station_id_by_name_line={key: min(ids) for key, ids in station_ids.items()},
         )
 
-    def resolve(self, name: str, line: str, *, path: Path) -> Station:
+    def resolve(self, name: str, line: str, *, path: Path) -> Complex:
         stations = self.by_name_line.get((name, line), frozenset())
         if not stations:
             raise ScenarioError(
@@ -249,7 +249,7 @@ class StationIndex:
             )
         return next(iter(stations))
 
-    def routes_on_line(self, station: Station, line: str) -> Routes:
+    def routes_on_line(self, station: Complex, line: str) -> Routes:
         """What the complex's platforms *on this line* serve.
 
         Not the complex's own routes, which are every line's together:
@@ -322,13 +322,13 @@ class Scenario:
     # A complex's routes are the union of its platforms', which the
     # station data holds to exactly, so these stay derived rather than
     # tracked.
-    effective_routes: dict[Station, Routes]
+    effective_routes: dict[Complex, Routes]
     platform_routes: dict[Station, Routes]
 
     def slug(self) -> str:
         return slugify(self.name)
 
-    def routes_of(self, station: Station) -> Routes:
+    def routes_of(self, station: Complex) -> Routes:
         """A complex's routes under this scenario."""
         return self.effective_routes.get(station, station.routes & self.routes)
 
@@ -347,10 +347,10 @@ class Scenario:
         overrides: Overrides,
         platforms: PlatformIndex,
         routes: Routes,
-    ) -> tuple[dict[Station, Routes], dict[Station, Routes]]:
+    ) -> tuple[dict[Complex, Routes], dict[Station, Routes]]:
         """`(complex -> routes, platform -> routes)` for the overridden
         complexes; everything else falls back to its real routes."""
-        effective: dict[Station, Routes] = {}
+        effective: dict[Complex, Routes] = {}
         platform_routes: dict[Station, Routes] = {}
         for complex_station in {c for c, _line in overrides}:
             union: Routes = frozenset()

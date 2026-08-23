@@ -11,10 +11,10 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
+    Complex,
     DayCoverage,
     DayFilterError,
     DayType,
-    Station,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.regions import (
@@ -274,7 +274,7 @@ def regional_flow(
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
     )
-    stations_by_id = Station.load_complexes(stations)
+    stations_by_id = Complex.load_all(stations)
     valid_boroughs = frozenset(s.borough for s in stations_by_id.values())
     region_def = resolve_region(
         preset=region,
