@@ -1156,7 +1156,7 @@ def one_seat_rides(
         stations_by_complex.setdefault(s.complex_id, []).append(s)
     # Numbers those stations, so a sweep can key its distances on a
     # pair of ids rather than on a pair of `Coord`s.
-    walk_points = WalkPoints.build(individual_stations, complexes_by_id)
+    walk_points = WalkPoints.build(individual_stations, complexes_by_id.values())
 
     # Keyed by borough too,
     # since a `line` label can span physically distinct segments:
