@@ -212,7 +212,7 @@ class StationIndex:
     @classmethod
     def build(
         cls,
-        stations_by_id: dict[int, Complex],
+        complexes_by_id: dict[int, Complex],
         individual_stations: list[Station],
     ) -> StationIndex:
         by_name_line: defaultdict[tuple[str, str], set[Complex]] = defaultdict(set)
@@ -225,7 +225,7 @@ class StationIndex:
         return cls(
             by_name_line={key: frozenset(v) for key, v in by_name_line.items()},
             known_routes=frozenset(
-                r for s in stations_by_id.values() for r in s.routes
+                r for s in complexes_by_id.values() for r in s.routes
             ),
             stations=ComplexStations.build(individual_stations),
             station_id_by_name_line={key: min(ids) for key, ids in station_ids.items()},

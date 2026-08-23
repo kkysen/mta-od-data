@@ -166,12 +166,12 @@ class ScenarioResult:
 
     def print_details(
         self,
-        stations_by_id: dict[int, Complex],
+        complexes_by_id: dict[int, Complex],
         origin_ids: list[int],
     ) -> None:
         print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
         for cid in origin_ids:
-            name = stations_by_id[cid].display()
+            name = complexes_by_id[cid].display()
             total, one_seat = self.per_origin[cid]
             pct = 100 * one_seat / total if total else float("nan")
             print(f"  {name:<45} total={total:>9,.0f}  one-seat={pct:5.1f}%")
@@ -431,7 +431,7 @@ def run_scenario(
     label: str,
     scoped: list[tuple[int, int, float]],
     total_riders: float,
-    stations_by_id: dict[int, Complex],
+    complexes_by_id: dict[int, Complex],
     origin_ids: list[int],
     routes_set: frozenset[str],
     primary_routes_set: frozenset[str],
@@ -460,7 +460,7 @@ def run_scenario(
     if verbose:
         print(f"\nCorridor assignment (scenario active: {corridor_scenario_active}):")
     for cid in origin_ids:
-        s = stations_by_id[cid]
+        s = complexes_by_id[cid]
         in_a = bool(s.routes & origin_corridor_a_routes_set)
         in_b = bool(s.routes & origin_corridor_b_routes_set)
         corridor_tag = "a+b" if in_a and in_b else "a" if in_a else "b" if in_b else "?"
@@ -506,8 +506,8 @@ def run_scenario(
     # for the aggregate table below.
     dest_route_union: dict[int, set[str]] = {}
     for origin_id, dest_id, riders in scoped:
-        origin = stations_by_id[origin_id]
-        dest = stations_by_id[dest_id]
+        origin = complexes_by_id[origin_id]
+        dest = complexes_by_id[dest_id]
         dest_routes = dest.routes
         is_one_seat, shared = classify_one_seat(
             effective_origin_routes[origin_id],
@@ -613,7 +613,7 @@ def run_scenario(
         per_origin[r.origin_id][0] += r.riders
         if r.one_seat:
             per_origin[r.origin_id][1] += r.riders
-        dest_station = stations_by_id[r.dest_id]
+        dest_station = complexes_by_id[r.dest_id]
         arrival_routes = dest_route_union.get(r.dest_id)
         dest_display_name = (
             dest_station.display(frozenset(arrival_routes))
@@ -1068,10 +1068,10 @@ def one_seat_rides(
             )
             raise SystemExit(1)
 
-    stations_by_id = Complex.load_all(stations)
-    boundary_lat = stations_by_id[boundary_complex_id].loc.lat
-    boundary_station = stations_by_id[boundary_complex_id]
-    boundary_name = boundary_station.display(boundary_station.routes & routes_set)
+    complexes_by_id = Complex.load_all(stations)
+    boundary_lat = complexes_by_id[boundary_complex_id].loc.lat
+    boundary_complex = complexes_by_id[boundary_complex_id]
+    boundary_name = boundary_complex.display(boundary_complex.routes & routes_set)
     print(
         f"Boundary: {boundary_name} (id {boundary_complex_id}), lat {boundary_lat:.6f}"
     )
@@ -1085,13 +1085,13 @@ def one_seat_rides(
 
     origin_ids = [
         s.complex_id
-        for s in stations_by_id.values()
+        for s in complexes_by_id.values()
         if (s.routes & routes_set) and side_ok(s.loc.lat, origin_side)
     ]
     origin_ids.sort()
     print(f"\nOrigin stations ({len(origin_ids)}):")
     for cid in origin_ids:
-        s = stations_by_id[cid]
+        s = complexes_by_id[cid]
         print(f"  {cid:>4}  {s.name}  routes={sorted(s.routes)}")
 
     con = duckdb.connect()
@@ -1133,7 +1133,7 @@ def one_seat_rides(
     # computed once and reused across scenarios.
     scoped = []
     for origin_id, dest_id, riders in pairs:
-        dest = stations_by_id.get(dest_id)
+        dest = complexes_by_id.get(dest_id)
         if dest is None:
             # Almost certainly a stale --stations file against a newer
             # OD extract; dropping it would silently undercount.
@@ -1151,13 +1151,13 @@ def one_seat_rides(
 
     total_riders = sum(r for _, _, r in scoped)
 
-    individual_stations = Station.load_all(stations_individual, stations_by_id)
+    individual_stations = Station.load_all(stations_individual, complexes_by_id)
     stations_by_complex: dict[int, list[Station]] = {}
     for s in individual_stations:
         stations_by_complex.setdefault(s.complex_id, []).append(s)
     # Numbers those stations, so a sweep can key its distances on a
     # pair of ids rather than on a pair of `Coord`s.
-    walk_points = WalkPoints.build(individual_stations, stations_by_id)
+    walk_points = WalkPoints.build(individual_stations, complexes_by_id)
 
     # Keyed by borough too,
     # since a `line` label can span physically distinct segments:
@@ -1259,7 +1259,7 @@ def one_seat_rides(
             label=sdef.label,
             scoped=scoped,
             total_riders=total_riders,
-            stations_by_id=stations_by_id,
+            complexes_by_id=complexes_by_id,
             origin_ids=origin_ids,
             routes_set=routes_set,
             primary_routes_set=primary_routes_set,
@@ -1282,7 +1282,7 @@ def one_seat_rides(
             close_threshold_m=close_threshold_m,
         )
         if not show_label:
-            result.print_details(stations_by_id, origin_ids)
+            result.print_details(complexes_by_id, origin_ids)
         results.append(result)
 
     if show_label:

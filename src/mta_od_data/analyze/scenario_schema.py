@@ -41,13 +41,13 @@ def generate_scenario_schema(
             SCENARIOS_SCHEMA_FILE, generate_scenario_schema; \\
             SCENARIOS_SCHEMA_FILE.write_text(generate_scenario_schema())"
     """
-    stations_by_id = Complex.load_all(stations_path)
-    individual_stations = Station.load_all(individual_stations_path, stations_by_id)
+    complexes_by_id = Complex.load_all(stations_path)
+    individual_stations = Station.load_all(individual_stations_path, complexes_by_id)
     known_lines = sorted({s.line for s in individual_stations if s.line})
     # Platform names, not a complex's merged name (e.g. "62 St/New
     # Utrecht Av"): that's what a `stations` entry resolves against.
     known_stations = sorted({s.name for s in individual_stations})
-    known_routes = sorted({r for s in stations_by_id.values() for r in s.routes})
+    known_routes = sorted({r for s in complexes_by_id.values() for r in s.routes})
 
     schema: dict[str, Any] = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",

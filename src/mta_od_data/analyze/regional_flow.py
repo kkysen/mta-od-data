@@ -274,8 +274,8 @@ def regional_flow(
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
     )
-    stations_by_id = Complex.load_all(stations)
-    valid_boroughs = frozenset(s.borough for s in stations_by_id.values())
+    complexes_by_id = Complex.load_all(stations)
+    valid_boroughs = frozenset(s.borough for s in complexes_by_id.values())
     region_def = resolve_region(
         preset=region,
         region_borough=region_borough,
@@ -284,16 +284,16 @@ def regional_flow(
         valid_boroughs=valid_boroughs,
     )
 
-    n_inside = sum(1 for s in stations_by_id.values() if region_def.contains(s))
+    n_inside = sum(1 for s in complexes_by_id.values() if region_def.contains(s))
     if n_inside == 0:
         print(
             f"error: region {region_def.name!r} matches 0 of "
-            f"{len(stations_by_id)} stations; check "
+            f"{len(complexes_by_id)} stations; check "
             "--region/--region-borough/--region-bbox",
             file=sys.stderr,
         )
         raise SystemExit(1)
-    print(f"Region: {region_def.name} ({n_inside} of {len(stations_by_id)} stations)")
+    print(f"Region: {region_def.name} ({n_inside} of {len(complexes_by_id)} stations)")
     print(f"Day filter: {days_list if days_list else 'all days'}")
 
     con = duckdb.connect()
@@ -334,8 +334,8 @@ def regional_flow(
     total_riders = 0.0
     in_in = in_out = out_in = out_out = 0.0
     for origin_id, dest_id, riders in pairs:
-        origin = stations_by_id.get(origin_id)
-        dest = stations_by_id.get(dest_id)
+        origin = complexes_by_id.get(origin_id)
+        dest = complexes_by_id.get(dest_id)
         if origin is None or dest is None:
             missing_id = origin_id if origin is None else dest_id
             print(
