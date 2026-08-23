@@ -69,7 +69,13 @@ class HashByField[T: DataclassInstance]:
     @property
     def key(self) -> tuple[type[T], tuple[Hashable, ...]]:
         value = self.value
-        return type(value), tuple(getattr(value, f.name) for f in fields(value))
+        # `f.compare`, so this says what the dataclass's own `__eq__`
+        # would: a field left out of that is one the type doesn't count
+        # as part of what it is, and counting it here would split two
+        # values the type calls equal.
+        return type(value), tuple(
+            getattr(value, f.name) for f in fields(value) if f.compare
+        )
 
     @override
     def __hash__(self) -> int:
