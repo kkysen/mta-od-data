@@ -31,6 +31,12 @@ DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {
 }
 
 
+# The routes serving something: a station, a complex, a corridor, a
+# scenario. Here rather than in `scenarios.py`, which is where it was
+# and which imports this module, so nothing here could say it.
+type Routes = frozenset[str]
+
+
 def abbreviate_name(name: str) -> str:
     """Shorter forms for station names that are unwieldy at full length,
     especially with a route list appended.
@@ -122,7 +128,7 @@ class Place(Protocol):
 
 
 @cache
-def display_station(name: str, routes: frozenset[str]) -> str:
+def display_station(name: str, routes: Routes) -> str:
     """A station's name with the routes serving it, `"DeKalb Av (B,Q,R)"`.
 
     Shared by `Complex` and `Station` rather than inherited:
@@ -152,7 +158,7 @@ class Complex:
 
     complex_id: int
     name: str
-    routes: frozenset[str]
+    routes: Routes
     # The complex's centroid, which is not any station's own point;
     # see `Station.loc` for when that difference matters.
     loc: Coord
@@ -161,7 +167,7 @@ class Complex:
     # In Manhattan's Congestion Relief Zone; see `regions.cbd_region`.
     cbd: bool
 
-    def display(self, routes: frozenset[str] | None = None) -> str:
+    def display(self, routes: Routes | None = None) -> str:
         return display_station(self.name, self.routes if routes is None else routes)
 
     # Every `Complex` ever built, by its field values, so that two of
@@ -220,7 +226,7 @@ class Station:
     # serve routes their complex has more of, and 38 are named
     # differently.
     name: str
-    routes: frozenset[str]
+    routes: Routes
     # This stop's own point, not the complex's centroid, which for a
     # merged complex (e.g. Times Sq-42 St/PABT) can sit well away from
     # any of its stations and throw off a nearest-station distance.
@@ -249,7 +255,7 @@ class Station:
     def cbd(self) -> bool:
         return self.complex.cbd
 
-    def display(self, routes: frozenset[str] | None = None) -> str:
+    def display(self, routes: Routes | None = None) -> str:
         return display_station(self.name, self.routes if routes is None else routes)
 
     _interned: ClassVar[dict[HashByField[Station], Station]] = {}
@@ -277,7 +283,7 @@ class Station:
 
 @cache
 def station_name(
-    stations: tuple[Station, ...], complex_name: str, routes: frozenset[str]
+    stations: tuple[Station, ...], complex_name: str, routes: Routes
 ) -> str:
     """`complex_name` narrowed to the stations `routes` actually stops at.
 
@@ -353,10 +359,10 @@ class ComplexStations:
         """
         return haversine(station.loc, other.loc)
 
-    def name(self, complex: Complex, routes: frozenset[str]) -> str:
+    def name(self, complex: Complex, routes: Routes) -> str:
         return station_name(self.by_complex.get(complex, ()), complex.name, routes)
 
-    def display(self, complex: Complex, routes: frozenset[str]) -> str:
+    def display(self, complex: Complex, routes: Routes) -> str:
         return f"{self.name(complex, routes)} ({','.join(sorted(routes))})"
 
     @classmethod

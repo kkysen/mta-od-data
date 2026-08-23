@@ -26,12 +26,9 @@ from pydantic import (
 )
 
 from mta_od_data import ROOT
-from mta_od_data.analyze.common import Complex, ComplexStations, Station
+from mta_od_data.analyze.common import Complex, ComplexStations, Routes, Station
 
 SCENARIOS_FILE = ROOT / "src" / "mta_od_data" / "analyze" / "scenarios.json5"
-
-
-type Routes = frozenset[str]
 
 
 class ScenarioError(Exception):
