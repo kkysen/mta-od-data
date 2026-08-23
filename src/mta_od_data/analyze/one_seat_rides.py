@@ -1151,7 +1151,7 @@ def one_seat_rides(
 
     total_riders = sum(r for _, _, r in scoped)
 
-    individual_stations = Station.load_individuals(stations_individual)
+    individual_stations = Station.load_all(stations_individual, stations_by_id)
     platforms_by_complex: dict[int, list[Station]] = {}
     for s in individual_stations:
         platforms_by_complex.setdefault(s.complex_id, []).append(s)

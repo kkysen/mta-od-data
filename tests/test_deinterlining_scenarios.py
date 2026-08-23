@@ -40,8 +40,8 @@ def stations_by_id() -> dict[int, Complex]:
 
 
 @pytest.fixture(scope="module")
-def individual_stations() -> list[Station]:
-    return Station.load_individuals(STATIONS_INDIVIDUAL)
+def individual_stations(stations_by_id: dict[int, Complex]) -> list[Station]:
+    return Station.load_all(STATIONS_INDIVIDUAL, stations_by_id)
 
 
 @pytest.fixture(scope="module")
@@ -290,21 +290,19 @@ def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> 
             cbd=False,
         )
 
-    def platform(complex_id: int) -> Station:
+    def platform(complex_station: Complex) -> Station:
         return Station(
-            complex_id=complex_id,
+            complex=complex_station,
             name="72 St",
             routes=frozenset({"B"}),
             loc=Coord(lat=0.0, lon=0.0),
-            borough="M",
-            cbd=False,
             line="Central Park West",
+            station_id=complex_station.complex_id,
         )
 
-    platforms = [platform(1), platform(2)]
-    index = StationIndex.build(
-        {p.complex_id: complex_station(p.complex_id) for p in platforms}, platforms
-    )
+    complexes = {cid: complex_station(cid) for cid in (1, 2)}
+    platforms = [platform(c) for c in complexes.values()]
+    index = StationIndex.build(complexes, platforms)
     with pytest.raises(ScenarioError, match="names 2 station complexes"):
         index.resolve("72 St", "Central Park West", path=tmp_path / "scenarios.json5")
 
