@@ -1,13 +1,17 @@
 import csv
 from collections import defaultdict
+from collections.abc import Hashable
 from dataclasses import dataclass, fields
 from enum import StrEnum
 from functools import cache
 from math import asin, cos, radians, sin, sqrt
 from pathlib import Path
-from typing import ClassVar, Protocol, Self
+from typing import TYPE_CHECKING, ClassVar, Protocol, Self
 
 import duckdb
+
+if TYPE_CHECKING:
+    from _typeshed import DataclassInstance
 
 
 class DayType(StrEnum):
@@ -48,7 +52,7 @@ class Coord:
     lon: float
 
 
-def intern[T: Complex | Station](pool: dict[tuple[object, ...], T], value: T) -> T:
+def intern[T: DataclassInstance](pool: dict[tuple[Hashable, ...], T], value: T) -> T:
     """`value`, or whatever equal thing was interned before it.
 
     What lets `Complex` and `Station` be compared by identity: a run
@@ -62,6 +66,10 @@ def intern[T: Complex | Station](pool: dict[tuple[object, ...], T], value: T) ->
 
     Loading is the only way in, so a directly constructed one isn't
     interned; the tests build a few, and never two of equal value.
+
+    Any dataclass, since `fields` is all this needs of one, and the key
+    is a tuple of whatever those fields hold: `Hashable`, which is what
+    a `dict` key requires of them, and all a pool ever asks.
     """
     return pool.setdefault(tuple(getattr(value, f.name) for f in fields(value)), value)
 
@@ -130,7 +138,7 @@ class Complex:
     # them are equal exactly when they are the same object, which is
     # what `eq=False` above assumes. Never emptied, which costs one
     # entry per complex per distinct station file: 445 for the real one.
-    _interned: ClassVar[dict[tuple[object, ...], Complex]] = {}
+    _interned: ClassVar[dict[tuple[Hashable, ...], Complex]] = {}
 
     @classmethod
     def load(cls, row: dict[str, str]) -> Complex:
@@ -214,7 +222,7 @@ class Station:
     def display(self, routes: frozenset[str] | None = None) -> str:
         return display_station(self.name, self.routes if routes is None else routes)
 
-    _interned: ClassVar[dict[tuple[object, ...], Station]] = {}
+    _interned: ClassVar[dict[tuple[Hashable, ...], Station]] = {}
 
     @classmethod
     def load(cls, row: dict[str, str], complexes: dict[int, Complex]) -> Station:
