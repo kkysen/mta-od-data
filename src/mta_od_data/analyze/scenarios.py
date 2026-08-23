@@ -15,7 +15,14 @@ from pathlib import Path
 from typing import Annotated
 
 import json5
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    ConfigDict,
+    Field,
+    TypeAdapter,
+    ValidationError,
+)
 
 from mta_od_data import ROOT
 from mta_od_data.analyze.common import PlatformIndex, Station
@@ -72,16 +79,50 @@ def merge_override(overrides: Overrides, key: OverrideKey, delta: RouteDelta) ->
 
     Returns the routes the two disagree about, empty when they agree.
     A disagreement leaves `overrides` untouched
-    and is the caller's to report,
-    since who is disagreeing is all that separates the two ways
-    to arrive here: two override groups in one scenario,
-    and two scenarios being combined.
+    and is the caller's to report.
+    Only `combine_scenarios` merges: within one scenario a platform is
+    named once (`Scenario.load` raises otherwise), so there is nothing
+    to merge it with.
     """
     existing = overrides.get(key)
     merged = delta if existing is None else existing | delta
     if not merged.conflict:
         overrides[key] = merged
     return merged.conflict
+
+
+def check_unique(values: list[str]) -> list[str]:
+    """A list field's values, rejected if any repeats.
+
+    Every list in a scenario file is a set written down:
+    the stations a group is about, the routes it moves,
+    the routes a scenario is about.
+    A repeat therefore says nothing the single mention didn't,
+    and reads as one of the two mistakes it usually is:
+    a station pasted twice while the list was being edited,
+    or a second entry that was meant to name a different station
+    and never got renamed.
+    Neither can be seen in a report,
+    since both collapse to the same set before anything is computed.
+    """
+    duplicates = sorted({value for value in values if values.count(value) > 1})
+    if duplicates:
+        raise ValueError(f"duplicate entries: {duplicates}")
+    return values
+
+
+# `uniqueItems` so `scenarios.schema.json` says this too:
+# the validator runs on a real load, but the schema is what an editor
+# has to flag the repeat with, at the point it's being typed.
+# A bare assignment rather than a PEP 695 `type` alias (which is what
+# the rest of this file uses, and what `UP040` asks for): pydantic gives
+# a `type` alias its own `$defs` entry, shared by every field using it,
+# and `scenario_schema.py` bakes a different `enum` into each field.
+Unique = Annotated[
+    list[str],
+    AfterValidator(check_unique),
+    Field(json_schema_extra={"uniqueItems": True}),
+]
 
 
 class OverrideGroup(BaseModel):
@@ -94,9 +135,9 @@ class OverrideGroup(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     line: str = Field(min_length=1)
-    add: list[str] = Field(default_factory=list)
-    remove: list[str] = Field(default_factory=list)
-    stations: list[str] = Field(min_length=1)
+    add: Unique = Field(default_factory=list)
+    remove: Unique = Field(default_factory=list)
+    stations: Unique = Field(min_length=1)
 
 
 class ScenarioEntry(BaseModel):
@@ -111,7 +152,7 @@ class ScenarioEntry(BaseModel):
 
     name: str = Field(min_length=1)
     description: str | None = None
-    routes: list[str] = Field(min_length=1)
+    routes: Unique = Field(min_length=1)
     overrides: list[OverrideGroup] = Field(default_factory=list)
 
 
@@ -313,14 +354,21 @@ class Scenario:
                         f"station doesn't belong in this group, or the "
                         f"wrong route is named"
                     )
-                conflict = merge_override(overrides, (station, group.line), delta)
-                if conflict:
+                # One platform, one delta, so two groups naming it are
+                # an error even where they agree: the two say different
+                # things about the same platform, and merging them
+                # picks a routing neither group is written to describe.
+                # A `line` repeated across groups is still fine, since
+                # a line's express and local stops legitimately move
+                # different routes; it's the pair that must be unique.
+                key = (station, group.line)
+                if key in overrides:
                     raise ScenarioError(
                         f'scenario {path}: scenario "{entry.name}" has two '
                         f'override groups for "{station_name}" on line '
-                        f'"{group.line}" that disagree about route(s) '
-                        f"{sorted(conflict)}"
+                        f'"{group.line}"'
                     )
+                overrides[key] = delta
         effective_routes, platform_routes = cls.resolve_routes(
             overrides, station_index.platforms, routes
         )
@@ -433,8 +481,12 @@ class ScenarioFile:
         # JSON5, not JSON:
         # tolerates the trailing comma before a closing `}`/`]`
         # that's easy to leave when hand-editing.
+        # `allow_duplicate_keys=False` because the default keeps the last
+        # of two same-named keys and drops the first without a word,
+        # which for a repeated category name is a whole category's
+        # scenarios silently missing from the report.
         try:
-            data = json5.loads(path.read_text())
+            data = json5.loads(path.read_text(), allow_duplicate_keys=False)
         except ValueError as e:
             raise ScenarioError(f"scenario file {path} isn't valid JSON: {e}") from e
         try:

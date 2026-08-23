@@ -110,6 +110,92 @@ def test_a_group_cannot_add_and_remove_the_same_route(
         ScenarioFile.load(path, station_index)
 
 
+def test_a_repeated_station_is_an_error(
+    tmp_path: Path, station_index: StationIndex
+) -> None:
+    """A list in a scenario file is a set written down,
+    so a repeat says nothing and can't be seen in a report:
+    it's either a paste, or an entry never renamed to the station
+    it was added for."""
+    path = write_scenarios(
+        tmp_path,
+        {
+            "X": [
+                {
+                    "name": "Repeated station",
+                    "routes": CONFLICT_ROUTES,
+                    "overrides": [
+                        {
+                            "line": "Broadway - Brighton",
+                            "add": ["N"],
+                            "remove": ["B"],
+                            "stations": ["Kings Hwy", "Kings Hwy"],
+                        }
+                    ],
+                }
+            ]
+        },
+    )
+    with pytest.raises(ScenarioError, match=r"duplicate entries: \['Kings Hwy'\]"):
+        ScenarioFile.load(path, station_index)
+
+
+def test_a_repeated_route_is_an_error(
+    tmp_path: Path, station_index: StationIndex
+) -> None:
+    path = write_scenarios(
+        tmp_path,
+        {
+            "X": [
+                {
+                    "name": "Repeated route",
+                    "routes": [*CONFLICT_ROUTES, "B"],
+                }
+            ]
+        },
+    )
+    with pytest.raises(ScenarioError, match=r"duplicate entries: \['B'\]"):
+        ScenarioFile.load(path, station_index)
+
+
+def test_two_groups_cannot_name_one_station_on_one_line(
+    tmp_path: Path, station_index: StationIndex
+) -> None:
+    """Even agreeing about it: one platform takes one delta, and the
+    two groups each describe a routing the merge isn't either of."""
+    path = write_scenarios(
+        tmp_path,
+        {
+            "X": [
+                {
+                    "name": "Twice-overridden",
+                    "routes": CONFLICT_ROUTES,
+                    "overrides": [
+                        {"add": ["N"], "remove": ["B"], **CONFLICT_STATION},
+                        {"add": ["D"], "remove": ["Q"], **CONFLICT_STATION},
+                    ],
+                }
+            ]
+        },
+    )
+    with pytest.raises(ScenarioError, match="two override groups"):
+        ScenarioFile.load(path, station_index)
+
+
+def test_a_repeated_category_is_an_error(
+    tmp_path: Path, station_index: StationIndex
+) -> None:
+    """Written as text, not via `write_scenarios`:
+    a duplicate key is exactly what a Python dict can't hold,
+    and JSON5's default is to keep the last silently,
+    which is a whole category's scenarios missing from the report."""
+    path = tmp_path / "scenarios.json5"
+    entry = f'{{"name": "S", "routes": {json.dumps(CONFLICT_ROUTES)}}}'
+    path.write_text(f'{{"X": [{entry}], "X": [{entry}]}}')
+    with pytest.raises(ScenarioError, match="Duplicate key"):
+        ScenarioFile.load(path, station_index)
+
+
 def test_scenarios_that_slug_alike_are_rejected(
     tmp_path: Path, station_index: StationIndex
 ) -> None:
