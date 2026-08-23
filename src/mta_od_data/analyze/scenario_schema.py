@@ -29,7 +29,7 @@ def generate_scenario_schema(
 
     Those `enum`s are an editor-time snapshot only:
     a real load re-checks
-    against whichever `--stations`/`--stations-individual` was actually
+    against whichever `--complexes`/`--stations` was actually
     passed, which can legitimately differ from these defaults.
 
     The reference CSVs aren't committed
@@ -47,7 +47,7 @@ def generate_scenario_schema(
     # Platform names, not a complex's merged name (e.g. "62 St/New
     # Utrecht Av"): that's what a `stations` entry resolves against.
     known_stations = sorted({s.name for s in stations})
-    known_routes = sorted({r for s in complexes_by_id.values() for r in s.routes})
+    known_routes = sorted({r for c in complexes_by_id.values() for r in c.routes})
 
     schema: dict[str, Any] = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",

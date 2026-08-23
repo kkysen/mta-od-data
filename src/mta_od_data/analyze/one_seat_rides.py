@@ -746,16 +746,16 @@ def render_notes(*, close_threshold_m: float) -> str:
 @app.command()
 def one_seat_rides(
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
-    complexes_path: Annotated[Path, Option("--stations")] = (
+    complexes_path: Annotated[Path, Option("--complexes")] = (
         DATA / "stations_complexes.csv"
     ),
-    stations_individual_path: Annotated[
+    stations_path: Annotated[
         Path,
         Option(
-            "--stations-individual",
+            "--stations",
             help=(
-                "Per-physical-station reference CSV, used for accurate "
-                "nearest-other-trunk distances"
+                "Per-station reference CSV (a row per line's stop within "
+                "a complex), used for accurate nearest-other-trunk distances"
             ),
         ),
     ] = DATA / "stations_individual.csv",
@@ -1153,7 +1153,7 @@ def one_seat_rides(
 
     total_riders = sum(r for _, _, r in scoped)
 
-    stations = Station.load_all(stations_individual_path, complexes_by_id)
+    stations = Station.load_all(stations_path, complexes_by_id)
     stations_by_complex: dict[int, list[Station]] = {}
     for s in stations:
         stations_by_complex.setdefault(s.complex_id, []).append(s)

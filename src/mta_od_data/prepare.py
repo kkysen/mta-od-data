@@ -127,13 +127,16 @@ def prepare(
     force: Annotated[
         bool, Option(help="Reconvert even if --out already exists")
     ] = False,
+    complexes_out: Annotated[
+        Path,
+        Option("--complexes-out", help="Output path for the complex reference CSV"),
+    ] = DEFAULT_STATIONS_CSV,
     stations_out: Annotated[
         Path,
-        Option(help="Output path for complex-level station reference CSV"),
-    ] = DEFAULT_STATIONS_CSV,
-    stations_individual_out: Annotated[
-        Path,
-        Option(help="Output path for individual (per-physical-station) reference CSV"),
+        Option(
+            "--stations-out",
+            help="Output path for the per-station (a line's stop) reference CSV",
+        ),
     ] = DEFAULT_STATIONS_INDIVIDUAL_CSV,
     force_stations: Annotated[
         bool, Option(help="Refetch station reference data even if it exists")
@@ -175,8 +178,8 @@ def prepare(
     """
     DATA.mkdir(exist_ok=True)
     force_stations = force_stations or stations_only
-    fetch_csv(STATIONS_URL, stations_out, force=force_stations)
-    fetch_csv(STATIONS_INDIVIDUAL_URL, stations_individual_out, force=force_stations)
+    fetch_csv(STATIONS_URL, complexes_out, force=force_stations)
+    fetch_csv(STATIONS_INDIVIDUAL_URL, stations_out, force=force_stations)
     if stations_only:
         return
     convert_od_to_parquet(
