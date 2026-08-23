@@ -17,7 +17,7 @@ def test_loading_twice_yields_the_same_objects() -> None:
     every `==` and every dict lookup on them silently wrong."""
     complexes_by_id = Complex.load_all(COMPLEXES)
     again = Complex.load_all(COMPLEXES)
-    assert all(complexes_by_id[cid] is again[cid] for cid in complexes_by_id)
+    assert all(a is b for a, b in zip(complexes_by_id, again, strict=True))
 
     stations = Station.load_all(STATIONS, complexes_by_id)
     # Against the *other* load's complexes, since a `Station` interns
@@ -35,7 +35,9 @@ def test_a_different_file_is_a_different_station(tmp_path: Path) -> None:
     complexes_by_id = Complex.load_all(COMPLEXES)
     others = Complex.load_all(edited)
     changed = [
-        cid for cid in complexes_by_id if complexes_by_id[cid] is not others[cid]
+        (mine, theirs)
+        for mine, theirs in zip(complexes_by_id, others, strict=True)
+        if mine is not theirs
     ]
-    assert [complexes_by_id[cid].name for cid in changed] == ["Astoria-Ditmars Blvd"]
-    assert [others[cid].name for cid in changed] == ["Ditmars"]
+    assert [mine.name for mine, _ in changed] == ["Astoria-Ditmars Blvd"]
+    assert [theirs.name for _, theirs in changed] == ["Ditmars"]

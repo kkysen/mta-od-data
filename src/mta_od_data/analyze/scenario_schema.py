@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from mta_od_data import DATA, ROOT
-from mta_od_data.analyze.common import Complex, Station
+from mta_od_data.analyze.common import Complex, Station, complexes_of
 from mta_od_data.analyze.scenarios import SCENARIO_FILE_ADAPTER
 
 SCENARIOS_SCHEMA_FILE = (
@@ -44,7 +44,8 @@ def generate_scenario_schema(
     # Platform names, not a complex's merged name (e.g. "62 St/New
     # Utrecht Av"): that's what a `stations` entry resolves against.
     known_stations = sorted({s.name for s in stations})
-    known_routes = sorted({r for c in complexes_by_id.values() for r in c.routes})
+    complexes = complexes_of(complexes_by_id)
+    known_routes = sorted({r for c in complexes for r in c.routes})
 
     schema: dict[str, Any] = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",

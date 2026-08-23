@@ -10,7 +10,13 @@ from pathlib import Path
 import pytest
 
 from mta_od_data import DATA
-from mta_od_data.analyze.common import Complex, Coord, Station
+from mta_od_data.analyze.common import (
+    Complex,
+    ComplexesById,
+    Coord,
+    Station,
+    complexes_of,
+)
 from mta_od_data.analyze.deinterlining import NO_WALK, Outcome, Walks, resolve_scenarios
 from mta_od_data.analyze.scenarios import (
     SCENARIOS_FILE,
@@ -24,20 +30,20 @@ STATIONS = DATA / "stations.csv"
 
 
 @pytest.fixture(scope="module")
-def complexes_by_id() -> dict[int, Complex]:
+def complexes_by_id() -> ComplexesById:
     return Complex.load_all(COMPLEXES)
 
 
 @pytest.fixture(scope="module")
-def stations(complexes_by_id: dict[int, Complex]) -> list[Station]:
+def stations(complexes_by_id: ComplexesById) -> list[Station]:
     return Station.load_all(STATIONS, complexes_by_id)
 
 
 @pytest.fixture(scope="module")
 def station_index(
-    complexes_by_id: dict[int, Complex], stations: list[Station]
+    complexes_by_id: ComplexesById, stations: list[Station]
 ) -> StationIndex:
-    return StationIndex.build(complexes_by_id.values(), stations)
+    return StationIndex.build(complexes_of(complexes_by_id), stations)
 
 
 @pytest.fixture(scope="module")
@@ -289,9 +295,9 @@ def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> 
             station_id=complex.complex_id,
         )
 
-    complexes_by_id = {cid: complex(cid) for cid in (1, 2)}
-    stations = [station(c) for c in complexes_by_id.values()]
-    index = StationIndex.build(complexes_by_id.values(), stations)
+    complexes = [complex(1), complex(2)]
+    stations = [station(c) for c in complexes]
+    index = StationIndex.build(complexes, stations)
     with pytest.raises(ScenarioError, match="names 2 station complexes"):
         index.resolve("72 St", "Central Park West", path=tmp_path / "scenarios.json5")
 
@@ -390,7 +396,7 @@ STRANDING_SCENARIOS = {
 def test_a_stranded_pair_is_far_not_a_crash(
     tmp_path: Path,
     station_index: StationIndex,
-    complexes_by_id: dict[int, Complex],
+    complexes_by_id: ComplexesById,
     stations: list[Station],
 ) -> None:
     """A trip between two stations the scenario leaves with no route in
@@ -408,7 +414,7 @@ def test_a_stranded_pair_is_far_not_a_crash(
     # gives one of the comparison's routes.
     scope = frozenset(
         complex
-        for complex in complexes_by_id.values()
+        for complex in complexes_of(complexes_by_id)
         if any(s.routes_of(complex) for s in comparison.scenarios)
     )
     assert origin in scope, "the origin should be in scope today"

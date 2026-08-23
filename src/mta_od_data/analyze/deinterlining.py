@@ -35,12 +35,15 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
+    MISSING_COMPLEX,
     Complex,
+    ComplexesById,
     ComplexStations,
     DayCoverage,
     DayFilterError,
     DayType,
     Station,
+    complexes_of,
 )
 from mta_od_data.analyze.markdown import collapsed, table_row, table_rule
 from mta_od_data.analyze.scenarios import (
@@ -237,20 +240,33 @@ type ODRow = tuple[Complex, Complex, float]
 
 def resolve_pairs(
     rows: list[tuple[int, int, float]],
-    complexes_by_id: dict[int, Complex],
+    complexes_by_id: ComplexesById,
     complexes_path: Path,
 ) -> list[ODRow]:
+    def missing(complex_id: int) -> ScenarioError:
+        return ScenarioError(
+            f"station complex {complex_id} not found in "
+            f"{complexes_path}; refetch station reference data with "
+            "`mta-od-data prepare --force-stations`"
+        )
+
+    # Bound locally, both of them: this loop runs once per pair, and a
+    # global read per lookup would cost more than the tuple saves.
+    by_id = complexes_by_id
+    n_ids = len(by_id)
+    absent = MISSING_COMPLEX
     resolved: list[ODRow] = []
     for origin_id, dest_id, riders in rows:
-        origin = complexes_by_id.get(origin_id)
-        dest = complexes_by_id.get(dest_id)
-        if origin is None or dest is None:
-            missing_id = origin_id if origin is None else dest_id
-            raise ScenarioError(
-                f"station complex {missing_id} not found in "
-                f"{complexes_path}; refetch station reference data with "
-                "`mta-od-data prepare --force-stations`"
-            )
+        # An id past the end and an id with no complex mean the same
+        # thing here, so the bounds test stands in for both.
+        if origin_id >= n_ids:
+            raise missing(origin_id)
+        if dest_id >= n_ids:
+            raise missing(dest_id)
+        origin = by_id[origin_id]
+        dest = by_id[dest_id]
+        if origin is absent or dest is absent:
+            raise missing(origin_id if origin is absent else dest_id)
         resolved.append((origin, dest, riders))
     return resolved
 
@@ -1553,7 +1569,7 @@ def deinterlining(
         "/".join(d.strip() for d in days.split(",")) if days else str(day_type)
     )
     complexes_by_id = Complex.load_all(complexes_path)
-    complexes = complexes_by_id.values()
+    complexes = complexes_of(complexes_by_id)
     stations = Station.load_all(stations_path, complexes_by_id)
     station_index = StationIndex.build(complexes, stations)
     try:

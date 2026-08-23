@@ -189,16 +189,51 @@ class Complex:
         return intern(cls._interned, complex)
 
     @classmethod
-    def load_all(cls, path: Path) -> dict[int, Complex]:
-        """By id, which is also what interns them:
-        one object per complex for the process's lifetime,
-        so a `Station` can hold its own rather than an id to look up.
+    def load_all(cls, path: Path) -> ComplexesById:
+        """Every complex, at the index its id is.
+
+        A `tuple` rather than a `dict`, because a complex id is a small
+        dense integer: 445 of them below 637, so the holes cost 1.5K of
+        `MISSING_COMPLEX` and a lookup is an index rather than a hash.
+        A tuple rather than a list because its items are inline, one
+        dereference fewer: over the 356k lookups a run makes, 6.5ms
+        against 8.0ms for a list and 11.3ms for a dict.
+
+        Loading is also what interns them, one object per complex for
+        the process's lifetime, so a `Station` can hold its own rather
+        than an id to look up.
         """
         with path.open(newline="") as f:
-            return {
+            by_id: dict[int, Complex] = {
                 (complex := cls.load(row)).complex_id: complex
                 for row in csv.DictReader(f)
             }
+        return tuple(
+            by_id.get(complex_id, MISSING_COMPLEX)
+            for complex_id in range(max(by_id) + 1)
+        )
+
+
+# A `Complex` with none of its fields ever set, standing at every id no
+# complex has, so that `ComplexesById` below can be a tuple of `Complex`
+# rather than of `Complex | None`: with a `None` there, every one of the
+# ~20 places that looks a trusted id up would have to rule it out again.
+#
+# `object.__new__` leaves the slots empty rather than filling them with
+# blanks, so reading any field of it raises `AttributeError` instead of
+# quietly reporting a station named "". Code that can meet one tests for
+# it (`is MISSING_COMPLEX`); code that can't, and is wrong about that,
+# fails at the first field it reads.
+MISSING_COMPLEX: Complex = object.__new__(Complex)
+
+# Complexes at the index of their id, `MISSING_COMPLEX` at every id
+# without one; see `Complex.load_all`.
+type ComplexesById = tuple[Complex, ...]
+
+
+def complexes_of(complexes_by_id: ComplexesById) -> tuple[Complex, ...]:
+    """The complexes themselves, without the holes."""
+    return tuple(c for c in complexes_by_id if c is not MISSING_COMPLEX)
 
 
 # By identity, like `Complex`, and for the same reason: `Station.load_all`
@@ -261,9 +296,20 @@ class Station:
     _interned: ClassVar[dict[HashByField[Station], Station]] = {}
 
     @classmethod
-    def load(cls, row: dict[str, str], complexes_by_id: dict[int, Complex]) -> Station:
+    def load(cls, row: dict[str, str], complexes_by_id: ComplexesById) -> Station:
+        complex_id = int(row["complex_id"])
+        complex = (
+            complexes_by_id[complex_id]
+            if complex_id < len(complexes_by_id)
+            else MISSING_COMPLEX
+        )
+        if complex is MISSING_COMPLEX:
+            raise ValueError(
+                f"station {row['stop_name']!r} is in complex {complex_id}, "
+                "which the complex file has no row for"
+            )
         station = cls(
-            complex=complexes_by_id[int(row["complex_id"])],
+            complex=complex,
             name=abbreviate_name(row["stop_name"]),
             routes=frozenset(row["daytime_routes"].split()),
             loc=Coord(
@@ -276,7 +322,7 @@ class Station:
         return intern(cls._interned, station)
 
     @classmethod
-    def load_all(cls, path: Path, complexes_by_id: dict[int, Complex]) -> list[Station]:
+    def load_all(cls, path: Path, complexes_by_id: ComplexesById) -> list[Station]:
         with path.open(newline="") as f:
             return [cls.load(row, complexes_by_id) for row in csv.DictReader(f)]
 

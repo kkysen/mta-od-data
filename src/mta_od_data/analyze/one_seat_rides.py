@@ -13,12 +13,15 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
+    MISSING_COMPLEX,
     Complex,
+    ComplexesById,
     ComplexStations,
     DayCoverage,
     DayFilterError,
     DayType,
     Station,
+    complexes_of,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 
@@ -165,7 +168,7 @@ class ScenarioResult:
 
     def print_details(
         self,
-        complexes_by_id: dict[int, Complex],
+        complexes_by_id: ComplexesById,
         origin_ids: list[int],
     ) -> None:
         print("\n=== Per-origin-station breakdown (avg weekday riders) ===")
@@ -430,7 +433,7 @@ def run_scenario(
     label: str,
     scoped: list[tuple[int, int, float]],
     total_riders: float,
-    complexes_by_id: dict[int, Complex],
+    complexes_by_id: ComplexesById,
     origin_ids: list[int],
     routes_set: frozenset[str],
     primary_routes_set: frozenset[str],
@@ -1069,7 +1072,7 @@ def one_seat_rides(
             raise SystemExit(1)
 
     complexes_by_id = Complex.load_all(complexes_path)
-    complexes = complexes_by_id.values()
+    complexes = complexes_of(complexes_by_id)
     boundary_lat = complexes_by_id[boundary_complex_id].loc.lat
     boundary_complex = complexes_by_id[boundary_complex_id]
     boundary_name = boundary_complex.display(boundary_complex.routes & routes_set)
@@ -1134,8 +1137,12 @@ def one_seat_rides(
     # computed once and reused across scenarios.
     scoped = []
     for origin_id, dest_id, riders in pairs:
-        dest = complexes_by_id.get(dest_id)
-        if dest is None:
+        dest = (
+            complexes_by_id[dest_id]
+            if dest_id < len(complexes_by_id)
+            else MISSING_COMPLEX
+        )
+        if dest is MISSING_COMPLEX:
             # Almost certainly a stale --stations file against a newer
             # OD extract; dropping it would silently undercount.
             print(
@@ -1158,7 +1165,7 @@ def one_seat_rides(
         stations_by_complex.setdefault(s.complex_id, []).append(s)
     # Numbers those stations, so a sweep can key its distances on a
     # pair of ids rather than on a pair of `Coord`s.
-    complex_stations = ComplexStations.build(stations, complexes_by_id.values())
+    complex_stations = ComplexStations.build(stations, complexes)
 
     # Keyed by borough too,
     # since a `line` label can span physically distinct segments:
