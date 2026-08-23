@@ -261,9 +261,9 @@ class Station:
     _interned: ClassVar[dict[HashByField[Station], Station]] = {}
 
     @classmethod
-    def load(cls, row: dict[str, str], complexes: dict[int, Complex]) -> Station:
+    def load(cls, row: dict[str, str], complexes_by_id: dict[int, Complex]) -> Station:
         station = cls(
-            complex=complexes[int(row["complex_id"])],
+            complex=complexes_by_id[int(row["complex_id"])],
             name=abbreviate_name(row["stop_name"]),
             routes=frozenset(row["daytime_routes"].split()),
             loc=Coord(
@@ -276,9 +276,9 @@ class Station:
         return intern(cls._interned, station)
 
     @classmethod
-    def load_all(cls, path: Path, complexes: dict[int, Complex]) -> list[Station]:
+    def load_all(cls, path: Path, complexes_by_id: dict[int, Complex]) -> list[Station]:
         with path.open(newline="") as f:
-            return [cls.load(row, complexes) for row in csv.DictReader(f)]
+            return [cls.load(row, complexes_by_id) for row in csv.DictReader(f)]
 
 
 @cache
