@@ -13,7 +13,6 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
-    MISSING_COMPLEX,
     Complex,
     ComplexesById,
     ComplexStations,
@@ -1137,12 +1136,8 @@ def one_seat_rides(
     # computed once and reused across scenarios.
     scoped = []
     for origin_id, dest_id, riders in pairs:
-        dest = (
-            complexes_by_id[dest_id]
-            if dest_id < len(complexes_by_id)
-            else MISSING_COMPLEX
-        )
-        if dest is MISSING_COMPLEX:
+        dest = complexes_by_id[dest_id] if dest_id < len(complexes_by_id) else None
+        if dest is None:
             # Almost certainly a stale --stations file against a newer
             # OD extract; dropping it would silently undercount.
             print(

@@ -209,31 +209,61 @@ class Complex:
                 for row in csv.DictReader(f)
             }
         return tuple(
-            by_id.get(complex_id, MISSING_COMPLEX)
+            by_id.get(complex_id) or MissingComplex(complex_id, path)
             for complex_id in range(max(by_id) + 1)
         )
 
 
-# A `Complex` with none of its fields ever set, standing at every id no
-# complex has, so that `ComplexesById` below can be a tuple of `Complex`
-# rather than of `Complex | None`: with a `None` there, every one of the
-# ~20 places that looks a trusted id up would have to rule it out again.
-#
-# `object.__new__` leaves the slots empty rather than filling them with
-# blanks, so reading any field of it raises `AttributeError` instead of
-# quietly reporting a station named "". Code that can meet one tests for
-# it (`is MISSING_COMPLEX`); code that can't, and is wrong about that,
-# fails at the first field it reads.
-MISSING_COMPLEX: Complex = object.__new__(Complex)
+class MissingComplexError(Exception):
+    """The extract names a complex the complex file doesn't have.
 
-# Complexes at the index of their id, `MISSING_COMPLEX` at every id
+    Raised rather than exiting, like `ScenarioError`; every `analyze`
+    command catches it and exits.
+    """
+
+
+class MissingComplex(Complex):
+    """What stands at an id no complex has, so that `ComplexesById` can
+    be a tuple of `Complex` rather than of `Complex | None`.
+
+    With a `None` there, every one of the ~20 places that looks up an
+    id it already trusts would have to rule it out again; with this,
+    they read as they did when the ids were a `dict`.
+
+    Its `Complex` fields are never set, so reading one doesn't return a
+    blank station: the empty slot falls through to `__getattr__`, which
+    says which id was asked for and what to do about it. Nothing has to
+    test for one, which is the point -- a run that never meets a
+    missing complex never pays for the possibility, and one that does
+    gets the message at the moment it reads a field.
+    """
+
+    # No `__slots__` of its own: a subclass of a `slots=True` dataclass
+    # can't declare them, and a `__dict__` on the handful of holes a
+    # complex file has costs nothing.
+    def __init__(self, missing_id: int, complexes_path: Path) -> None:
+        # `object.__setattr__` because `Complex` is frozen, and no
+        # `super().__init__`: the whole point is that its fields stay
+        # unset.
+        object.__setattr__(self, "missing_id", missing_id)
+        object.__setattr__(self, "complexes_path", complexes_path)
+
+    def __getattr__(self, name: str) -> object:
+        raise MissingComplexError(
+            f"station complex {self.missing_id} not found in "
+            f"{self.complexes_path}; refetch station reference data with "
+            "`mta-od-data prepare --force-stations`"
+        )
+
+
+# Complexes at the index of their id, a `MissingComplex` at every id
 # without one; see `Complex.load_all`.
 type ComplexesById = tuple[Complex, ...]
 
 
 def complexes_of(complexes_by_id: ComplexesById) -> tuple[Complex, ...]:
     """The complexes themselves, without the holes."""
-    return tuple(c for c in complexes_by_id if c is not MISSING_COMPLEX)
+    return tuple(c for c in complexes_by_id if not isinstance(c, MissingComplex))
 
 
 # By identity, like `Complex`, and for the same reason: `Station.load_all`
@@ -298,16 +328,14 @@ class Station:
     @classmethod
     def load(cls, row: dict[str, str], complexes_by_id: ComplexesById) -> Station:
         complex_id = int(row["complex_id"])
-        complex = (
-            complexes_by_id[complex_id]
-            if complex_id < len(complexes_by_id)
-            else MISSING_COMPLEX
-        )
-        if complex is MISSING_COMPLEX:
-            raise ValueError(
+        if complex_id >= len(complexes_by_id):
+            raise MissingComplexError(
                 f"station {row['stop_name']!r} is in complex {complex_id}, "
-                "which the complex file has no row for"
+                "which is past the last id the complex file has"
             )
+        # A `MissingComplex` here is one the complex file lacks, which
+        # says so itself the moment anything reads it.
+        complex = complexes_by_id[complex_id]
         station = cls(
             complex=complex,
             name=abbreviate_name(row["stop_name"]),
