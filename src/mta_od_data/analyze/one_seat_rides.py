@@ -18,7 +18,6 @@ from mta_od_data.analyze.common import (
     DayFilterError,
     DayType,
     Station,
-    WalkPointId,
     WalkPoints,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
@@ -1215,15 +1214,15 @@ def one_seat_rides(
         @cache
         def assigned_points(
             assigned_routes: frozenset[str],
-        ) -> list[tuple[WalkPointId, Station]]:
+        ) -> list[Station]:
             # Membership is decided at the complex level,
             # the granularity a reassignment is keyed at,
             # while the stations are what's returned and measured
             # between, a complex being able to span physically separate
             # stations.
             return [
-                (point_id, station)
-                for point_id, station in enumerate(individual_stations)
+                station
+                for station in individual_stations
                 if effective_origin_routes.get(station.complex_id, station.routes)
                 & assigned_routes
             ]
@@ -1243,9 +1242,9 @@ def one_seat_rides(
             # but not a gap in `stations_individual.csv` itself.
             assert candidates, "no individual station serves this route set"
             best: tuple[float, Station] | None = None
-            for point in walk_points.by_complex[dest.complex_id]:
-                for point_id, c in candidates:
-                    dist_m = walk_points.distance(point, point_id)
+            for here in walk_points.by_complex[dest.complex_id]:
+                for c in candidates:
+                    dist_m = walk_points.distance(here, c)
                     if best is None or dist_m < best[0]:
                         best = (dist_m, c)
             assert best is not None
