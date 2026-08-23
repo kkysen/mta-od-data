@@ -1,11 +1,11 @@
 import csv
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from enum import StrEnum
 from functools import cache
 from math import asin, cos, radians, sin, sqrt
 from pathlib import Path
-from typing import Protocol, Self
+from typing import ClassVar, Protocol, Self
 
 import duckdb
 
@@ -46,6 +46,24 @@ def abbreviate_name(name: str) -> str:
 class Coord:
     lat: float
     lon: float
+
+
+def intern[T: Complex | Station](pool: dict[tuple[object, ...], T], value: T) -> T:
+    """`value`, or whatever equal thing was interned before it.
+
+    What lets `Complex` and `Station` be compared by identity: a run
+    loads each file once, but nothing stops a second load, and two
+    objects of equal value have to be one object for `eq=False` to
+    mean what it says.
+
+    Keyed on the field values, not on the id: ids are unique only
+    within one station file, so keying on them would hand a run with
+    its own `--stations` the rows of whichever file was read first.
+
+    Loading is the only way in, so a directly constructed one isn't
+    interned; the tests build a few, and never two of equal value.
+    """
+    return pool.setdefault(tuple(getattr(value, f.name) for f in fields(value)), value)
 
 
 class Place(Protocol):
@@ -108,9 +126,15 @@ class Complex:
     def display(self, routes: frozenset[str] | None = None) -> str:
         return display_station(self.name, self.routes if routes is None else routes)
 
+    # Every `Complex` ever built, by its field values, so that two of
+    # them are equal exactly when they are the same object, which is
+    # what `eq=False` above assumes. Never emptied, which costs one
+    # entry per complex per distinct station file: 445 for the real one.
+    _interned: ClassVar[dict[tuple[object, ...], Complex]] = {}
+
     @classmethod
-    def load(cls, row: dict[str, str]) -> Self:
-        return cls(
+    def load(cls, row: dict[str, str]) -> Complex:
+        complex_station = cls(
             complex_id=int(row["complex_id"]),
             name=abbreviate_name(row["stop_name"]),
             routes=frozenset(row["daytime_routes"].split()),
@@ -118,9 +142,10 @@ class Complex:
             borough=row["borough"],
             cbd=row["cbd"] == "true",
         )
+        return intern(cls._interned, complex_station)
 
     @classmethod
-    def load_all(cls, path: Path) -> dict[int, Self]:
+    def load_all(cls, path: Path) -> dict[int, Complex]:
         """By id, which is also what interns them:
         one object per complex for the process's lifetime,
         so a `Station` can hold its own rather than an id to look up.
@@ -189,9 +214,11 @@ class Station:
     def display(self, routes: frozenset[str] | None = None) -> str:
         return display_station(self.name, self.routes if routes is None else routes)
 
+    _interned: ClassVar[dict[tuple[object, ...], Station]] = {}
+
     @classmethod
-    def load(cls, row: dict[str, str], complexes: dict[int, Complex]) -> Self:
-        return cls(
+    def load(cls, row: dict[str, str], complexes: dict[int, Complex]) -> Station:
+        station = cls(
             complex=complexes[int(row["complex_id"])],
             name=abbreviate_name(row["stop_name"]),
             routes=frozenset(row["daytime_routes"].split()),
@@ -201,9 +228,11 @@ class Station:
             line=row["line"],
             station_id=int(row["station_id"]),
         )
+        # Its `complex` is interned too, so it keys by identity here.
+        return intern(cls._interned, station)
 
     @classmethod
-    def load_all(cls, path: Path, complexes: dict[int, Complex]) -> list[Self]:
+    def load_all(cls, path: Path, complexes: dict[int, Complex]) -> list[Station]:
         with path.open(newline="") as f:
             return [cls.load(row, complexes) for row in csv.DictReader(f)]
 
