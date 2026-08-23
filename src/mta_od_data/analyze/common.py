@@ -292,30 +292,6 @@ def station_name(
     return names.pop() if len(names) == 1 else complex_name
 
 
-@dataclass(slots=True, frozen=True)
-class ComplexStations:
-    """The `Station`s in each complex, for `display`."""
-
-    by_complex: dict[Complex, tuple[Station, ...]]
-
-    @classmethod
-    def build(cls, individual_stations: list[Station]) -> Self:
-        by_complex: defaultdict[Complex, list[Station]] = defaultdict(list)
-        for station in individual_stations:
-            by_complex[station.complex].append(station)
-        return cls(by_complex={c: tuple(v) for c, v in by_complex.items()})
-
-    def name(self, complex: Complex, routes: frozenset[str]) -> str:
-        return station_name(
-            self.by_complex.get(complex, ()),
-            complex.name,
-            routes,
-        )
-
-    def display(self, complex: Complex, routes: frozenset[str]) -> str:
-        return f"{self.name(complex, routes)} ({','.join(sorted(routes))})"
-
-
 def haversine(c1: Coord, c2: Coord) -> float:
     """Great-circle metres between two points."""
     r = 6_371_000.0
@@ -331,20 +307,23 @@ def haversine(c1: Coord, c2: Coord) -> float:
 # disappearing. Nothing is given up for it, there being one of these per
 # run: slots are worth having on `ODPair` and `Walk`, of which a
 # comparison builds hundreds of thousands, and worth nothing here.
+#
+# `eq=False` because a table of stations has no meaningful equality and
+# no cheap hash: two of them holding the same stations still aren't
+# interchangeable, and a frozen dataclass's generated hash would raise
+# on the `dict` anyway. `distance`'s cache doesn't key on it -- it wraps
+# a bound method, so the table is the closure, not the key.
 @dataclass(frozen=True, eq=False)
-class WalkPoints:
-    """Every station a walk can be measured between, by complex.
+class ComplexStations:
+    """The `Station`s in each complex: what a complex reads as, and
+    what a walk to or from it is measured between.
 
-    Walks run station to station: a rider leaves from whichever of
-    their complex's stations is nearest what they are walking to, so a
-    complex enters as all of its stations at once.
-
-    `eq=False` because a table of measurements has no meaningful
-    equality and no cheap hash: two of them holding the same stations
-    still aren't interchangeable, and a frozen dataclass's generated
-    hash would raise on the `dict` anyway. `distance`'s cache doesn't
-    key on it -- it wraps a bound method, so the table is the closure,
-    not the key.
+    The two go together because they are the same question asked twice.
+    A complex is several stations, so naming one means narrowing to the
+    stations a route set reaches, and walking to one means reaching
+    whichever of its stations is nearest: a rider bound for Times Sq on
+    the N,Q,R is on its Broadway station both for what the row calls it
+    and for how far they walk.
     """
 
     by_complex: dict[Complex, tuple[Station, ...]]
@@ -368,10 +347,16 @@ class WalkPoints:
         """
         return haversine(station.loc, other.loc)
 
+    def name(self, complex: Complex, routes: frozenset[str]) -> str:
+        return station_name(self.by_complex.get(complex, ()), complex.name, routes)
+
+    def display(self, complex: Complex, routes: frozenset[str]) -> str:
+        return f"{self.name(complex, routes)} ({','.join(sorted(routes))})"
+
     @classmethod
     def build(
         cls, individual_stations: list[Station], complexes: Collection[Complex]
-    ) -> WalkPoints:
+    ) -> ComplexStations:
         by_complex: defaultdict[Complex, list[Station]] = defaultdict(list)
         for station in individual_stations:
             by_complex[station.complex].append(station)
