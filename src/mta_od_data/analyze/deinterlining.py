@@ -36,12 +36,12 @@ from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
     Complex,
+    ComplexStations,
     DayCoverage,
     DayFilterError,
     DayType,
-    PlatformId,
-    PlatformIndex,
     Station,
+    WalkPointId,
     WalkPoints,
 )
 from mta_od_data.analyze.markdown import collapsed, table_row, table_rule
@@ -119,7 +119,7 @@ class TripEnd:
         there is nothing to factor out and the left is what it had.
 
         Usually only the routes differ.
-        A route move can take the narrowed platform name with it,
+        A route move can take the narrowed station name with it,
         though, and then there is no shared name to factor out
         and both halves are named in full.
         """
@@ -248,15 +248,15 @@ class Walks:
 
     stations_by_id: dict[int, Complex]
     individual_stations: list[Station]
-    platforms: PlatformIndex
+    stations: ComplexStations
     close_threshold_m: float
 
     def for_scenario(self, scenario: Scenario) -> ScenarioWalks:
         return ScenarioWalks(walks=self, scenario=scenario)
 
     # One per run, so every scenario shares its distances: where a
-    # platform is doesn't depend on which routes stop there.
-    @cache  # noqa: B019  (see `ScenarioWalks.corridor_platforms`)
+    # station is doesn't depend on which routes stop there.
+    @cache  # noqa: B019  (see `ScenarioWalks.corridor_stations`)
     def points(self) -> WalkPoints:
         return WalkPoints.build(self.individual_stations, self.stations_by_id)
 
@@ -277,10 +277,10 @@ class ScenarioWalks:
     scenario: Scenario
 
     @property
-    def platforms(self) -> PlatformIndex:
-        return self.walks.platforms
+    def stations(self) -> ComplexStations:
+        return self.walks.stations
 
-    @cache  # noqa: B019  (see `corridor_platforms`)
+    @cache  # noqa: B019  (see `corridor_stations`)
     def routes_by_complex(self) -> dict[int, Routes]:
         """Every complex's routes under this scenario, worked out once.
 
@@ -290,15 +290,15 @@ class ScenarioWalks:
         distinct answers.
         """
         return {
-            complex_id: self.scenario.routes_of(station)
-            for complex_id, station in self.walks.stations_by_id.items()
+            complex_id: self.scenario.routes_of(complex_station)
+            for complex_id, complex_station in self.walks.stations_by_id.items()
         }
 
-    @cache  # noqa: B019  (see `corridor_platforms`)
+    @cache  # noqa: B019  (see `corridor_stations`)
     def ends_by_complex(self) -> dict[int, TripEnd]:
         """How every complex reads under this scenario, worked out once.
 
-        Its narrowed platform name and its route list are as fixed for
+        Its narrowed station name and its route list are as fixed for
         the scenario as its routes are, and `classify` names both ends
         of every OD pair: another 780k calls for 445 answers, each one
         sorting a route set and joining it.
@@ -310,11 +310,11 @@ class ScenarioWalks:
         return {
             complex_id: TripEnd(
                 id=complex_id,
-                station=self.platforms.name(station, routes),
+                station=self.stations.name(complex_station, routes),
                 routes=",".join(sorted(routes)),
             )
             for complex_id, routes in self.routes_by_complex().items()
-            if (station := self.walks.stations_by_id[complex_id]) is not None
+            if (complex_station := self.walks.stations_by_id[complex_id]) is not None
         }
 
     # B019: `cache` on a method stores its entries on the *function*,
@@ -324,82 +324,82 @@ class ScenarioWalks:
     # and exits -- but a long-lived caller comparing scenario after
     # scenario would grow this without bound, and wants its own cache.
     @cache  # noqa: B019
-    def corridor_platforms(
+    def corridor_stations(
         self, corridor_routes: Routes
-    ) -> list[tuple[PlatformId, Station]]:
-        """The platforms a rider could board this corridor at,
+    ) -> list[tuple[WalkPointId, Station]]:
+        """The stations a rider could board this corridor at,
         under this scenario.
 
-        Per platform, not per complex.
-        The distance is measured to a platform's own coordinates, and
+        Per station, not per complex.
+        The distance is measured to a station's own coordinates, and
         a complex can span physically separate stations
         (Times Sq-42 St and 42 St-Port Authority Bus Terminal are
-        200m apart), so crediting every platform of a complex with
+        200m apart), so crediting every station of a complex with
         every route the complex has understated a walk by up to that.
         """
         return [
-            (platform_id, platform)
-            for platform_id, platform in enumerate(self.walks.individual_stations)
-            if self.scenario.routes_at(platform) & corridor_routes
+            (point_id, station)
+            for point_id, station in enumerate(self.walks.individual_stations)
+            if self.scenario.routes_at(station) & corridor_routes
         ]
 
-    @cache  # noqa: B019  (see `corridor_platforms`)
-    def corridor_points(self, complex_id: int) -> tuple[PlatformId, ...]:
+    @cache  # noqa: B019  (see `corridor_stations`)
+    def corridor_points(self, complex_id: int) -> tuple[WalkPointId, ...]:
         """Where a rider of this comparison stands at this complex.
 
-        Its platforms that serve one of the comparison's routes, not all
+        Its stations that serve one of the comparison's routes, not all
         of them: a rider walking to or from Times Sq for the N,Q,R is on
-        its Broadway platform, and crediting them with the 7's, 386m
+        its Broadway station, and crediting them with the 7's, 386m
         away, would measure a walk they don't take. It is the same
         narrowing the row's own label makes when it reads
         `Times Sq-42 St (N,Q,R)`.
 
         All of them when none serves one, which is a complex the other
-        end put in scope: there is no corridor platform to stand on, so
+        end put in scope: there is no corridor station to stand on, so
         the complex is all that is known about where they are.
         """
         points = self.walks.points()
-        platforms = self.walks.individual_stations
+        stations = self.walks.individual_stations
         on_corridor = tuple(
             point
             for point in points.by_complex[complex_id]
-            if (platform := points.platform(point)) is not None
-            and self.scenario.routes_at(platforms[platform])
+            if (station := points.station(point)) is not None
+            and self.scenario.routes_at(stations[station])
         )
         return on_corridor or points.by_complex[complex_id]
 
-    @cache  # noqa: B019  (see `corridor_platforms`)
+    @cache  # noqa: B019  (see `corridor_stations`)
     def min_dist_to_route(
         self, complex_id: int, route: str
     ) -> tuple[float, Station] | None:
-        """The nearest platform this route stops at, and how far.
+        """The nearest station this route stops at, and how far.
 
         `None` when the route stops nowhere under this scenario, e.g. a
         synthetic one no scenario uses yet, or one every scenario in the
         comparison takes off the map.
         """
-        candidates = self.corridor_platforms(frozenset({route}))
+        candidates = self.corridor_stations(frozenset({route}))
         if not candidates:
             return None
 
         points = self.walks.points()
         distance = points.distance
-        # By distance alone: two platforms exactly as far away would
+        # By distance alone: two stations exactly as far away would
         # otherwise be compared as `Station`s, which don't order.
         return min(
             (
-                (distance(point, platform_id), platform)
+                (distance(point, point_id), station)
                 for point in self.corridor_points(complex_id)
-                for platform_id, platform in candidates
+                for point_id, station in candidates
             ),
             key=itemgetter(0),
         )
 
-    @cache  # noqa: B019  (see `corridor_platforms`)
+    @cache  # noqa: B019  (see `corridor_stations`)
     def min_dist_to_corridor(
         self, complex_id: int, corridor_routes: Routes
     ) -> tuple[float, Station] | None:
-        """The nearest platform a rider could board this corridor at.
+        """The nearest station a rider could board this corridor at.
 
         The nearest of a set of routes is the nearest of each route's
         own nearest, so the sweep is keyed per route: one per (station,
@@ -412,7 +412,7 @@ class ScenarioWalks:
         of its own to measure against, or none of these routes stops
         anywhere. The caller decides what an unmeasurable end means.
         """
-        # Sorted, so which of two equally distant platforms wins doesn't
+        # Sorted, so which of two equally distant stations wins doesn't
         # depend on a `frozenset`'s iteration order.
         measured = [
             nearest
@@ -467,11 +467,11 @@ class ScenarioWalks:
 
         # Keyed on the distance alone: two equal walks would otherwise
         # be compared by the `Station` beside it, which doesn't order.
-        dist_m, platform, walk_at_origin = min(measured, key=itemgetter(0))
+        dist_m, station, walk_at_origin = min(measured, key=itemgetter(0))
         return Walk(
             close=dist_m <= self.walks.close_threshold_m,
             dist_m=dist_m,
-            station=self.ends_by_complex()[platform.complex_id].name,
+            station=self.ends_by_complex()[station.complex_id].name,
             at_origin=walk_at_origin,
         )
 
@@ -1257,7 +1257,7 @@ class ScenarioComparisonResult:
     # pairs that moved, and both the printed summary and the markdown
     # want the same one. Cached, rather than passed from one to the
     # other, since neither reads the other's output.
-    @cache  # noqa: B019  (see `ScenarioWalks.corridor_platforms`)
+    @cache  # noqa: B019  (see `ScenarioWalks.corridor_stations`)
     def transitions(self, result: ScenarioResult) -> Transitions | None:
         """`None` for the baseline itself, which cannot differ from
         itself."""
@@ -1638,7 +1638,7 @@ def deinterlining(
     walks = Walks(
         stations_by_id=stations_by_id,
         individual_stations=individual_stations,
-        platforms=station_index.platforms,
+        stations=station_index.stations,
         close_threshold_m=close_threshold_m,
     )
 

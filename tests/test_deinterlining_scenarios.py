@@ -218,7 +218,7 @@ def test_stations_out_of_line_order_are_an_error(
 def test_two_groups_cannot_name_one_station_on_one_line(
     tmp_path: Path, station_index: StationIndex
 ) -> None:
-    """Even agreeing about it: one platform takes one delta, and the
+    """Even agreeing about it: one station takes one delta, and the
     two groups each describe a routing the merge isn't either of."""
     path = write_scenarios(
         tmp_path,
@@ -273,7 +273,7 @@ def test_scenarios_that_slug_alike_are_rejected(
 
 def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> None:
     """Which complex an override means has no answer then, and the index
-    used to answer with whichever platform row came last.
+    used to answer with whichever station row came last.
 
     Synthetic, because today's reference data has no such pair: the
     failure would arrive with a station file, silently, as a scenario
@@ -290,7 +290,7 @@ def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> 
             cbd=False,
         )
 
-    def platform(complex_station: Complex) -> Station:
+    def station(complex_station: Complex) -> Station:
         return Station(
             complex=complex_station,
             name="72 St",
@@ -301,8 +301,8 @@ def test_a_name_two_complexes_share_on_one_line_is_ambiguous(tmp_path: Path) -> 
         )
 
     complexes = {cid: complex_station(cid) for cid in (1, 2)}
-    platforms = [platform(c) for c in complexes.values()]
-    index = StationIndex.build(complexes, platforms)
+    stations = [station(c) for c in complexes.values()]
+    index = StationIndex.build(complexes, stations)
     with pytest.raises(ScenarioError, match="names 2 station complexes"):
         index.resolve("72 St", "Central Park West", path=tmp_path / "scenarios.json5")
 
@@ -313,8 +313,8 @@ def test_removing_a_route_the_line_does_not_serve_is_an_error(
     """The check is per line, not per complex.
 
     62 St/New Utrecht Av is one complex over two lines: `D` stops at its
-    West End platform, `N` at its Sea Beach one. Removing `D` from the
-    Sea Beach platform is a no-op, and it passed while the check asked
+    West End station, `N` at its Sea Beach one. Removing `D` from the
+    Sea Beach station is a no-op, and it passed while the check asked
     the complex, which serves both.
     """
     path = write_scenarios(
@@ -418,9 +418,9 @@ def test_a_stranded_pair_is_far_not_a_crash(
     # As `deinterlining()` scopes a run: every complex some scenario
     # gives one of the comparison's routes.
     scope_ids = frozenset(
-        station.complex_id
-        for station in stations_by_id.values()
-        if any(s.routes_of(station) for s in comparison.scenarios)
+        complex_station.complex_id
+        for complex_station in stations_by_id.values()
+        if any(s.routes_of(complex_station) for s in comparison.scenarios)
     )
     assert origin.complex_id in scope_ids, "the origin should be in scope today"
 
@@ -431,7 +431,7 @@ def test_a_stranded_pair_is_far_not_a_crash(
         walks=Walks(
             stations_by_id=stations_by_id,
             individual_stations=individual_stations,
-            platforms=station_index.platforms,
+            stations=station_index.stations,
             close_threshold_m=300.0,
         ),
     )

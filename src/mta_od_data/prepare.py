@@ -14,7 +14,7 @@ DEFAULT_PARQUET = DATA / "mta_od.parquet"
 DEFAULT_STATIONS_CSV = DATA / "stations_complexes.csv"
 DEFAULT_STATIONS_INDIVIDUAL_CSV = DATA / "stations_individual.csv"
 STATIONS_URL = "https://data.ny.gov/resource/5f5g-n3cz.csv?$limit=1000"
-# Per-platform coordinates; see `Station.load_individual`.
+# Per-station coordinates; see `Station.load_individual`.
 STATIONS_INDIVIDUAL_URL = "https://data.ny.gov/resource/39hk-dx4f.csv?$limit=1000"
 
 # Every one of these is functionally determined by the complex ID next to it
