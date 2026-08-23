@@ -13,10 +13,10 @@
         {
           "line": "Nostrand",
           "add": [
-            "3"
+            "3",
           ],
           "remove": [
-            "5"
+            "5",
           ],
           "stations": [
             "President St-Medgar Evers College",
@@ -31,10 +31,10 @@
         {
           "line": "Eastern Pky",
           "add": [
-            "5"
+            "5",
           ],
           "remove": [
-            "3"
+            "3",
           ],
           "stations": [
             "Nostrand Av",
@@ -64,10 +64,10 @@
         {
           "line": "Nostrand",
           "add": [
-            "4"
+            "4",
           ],
           "remove": [
-            "2"
+            "2",
           ],
           "stations": [
             "President St-Medgar Evers College",
@@ -82,10 +82,10 @@
         {
           "line": "Eastern Pky",
           "add": [
-            "2"
+            "2",
           ],
           "remove": [
-            "4"
+            "4",
           ],
           "stations": [
             "Crown Hts-Utica Av",
@@ -109,10 +109,10 @@
         {
           "line": "4th Av",
           "add": [
-            "B"
+            "B",
           ],
           "remove": [
-            "N"
+            "N",
           ],
           "stations": [
             "36 St",
@@ -122,10 +122,10 @@
         {
           "line": "Sea Beach",
           "add": [
-            "B"
+            "B",
           ],
           "remove": [
-            "N"
+            "N",
           ],
           "stations": [
             "8 Av",
@@ -142,10 +142,10 @@
         {
           "line": "Sea Beach / West End / Culver / Brighton",
           "add": [
-            "B"
+            "B",
           ],
           "remove": [
-            "N"
+            "N",
           ],
           "stations": [
             "Coney Island-Stillwell Av",
@@ -154,10 +154,10 @@
         {
           "line": "Broadway - Brighton",
           "add": [
-            "N"
+            "N",
           ],
           "remove": [
-            "B"
+            "B",
           ],
           "stations": [
             "DeKalb Av",
@@ -186,10 +186,10 @@
         {
           "line": "4th Av",
           "add": [
-            "Q"
+            "Q",
           ],
           "remove": [
-            "D"
+            "D",
           ],
           "stations": [
             "36 St",
@@ -198,10 +198,10 @@
         {
           "line": "West End",
           "add": [
-            "Q"
+            "Q",
           ],
           "remove": [
-            "D"
+            "D",
           ],
           "stations": [
             "9 Av",
@@ -221,10 +221,10 @@
         {
           "line": "Broadway - Brighton",
           "add": [
-            "D"
+            "D",
           ],
           "remove": [
-            "Q"
+            "Q",
           ],
           "stations": [
             "DeKalb Av",
@@ -264,10 +264,10 @@
         {
           "line": "8th Av - Fulton St",
           "add": [
-            "D"
+            "D",
           ],
           "remove": [
-            "C"
+            "C",
           ],
           "stations": [
             "72 St",
@@ -295,10 +295,10 @@
         {
           "line": "8th Av - Fulton St",
           "add": [
-            "A"
+            "A",
           ],
           "remove": [
-            "B"
+            "B",
           ],
           "stations": [
             "72 St",
@@ -328,10 +328,10 @@
         {
           "line": "Concourse",
           "add": [
-            "C"
+            "C",
           ],
           "remove": [
-            "B"
+            "B",
           ],
           "stations": [
             "155 St",
@@ -349,10 +349,10 @@
         {
           "line": "8th Av - Fulton St",
           "add": [
-            "B"
+            "B",
           ],
           "remove": [
-            "C"
+            "C",
           ],
           "stations": [
             "155 St",
@@ -375,10 +375,10 @@
         {
           "line": "Concourse",
           "add": [
-            "A"
+            "A",
           ],
           "remove": [
-            "D"
+            "D",
           ],
           "stations": [
             "155 St",
@@ -397,10 +397,10 @@
         {
           "line": "8th Av - Fulton St",
           "add": [
-            "D"
+            "D",
           ],
           "remove": [
-            "A"
+            "A",
           ],
           "stations": [
             "168 St",
