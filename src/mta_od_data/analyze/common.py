@@ -373,10 +373,14 @@ class ComplexStations:
         # measuring to a point no rider stands at.
         without = sorted(set(complexes) - set(by_complex), key=attrgetter("complex_id"))
         if without:
+            # All of them, not a first few: this is a station file that
+            # can't be worked with, and which complexes are missing is
+            # the whole of what there is to say about it. At most 445.
+            named = ", ".join(f"{c.name} ({c.complex_id})" for c in without)
             raise ValueError(
                 f"{len(without)} complexes have no stations of their own "
-                f"({[c.name for c in without[:5]]}...): a walk is measured "
-                "between stations, so there is nowhere to measure from"
+                f"({named}): a walk is measured between stations, so there "
+                "is nowhere to measure from"
             )
         return cls(by_complex={c: tuple(v) for c, v in by_complex.items()})
 
