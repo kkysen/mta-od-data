@@ -1,9 +1,6 @@
 """The checked-in `scenarios.json5` must still load:
 it's hand-edited, so a typo'd station name, line, or route
 only surfaces when `mta-od-data analyze deinterlining` actually resolves it.
-
-Skipped without the station reference CSVs,
-which resolving a scenario's overrides needs.
 """
 
 import json
@@ -12,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from mta_od_data import DATA, ROOT
+from mta_od_data import DATA
 from mta_od_data.analyze.common import Complex, Coord, Station
 from mta_od_data.analyze.deinterlining import NO_WALK, Outcome, Walks, resolve_scenarios
 from mta_od_data.analyze.scenarios import (
@@ -24,14 +21,6 @@ from mta_od_data.analyze.scenarios import (
 
 COMPLEXES = DATA / "complexes.csv"
 STATIONS = DATA / "stations.csv"
-
-pytestmark = pytest.mark.skipif(
-    not (COMPLEXES.exists() and STATIONS.exists()),
-    reason=(
-        f"{COMPLEXES.relative_to(ROOT)}/{STATIONS.relative_to(ROOT)} not "
-        "found (run `uv run mta-od-data prepare` first)"
-    ),
-)
 
 
 @pytest.fixture(scope="module")
