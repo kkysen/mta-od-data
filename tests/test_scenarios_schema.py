@@ -14,14 +14,14 @@ from mta_od_data.analyze.scenario_schema import (
     generate_scenario_schema,
 )
 
-STATIONS = DATA / "stations_complexes.csv"
-STATIONS_INDIVIDUAL = DATA / "stations_individual.csv"
+COMPLEXES = DATA / "complexes.csv"
+STATIONS = DATA / "stations.csv"
 
 
 @pytest.mark.skipif(
-    not (STATIONS.exists() and STATIONS_INDIVIDUAL.exists()),
+    not (COMPLEXES.exists() and STATIONS.exists()),
     reason=(
-        f"{STATIONS.relative_to(ROOT)}/{STATIONS_INDIVIDUAL.relative_to(ROOT)} not "
+        f"{COMPLEXES.relative_to(ROOT)}/{STATIONS.relative_to(ROOT)} not "
         "found (run `uv run mta-od-data prepare` first)"
     ),
 )
