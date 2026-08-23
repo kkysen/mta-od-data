@@ -61,6 +61,13 @@ class Station:
     # Physical line name (e.g. "4th Av"), per-platform stations only;
     # empty for a complex, which can span several lines.
     line: str = ""
+    # The source data's own per-platform id, which runs along the line,
+    # so sorting by it puts a line's stations in the order they're
+    # passed. Per-platform only, 0 for a complex, like `line`.
+    # Not `gtfs_stop_id`, which also identifies a platform but doesn't
+    # sort the same way (its prefixes are per-service, so the Brighton
+    # line's platforms interleave `D` and `R` ids).
+    station_id: int = 0
 
     # B019 warns that caching a method keeps `self` alive forever,
     # but `load_complexes`/`load_individuals` already hold every `Station`
@@ -106,6 +113,7 @@ class Station:
             borough=row["borough"],
             cbd=row["cbd"] == "true",
             line=row["line"],
+            station_id=int(row["station_id"]),
         )
 
     @classmethod

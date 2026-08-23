@@ -203,6 +203,11 @@ class StationIndex:
     # A scenario's overrides are declared per line and resolved to a
     # complex, so applying them needs the complex's platforms.
     platforms: PlatformIndex
+    # The `station_id` a (name, line) is at, for `check_station_order`.
+    # The lowest, for the rare complex whose platforms of one name on
+    # one line are several rows: they're adjacent in the source data,
+    # so which one represents them can't change an order.
+    station_id_by_name_line: dict[tuple[str, str], int]
 
     @classmethod
     def build(
@@ -211,7 +216,9 @@ class StationIndex:
         individual_stations: list[Station],
     ) -> StationIndex:
         by_name_line: defaultdict[tuple[str, str], set[Station]] = defaultdict(set)
+        station_ids: defaultdict[tuple[str, str], list[int]] = defaultdict(list)
         for platform in individual_stations:
+            station_ids[platform.name, platform.line].append(platform.station_id)
             # By complex, so a complex's several platforms of one name
             # on one line (which is routine) count once.
             by_name_line[platform.name, platform.line].add(
@@ -223,6 +230,7 @@ class StationIndex:
                 r for s in stations_by_id.values() for r in s.routes
             ),
             platforms=PlatformIndex.build(individual_stations),
+            station_id_by_name_line={key: min(ids) for key, ids in station_ids.items()},
         )
 
     def resolve(self, name: str, line: str, *, path: Path) -> Station:
@@ -252,6 +260,35 @@ class StationIndex:
             for platform in self.platforms.by_complex.get(station.complex_id, ())
             if platform.line == line
             for route in platform.routes
+        )
+
+    def check_station_order(
+        self, group: OverrideGroup, *, name: str, path: Path
+    ) -> None:
+        """A group's stations must run along its line, either way.
+
+        `station_id` runs along a line, so a group written by walking
+        the line is already in order, ascending or descending depending
+        on which end it was walked from, and one written any other way
+        has a station somewhere it isn't passed.
+        Both directions stay legal because a group is usually written
+        outward from the junction it's about, which is the order it's
+        read in, and which end that is depends on the junction.
+        """
+        ids = [
+            self.station_id_by_name_line[station, group.line]
+            for station in group.stations
+        ]
+        if ids in (sorted(ids), sorted(ids, reverse=True)):
+            return
+        ordered = [
+            station for _, station in sorted(zip(ids, group.stations, strict=True))
+        ]
+        raise ScenarioError(
+            f'scenario {path}: scenario "{name}" lists the stations of '
+            f'line "{group.line}" in an order that isn\'t the order the '
+            f"line passes them: expected {ordered} or its reverse, "
+            f"got {group.stations}"
         )
 
     def check_routes(self, routes: Routes, *, name: str, path: Path) -> None:
@@ -396,6 +433,10 @@ class Scenario:
                         f'"{group.line}"'
                     )
                 overrides[key] = delta
+            # After the loop, so a name that doesn't resolve is reported
+            # as the unknown station it is rather than as a `KeyError`
+            # from the ordering lookup.
+            station_index.check_station_order(group, name=entry.name, path=path)
         effective_routes, platform_routes = cls.resolve_routes(
             overrides, station_index.platforms, routes
         )
