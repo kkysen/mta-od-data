@@ -35,13 +35,13 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
-    MISSING_COMPLEX,
     Complex,
     ComplexesById,
     ComplexStations,
     DayCoverage,
     DayFilterError,
     DayType,
+    MissingComplexError,
     Station,
     complexes_of,
 )
@@ -243,32 +243,31 @@ def resolve_pairs(
     complexes_by_id: ComplexesById,
     complexes_path: Path,
 ) -> list[ODRow]:
-    def missing(complex_id: int) -> ScenarioError:
-        return ScenarioError(
-            f"station complex {complex_id} not found in "
+    """The extract's pairs with their ids looked up.
+
+    Nothing here tests whether a complex is one the file has: an id it
+    lacks resolves to a `MissingComplex`, which says so itself the
+    moment a scenario reads a field of it. An id past the *end* is the
+    one case an index can't answer for, so `IndexError` is caught here
+    and named, once, rather than tested for per pair.
+    """
+    try:
+        return [
+            (complexes_by_id[origin_id], complexes_by_id[dest_id], riders)
+            for origin_id, dest_id, riders in rows
+        ]
+    except IndexError:
+        past_end = next(
+            complex_id
+            for origin_id, dest_id, _ in rows
+            for complex_id in (origin_id, dest_id)
+            if complex_id >= len(complexes_by_id)
+        )
+        raise MissingComplexError(
+            f"station complex {past_end} not found in "
             f"{complexes_path}; refetch station reference data with "
             "`mta-od-data prepare --force-stations`"
-        )
-
-    # Bound locally, both of them: this loop runs once per pair, and a
-    # global read per lookup would cost more than the tuple saves.
-    by_id = complexes_by_id
-    n_ids = len(by_id)
-    absent = MISSING_COMPLEX
-    resolved: list[ODRow] = []
-    for origin_id, dest_id, riders in rows:
-        # An id past the end and an id with no complex mean the same
-        # thing here, so the bounds test stands in for both.
-        if origin_id >= n_ids:
-            raise missing(origin_id)
-        if dest_id >= n_ids:
-            raise missing(dest_id)
-        origin = by_id[origin_id]
-        dest = by_id[dest_id]
-        if origin is absent or dest is absent:
-            raise missing(origin_id if origin is absent else dest_id)
-        resolved.append((origin, dest, riders))
-    return resolved
+        ) from None
 
 
 @dataclass(slots=True, frozen=True, eq=False)

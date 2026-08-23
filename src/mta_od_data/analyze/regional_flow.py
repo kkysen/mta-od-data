@@ -11,7 +11,6 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
-    MISSING_COMPLEX,
     Complex,
     DayCoverage,
     DayFilterError,
@@ -338,12 +337,11 @@ def regional_flow(
     in_in = in_out = out_in = out_out = 0.0
     n_ids = len(complexes_by_id)
     for origin_id, dest_id, riders in pairs:
-        # Past the end and present-but-empty both mean the extract names
-        # a complex the file doesn't have; see `MISSING_COMPLEX`.
-        origin = complexes_by_id[origin_id] if origin_id < n_ids else MISSING_COMPLEX
-        dest = complexes_by_id[dest_id] if dest_id < n_ids else MISSING_COMPLEX
-        if origin is MISSING_COMPLEX or dest is MISSING_COMPLEX:
-            missing_id = origin_id if origin is MISSING_COMPLEX else dest_id
+        # An id past the end is the one case an index can't answer for;
+        # one the file merely lacks resolves to a `MissingComplex`,
+        # which raises `MissingComplexError` when read below.
+        if origin_id >= n_ids or dest_id >= n_ids:
+            missing_id = origin_id if origin_id >= n_ids else dest_id
             print(
                 f"error: station complex {missing_id} not found in "
                 f"{complexes_path}; refetch station reference data with "
@@ -351,6 +349,8 @@ def regional_flow(
                 file=sys.stderr,
             )
             raise SystemExit(1)
+        origin = complexes_by_id[origin_id]
+        dest = complexes_by_id[dest_id]
 
         origin_in = region_def.contains(origin)
         dest_in = region_def.contains(dest)
