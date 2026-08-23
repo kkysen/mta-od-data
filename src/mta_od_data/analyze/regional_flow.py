@@ -11,10 +11,12 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
+    MISSING_COMPLEX,
     Complex,
     DayCoverage,
     DayFilterError,
     DayType,
+    complexes_of,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.regions import (
@@ -275,7 +277,7 @@ def regional_flow(
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
     )
     complexes_by_id = Complex.load_all(complexes_path)
-    complexes = complexes_by_id.values()
+    complexes = complexes_of(complexes_by_id)
     valid_boroughs = frozenset(c.borough for c in complexes)
     region_def = resolve_region(
         preset=region,
@@ -334,11 +336,14 @@ def regional_flow(
     rows: list[FlowRow] = []
     total_riders = 0.0
     in_in = in_out = out_in = out_out = 0.0
+    n_ids = len(complexes_by_id)
     for origin_id, dest_id, riders in pairs:
-        origin = complexes_by_id.get(origin_id)
-        dest = complexes_by_id.get(dest_id)
-        if origin is None or dest is None:
-            missing_id = origin_id if origin is None else dest_id
+        # Past the end and present-but-empty both mean the extract names
+        # a complex the file doesn't have; see `MISSING_COMPLEX`.
+        origin = complexes_by_id[origin_id] if origin_id < n_ids else MISSING_COMPLEX
+        dest = complexes_by_id[dest_id] if dest_id < n_ids else MISSING_COMPLEX
+        if origin is MISSING_COMPLEX or dest is MISSING_COMPLEX:
+            missing_id = origin_id if origin is MISSING_COMPLEX else dest_id
             print(
                 f"error: station complex {missing_id} not found in "
                 f"{complexes_path}; refetch station reference data with "
