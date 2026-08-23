@@ -172,6 +172,49 @@ def test_an_unsorted_route_list_is_an_error(
         ScenarioFile.load(path, station_index)
 
 
+def test_stations_out_of_line_order_are_an_error(
+    tmp_path: Path, station_index: StationIndex
+) -> None:
+    """Reversed is fine, since which end a group is written from
+    depends on the junction it's about; shuffled is not."""
+    stations = ["7 Av", "Prospect Park", "Church Av", "Newkirk Plaza"]
+    reversed_group = {
+        "line": "Broadway - Brighton",
+        "add": ["N"],
+        "remove": ["B"],
+        "stations": stations[::-1],
+    }
+    path = write_scenarios(
+        tmp_path,
+        {
+            "X": [
+                {
+                    "name": "Reversed",
+                    "routes": CONFLICT_ROUTES,
+                    "overrides": [reversed_group],
+                }
+            ]
+        },
+    )
+    ScenarioFile.load(path, station_index)
+
+    shuffled = [*stations[2:], *stations[:2]]
+    path = write_scenarios(
+        tmp_path,
+        {
+            "X": [
+                {
+                    "name": "Shuffled",
+                    "routes": CONFLICT_ROUTES,
+                    "overrides": [{**reversed_group, "stations": shuffled}],
+                }
+            ]
+        },
+    )
+    with pytest.raises(ScenarioError, match="the order the line passes them"):
+        ScenarioFile.load(path, station_index)
+
+
 def test_two_groups_cannot_name_one_station_on_one_line(
     tmp_path: Path, station_index: StationIndex
 ) -> None:
