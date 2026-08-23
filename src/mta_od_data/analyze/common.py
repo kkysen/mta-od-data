@@ -296,15 +296,6 @@ def haversine(c1: Coord, c2: Coord) -> float:
     return 2 * r * asin(sqrt(a))
 
 
-# An index into `WalkPoints.locations`, naming one station -- or the
-# centroid of a complex with no station rows of its own, which is the
-# only other thing a walk is ever measured from.
-# An `int` rather than a type of its own: it is used as a dict key
-# hundreds of thousands of times a run, which is the whole point of it,
-# and anything wrapping it hashes an order of magnitude slower.
-type WalkPointId = int
-
-
 # No `slots=True`: a slot named `distance` would collide with the method
 # of that name below, silently, the slot winning and the method
 # disappearing. Nothing is given up for it, there being one of these per
@@ -312,26 +303,21 @@ type WalkPointId = int
 # comparison builds hundreds of thousands, and worth nothing here.
 @dataclass(frozen=True, eq=False)
 class WalkPoints:
-    """Every location a walk can be measured between, by `WalkPointId`.
+    """Every station a walk can be measured between, by complex.
 
     Walks run station to station: a rider leaves from whichever of
     their complex's stations is nearest what they are walking to, so a
-    complex enters as all of its stations at once, which is what
-    `by_complex` holds.
+    complex enters as all of its stations at once.
 
-    `eq=False` because a table of coordinates has no meaningful equality
-    and no cheap hash: two of them holding the same numbers still aren't
-    interchangeable, and a frozen dataclass's generated hash would raise
-    on the `list` anyway. `distance`'s cache doesn't key on it -- it
-    wraps a bound method, so the table is the closure, not the key.
+    `eq=False` because a table of measurements has no meaningful
+    equality and no cheap hash: two of them holding the same stations
+    still aren't interchangeable, and a frozen dataclass's generated
+    hash would raise on the `dict` anyway. `distance`'s cache doesn't
+    key on it -- it wraps a bound method, so the table is the closure,
+    not the key.
     """
 
-    locations: list[Coord]
-    by_complex: dict[int, tuple[WalkPointId, ...]]
-    # Ids below this are stations, in `individual_stations` order;
-    # ids at or above it are the centroids standing in for complexes
-    # with no station rows of their own.
-    n_stations: int
+    by_complex: dict[int, tuple[Station, ...]]
 
     def __post_init__(self) -> None:
         # Each table remembers its own distances, shadowing the method
@@ -343,38 +329,35 @@ class WalkPoints:
         # it derives from its fields.
         object.__setattr__(self, "distance", cache(self.distance))
 
-    def distance(self, point: WalkPointId, other: WalkPointId) -> float:
-        """Metres between two of these, remembered per table.
+    def distance(self, station: Station, other: Station) -> float:
+        """Metres between two stations, remembered per table.
 
-        Ids rather than the `Coord`s themselves, which are dataclasses:
-        a dataclass recomputes its hash on every lookup, where an int is
-        its own.
+        The stations themselves, which is affordable because they are
+        interned and so hash by identity: hashing one by its fields
+        would cost more than the `haversine` this is caching.
         """
-        return haversine(self.locations[point], self.locations[other])
-
-    def station(self, point: WalkPointId) -> WalkPointId | None:
-        """`point` if it is a station, `None` if it is a centroid."""
-        return point if point < self.n_stations else None
+        return haversine(station.loc, other.loc)
 
     @classmethod
     def build(
         cls, individual_stations: list[Station], complexes_by_id: dict[int, Complex]
     ) -> WalkPoints:
-        locations = [station.loc for station in individual_stations]
-        by_complex: defaultdict[int, list[WalkPointId]] = defaultdict(list)
-        for point_id, station in enumerate(individual_stations):
-            by_complex[station.complex_id].append(point_id)
-        for complex_id, complex_station in complexes_by_id.items():
-            if complex_id not in by_complex:
-                # No station rows of its own, so its centroid stands in,
-                # and takes an id past the last station's.
-                by_complex[complex_id] = [len(locations)]
-                locations.append(complex_station.loc)
-        return cls(
-            locations=locations,
-            by_complex={cid: tuple(ids) for cid, ids in by_complex.items()},
-            n_stations=len(individual_stations),
-        )
+        by_complex: defaultdict[int, list[Station]] = defaultdict(list)
+        for station in individual_stations:
+            by_complex[station.complex_id].append(station)
+        # Every one of the 445 real complexes has stations of its own,
+        # and a walk is only ever measured between stations, so a
+        # complex without any is a station file this can't answer for.
+        # It used to fall back to the complex's centroid, silently
+        # measuring to a point no rider stands at.
+        without = sorted(set(complexes_by_id) - set(by_complex))
+        if without:
+            raise ValueError(
+                f"{len(without)} complexes have no stations of their own "
+                f"({without[:5]}...): a walk is measured between stations, "
+                "so there is nowhere to measure from"
+            )
+        return cls(by_complex={cid: tuple(v) for cid, v in by_complex.items()})
 
 
 class DayFilterError(Exception):

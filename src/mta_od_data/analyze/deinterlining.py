@@ -41,7 +41,6 @@ from mta_od_data.analyze.common import (
     DayFilterError,
     DayType,
     Station,
-    WalkPointId,
     WalkPoints,
 )
 from mta_od_data.analyze.markdown import collapsed, table_row, table_rule
@@ -324,9 +323,7 @@ class ScenarioWalks:
     # and exits -- but a long-lived caller comparing scenario after
     # scenario would grow this without bound, and wants its own cache.
     @cache  # noqa: B019
-    def corridor_stations(
-        self, corridor_routes: Routes
-    ) -> list[tuple[WalkPointId, Station]]:
+    def corridor_stations(self, corridor_routes: Routes) -> list[Station]:
         """The stations a rider could board this corridor at,
         under this scenario.
 
@@ -338,13 +335,13 @@ class ScenarioWalks:
         every route the complex has understated a walk by up to that.
         """
         return [
-            (point_id, station)
-            for point_id, station in enumerate(self.walks.individual_stations)
+            station
+            for station in self.walks.individual_stations
             if self.scenario.routes_at(station) & corridor_routes
         ]
 
     @cache  # noqa: B019  (see `corridor_stations`)
-    def corridor_points(self, complex_id: int) -> tuple[WalkPointId, ...]:
+    def corridor_points(self, complex_id: int) -> tuple[Station, ...]:
         """Where a rider of this comparison stands at this complex.
 
         Its stations that serve one of the comparison's routes, not all
@@ -358,15 +355,11 @@ class ScenarioWalks:
         end put in scope: there is no corridor station to stand on, so
         the complex is all that is known about where they are.
         """
-        points = self.walks.points()
-        stations = self.walks.individual_stations
+        stations = self.walks.points().by_complex[complex_id]
         on_corridor = tuple(
-            point
-            for point in points.by_complex[complex_id]
-            if (station := points.station(point)) is not None
-            and self.scenario.routes_at(stations[station])
+            station for station in stations if self.scenario.routes_at(station)
         )
-        return on_corridor or points.by_complex[complex_id]
+        return on_corridor or stations
 
     @cache  # noqa: B019  (see `corridor_stations`)
     def min_dist_to_route(
@@ -388,9 +381,9 @@ class ScenarioWalks:
         # otherwise be compared as `Station`s, which don't order.
         return min(
             (
-                (distance(point, point_id), station)
-                for point in self.corridor_points(complex_id)
-                for point_id, station in candidates
+                (distance(here, station), station)
+                for here in self.corridor_points(complex_id)
+                for station in candidates
             ),
             key=itemgetter(0),
         )
