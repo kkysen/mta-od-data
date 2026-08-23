@@ -1,26 +1,14 @@
 """`Complex` and `Station` are compared by identity,
 which holds only because loading interns them.
-
-Skipped without the station reference CSVs, which are gitignored.
 """
 
 from pathlib import Path
 
-import pytest
-
-from mta_od_data import DATA, ROOT
+from mta_od_data import DATA
 from mta_od_data.analyze.common import Complex, Station
 
 COMPLEXES = DATA / "complexes.csv"
 STATIONS = DATA / "stations.csv"
-
-pytestmark = pytest.mark.skipif(
-    not (COMPLEXES.exists() and STATIONS.exists()),
-    reason=(
-        f"{COMPLEXES.relative_to(ROOT)}/{STATIONS.relative_to(ROOT)} not "
-        "found (run `uv run mta-od-data prepare` first)"
-    ),
-)
 
 
 def test_loading_twice_yields_the_same_objects() -> None:

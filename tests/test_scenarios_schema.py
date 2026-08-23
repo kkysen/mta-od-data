@@ -1,30 +1,14 @@
 """The checked-in `scenarios.schema.json` must match what the models
 that actually validate a scenario file generate, or it's silently
 documenting a shape `ScenarioFile.load` no longer accepts.
-
-Skipped without the station reference CSVs, which
-`generate_scenario_schema` reads for its enums.
 """
 
-import pytest
-
-from mta_od_data import DATA, ROOT
 from mta_od_data.analyze.scenario_schema import (
     SCENARIOS_SCHEMA_FILE,
     generate_scenario_schema,
 )
 
-COMPLEXES = DATA / "complexes.csv"
-STATIONS = DATA / "stations.csv"
 
-
-@pytest.mark.skipif(
-    not (COMPLEXES.exists() and STATIONS.exists()),
-    reason=(
-        f"{COMPLEXES.relative_to(ROOT)}/{STATIONS.relative_to(ROOT)} not "
-        "found (run `uv run mta-od-data prepare` first)"
-    ),
-)
 def test_scenarios_schema_matches_models() -> None:
     fresh = generate_scenario_schema()
     committed = SCENARIOS_SCHEMA_FILE.read_text()

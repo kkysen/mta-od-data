@@ -32,9 +32,6 @@ def generate_scenario_schema(
     against whichever `--complexes`/`--stations` was actually
     passed, which can legitimately differ from these defaults.
 
-    The reference CSVs aren't committed
-    (gitignored, `mta-od-data prepare`-generated);
-    `tests/test_scenarios_schema.py` skips rather than fails without them.
     Regenerate `scenarios.schema.json` with:
 
         uv run python -c "from mta_od_data.analyze.scenario_schema import \\
