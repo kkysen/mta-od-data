@@ -417,19 +417,17 @@ def test_a_stranded_pair_is_far_not_a_crash(
     dest = station_index.resolve("Astoria-Ditmars Blvd", "Astoria", path=path)
     # As `deinterlining()` scopes a run: every complex some scenario
     # gives one of the comparison's routes.
-    scope_ids = frozenset(
-        complex.complex_id
+    scope = frozenset(
+        complex
         for complex in complexes_by_id.values()
         if any(s.routes_of(complex) for s in comparison.scenarios)
     )
-    assert origin.complex_id in scope_ids, "the origin should be in scope today"
+    assert origin in scope, "the origin should be in scope today"
 
     result = comparison.classify(
-        pairs=[(origin.complex_id, dest.complex_id, 100.0)],
-        complexes_path=STATIONS,
-        scope_ids=scope_ids,
+        pairs=[(origin, dest, 100.0)],
+        scope=scope,
         walks=Walks(
-            complexes_by_id=complexes_by_id,
             stations=stations,
             complex_stations=station_index.complex_stations,
             close_threshold_m=300.0,
