@@ -77,7 +77,13 @@ def display_station(name: str, routes: frozenset[str]) -> str:
     return f"{name} ({','.join(sorted(routes))})"
 
 
-@dataclass(slots=True, frozen=True)
+# `eq=False` to be hashed and compared by identity, which is what these
+# are: `load_all` interns them, one object per complex for the life of a
+# run, so two `Complex`es are the same complex exactly when they are the
+# same object. A generated `__eq__`/`__hash__` would instead walk every
+# field -- a `frozenset` of routes and a `Coord` among them -- on a type
+# used as a dict key hundreds of thousands of times a run.
+@dataclass(slots=True, frozen=True, eq=False)
 class Complex:
     """A station complex: everything a rider can reach without a
     MetroCard, which is what the OD data counts trips between.
@@ -126,7 +132,11 @@ class Complex:
             }
 
 
-@dataclass(slots=True, frozen=True)
+# By identity, like `Complex`, and for the same reason: `Station.load_all`
+# builds one object per row of the reference data, and nothing else
+# constructs one. Field-wise hashing would be worse here than there,
+# since a `Station` holds its `Complex` and would hash that too.
+@dataclass(slots=True, frozen=True, eq=False)
 class Station:
     """One line's stop, which is what the reference data calls a
     station: `62 St` on the Sea Beach line, as against the
