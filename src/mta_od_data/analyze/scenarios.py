@@ -202,7 +202,7 @@ class StationIndex:
     known_routes: frozenset[str]
     # A scenario's overrides are declared per line and resolved to a
     # complex, so applying them needs the complex's stations.
-    stations: ComplexStations
+    complex_stations: ComplexStations
     # The `station_id` a (name, line) is at, for `check_station_order`.
     # The lowest, for the rare complex whose stations of one name on
     # one line are several rows: they're adjacent in the source data,
@@ -213,11 +213,11 @@ class StationIndex:
     def build(
         cls,
         complexes_by_id: dict[int, Complex],
-        individual_stations: list[Station],
+        stations: list[Station],
     ) -> StationIndex:
         by_name_line: defaultdict[tuple[str, str], set[Complex]] = defaultdict(set)
         station_ids: defaultdict[tuple[str, str], list[int]] = defaultdict(list)
-        for station in individual_stations:
+        for station in stations:
             station_ids[station.name, station.line].append(station.station_id)
             # By complex, so a complex's several stations of one name
             # on one line (which is routine) count once.
@@ -227,9 +227,7 @@ class StationIndex:
             known_routes=frozenset(
                 r for s in complexes_by_id.values() for r in s.routes
             ),
-            stations=ComplexStations.build(
-                individual_stations, complexes_by_id.values()
-            ),
+            complex_stations=ComplexStations.build(stations, complexes_by_id.values()),
             station_id_by_name_line={key: min(ids) for key, ids in station_ids.items()},
         )
 
@@ -257,7 +255,7 @@ class StationIndex:
         """
         return frozenset(
             route
-            for station in self.stations.by_complex.get(complex, ())
+            for station in self.complex_stations.by_complex.get(complex, ())
             if station.line == line
             for route in station.routes
         )
@@ -345,7 +343,7 @@ class Scenario:
     @staticmethod
     def resolve_routes(
         overrides: Overrides,
-        stations: ComplexStations,
+        complex_stations: ComplexStations,
         routes: Routes,
     ) -> tuple[dict[Complex, Routes], dict[Station, Routes]]:
         """`(complex -> routes, station -> routes)` for the overridden
@@ -354,7 +352,7 @@ class Scenario:
         station_routes: dict[Station, Routes] = {}
         for complex in {c for c, _line in overrides}:
             union: Routes = frozenset()
-            for station in stations.by_complex.get(complex, ()):
+            for station in complex_stations.by_complex.get(complex, ()):
                 delta = overrides.get((complex, station.line))
                 at = (delta.apply(station) if delta else station.routes) & routes
                 station_routes[station] = at
@@ -438,7 +436,7 @@ class Scenario:
             # from the ordering lookup.
             station_index.check_station_order(group, name=entry.name, path=path)
         effective_routes, station_routes = cls.resolve_routes(
-            overrides, station_index.stations, routes
+            overrides, station_index.complex_stations, routes
         )
         return cls(
             name=entry.name,
@@ -452,7 +450,10 @@ class Scenario:
 
     @classmethod
     def combine(
-        cls, scenarios: list[Scenario], routes: Routes, stations: ComplexStations
+        cls,
+        scenarios: list[Scenario],
+        routes: Routes,
+        complex_stations: ComplexStations,
     ) -> Scenario:
         """`routes` is the whole comparison's universe
         (`ScenarioComparison`),
@@ -479,7 +480,7 @@ class Scenario:
                     )
                 source[key] = scenario.name
         effective_routes, station_routes = cls.resolve_routes(
-            overrides, stations, routes
+            overrides, complex_stations, routes
         )
         # A category left unchanged contributes nothing to the name:
         # "Current + A/C CPW Express" and "A/C CPW Express" describe the
@@ -633,7 +634,7 @@ class ScenarioFile:
             return []
         routes = self.routes
         return [
-            Scenario.combine(list(combo), routes, self.station_index.stations)
+            Scenario.combine(list(combo), routes, self.station_index.complex_stations)
             for combo in itertools.product(
                 *([*baseline, *c.scenarios] for c in self.categories)
             )

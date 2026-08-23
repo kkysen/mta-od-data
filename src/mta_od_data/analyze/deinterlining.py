@@ -245,8 +245,8 @@ class Walks:
     """
 
     complexes_by_id: dict[int, Complex]
-    individual_stations: list[Station]
-    stations: ComplexStations
+    stations: list[Station]
+    complex_stations: ComplexStations
     close_threshold_m: float
 
     def for_scenario(self, scenario: Scenario) -> ScenarioWalks:
@@ -269,8 +269,8 @@ class ScenarioWalks:
     scenario: Scenario
 
     @property
-    def stations(self) -> ComplexStations:
-        return self.walks.stations
+    def complex_stations(self) -> ComplexStations:
+        return self.walks.complex_stations
 
     @cache  # noqa: B019  (see `corridor_stations`)
     def routes_by_complex(self) -> dict[Complex, Routes]:
@@ -302,7 +302,7 @@ class ScenarioWalks:
         return {
             complex: TripEnd(
                 id=complex.complex_id,
-                station=self.stations.name(complex, routes),
+                station=self.complex_stations.name(complex, routes),
                 routes=",".join(sorted(routes)),
             )
             for complex, routes in self.routes_by_complex().items()
@@ -328,7 +328,7 @@ class ScenarioWalks:
         """
         return [
             station
-            for station in self.walks.individual_stations
+            for station in self.walks.stations
             if self.scenario.routes_at(station) & corridor_routes
         ]
 
@@ -347,7 +347,7 @@ class ScenarioWalks:
         end put in scope: there is no corridor station to stand on, so
         the complex is all that is known about where they are.
         """
-        stations = self.stations.by_complex[complex]
+        stations = self.complex_stations.by_complex[complex]
         on_corridor = tuple(
             station for station in stations if self.scenario.routes_at(station)
         )
@@ -367,7 +367,7 @@ class ScenarioWalks:
         if not candidates:
             return None
 
-        distance = self.stations.distance
+        distance = self.complex_stations.distance
         # By distance alone: two stations exactly as far away would
         # otherwise be compared as `Station`s, which don't order.
         return min(
@@ -463,7 +463,7 @@ class ScenarioWalks:
         self,
         *,
         pairs: list[tuple[int, int, float]],
-        stations_path: Path,
+        complexes_path: Path,
         scope_ids: frozenset[int],
     ) -> ScenarioResult:
         rows: list[ODPair] = []
@@ -476,7 +476,7 @@ class ScenarioWalks:
                 missing_id = origin_id if origin is None else dest_id
                 raise ScenarioError(
                     f"station complex {missing_id} not found in "
-                    f"{stations_path}; refetch station reference data with "
+                    f"{complexes_path}; refetch station reference data with "
                     "`mta-od-data prepare --force-stations`"
                 )
 
@@ -1194,7 +1194,7 @@ class ScenarioComparison:
         self,
         *,
         pairs: list[tuple[int, int, float]],
-        stations_path: Path,
+        complexes_path: Path,
         scope_ids: frozenset[int],
         walks: Walks,
     ) -> ScenarioComparisonResult:
@@ -1203,7 +1203,7 @@ class ScenarioComparison:
             results=[
                 walks.for_scenario(scenario).classify(
                     pairs=pairs,
-                    stations_path=stations_path,
+                    complexes_path=complexes_path,
                     scope_ids=scope_ids,
                 )
                 for scenario in self.scenarios
@@ -1465,10 +1465,13 @@ def deinterlining(
         ),
     ] = SCENARIOS_FILE,
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
-    stations: Annotated[Path, Option()] = DATA / "stations_complexes.csv",
-    stations_individual: Annotated[
+    complexes_path: Annotated[Path, Option("--stations")] = (
+        DATA / "stations_complexes.csv"
+    ),
+    stations_individual_path: Annotated[
         Path,
         Option(
+            "--stations-individual",
             help=(
                 "Per-physical-station reference CSV, used for accurate "
                 "nearest-other-trunk distances"
@@ -1542,9 +1545,9 @@ def deinterlining(
     day_type_label = (
         "/".join(d.strip() for d in days.split(",")) if days else str(day_type)
     )
-    complexes_by_id = Complex.load_all(stations)
-    individual_stations = Station.load_all(stations_individual, complexes_by_id)
-    station_index = StationIndex.build(complexes_by_id, individual_stations)
+    complexes_by_id = Complex.load_all(complexes_path)
+    stations = Station.load_all(stations_individual_path, complexes_by_id)
+    station_index = StationIndex.build(complexes_by_id, stations)
     try:
         comparison = resolve_scenarios(
             categories=categories,
@@ -1621,15 +1624,15 @@ def deinterlining(
 
     walks = Walks(
         complexes_by_id=complexes_by_id,
-        individual_stations=individual_stations,
-        stations=station_index.stations,
+        stations=stations,
+        complex_stations=station_index.complex_stations,
         close_threshold_m=close_threshold_m,
     )
 
     try:
         result = comparison.classify(
             pairs=pairs,
-            stations_path=stations,
+            complexes_path=complexes_path,
             scope_ids=scope_ids,
             walks=walks,
         )

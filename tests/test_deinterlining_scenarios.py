@@ -40,15 +40,15 @@ def complexes_by_id() -> dict[int, Complex]:
 
 
 @pytest.fixture(scope="module")
-def individual_stations(complexes_by_id: dict[int, Complex]) -> list[Station]:
+def stations(complexes_by_id: dict[int, Complex]) -> list[Station]:
     return Station.load_all(STATIONS_INDIVIDUAL, complexes_by_id)
 
 
 @pytest.fixture(scope="module")
 def station_index(
-    complexes_by_id: dict[int, Complex], individual_stations: list[Station]
+    complexes_by_id: dict[int, Complex], stations: list[Station]
 ) -> StationIndex:
-    return StationIndex.build(complexes_by_id, individual_stations)
+    return StationIndex.build(complexes_by_id, stations)
 
 
 @pytest.fixture(scope="module")
@@ -402,7 +402,7 @@ def test_a_stranded_pair_is_far_not_a_crash(
     tmp_path: Path,
     station_index: StationIndex,
     complexes_by_id: dict[int, Complex],
-    individual_stations: list[Station],
+    stations: list[Station],
 ) -> None:
     """A trip between two stations the scenario leaves with no route in
     the comparison's universe: no walk at either end turns it into a
@@ -426,12 +426,12 @@ def test_a_stranded_pair_is_far_not_a_crash(
 
     result = comparison.classify(
         pairs=[(origin.complex_id, dest.complex_id, 100.0)],
-        stations_path=STATIONS,
+        complexes_path=STATIONS,
         scope_ids=scope_ids,
         walks=Walks(
             complexes_by_id=complexes_by_id,
-            individual_stations=individual_stations,
-            stations=station_index.stations,
+            stations=stations,
+            complex_stations=station_index.complex_stations,
             close_threshold_m=300.0,
         ),
     )

@@ -746,10 +746,13 @@ def render_notes(*, close_threshold_m: float) -> str:
 @app.command()
 def one_seat_rides(
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
-    stations: Annotated[Path, Option()] = DATA / "stations_complexes.csv",
-    stations_individual: Annotated[
+    complexes_path: Annotated[Path, Option("--stations")] = (
+        DATA / "stations_complexes.csv"
+    ),
+    stations_individual_path: Annotated[
         Path,
         Option(
+            "--stations-individual",
             help=(
                 "Per-physical-station reference CSV, used for accurate "
                 "nearest-other-trunk distances"
@@ -1067,7 +1070,7 @@ def one_seat_rides(
             )
             raise SystemExit(1)
 
-    complexes_by_id = Complex.load_all(stations)
+    complexes_by_id = Complex.load_all(complexes_path)
     boundary_lat = complexes_by_id[boundary_complex_id].loc.lat
     boundary_complex = complexes_by_id[boundary_complex_id]
     boundary_name = boundary_complex.display(boundary_complex.routes & routes_set)
@@ -1138,7 +1141,7 @@ def one_seat_rides(
             # OD extract; dropping it would silently undercount.
             print(
                 f"error: destination complex {dest_id} not found in "
-                f"{stations}; refetch station reference data with "
+                f"{complexes_path}; refetch station reference data with "
                 "`mta-od-data prepare --force-stations`",
                 file=sys.stderr,
             )
@@ -1150,15 +1153,13 @@ def one_seat_rides(
 
     total_riders = sum(r for _, _, r in scoped)
 
-    individual_stations = Station.load_all(stations_individual, complexes_by_id)
+    stations = Station.load_all(stations_individual_path, complexes_by_id)
     stations_by_complex: dict[int, list[Station]] = {}
-    for s in individual_stations:
+    for s in stations:
         stations_by_complex.setdefault(s.complex_id, []).append(s)
     # Numbers those stations, so a sweep can key its distances on a
     # pair of ids rather than on a pair of `Coord`s.
-    complex_stations = ComplexStations.build(
-        individual_stations, complexes_by_id.values()
-    )
+    complex_stations = ComplexStations.build(stations, complexes_by_id.values())
 
     # Keyed by borough too,
     # since a `line` label can span physically distinct segments:
@@ -1169,7 +1170,7 @@ def one_seat_rides(
     # A coarse split, since one borough can still hold two branches
     # of a composite line, but it fixes the case that shows up.
     routes_by_line: dict[tuple[str, str], set[str]] = {}
-    for s in individual_stations:
+    for s in stations:
         routes_by_line.setdefault((s.line, s.borough), set()).update(s.routes)
 
     # The primary routes on an origin's own physical line,
@@ -1204,7 +1205,7 @@ def one_seat_rides(
     # and `--origin-side north` alone would break it.
     #
     # Local, not cached at module level:
-    # these close over `individual_stations`, loaded per invocation,
+    # these close over `stations`, loaded per invocation,
     # so a longer-lived cache could serve another invocation's data.
     # (`ComplexStations` has the same property by holding its own cache.)
     def make_min_dist_to_corridor(
@@ -1224,7 +1225,7 @@ def one_seat_rides(
             # stations.
             return [
                 station
-                for station in individual_stations
+                for station in stations
                 if effective_origin_routes.get(station.complex_id, station.routes)
                 & assigned_routes
             ]
