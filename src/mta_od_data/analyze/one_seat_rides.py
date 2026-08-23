@@ -14,11 +14,11 @@ from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
     Complex,
+    ComplexStations,
     DayCoverage,
     DayFilterError,
     DayType,
     Station,
-    WalkPoints,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 
@@ -1156,7 +1156,9 @@ def one_seat_rides(
         stations_by_complex.setdefault(s.complex_id, []).append(s)
     # Numbers those stations, so a sweep can key its distances on a
     # pair of ids rather than on a pair of `Coord`s.
-    walk_points = WalkPoints.build(individual_stations, complexes_by_id.values())
+    complex_stations = ComplexStations.build(
+        individual_stations, complexes_by_id.values()
+    )
 
     # Keyed by borough too,
     # since a `line` label can span physically distinct segments:
@@ -1204,7 +1206,7 @@ def one_seat_rides(
     # Local, not cached at module level:
     # these close over `individual_stations`, loaded per invocation,
     # so a longer-lived cache could serve another invocation's data.
-    # (`WalkPoints` has the same property by holding its own cache.)
+    # (`ComplexStations` has the same property by holding its own cache.)
     def make_min_dist_to_corridor(
         effective_origin_routes: dict[int, frozenset[str]],
     ) -> Callable[[Complex, frozenset[str]], tuple[float, Station]]:
@@ -1228,7 +1230,7 @@ def one_seat_rides(
             ]
 
         # (dest, route set) repeats constantly across rows,
-        # and skipping a whole sweep beats `WalkPoints.distance`'s own
+        # and skipping a whole sweep beats `ComplexStations.distance`'s own
         # per-point-pair cache,
         # which still catches the overlap between two different sweeps.
         # On the default DeKalb scenario the two layers together
@@ -1242,9 +1244,9 @@ def one_seat_rides(
             # but not a gap in `stations_individual.csv` itself.
             assert candidates, "no individual station serves this route set"
             best: tuple[float, Station] | None = None
-            for here in walk_points.by_complex[dest]:
+            for here in complex_stations.by_complex[dest]:
                 for c in candidates:
-                    dist_m = walk_points.distance(here, c)
+                    dist_m = complex_stations.distance(here, c)
                     if best is None or dist_m < best[0]:
                         best = (dist_m, c)
             assert best is not None

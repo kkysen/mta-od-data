@@ -227,7 +227,9 @@ class StationIndex:
             known_routes=frozenset(
                 r for s in complexes_by_id.values() for r in s.routes
             ),
-            stations=ComplexStations.build(individual_stations),
+            stations=ComplexStations.build(
+                individual_stations, complexes_by_id.values()
+            ),
             station_id_by_name_line={key: min(ids) for key, ids in station_ids.items()},
         )
 

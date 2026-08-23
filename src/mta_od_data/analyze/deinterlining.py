@@ -41,7 +41,6 @@ from mta_od_data.analyze.common import (
     DayFilterError,
     DayType,
     Station,
-    WalkPoints,
 )
 from mta_od_data.analyze.markdown import collapsed, table_row, table_rule
 from mta_od_data.analyze.scenarios import (
@@ -253,12 +252,6 @@ class Walks:
     def for_scenario(self, scenario: Scenario) -> ScenarioWalks:
         return ScenarioWalks(walks=self, scenario=scenario)
 
-    # One per run, so every scenario shares its distances: where a
-    # station is doesn't depend on which routes stop there.
-    @cache  # noqa: B019  (see `ScenarioWalks.corridor_stations`)
-    def points(self) -> WalkPoints:
-        return WalkPoints.build(self.individual_stations, self.complexes_by_id.values())
-
 
 @dataclass(slots=True, frozen=True, eq=False)
 class ScenarioWalks:
@@ -354,7 +347,7 @@ class ScenarioWalks:
         end put in scope: there is no corridor station to stand on, so
         the complex is all that is known about where they are.
         """
-        stations = self.walks.points().by_complex[complex]
+        stations = self.stations.by_complex[complex]
         on_corridor = tuple(
             station for station in stations if self.scenario.routes_at(station)
         )
@@ -374,8 +367,7 @@ class ScenarioWalks:
         if not candidates:
             return None
 
-        points = self.walks.points()
-        distance = points.distance
+        distance = self.stations.distance
         # By distance alone: two stations exactly as far away would
         # otherwise be compared as `Station`s, which don't order.
         return min(
