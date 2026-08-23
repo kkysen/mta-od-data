@@ -277,7 +277,8 @@ def regional_flow(
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
     )
     complexes_by_id = Complex.load_all(complexes_path)
-    valid_boroughs = frozenset(s.borough for s in complexes_by_id.values())
+    complexes = complexes_by_id.values()
+    valid_boroughs = frozenset(c.borough for c in complexes)
     region_def = resolve_region(
         preset=region,
         region_borough=region_borough,
@@ -286,16 +287,16 @@ def regional_flow(
         valid_boroughs=valid_boroughs,
     )
 
-    n_inside = sum(1 for s in complexes_by_id.values() if region_def.contains(s))
+    n_inside = sum(1 for c in complexes if region_def.contains(c))
     if n_inside == 0:
         print(
             f"error: region {region_def.name!r} matches 0 of "
-            f"{len(complexes_by_id)} stations; check "
+            f"{len(complexes)} complexes; check "
             "--region/--region-borough/--region-bbox",
             file=sys.stderr,
         )
         raise SystemExit(1)
-    print(f"Region: {region_def.name} ({n_inside} of {len(complexes_by_id)} stations)")
+    print(f"Region: {region_def.name} ({n_inside} of {len(complexes)} complexes)")
     print(f"Day filter: {days_list if days_list else 'all days'}")
 
     con = duckdb.connect()

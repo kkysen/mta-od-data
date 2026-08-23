@@ -1071,6 +1071,7 @@ def one_seat_rides(
             raise SystemExit(1)
 
     complexes_by_id = Complex.load_all(complexes_path)
+    complexes = complexes_by_id.values()
     boundary_lat = complexes_by_id[boundary_complex_id].loc.lat
     boundary_complex = complexes_by_id[boundary_complex_id]
     boundary_name = boundary_complex.display(boundary_complex.routes & routes_set)
@@ -1086,9 +1087,9 @@ def one_seat_rides(
         return lat < boundary_lat if side == "south" else lat > boundary_lat
 
     origin_ids = [
-        s.complex_id
-        for s in complexes_by_id.values()
-        if (s.routes & routes_set) and side_ok(s.loc.lat, origin_side)
+        c.complex_id
+        for c in complexes
+        if (c.routes & routes_set) and side_ok(c.loc.lat, origin_side)
     ]
     origin_ids.sort()
     print(f"\nOrigin stations ({len(origin_ids)}):")

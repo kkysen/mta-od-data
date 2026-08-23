@@ -10,7 +10,7 @@ replace `one_seat_rides.py`'s corridor-A/corridor-B machinery.
 import itertools
 import re
 from collections import Counter, defaultdict
-from collections.abc import Hashable
+from collections.abc import Collection, Hashable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, TypeVar
@@ -209,7 +209,7 @@ class StationIndex:
     @classmethod
     def build(
         cls,
-        complexes_by_id: dict[int, Complex],
+        complexes: Collection[Complex],
         stations: list[Station],
     ) -> StationIndex:
         by_name_line: defaultdict[tuple[str, str], set[Complex]] = defaultdict(set)
@@ -221,10 +221,8 @@ class StationIndex:
             by_name_line[station.name, station.line].add(station.complex)
         return cls(
             by_name_line={key: frozenset(v) for key, v in by_name_line.items()},
-            known_routes=frozenset(
-                r for s in complexes_by_id.values() for r in s.routes
-            ),
-            complex_stations=ComplexStations.build(stations, complexes_by_id.values()),
+            known_routes=frozenset(r for c in complexes for r in c.routes),
+            complex_stations=ComplexStations.build(stations, complexes),
             station_id_by_name_line={key: min(ids) for key, ids in station_ids.items()},
         )
 

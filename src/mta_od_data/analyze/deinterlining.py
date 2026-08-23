@@ -1555,8 +1555,9 @@ def deinterlining(
         "/".join(d.strip() for d in days.split(",")) if days else str(day_type)
     )
     complexes_by_id = Complex.load_all(complexes_path)
+    complexes = complexes_by_id.values()
     stations = Station.load_all(stations_path, complexes_by_id)
-    station_index = StationIndex.build(complexes_by_id, stations)
+    station_index = StationIndex.build(complexes, stations)
     try:
         comparison = resolve_scenarios(
             categories=categories,
@@ -1578,10 +1579,11 @@ def deinterlining(
     # if some scenario gives it one of the comparison's routes.
     # Either end putting a pair in scope, since a swap changes a trip
     # the same way whichever direction it runs.
-    scope = frozenset(
-        c for c in complexes_by_id.values() if any(sc.routes_of(c) for sc in scenarios)
+    scope = frozenset(c for c in complexes if any(sc.routes_of(c) for sc in scenarios))
+    print(
+        f"Complexes in scope: {len(scope):,} of {len(complexes):,} "
+        f"({len(stations):,} stations)"
     )
-    print(f"Stations in scope: {len(scope):,} of {len(complexes_by_id):,}")
 
     con = duckdb.connect()
     day_params: list[str] = list(days_list) if days_list else []
