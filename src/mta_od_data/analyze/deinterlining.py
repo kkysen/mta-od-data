@@ -280,7 +280,7 @@ class ScenarioWalks:
         return self.walks.stations
 
     @cache  # noqa: B019  (see `corridor_stations`)
-    def routes_by_complex(self) -> dict[int, Routes]:
+    def routes_by_complex(self) -> dict[Complex, Routes]:
         """Every complex's routes under this scenario, worked out once.
 
         `Scenario.routes_of` is a dict lookup and a set intersection,
@@ -289,12 +289,12 @@ class ScenarioWalks:
         distinct answers.
         """
         return {
-            complex_id: self.scenario.routes_of(complex_station)
-            for complex_id, complex_station in self.walks.complexes_by_id.items()
+            complex_station: self.scenario.routes_of(complex_station)
+            for complex_station in self.walks.complexes_by_id.values()
         }
 
     @cache  # noqa: B019  (see `corridor_stations`)
-    def ends_by_complex(self) -> dict[int, TripEnd]:
+    def ends_by_complex(self) -> dict[Complex, TripEnd]:
         """How every complex reads under this scenario, worked out once.
 
         Its narrowed station name and its route list are as fixed for
@@ -307,13 +307,12 @@ class ScenarioWalks:
         lookups.
         """
         return {
-            complex_id: TripEnd(
-                id=complex_id,
+            complex_station: TripEnd(
+                id=complex_station.complex_id,
                 station=self.stations.name(complex_station, routes),
                 routes=",".join(sorted(routes)),
             )
-            for complex_id, routes in self.routes_by_complex().items()
-            if (complex_station := self.walks.complexes_by_id[complex_id]) is not None
+            for complex_station, routes in self.routes_by_complex().items()
         }
 
     # B019: `cache` on a method stores its entries on the *function*,
@@ -464,7 +463,7 @@ class ScenarioWalks:
         return Walk(
             close=dist_m <= self.walks.close_threshold_m,
             dist_m=dist_m,
-            station=self.ends_by_complex()[station.complex_id].name,
+            station=self.ends_by_complex()[station.complex].name,
             at_origin=walk_at_origin,
         )
 
@@ -489,8 +488,8 @@ class ScenarioWalks:
                     "`mta-od-data prepare --force-stations`"
                 )
 
-            effective_origin_routes = routes_by_complex[origin_id]
-            effective_dest_routes = routes_by_complex[dest_id]
+            effective_origin_routes = routes_by_complex[origin]
+            effective_dest_routes = routes_by_complex[dest]
             one_seat = bool(effective_origin_routes & effective_dest_routes)
 
             walk = (
@@ -506,8 +505,8 @@ class ScenarioWalks:
 
             rows.append(
                 ODPair(
-                    origin=ends_by_complex[origin_id],
-                    destination=ends_by_complex[dest_id],
+                    origin=ends_by_complex[origin],
+                    destination=ends_by_complex[dest],
                     riders=riders,
                     both_ends=origin_id in scope_ids and dest_id in scope_ids,
                     one_seat=one_seat,
