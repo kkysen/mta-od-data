@@ -229,6 +229,32 @@ class Outcome(StrEnum):
         return self is not Outcome.FAR
 
 
+# One row of the OD extract, once its two complex ids are complexes:
+# the parquet knows only ids, and `resolve_pairs` is where they stop
+# being ids, so nothing downstream has to hold a map to look one up.
+type ODRow = tuple[Complex, Complex, float]
+
+
+def resolve_pairs(
+    rows: list[tuple[int, int, float]],
+    complexes_by_id: dict[int, Complex],
+    complexes_path: Path,
+) -> list[ODRow]:
+    resolved: list[ODRow] = []
+    for origin_id, dest_id, riders in rows:
+        origin = complexes_by_id.get(origin_id)
+        dest = complexes_by_id.get(dest_id)
+        if origin is None or dest is None:
+            missing_id = origin_id if origin is None else dest_id
+            raise ScenarioError(
+                f"station complex {missing_id} not found in "
+                f"{complexes_path}; refetch station reference data with "
+                "`mta-od-data prepare --force-stations`"
+            )
+        resolved.append((origin, dest, riders))
+    return resolved
+
+
 @dataclass(slots=True, frozen=True, eq=False)
 class Walks:
     """One run's station data, everything measuring a walk needs
@@ -244,7 +270,6 @@ class Walks:
     possible.
     """
 
-    complexes_by_id: dict[int, Complex]
     stations: list[Station]
     complex_stations: ComplexStations
     close_threshold_m: float
@@ -283,7 +308,7 @@ class ScenarioWalks:
         """
         return {
             complex: self.scenario.routes_of(complex)
-            for complex in self.walks.complexes_by_id.values()
+            for complex in self.complex_stations.by_complex
         }
 
     @cache  # noqa: B019  (see `corridor_stations`)
@@ -462,24 +487,13 @@ class ScenarioWalks:
     def classify(
         self,
         *,
-        pairs: list[tuple[int, int, float]],
-        complexes_path: Path,
-        scope_ids: frozenset[int],
+        pairs: list[ODRow],
+        scope: frozenset[Complex],
     ) -> ScenarioResult:
         rows: list[ODPair] = []
         routes_by_complex = self.routes_by_complex()
         ends_by_complex = self.ends_by_complex()
-        for origin_id, dest_id, riders in pairs:
-            origin = self.walks.complexes_by_id.get(origin_id)
-            dest = self.walks.complexes_by_id.get(dest_id)
-            if origin is None or dest is None:
-                missing_id = origin_id if origin is None else dest_id
-                raise ScenarioError(
-                    f"station complex {missing_id} not found in "
-                    f"{complexes_path}; refetch station reference data with "
-                    "`mta-od-data prepare --force-stations`"
-                )
-
+        for origin, dest, riders in pairs:
             effective_origin_routes = routes_by_complex[origin]
             effective_dest_routes = routes_by_complex[dest]
             one_seat = bool(effective_origin_routes & effective_dest_routes)
@@ -500,7 +514,7 @@ class ScenarioWalks:
                     origin=ends_by_complex[origin],
                     destination=ends_by_complex[dest],
                     riders=riders,
-                    both_ends=origin_id in scope_ids and dest_id in scope_ids,
+                    both_ends=origin in scope and dest in scope,
                     one_seat=one_seat,
                     walk=walk,
                 )
@@ -1193,19 +1207,14 @@ class ScenarioComparison:
     def classify(
         self,
         *,
-        pairs: list[tuple[int, int, float]],
-        complexes_path: Path,
-        scope_ids: frozenset[int],
+        pairs: list[ODRow],
+        scope: frozenset[Complex],
         walks: Walks,
     ) -> ScenarioComparisonResult:
         return ScenarioComparisonResult(
             comparison=self,
             results=[
-                walks.for_scenario(scenario).classify(
-                    pairs=pairs,
-                    complexes_path=complexes_path,
-                    scope_ids=scope_ids,
-                )
+                walks.for_scenario(scenario).classify(pairs=pairs, scope=scope)
                 for scenario in self.scenarios
             ],
         )
@@ -1569,12 +1578,10 @@ def deinterlining(
     # if some scenario gives it one of the comparison's routes.
     # Either end putting a pair in scope, since a swap changes a trip
     # the same way whichever direction it runs.
-    scope_ids = frozenset(
-        s.complex_id
-        for s in complexes_by_id.values()
-        if any(sc.routes_of(s) for sc in scenarios)
+    scope = frozenset(
+        c for c in complexes_by_id.values() if any(sc.routes_of(c) for sc in scenarios)
     )
-    print(f"Stations in scope: {len(scope_ids):,} of {len(complexes_by_id):,}")
+    print(f"Stations in scope: {len(scope):,} of {len(complexes_by_id):,}")
 
     con = duckdb.connect()
     day_params: list[str] = list(days_list) if days_list else []
@@ -1583,7 +1590,7 @@ def deinterlining(
         if not days_list
         else '"Day of Week" IN (' + ", ".join("?" for _ in days_list) + ")"
     )
-    scope_id_list = ", ".join(str(i) for i in sorted(scope_ids))
+    scope_id_list = ", ".join(str(i) for i in sorted(c.complex_id for c in scope))
     scope_filter_sql = (
         f'("Origin Station Complex ID" IN ({scope_id_list})'
         f' OR "Destination Station Complex ID" IN ({scope_id_list}))'
@@ -1613,9 +1620,14 @@ def deinterlining(
         -- snapshot tests rather than fail them honestly.
         ORDER BY 1, 2
     """
-    pairs: list[tuple[int, int, float]] = con.execute(
+    fetched: list[tuple[int, int, float]] = con.execute(
         pairs_query, [str(parquet), *day_params]
     ).fetchall()
+    try:
+        pairs = resolve_pairs(fetched, complexes_by_id, complexes_path)
+    except ScenarioError as e:
+        print(f"error: {e}", file=sys.stderr)
+        raise SystemExit(1) from e
     print(
         f"\n{len(pairs):,} distinct origin/destination pairs, averaged over "
         f"{n_distinct_days} distinct days matching the day filter "
@@ -1623,7 +1635,6 @@ def deinterlining(
     )
 
     walks = Walks(
-        complexes_by_id=complexes_by_id,
         stations=stations,
         complex_stations=station_index.complex_stations,
         close_threshold_m=close_threshold_m,
@@ -1632,8 +1643,7 @@ def deinterlining(
     try:
         result = comparison.classify(
             pairs=pairs,
-            complexes_path=complexes_path,
-            scope_ids=scope_ids,
+            scope=scope,
             walks=walks,
         )
     except ScenarioError as e:
