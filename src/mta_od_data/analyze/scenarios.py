@@ -10,9 +10,10 @@ replace `one_seat_rides.py`'s corridor-A/corridor-B machinery.
 import itertools
 import re
 from collections import defaultdict
+from collections.abc import Hashable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, TypeVar
 
 import json5
 from pydantic import (
@@ -91,7 +92,7 @@ def merge_override(overrides: Overrides, key: OverrideKey, delta: RouteDelta) ->
     return merged.conflict
 
 
-def check_unique(values: list[str]) -> list[str]:
+def check_unique[T: Hashable](values: list[T]) -> list[T]:
     """A list field's values, rejected if any repeats.
 
     Every list in a scenario file is a set written down:
@@ -105,7 +106,9 @@ def check_unique(values: list[str]) -> list[str]:
     Neither can be seen in a report,
     since both collapse to the same set before anything is computed.
     """
-    duplicates = sorted({value for value in values if values.count(value) > 1})
+    # In the order the file has them, since that's where a reader
+    # goes looking, and `T` need only be hashable to be counted.
+    duplicates = list(dict.fromkeys(v for v in values if values.count(v) > 1))
     if duplicates:
         raise ValueError(f"duplicate entries: {duplicates}")
     return values
@@ -114,12 +117,15 @@ def check_unique(values: list[str]) -> list[str]:
 # `uniqueItems` so `scenarios.schema.json` says this too:
 # the validator runs on a real load, but the schema is what an editor
 # has to flag the repeat with, at the point it's being typed.
-# A bare assignment rather than a PEP 695 `type` alias (which is what
-# the rest of this file uses, and what `UP040` asks for): pydantic gives
-# a `type` alias its own `$defs` entry, shared by every field using it,
-# and `scenario_schema.py` bakes a different `enum` into each field.
-Unique = Annotated[
-    list[str],
+# A bare assignment with a legacy `TypeVar`, rather than the PEP 695
+# `type UniqueList[T]` the rest of this file's aliases are written as:
+# pydantic gives a `type` alias its own `$defs` entry, shared by every
+# field using it, and `scenario_schema.py` bakes a different `enum`
+# into each field.
+T = TypeVar("T", bound=Hashable)
+
+UniqueList = Annotated[
+    list[T],
     AfterValidator(check_unique),
     Field(json_schema_extra={"uniqueItems": True}),
 ]
@@ -135,9 +141,9 @@ class OverrideGroup(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     line: str = Field(min_length=1)
-    add: Unique = Field(default_factory=list)
-    remove: Unique = Field(default_factory=list)
-    stations: Unique = Field(min_length=1)
+    add: UniqueList[str] = Field(default_factory=list)
+    remove: UniqueList[str] = Field(default_factory=list)
+    stations: UniqueList[str] = Field(min_length=1)
 
 
 class ScenarioEntry(BaseModel):
@@ -152,7 +158,7 @@ class ScenarioEntry(BaseModel):
 
     name: str = Field(min_length=1)
     description: str | None = None
-    routes: Unique = Field(min_length=1)
+    routes: UniqueList[str] = Field(min_length=1)
     overrides: list[OverrideGroup] = Field(default_factory=list)
 
 
