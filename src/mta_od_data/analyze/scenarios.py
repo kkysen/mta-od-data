@@ -114,6 +114,20 @@ def check_unique[T: Hashable](values: list[T]) -> list[T]:
     return values
 
 
+def check_sorted(values: list[str]) -> list[str]:
+    """A list field's values, rejected unless already in order.
+
+    A route list is a set too, so its order carries nothing and is
+    free to be the one that makes two lists comparable by eye:
+    whether `["B", "D", "N", "Q", "R"]` and another scenario's routes
+    are the same set shouldn't depend on what order each was typed in.
+    """
+    ordered = sorted(values)
+    if values != ordered:
+        raise ValueError(f"out of order: expected {ordered}")
+    return values
+
+
 # `uniqueItems` so `scenarios.schema.json` says this too:
 # the validator runs on a real load, but the schema is what an editor
 # has to flag the repeat with, at the point it's being typed.
@@ -131,6 +145,13 @@ UniqueList = Annotated[
 ]
 
 
+# Routes only, and `str` rather than `T`,
+# since being sorted takes an order and not just equality.
+# JSON Schema has no keyword for it, so unlike `uniqueItems`
+# this one is the validator's alone to say.
+SortedUniqueList = Annotated[UniqueList[str], AfterValidator(check_sorted)]
+
+
 class OverrideGroup(BaseModel):
     """`line` (e.g. "8th Av - Fulton St") is required
     even where a station name is already unique:
@@ -141,8 +162,8 @@ class OverrideGroup(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     line: str = Field(min_length=1)
-    add: UniqueList[str] = Field(default_factory=list)
-    remove: UniqueList[str] = Field(default_factory=list)
+    add: SortedUniqueList = Field(default_factory=list)
+    remove: SortedUniqueList = Field(default_factory=list)
     stations: UniqueList[str] = Field(min_length=1)
 
 
@@ -158,7 +179,7 @@ class ScenarioEntry(BaseModel):
 
     name: str = Field(min_length=1)
     description: str | None = None
-    routes: UniqueList[str] = Field(min_length=1)
+    routes: SortedUniqueList = Field(min_length=1)
     overrides: list[OverrideGroup] = Field(default_factory=list)
 
 

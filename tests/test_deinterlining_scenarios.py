@@ -158,6 +158,20 @@ def test_a_repeated_route_is_an_error(
         ScenarioFile.load(path, station_index)
 
 
+def test_an_unsorted_route_list_is_an_error(
+    tmp_path: Path, station_index: StationIndex
+) -> None:
+    """A duplicate is caught first, and reported as one:
+    a repeat is out of order too, and `['B']` says more about it
+    than the sorted list the other check would print."""
+    path = write_scenarios(
+        tmp_path,
+        {"X": [{"name": "Unsorted", "routes": ["D", "B", "N", "Q", "R"]}]},
+    )
+    with pytest.raises(ScenarioError, match=r"out of order: expected"):
+        ScenarioFile.load(path, station_index)
+
+
 def test_two_groups_cannot_name_one_station_on_one_line(
     tmp_path: Path, station_index: StationIndex
 ) -> None:
