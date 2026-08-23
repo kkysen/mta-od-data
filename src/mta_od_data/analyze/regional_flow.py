@@ -194,7 +194,9 @@ def write_csv(path: Path, rows: list[FlowRow]) -> None:
 @app.command(name="regional-flow")
 def regional_flow(
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
-    stations: Annotated[Path, Option()] = DATA / "stations_complexes.csv",
+    complexes_path: Annotated[Path, Option("--stations")] = (
+        DATA / "stations_complexes.csv"
+    ),
     day_type: Annotated[DayType, Option()] = DayType.WEEKDAY,
     days: Annotated[
         str | None,
@@ -274,7 +276,7 @@ def regional_flow(
     days_list = (
         [d.strip() for d in days.split(",")] if days else DAY_TYPE_PRESETS[day_type]
     )
-    complexes_by_id = Complex.load_all(stations)
+    complexes_by_id = Complex.load_all(complexes_path)
     valid_boroughs = frozenset(s.borough for s in complexes_by_id.values())
     region_def = resolve_region(
         preset=region,
@@ -340,7 +342,7 @@ def regional_flow(
             missing_id = origin_id if origin is None else dest_id
             print(
                 f"error: station complex {missing_id} not found in "
-                f"{stations}; refetch station reference data with "
+                f"{complexes_path}; refetch station reference data with "
                 "`mta-od-data prepare --force-stations`",
                 file=sys.stderr,
             )

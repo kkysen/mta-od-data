@@ -20,8 +20,8 @@ SCENARIOS_SCHEMA_FILE = (
 
 def generate_scenario_schema(
     *,
-    stations_path: Path = DATA / "stations_complexes.csv",
-    individual_stations_path: Path = DATA / "stations_individual.csv",
+    complexes_path: Path = DATA / "stations_complexes.csv",
+    stations_path: Path = DATA / "stations_individual.csv",
 ) -> str:
     """The JSON Schema for a scenario file,
     with real line, station, and route values baked in as `enum`s
@@ -41,12 +41,12 @@ def generate_scenario_schema(
             SCENARIOS_SCHEMA_FILE, generate_scenario_schema; \\
             SCENARIOS_SCHEMA_FILE.write_text(generate_scenario_schema())"
     """
-    complexes_by_id = Complex.load_all(stations_path)
-    individual_stations = Station.load_all(individual_stations_path, complexes_by_id)
-    known_lines = sorted({s.line for s in individual_stations if s.line})
+    complexes_by_id = Complex.load_all(complexes_path)
+    stations = Station.load_all(stations_path, complexes_by_id)
+    known_lines = sorted({s.line for s in stations if s.line})
     # Platform names, not a complex's merged name (e.g. "62 St/New
     # Utrecht Av"): that's what a `stations` entry resolves against.
-    known_stations = sorted({s.name for s in individual_stations})
+    known_stations = sorted({s.name for s in stations})
     known_routes = sorted({r for s in complexes_by_id.values() for r in s.routes})
 
     schema: dict[str, Any] = {

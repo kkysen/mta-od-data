@@ -361,10 +361,10 @@ class ComplexStations:
 
     @classmethod
     def build(
-        cls, individual_stations: list[Station], complexes: Collection[Complex]
+        cls, stations: list[Station], complexes: Collection[Complex]
     ) -> ComplexStations:
         by_complex: defaultdict[Complex, list[Station]] = defaultdict(list)
-        for station in individual_stations:
+        for station in stations:
             by_complex[station.complex].append(station)
         # Every one of the 445 real complexes has stations of its own,
         # and a walk is only ever measured between stations, so a
