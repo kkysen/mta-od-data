@@ -166,7 +166,7 @@ class Complex:
 
     @classmethod
     def load(cls, row: dict[str, str]) -> Complex:
-        complex_station = cls(
+        complex = cls(
             complex_id=int(row["complex_id"]),
             name=abbreviate_name(row["stop_name"]),
             routes=frozenset(row["daytime_routes"].split()),
@@ -174,7 +174,7 @@ class Complex:
             borough=row["borough"],
             cbd=row["cbd"] == "true",
         )
-        return intern(cls._interned, complex_station)
+        return intern(cls._interned, complex)
 
     @classmethod
     def load_all(cls, path: Path) -> dict[int, Complex]:
@@ -184,7 +184,7 @@ class Complex:
         """
         with path.open(newline="") as f:
             return {
-                (complex_station := cls.load(row)).complex_id: complex_station
+                (complex := cls.load(row)).complex_id: complex
                 for row in csv.DictReader(f)
             }
 
@@ -305,15 +305,15 @@ class ComplexStations:
             by_complex[station.complex].append(station)
         return cls(by_complex={c: tuple(v) for c, v in by_complex.items()})
 
-    def name(self, complex_station: Complex, routes: frozenset[str]) -> str:
+    def name(self, complex: Complex, routes: frozenset[str]) -> str:
         return station_name(
-            self.by_complex.get(complex_station, ()),
-            complex_station.name,
+            self.by_complex.get(complex, ()),
+            complex.name,
             routes,
         )
 
-    def display(self, complex_station: Complex, routes: frozenset[str]) -> str:
-        return f"{self.name(complex_station, routes)} ({','.join(sorted(routes))})"
+    def display(self, complex: Complex, routes: frozenset[str]) -> str:
+        return f"{self.name(complex, routes)} ({','.join(sorted(routes))})"
 
 
 def haversine(c1: Coord, c2: Coord) -> float:
