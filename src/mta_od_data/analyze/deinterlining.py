@@ -1622,7 +1622,7 @@ def deinterlining(
     )
 
     try:
-        coverage = DayCoverage.query(con, parquet, day_filter_sql, day_params)
+        coverage = DayCoverage.query(parquet, day_filter_sql, day_params)
     except DayFilterError as e:
         print(f"error: {e}", file=sys.stderr)
         raise SystemExit(1) from e
