@@ -12,8 +12,9 @@ import re
 from collections import Counter, defaultdict
 from collections.abc import Collection, Hashable
 from dataclasses import dataclass
+from functools import cache
 from pathlib import Path
-from typing import Annotated, TypeVar
+from typing import Annotated, Any, TypeVar
 
 import json5
 from pydantic import (
@@ -534,6 +535,38 @@ class ScenarioCategory:
         )
 
 
+def parse_json5(path: Path) -> Any:
+    """`path` parsed, and parsed once for as long as it says the same
+    thing.
+
+    JSON5, not JSON:
+    tolerates the trailing comma before a closing `}`/`]`
+    that's easy to leave when hand-editing.
+    `allow_duplicate_keys=False` because the default keeps the last
+    of two same-named keys and drops the first without a word,
+    which for a repeated category name is a whole category's
+    scenarios silently missing from the report.
+    """
+    # Keyed by the text and not by the path, so rereading is what
+    # decides whether the parse still applies. Reading this file is
+    # 0.01ms against the 27ms of parsing it, which buys a key that
+    # can't go stale: a path with a `stat` behind it, as the extract
+    # has, would answer for a file rewritten inside one nanosecond,
+    # and a path alone would answer for any rewrite at all.
+    return parse_json5_text(path.read_text())
+
+
+@cache
+def parse_json5_text(text: str) -> Any:
+    """The parse `parse_json5` remembers.
+
+    The result is shared by every caller, so it is theirs to read and
+    not to alter; `ScenarioFile.load` hands it straight to pydantic,
+    which builds its own models out of it.
+    """
+    return json5.loads(text, allow_duplicate_keys=False)
+
+
 @dataclass(slots=True, frozen=True)
 class ScenarioFile:
     path: Path
@@ -542,15 +575,8 @@ class ScenarioFile:
 
     @classmethod
     def load(cls, path: Path, station_index: StationIndex) -> ScenarioFile:
-        # JSON5, not JSON:
-        # tolerates the trailing comma before a closing `}`/`]`
-        # that's easy to leave when hand-editing.
-        # `allow_duplicate_keys=False` because the default keeps the last
-        # of two same-named keys and drops the first without a word,
-        # which for a repeated category name is a whole category's
-        # scenarios silently missing from the report.
         try:
-            data = json5.loads(path.read_text(), allow_duplicate_keys=False)
+            data = parse_json5(path)
         except ValueError as e:
             raise ScenarioError(f"scenario file {path} isn't valid JSON: {e}") from e
         try:
