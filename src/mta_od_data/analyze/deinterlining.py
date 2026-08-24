@@ -18,7 +18,6 @@ reconcile if the two ever merge.
 """
 
 import csv
-import shlex
 import sys
 from collections import defaultdict
 from collections.abc import Callable, Sequence
@@ -30,7 +29,7 @@ from pathlib import Path
 from typing import Annotated, Any
 
 import duckdb
-from typer import Option, Typer
+from typer import Context, Option, Typer
 
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
@@ -55,6 +54,7 @@ from mta_od_data.analyze.scenarios import (
     ScenarioFile,
     StationIndex,
 )
+from mta_od_data.invocation import produced_by
 
 app = Typer()
 
@@ -1460,6 +1460,7 @@ def resolve_scenarios(
 
 @app.command()
 def deinterlining(
+    ctx: Context,
     categories: Annotated[
         list[str] | None,
         Option(
@@ -1679,7 +1680,7 @@ def deinterlining(
         result.write_csvs(csv_out)
 
     if markdown_out:
-        produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
+        invocation = produced_by(ctx)
         preamble = "\n".join(
             [
                 "# Deinterlining Scenario Comparison: "
@@ -1693,7 +1694,7 @@ def deinterlining(
                 f"on those routes are reported alongside as context, but "
                 f"can't be a one-seat ride under any of them.",
                 "",
-                f"Produced by `{produced_by}`.",
+                f"Produced by `{invocation}`.",
                 "",
             ]
         )

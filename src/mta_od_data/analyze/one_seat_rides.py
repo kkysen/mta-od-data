@@ -1,5 +1,4 @@
 import csv
-import shlex
 import sys
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
@@ -8,7 +7,7 @@ from pathlib import Path
 from typing import Annotated, Literal
 
 import duckdb
-from typer import Option, Typer
+from typer import Context, Option, Typer
 
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
@@ -23,6 +22,7 @@ from mta_od_data.analyze.common import (
     complexes_of,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
+from mta_od_data.invocation import produced_by
 
 app = Typer()
 
@@ -747,6 +747,7 @@ def render_notes(*, close_threshold_m: float) -> str:
 
 @app.command()
 def one_seat_rides(
+    ctx: Context,
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
     complexes_path: Annotated[Path, Option("--complexes")] = (DATA / "complexes.csv"),
     stations_path: Annotated[
@@ -1306,7 +1307,7 @@ def one_seat_rides(
     if markdown_out:
         # argv[0] is an absolute path into the venv,
         # not reproducible across checkouts.
-        produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
+        invocation = produced_by(ctx)
         preamble_lines = [
             "# One Seat Ride Analysis for Deinterlining "
             f"{trunk_a_label}/{trunk_b_label} at {boundary_name}",
@@ -1318,7 +1319,7 @@ def one_seat_rides(
             f"{origin_side} of {boundary_name}, with destinations {dest_side} "
             f"of it (i.e. trips that cross the junction).",
             "",
-            f"Produced by `{produced_by}`.",
+            f"Produced by `{invocation}`.",
             "",
         ]
         sections = [
