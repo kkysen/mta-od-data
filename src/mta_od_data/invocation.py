@@ -47,11 +47,8 @@ class InvocationGroup(TyperGroup):
         # and this group is only ever the root, so a `None` is a caller
         # that bypassed `main` rather than a run to record.
         assert info_name is not None, "the root group is invoked by name"
-        # Before `super()`, which parses `args` and is free to consume
-        # it, and `setdefault` so a caller with its own `obj` keeps it:
-        # nothing passes one today, and this quietly losing to one later
-        # would be a `Produced by` line quoting the wrong command.
-        extra.setdefault("obj", shlex.join([info_name, *args]))
+        # Before `super()`, which parses `args` and is free to consume it.
+        extra["obj"] = shlex.join([info_name, *args])
         return super().make_context(info_name, args, parent=parent, **extra)
 
 
