@@ -1,4 +1,4 @@
-# Deinterlining Scenario Comparison: 2,3,4,5
+# Deinterlining Scenario Comparison: Nostrand
 
 Average weekday ridership (60 distinct days in the data, 2025-01 to 2025-12), over every origin/destination pair with both ends served by 2,3,4,5 under any scenario compared here. Pairs with only one end on those routes are reported alongside as context, but can't be a one-seat ride under any of them.
 
