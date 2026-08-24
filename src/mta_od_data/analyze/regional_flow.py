@@ -4,7 +4,6 @@ from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import Annotated
 
-import duckdb
 from typer import Context, Option, Typer
 
 from mta_od_data import DATA
@@ -15,6 +14,7 @@ from mta_od_data.analyze.common import (
     DayFilterError,
     DayType,
     complexes_of,
+    connection,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.regions import (
@@ -299,7 +299,7 @@ def regional_flow(
     print(f"Region: {region_def.name} ({n_inside} of {len(complexes)} complexes)")
     print(f"Day filter: {days_list if days_list else 'all days'}")
 
-    con = duckdb.connect()
+    con = connection()
     day_params: list[str] = list(days_list) if days_list else []
     day_filter_sql = (
         "TRUE"
