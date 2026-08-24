@@ -9,11 +9,22 @@ the CLI without assigning to `sys.argv` behind its own back.
 """
 
 import shlex
+from dataclasses import dataclass
 from typing import Any, override
 
 from typer import Context
 from typer._click.core import Context as ClickContext
 from typer.core import TyperGroup
+
+
+@dataclass(frozen=True, slots=True)
+class Invocation:
+    info_name: str
+    args: tuple[str, ...]
+
+    @override
+    def __str__(self) -> str:
+        return shlex.join((self.info_name, *self.args))
 
 
 class InvocationGroup(TyperGroup):
@@ -49,11 +60,11 @@ class InvocationGroup(TyperGroup):
         # that bypassed `main` rather than a run to record.
         assert info_name is not None, "the root group is invoked by name"
         # Before `super()`, which parses `args` and is free to consume it.
-        extra["obj"] = shlex.join([info_name, *args])
+        extra["obj"] = Invocation(info_name=info_name, args=tuple(args))
         return super().make_context(info_name, args, parent=parent, **extra)
 
 
-def produced_by(ctx: Context) -> str:
+def produced_by(ctx: Context) -> Invocation:
     """The command line `ctx` was invoked with.
 
     An `assert` rather than a fallback to `sys.argv`: a missing `obj`
@@ -62,7 +73,7 @@ def produced_by(ctx: Context) -> str:
     can be wrong in exactly the case the tests exist to catch.
     """
     invocation = ctx.obj
-    assert isinstance(invocation, str), (
+    assert isinstance(invocation, Invocation), (
         f"no invocation recorded on the context ({invocation!r}): "
         f"the root app must use `cls=InvocationGroup`"
     )
