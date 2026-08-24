@@ -28,7 +28,6 @@ from operator import attrgetter, itemgetter
 from pathlib import Path
 from typing import Annotated, Any
 
-import duckdb
 from typer import Context, Option, Typer
 
 from mta_od_data import DATA
@@ -43,6 +42,7 @@ from mta_od_data.analyze.common import (
     MissingComplexError,
     Station,
     complexes_of,
+    connection,
 )
 from mta_od_data.analyze.markdown import collapsed, table_row, table_rule
 from mta_od_data.analyze.scenarios import (
@@ -1608,7 +1608,7 @@ def deinterlining(
         f"({len(stations):,} stations)"
     )
 
-    con = duckdb.connect()
+    con = connection()
     day_params: list[str] = list(days_list) if days_list else []
     day_filter_sql = (
         "TRUE"

@@ -207,6 +207,24 @@ class Complex:
         return _complexes_by_id(path, read_csv_text(path))
 
 
+@cache
+def connection() -> duckdb.DuckDBPyConnection:
+    """The process's in-memory duckdb, opened when first asked for.
+
+    Shared rather than one per command, `duckdb.connect()` being 6ms
+    and every `analyze` command wanting exactly one. Nothing to close:
+    an in-memory instance holds no file open, and the queries here read
+    parquet by name without leaving anything behind in it.
+
+    Not a cache of anything the database knows, which is a separate
+    question with the answer "no": `parquet_metadata_cache` is off by
+    default, and reusing a connection measures no faster than opening
+    one, the extract being in the page cache and the time going to
+    decompressing and aggregating it either way.
+    """
+    return duckdb.connect()
+
+
 def read_csv_text(path: Path) -> str:
     """A reference CSV's text, `newline=""` as the `csv` module wants
     it: the reader handles a line ending inside a quoted field itself,
@@ -594,10 +612,9 @@ def _day_coverage(
             WHERE {day_filter_sql}
         )
     """
-    with duckdb.connect() as con:
-        result: tuple[int, int, int] | None = con.execute(
-            query, [str(parquet), *day_params]
-        ).fetchone()
+    result: tuple[int, int, int] | None = (
+        connection().execute(query, [str(parquet), *day_params]).fetchone()
+    )
     assert result is not None, "aggregate query always returns exactly one row"
     n_days, first, last = result
     if not n_days:

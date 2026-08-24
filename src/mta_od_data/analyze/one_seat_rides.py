@@ -6,7 +6,6 @@ from functools import cache
 from pathlib import Path
 from typing import Annotated, Literal
 
-import duckdb
 from typer import Context, Option, Typer
 
 from mta_od_data import DATA
@@ -20,6 +19,7 @@ from mta_od_data.analyze.common import (
     DayType,
     Station,
     complexes_of,
+    connection,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.invocation import produced_by
@@ -1098,7 +1098,7 @@ def one_seat_rides(
         s = complexes_by_id[cid]
         print(f"  {cid:>4}  {s.name}  routes={sorted(s.routes)}")
 
-    con = duckdb.connect()
+    con = connection()
     day_params: list[str] = list(days_list) if days_list else []
     day_filter_sql = (
         "TRUE"
