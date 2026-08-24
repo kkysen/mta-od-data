@@ -1,22 +1,24 @@
 """Each `analyze` subcommand's committed `.md` report
 must match a fresh run of the same command.
 
-Runs the real installed CLI as a subprocess, not an in-process call,
-so the `Produced by` line it embeds reflects the actual invocation,
-the same way a human regenerating the file by hand would see it.
+Runs each command through the CLI's own `app`, in this process,
+with the argv handed in rather than taken from `sys.argv`:
+`InvocationGroup` records what it was given either way, so the
+`Produced by` line comes out as it would from a shell, and a run
+costs one parse rather than one interpreter.
 
 Skipped when `data/mta_od.parquet` is missing:
 it's gitignored, so this can't run in CI.
 """
 
 import shlex
-import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
 
 from mta_od_data import DATA, ROOT
+from mta_od_data.cli import app
 
 PARQUET = DATA / "mta_od.parquet"
 ANALYZE_DIR = ROOT / "src" / "mta_od_data" / "analyze"
@@ -119,15 +121,25 @@ SNAPSHOTS = [
     ),
 )
 @pytest.mark.parametrize("snapshot", SNAPSHOTS, ids=lambda s: s.name)
-def test_snapshot_matches_fresh_run(snapshot: Snapshot, tmp_path: Path) -> None:
+def test_snapshot_matches_fresh_run(
+    snapshot: Snapshot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     tmp_out = tmp_path / snapshot.path.name
-    result = subprocess.run(
-        [*snapshot.cmd, "--markdown-out", str(tmp_out)],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
+    prog, *args = snapshot.cmd
+    # `cmd` names its paths relative to the repo root, and the committed
+    # `Produced by` line quotes them exactly as written, so they have to
+    # be resolved from there rather than from wherever pytest was run.
+    monkeypatch.chdir(ROOT)
+    # `app(args=...)`, so the `prog_name` and the arguments are this
+    # list and not pytest's own argv, and `standalone_mode` left on, so
+    # a command that fails exits the way it would in a shell.
+    with pytest.raises(SystemExit) as exit:
+        app(args=[*args, "--markdown-out", str(tmp_out)], prog_name=prog)
+    # `None` is `sys.exit()` with nothing to say, which is a success.
+    assert exit.value.code in (0, None), (
+        f"{shlex.join(snapshot.cmd)} exited {exit.value.code}; "
+        f"its own output is captured above"
     )
-    assert result.returncode == 0, result.stdout + result.stderr
 
     # The snapshot embeds its own producing argv,
     # so undo the substitution of the real path for this scratch one,
