@@ -1,9 +1,10 @@
 import csv
 from collections import defaultdict
-from collections.abc import Collection, Hashable
+from collections.abc import Collection, Hashable, Iterator
 from dataclasses import dataclass, fields
 from enum import StrEnum
 from functools import cache
+from io import StringIO
 from math import asin, cos, radians, sin, sqrt
 from operator import attrgetter
 from pathlib import Path
@@ -203,15 +204,49 @@ class Complex:
         the process's lifetime, so a `Station` can hold its own rather
         than an id to look up.
         """
-        with path.open(newline="") as f:
-            by_id: dict[int, Complex] = {
-                (complex := cls.load(row)).complex_id: complex
-                for row in csv.DictReader(f)
-            }
-        return tuple(
-            by_id.get(complex_id) or MissingComplex(complex_id, path)
-            for complex_id in range(max(by_id) + 1)
-        )
+        return _complexes_by_id(path, read_csv_text(path))
+
+
+def read_csv_text(path: Path) -> str:
+    """A reference CSV's text, `newline=""` as the `csv` module wants
+    it: the reader handles a line ending inside a quoted field itself,
+    and only sees one if nothing translated it first."""
+    return path.read_text(newline="")
+
+
+def read_csv_rows(text: str) -> Iterator[dict[str, str]]:
+    return csv.DictReader(StringIO(text, newline=""))
+
+
+# Keyed by what the files say rather than by where they are, so that a
+# file rewritten under a name already read is read again. The reading
+# is what makes that key affordable: 0.05ms of the 2.7ms a complex file
+# costs to load, against a `stat` that can't tell two writes of one
+# nanosecond apart. The extract is keyed the other way for want of the
+# same option, 358MB being no way to check.
+@cache
+def _complexes_by_id(path: Path, text: str) -> ComplexesById:
+    """`Complex.load_all`'s parse. Takes the `path` as well as the text
+    because a hole holds it, to name the file to refetch."""
+    by_id: dict[int, Complex] = {
+        (complex := Complex.load(row)).complex_id: complex
+        for row in read_csv_rows(text)
+    }
+    return tuple(
+        by_id.get(complex_id) or MissingComplex(complex_id, path)
+        for complex_id in range(max(by_id) + 1)
+    )
+
+
+@cache
+def _stations(text: str, complexes_by_id: ComplexesById) -> list[Station]:
+    """`Station.load_all`'s parse.
+
+    The list is shared by every caller, so it is theirs to read and not
+    to alter; nothing has ever had reason to, the stations themselves
+    being frozen.
+    """
+    return [Station.load(row, complexes_by_id) for row in read_csv_rows(text)]
 
 
 class MissingComplexError(Exception):
@@ -351,8 +386,13 @@ class Station:
 
     @classmethod
     def load_all(cls, path: Path, complexes_by_id: ComplexesById) -> list[Station]:
-        with path.open(newline="") as f:
-            return [cls.load(row, complexes_by_id) for row in csv.DictReader(f)]
+        """Every station in `path`, remembered by what the file says.
+
+        No `path` in the key, unlike the complexes: a `Station` holds
+        nothing that names the file it was read from, so two paths of
+        one text have the same stations to hand back.
+        """
+        return _stations(read_csv_text(path), complexes_by_id)
 
 
 @cache
