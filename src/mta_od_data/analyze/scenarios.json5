@@ -414,4 +414,59 @@
       ],
     },
   ],
+  "F/M Swap": [
+    {
+      "name": "F 63 St",
+      "description": "F 63 St, M 53 St",
+      "routes": [
+        "E",
+        "F",
+        "M",
+        "R",
+      ],
+      "overrides": [
+        {
+          "line": "63rd St",
+          "add": [
+            "F",
+          ],
+          "remove": [
+            "M",
+          ],
+          "stations": [
+            "21 St-Queensbridge",
+            "Roosevelt Island",
+            "Lexington Av/63 St",
+          ],
+        },
+        {
+          "line": "6th Av - Culver",
+          "add": [
+            "F",
+          ],
+          "remove": [
+            "M",
+          ],
+          "stations": [
+            "57 St",
+          ],
+        },
+        {
+          "line": "Queens Blvd",
+          "add": [
+            "M",
+          ],
+          "remove": [
+            "F",
+          ],
+          "stations": [
+            "Queens Plaza",
+            "Court Sq-23 St",
+            "Lexington Av/53 St",
+            "5 Av/53 St",
+          ],
+        },
+      ],
+    },
+  ],
 }

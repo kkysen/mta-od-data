@@ -102,6 +102,11 @@ SNAPSHOTS = [
         cmd=["mta-od-data", "analyze", "deinterlining", "--category", "Nostrand"],
         path=ANALYZE_DIR / "nostrand_deinterlining.md",
     ),
+    Snapshot(
+        name="deinterlining-fm-swap",
+        cmd=["mta-od-data", "analyze", "deinterlining", "--category", "F/M Swap"],
+        path=ANALYZE_DIR / "fm_swap_deinterlining.md",
+    ),
 ]
 
 
