@@ -12,6 +12,7 @@ import shlex
 from typing import Any, override
 
 from typer import Context
+from typer._click.core import Context as ClickContext
 from typer.core import TyperGroup
 
 
@@ -30,19 +31,19 @@ class InvocationGroup(TyperGroup):
     context with that subcommand's own class.
     """
 
-    # `parent` and the return are the click `Context` that typer vendors
-    # as `typer._click.core`, a base of the public `typer.Context` and
-    # not exported anywhere public itself. `Any` rather than reaching
-    # into a private module for a name that only appears in a signature
-    # this never looks at.
+    # `ClickContext`, not the `Context` a command is handed: the base
+    # `make_context` is declared in terms of the click class typer
+    # vendors, and `typer.Context` is a subclass of it, which would
+    # narrow a parameter the base declares wider. It has no public name,
+    # hence the private import.
     @override
     def make_context(
         self,
         info_name: str | None,
         args: list[str],
-        parent: Any = None,
+        parent: ClickContext | None = None,
         **extra: Any,
-    ) -> Any:
+    ) -> ClickContext:
         # `main` always resolves a program name before it gets here,
         # and this group is only ever the root, so a `None` is a caller
         # that bypassed `main` rather than a run to record.
