@@ -1,12 +1,11 @@
 import csv
-import shlex
 import sys
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import Annotated
 
 import duckdb
-from typer import Option, Typer
+from typer import Context, Option, Typer
 
 from mta_od_data import DATA
 from mta_od_data.analyze.common import (
@@ -26,6 +25,7 @@ from mta_od_data.analyze.regions import (
     parse_bbox,
     region_from_preset,
 )
+from mta_od_data.invocation import produced_by
 
 app = Typer()
 
@@ -194,6 +194,7 @@ def write_csv(path: Path, rows: list[FlowRow]) -> None:
 
 @app.command(name="regional-flow")
 def regional_flow(
+    ctx: Context,
     parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
     complexes_path: Annotated[Path, Option("--complexes")] = (DATA / "complexes.csv"),
     day_type: Annotated[DayType, Option()] = DayType.WEEKDAY,
@@ -394,7 +395,7 @@ def regional_flow(
         write_csv(csv_out, result.rows)
 
     if markdown_out:
-        produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
+        invocation = produced_by(ctx)
         preamble_lines = [
             f"# Regional Flow: {result.region_name}",
             "",
@@ -404,7 +405,7 @@ def regional_flow(
             f"origin/destination pair classified by whether each end falls "
             f"inside {result.region_name}.",
             "",
-            f"Produced by `{produced_by}`.",
+            f"Produced by `{invocation}`.",
             "",
         ]
         sections = [
