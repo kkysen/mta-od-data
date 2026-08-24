@@ -7,7 +7,7 @@ from functools import cache
 from math import asin, cos, radians, sin, sqrt
 from operator import attrgetter
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Protocol, Self, override
+from typing import TYPE_CHECKING, ClassVar, Protocol, override
 
 import duckdb
 
@@ -488,42 +488,82 @@ class DayCoverage:
     @classmethod
     def query(
         cls,
-        con: duckdb.DuckDBPyConnection,
         parquet: Path,
         day_filter_sql: str,
         day_params: list[str],
-    ) -> Self:
-        query = f"""
-            SELECT COUNT(*), MIN(year_month), MAX(year_month)
-            FROM (
-                SELECT DISTINCT "Year" * 100 + "Month" AS year_month, "Day of Week"
-                FROM read_parquet(?)
-                WHERE {day_filter_sql}
-            )
+    ) -> DayCoverage:
+        """How much of `parquet` the filter selects, remembered.
+
+        Every command asks this of the same extract with the same filter
+        before it asks anything else, and the answer is a property of
+        the file, so a process running several commands (the snapshot
+        tests, or any script driving `app`) pays for one scan of it
+        rather than one each.
         """
-        result: tuple[int, int, int] | None = con.execute(
-            query, [str(parquet), *day_params]
-        ).fetchone()
-        assert result is not None, "aggregate query always returns exactly one row"
-        n_days, first, last = result
-        if not n_days:
-            # Before anything divides by it: every command averages its
-            # ridership over `n_days`, and `MIN`/`MAX` over no rows are
-            # NULL, so an unguarded empty filter is a division by zero
-            # or a `None` where a month should be.
-            selected = ", ".join(day_params) or "all days"
-            raise DayFilterError(
-                f"no rows in {parquet} match the day filter ({selected}); "
-                f"check --days against the extract's 'Day of Week' values, "
-                f"which are full names like 'Monday'"
-            )
-        return cls(
-            n_days=n_days,
-            first_month=cls.format_month(first),
-            last_month=cls.format_month(last),
+        return _day_coverage(
+            extract_version(parquet), day_filter_sql, tuple(day_params)
         )
 
     @staticmethod
     def format_month(year_month: int) -> str:
         year, month = divmod(year_month, 100)
         return f"{year}-{month:02d}"
+
+
+# The extract as a cache key. Not the path alone, which goes on naming
+# the same file after `prepare` has rewritten it with another month's
+# data in it.
+type ExtractVersion = tuple[Path, int, int]
+
+
+def extract_version(parquet: Path) -> ExtractVersion:
+    stat = parquet.stat()
+    return parquet, stat.st_mtime_ns, stat.st_size
+
+
+@cache
+def _day_coverage(
+    version: ExtractVersion,
+    day_filter_sql: str,
+    day_params: tuple[str, ...],
+) -> DayCoverage:
+    """`DayCoverage.query`'s scan, keyed by what it reads.
+
+    Its own connection rather than the caller's: nothing here depends on
+    session state, and a result shared between callers can't be tied to
+    whichever connection happened to miss the cache first.
+    A `DayFilterError` isn't remembered, being raised rather than
+    returned, which costs a rescan to raise it again and is only ever
+    the last thing a command does.
+    """
+    parquet, _mtime_ns, _size = version
+    query = f"""
+        SELECT COUNT(*), MIN(year_month), MAX(year_month)
+        FROM (
+            SELECT DISTINCT "Year" * 100 + "Month" AS year_month, "Day of Week"
+            FROM read_parquet(?)
+            WHERE {day_filter_sql}
+        )
+    """
+    with duckdb.connect() as con:
+        result: tuple[int, int, int] | None = con.execute(
+            query, [str(parquet), *day_params]
+        ).fetchone()
+    assert result is not None, "aggregate query always returns exactly one row"
+    n_days, first, last = result
+    if not n_days:
+        # Before anything divides by it: every command averages its
+        # ridership over `n_days`, and `MIN`/`MAX` over no rows are
+        # NULL, so an unguarded empty filter is a division by zero
+        # or a `None` where a month should be.
+        selected = ", ".join(day_params) or "all days"
+        raise DayFilterError(
+            f"no rows in {parquet} match the day filter ({selected}); "
+            f"check --days against the extract's 'Day of Week' values, "
+            f"which are full names like 'Monday'"
+        )
+    return DayCoverage(
+        n_days=n_days,
+        first_month=DayCoverage.format_month(first),
+        last_month=DayCoverage.format_month(last),
+    )
