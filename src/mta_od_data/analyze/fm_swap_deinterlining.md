@@ -1,4 +1,4 @@
-# Deinterlining Scenario Comparison: E,F,M,R
+# Deinterlining Scenario Comparison: F/M Swap
 
 Average weekday ridership (60 distinct days in the data, 2025-01 to 2025-12), over every origin/destination pair with both ends served by E,F,M,R under any scenario compared here. Pairs with only one end on those routes are reported alongside as context, but can't be a one-seat ride under any of them.
 

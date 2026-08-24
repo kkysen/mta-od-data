@@ -1,4 +1,4 @@
-# Deinterlining Scenario Comparison: B,D,N,Q,R
+# Deinterlining Scenario Comparison: DeKalb
 
 Average weekday ridership (60 distinct days in the data, 2025-01 to 2025-12), over every origin/destination pair with both ends served by B,D,N,Q,R under any scenario compared here. Pairs with only one end on those routes are reported alongside as context, but can't be a one-seat ride under any of them.
 

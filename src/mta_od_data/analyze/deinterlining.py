@@ -1218,6 +1218,11 @@ class ScenarioComparison:
 
     routes: Routes
     scenarios: list[Scenario]
+    # The categories these scenarios were selected from, in file order,
+    # which is what the report is titled after: "F/M Swap" says which
+    # junction is being compared, where the route universe it works out
+    # to doesn't.
+    categories: tuple[str, ...]
 
     def classify(
         self,
@@ -1446,6 +1451,10 @@ def resolve_scenarios(
     return ScenarioComparison(
         routes=selected.routes,
         scenarios=selected.combine_scenarios([CURRENT]),
+        # From the file rather than from `categories`, so the order is
+        # the file's and the spelling is the file's, whatever order the
+        # `--category` flags were passed in.
+        categories=tuple(c.name for c in selected.categories),
     )
 
 
@@ -1673,7 +1682,8 @@ def deinterlining(
         produced_by = shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])
         preamble = "\n".join(
             [
-                f"# Deinterlining Scenario Comparison: {','.join(sorted(routes_set))}",
+                "# Deinterlining Scenario Comparison: "
+                f"{' + '.join(comparison.categories)}",
                 "",
                 f"Average {day_type_label} ridership ({n_distinct_days} distinct "
                 f"days in the data, {coverage.first_month} to "
