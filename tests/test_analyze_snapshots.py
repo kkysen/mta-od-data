@@ -9,6 +9,7 @@ Skipped when `data/mta_od.parquet` is missing:
 it's gitignored, so this can't run in CI.
 """
 
+import shlex
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -137,9 +138,13 @@ def test_snapshot_matches_fresh_run(snapshot: Snapshot, tmp_path: Path) -> None:
     # read it as such so it gets the same "regenerate it with" message
     # instead of an opaque `FileNotFoundError`.
     committed = snapshot.path.read_text() if snapshot.path.exists() else None
+    # `shlex.join`, so the line can be pasted into a shell as-is:
+    # a category like `F/M Swap` is one argument only once quoted,
+    # which is also how the report's own `Produced by` line writes it.
+    rerun = shlex.join(["uv", "run", *snapshot.cmd, "--markdown-out", str(rel_path)])
     assert fresh == committed, (
         f"{rel_path} is {'out of date' if committed is not None else 'missing'}. "
         "Regenerate it with:\n"
-        f"  uv run {' '.join(snapshot.cmd)} --markdown-out {rel_path}\n"
+        f"  {rerun}\n"
         "and commit the result."
     )
