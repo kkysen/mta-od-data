@@ -11,7 +11,7 @@ from pathlib import Path
 import duckdb
 import pytest
 
-from mta_od_data.analyze.common import DayCoverage, DayFilterError
+from mta_od_data.analyze.common import DayCoverage, DayFilterError, _day_coverage
 
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 WEEKDAY_FILTER = '"Day of Week" IN (?, ?, ?, ?, ?)'
@@ -65,7 +65,17 @@ def test_a_rewritten_extract_is_queried_again(extract: Path) -> None:
 
 
 def test_a_filter_matching_nothing_says_so(extract: Path) -> None:
-    """And says so every time, the error not being what's remembered."""
+    """Every time, and off one scan: an empty filter is a question
+    about the extract like any other, and answering it twice means
+    reading the whole file to be told nothing again."""
+    raised = []
     for _ in range(2):
-        with pytest.raises(DayFilterError, match="Sunday"):
+        with pytest.raises(DayFilterError, match="Sunday") as caught:
             DayCoverage.query(extract, '"Day of Week" IN (?)', ["Sunday"])
+        raised.append(caught.value)
+    first, second = raised
+    assert _day_coverage.cache_info().hits >= 1, "the second call rescanned"
+    # A new error per call, carrying the same message: one instance
+    # raised twice would hand the second caller the first one's stack.
+    assert first is not second
+    assert first.args == second.args

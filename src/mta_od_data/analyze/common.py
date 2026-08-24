@@ -500,9 +500,17 @@ class DayCoverage:
         tests, or any script driving `app`) pays for one scan of it
         rather than one each.
         """
-        return _day_coverage(
+        coverage = _day_coverage(
             extract_version(parquet), day_filter_sql, tuple(day_params)
         )
+        if isinstance(coverage, DayFilterError):
+            # A new one per call, from the remembered one's arguments:
+            # `raise coverage` would append this raise's frames to the
+            # traceback of the one already stored, so a second caller
+            # would be handed the first caller's stack and the object
+            # would collect a frame for every call that ever failed.
+            raise DayFilterError(*coverage.args)
+        return coverage
 
     @staticmethod
     def format_month(year_month: int) -> str:
@@ -526,15 +534,16 @@ def _day_coverage(
     version: ExtractVersion,
     day_filter_sql: str,
     day_params: tuple[str, ...],
-) -> DayCoverage:
+) -> DayCoverage | DayFilterError:
     """`DayCoverage.query`'s scan, keyed by what it reads.
 
     Its own connection rather than the caller's: nothing here depends on
     session state, and a result shared between callers can't be tied to
     whichever connection happened to miss the cache first.
-    A `DayFilterError` isn't remembered, being raised rather than
-    returned, which costs a rescan to raise it again and is only ever
-    the last thing a command does.
+    An empty filter is remembered too, as the error it would raise:
+    `@cache` stores nothing when a call raises, so raising here would
+    rescan the whole extract for every repeat of a question already
+    answered. `query` does the raising.
     """
     parquet, _mtime_ns, _size = version
     query = f"""
@@ -557,7 +566,7 @@ def _day_coverage(
         # NULL, so an unguarded empty filter is a division by zero
         # or a `None` where a month should be.
         selected = ", ".join(day_params) or "all days"
-        raise DayFilterError(
+        return DayFilterError(
             f"no rows in {parquet} match the day filter ({selected}); "
             f"check --days against the extract's 'Day of Week' values, "
             f"which are full names like 'Monday'"
