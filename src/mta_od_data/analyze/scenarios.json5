@@ -469,4 +469,94 @@
       ],
     },
   ],
+  "11th St": [
+    {
+      "name": "R Astoria",
+      "description": "N 2 Av, R Astoria",
+      "routes": [
+        "N",
+        "R",
+      ],
+      "overrides": [
+        {
+          "line": "Broadway - Brighton",
+          "remove": [
+            "N",
+          ],
+          "stations": [
+            "49 St",
+          ],
+        },
+        {
+          "line": "63rd St",
+          "add": [
+            "N",
+          ],
+          "stations": [
+            "Lexington Av/63 St",
+          ],
+        },
+        {
+          "line": "Second Av",
+          "add": [
+            "N",
+          ],
+          "stations": [
+            "72 St",
+            "86 St",
+            "96 St",
+          ],
+        },
+        {
+          "line": "Queens Blvd",
+          "remove": [
+            "R",
+          ],
+          "stations": [
+            "Forest Hills-71 Av",
+            "67 Av",
+            "63 Dr-Rego Park",
+            "Woodhaven Blvd",
+            "Grand Av-Newtown",
+            "Elmhurst Av",
+            "Jackson Hts-Roosevelt Av",
+            "65 St",
+            "Northern Blvd",
+            "46 St",
+            "Steinway St",
+            "36 St",
+            "Queens Plaza",
+          ],
+        },
+        {
+          "line": "Astoria",
+          "add": [
+            "R",
+          ],
+          "remove": [
+            "N",
+          ],
+          "stations": [
+            "Astoria-Ditmars Blvd",
+            "Astoria Blvd",
+            "30 Av",
+            "Broadway",
+            "36 Av",
+            "39 Av-Dutch Kills",
+            "Queensboro Plaza",
+          ],
+        },
+        {
+          "line": "Astoria",
+          "remove": [
+            "N",
+          ],
+          "stations": [
+            "Lexington Av/59 St",
+            "5 Av/59 St",
+          ],
+        },
+      ],
+    }
+  ]
 }
