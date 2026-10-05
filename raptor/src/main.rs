@@ -2,15 +2,17 @@
 
 mod calendar;
 mod gtfs;
+mod raptor;
 mod timetable;
 
 use std::path::PathBuf;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use jiff::civil::Date;
 
-use crate::gtfs::Feed;
+use crate::gtfs::{Feed, Secs, parse_time};
+use crate::raptor::{Journey, Leg, Router};
 use crate::timetable::{DEFAULT_MIN_CHANGE, Timetable};
 
 #[derive(Parser)]
@@ -35,6 +37,26 @@ enum Command {
         #[arg(long)]
         date: Date,
     },
+    /// Earliest-arrival journeys between two stops, one per number of rides.
+    Route {
+        #[arg(long)]
+        feed: PathBuf,
+        #[arg(long)]
+        date: Date,
+        /// Origin stop IDs (parent stations, e.g. `127`); several means any of them.
+        #[arg(long, num_args = 1.., required = true)]
+        from: Vec<String>,
+        /// Destination stop IDs; several means any of them.
+        #[arg(long, num_args = 1.., required = true)]
+        to: Vec<String>,
+        /// Departure time, `HH:MM:SS` from the service date's start.
+        #[arg(long, value_parser = parse_secs)]
+        depart: Secs,
+    },
+}
+
+fn parse_secs(s: &str) -> Result<Secs, String> {
+    parse_time(s).ok_or_else(|| format!("expected HH:MM:SS, got {s:?}"))
 }
 
 fn main() -> Result<()> {
@@ -51,6 +73,29 @@ fn main() -> Result<()> {
         Command::Timetable { feed, date } => {
             let tt = Timetable::build(&Feed::open(&feed)?, date)?;
             print_report(&tt);
+        }
+        Command::Route {
+            feed,
+            date,
+            from,
+            to,
+            depart,
+        } => {
+            let tt = Timetable::build(&Feed::open(&feed)?, date)?;
+            let stops = |ids: &[String]| {
+                ids.iter()
+                    .map(|id| tt.stop(id).with_context(|| format!("no stop {id}")))
+                    .collect::<Result<Vec<_>>>()
+            };
+            let (from, to) = (stops(&from)?, stops(&to)?);
+            let router = Router::new(&tt);
+            let journeys = router.query(&from, depart).journeys(&to);
+            if journeys.is_empty() {
+                println!("no journey");
+            }
+            for journey in &journeys {
+                print_journey(&tt, journey);
+            }
         }
     }
     Ok(())
@@ -109,4 +154,45 @@ fn print_report(tt: &Timetable) {
         r.unclosed_footpaths.len(),
         &r.unclosed_footpaths[..r.unclosed_footpaths.len().min(EXAMPLES)]
     );
+}
+
+fn hms(t: Secs) -> String {
+    let sign = if t < 0 { "-" } else { "" };
+    let t = t.abs();
+    format!("{sign}{:02}:{:02}:{:02}", t / 3600, t / 60 % 60, t % 60)
+}
+
+fn print_journey(tt: &Timetable, j: &Journey) {
+    let name = |s: u32| {
+        let stop = &tt.stops[s as usize];
+        format!("{} ({})", stop.name, stop.id)
+    };
+    println!(
+        "{} rides, arrive {} ({} min)",
+        j.rides(),
+        hms(j.arrive),
+        (j.arrive - j.depart) / 60
+    );
+    for leg in &j.legs {
+        match *leg {
+            Leg::Ride {
+                pattern,
+                board_stop,
+                alight_stop,
+                depart,
+                arrive,
+                ..
+            } => println!(
+                "  {} {} {} -> {} {}",
+                tt.patterns[pattern as usize].route_id,
+                hms(depart),
+                name(board_stop),
+                hms(arrive),
+                name(alight_stop),
+            ),
+            Leg::Walk { from, to, duration } => {
+                println!("  walk {}s {} -> {}", duration, name(from), name(to))
+            }
+        }
+    }
 }
