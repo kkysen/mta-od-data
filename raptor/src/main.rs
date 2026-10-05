@@ -1,19 +1,21 @@
 //! RAPTOR journey assignment for the MTA OD data; see `raptor_design.md`.
 
 mod assign;
+mod batch;
 mod calendar;
 mod gtfs;
 mod od;
 mod raptor;
 mod timetable;
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
-use jiff::civil::Date;
+use jiff::civil::{Date, Weekday};
 
-use crate::assign::{Config, assign, write_paths};
+use crate::assign::{Config, Unassigned, assign, write_paths};
+use crate::batch::{load_versions, pick_dates};
 use crate::gtfs::{Feed, Secs, parse_time};
 use crate::od::{Complexes, load_slice};
 use crate::raptor::{Journey, Leg, Router};
@@ -88,6 +90,29 @@ enum Command {
         #[arg(long)]
         out: Option<PathBuf>,
     },
+    /// `assign` each (month, weekday) in a date range on a representative date,
+    /// with the latest feed version covering it,
+    /// and write a manifest of the dates run and how many days each stands for.
+    AssignRange {
+        /// Feed version zips, from `mta-od-data fetch-gtfs`.
+        #[arg(long, default_value = "../data/gtfs")]
+        gtfs_dir: PathBuf,
+        /// First date, inclusive.
+        #[arg(long)]
+        from: Date,
+        /// Last date, inclusive.
+        #[arg(long)]
+        to: Date,
+        #[arg(long, default_value = "../data/mta_od.parquet")]
+        od: PathBuf,
+        #[arg(long, default_value = "../data/stations.csv")]
+        stations: PathBuf,
+        #[arg(long, default_value = "assign.json5")]
+        config: PathBuf,
+        /// Where the path Parquets and `manifest.csv` go.
+        #[arg(long, default_value = "../data/raptor")]
+        out_dir: PathBuf,
+    },
     /// Every Pareto-optimal journey between two stops departing in a window.
     Profile {
         #[arg(long)]
@@ -105,6 +130,53 @@ enum Command {
         #[arg(long, value_parser = parse_secs)]
         before: Secs,
     },
+}
+
+fn default_paths_out(date: Date) -> PathBuf {
+    format!("../data/raptor/paths-{date}.parquet").into()
+}
+
+struct AssignInputs<'a> {
+    od: &'a Path,
+    stations: &'a Path,
+    /// The config, and its text for the output's metadata.
+    config: &'a (Config, String),
+}
+
+struct AssignSummary {
+    riders_in: f64,
+    riders_assigned: f64,
+    unassigned: Unassigned,
+}
+
+/// Assigns `date`'s OD rows on `feed`'s timetable for it, and writes the paths to `out`.
+fn assign_date(
+    feed: &Feed,
+    feed_path: &Path,
+    date: Date,
+    inputs: &AssignInputs,
+    out: &Path,
+) -> Result<AssignSummary> {
+    let start = std::time::Instant::now();
+    let tt = Timetable::build(feed, date)?;
+    let complexes = Complexes::load(inputs.stations, &tt)?;
+    let rows = load_slice(inputs.od, date)?;
+    println!("loaded in {:.1?}", start.elapsed());
+    let (paths, unassigned) = assign(&tt, &complexes, &rows, &inputs.config.0);
+    println!("assigned in {:.1?}", start.elapsed());
+    let metadata = vec![
+        ("feed".to_string(), feed_path.display().to_string()),
+        ("date".to_string(), date.to_string()),
+        ("config".to_string(), inputs.config.1.clone()),
+    ];
+    write_paths(out, &paths, date, metadata)?;
+    println!("wrote {} paths to {}", paths.len(), out.display());
+    print_assignment(&rows, &paths, &unassigned);
+    Ok(AssignSummary {
+        riders_in: riders(rows.iter()),
+        riders_assigned: paths.iter().fold(0.0, |sum, p| sum + p.riders),
+        unassigned,
+    })
 }
 
 fn parse_secs(s: &str) -> Result<Secs, String> {
@@ -157,23 +229,82 @@ fn main() -> Result<()> {
             config,
             out,
         } => {
-            let start = std::time::Instant::now();
-            let (config_values, config_text) = Config::load(&config)?;
-            let tt = Timetable::build(&Feed::open(&feed)?, date)?;
-            let complexes = Complexes::load(&stations, &tt)?;
-            let rows = load_slice(&od, date)?;
-            println!("loaded in {:.1?}", start.elapsed());
-            let (paths, unassigned) = assign(&tt, &complexes, &rows, &config_values);
-            println!("assigned in {:.1?}", start.elapsed());
-            let out = out.unwrap_or_else(|| format!("../data/raptor/paths-{date}.parquet").into());
-            let metadata = vec![
-                ("feed".to_string(), feed.display().to_string()),
-                ("date".to_string(), date.to_string()),
-                ("config".to_string(), config_text),
+            let config = Config::load(&config)?;
+            let out = out.unwrap_or_else(|| default_paths_out(date));
+            let inputs = AssignInputs {
+                od: &od,
+                stations: &stations,
+                config: &config,
+            };
+            assign_date(&Feed::open(&feed)?, &feed, date, &inputs, &out)?;
+        }
+        Command::AssignRange {
+            gtfs_dir,
+            from,
+            to,
+            od,
+            stations,
+            config,
+            out_dir,
+        } => {
+            let config = Config::load(&config)?;
+            let versions = load_versions(&gtfs_dir)?;
+            let weekdays = [
+                Weekday::Monday,
+                Weekday::Tuesday,
+                Weekday::Wednesday,
+                Weekday::Thursday,
+                Weekday::Friday,
             ];
-            write_paths(&out, &paths, date, metadata)?;
-            println!("wrote {} paths to {}", paths.len(), out.display());
-            print_assignment(&rows, &paths, &unassigned);
+            let picks = pick_dates(&versions, from, to, &weekdays)?;
+            let inputs = AssignInputs {
+                od: &od,
+                stations: &stations,
+                config: &config,
+            };
+            std::fs::create_dir_all(&out_dir)?;
+            let mut manifest = csv::Writer::from_path(out_dir.join("manifest.csv"))?;
+            manifest.write_record([
+                "date",
+                "year",
+                "month",
+                "day_of_week",
+                "days",
+                "feed",
+                "paths",
+                "riders_in",
+                "riders_assigned",
+                "unassigned_no_stops",
+                "unassigned_unreachable",
+                "unassigned_no_departure",
+            ])?;
+            for pick in &picks {
+                let out = out_dir.join(format!("paths-{}.parquet", pick.date));
+                println!("== {} ({:?})", pick.date, pick.date.weekday());
+                let s = assign_date(
+                    &pick.version.feed,
+                    &pick.version.path,
+                    pick.date,
+                    &inputs,
+                    &out,
+                )?;
+                manifest.write_record([
+                    pick.date.to_string(),
+                    pick.date.year().to_string(),
+                    pick.date.month().to_string(),
+                    od::day_of_week(pick.date).to_string(),
+                    pick.days.to_string(),
+                    pick.version.path.display().to_string(),
+                    out.display().to_string(),
+                    s.riders_in.to_string(),
+                    s.riders_assigned.to_string(),
+                    s.unassigned.no_stops.to_string(),
+                    s.unassigned.unreachable.to_string(),
+                    s.unassigned.no_departure.to_string(),
+                ])?;
+                manifest.flush()?;
+            }
+            println!("wrote {}", out_dir.join("manifest.csv").display());
         }
         Command::Profile {
             feed,

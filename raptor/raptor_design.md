@@ -355,6 +355,20 @@ Complexity is added only once the simple version works end to end.
    conservation error 1e-6;
    51.8% 1 ride, 40.6% 2, 7.6% 3; mean journey 25.5 min;
    5.2M path rows; ~7s to assign on 12 cores, ~19s in all.
+   `raptor assign-range --from <date> --to <date>` assigns
+   every (month, weekday Monday to Friday) in the range on one date each,
+   writing `data/raptor/paths-<date>.parquet` and `data/raptor/manifest.csv`
+   (date, feed, how many of the month's dates in the range share its weekday,
+   and the run's rider totals),
+   so an average over the range weights each date by its `days`.
+   The date is the middle usable one:
+   covered with both neighbors by a feed version
+   (the latest-fetched such, from `data/gtfs/`),
+   with no `calendar_dates.txt` exception (holidays),
+   and no daylight-saving change.
+   This is the representative-date rule.
+   The OD data averages each (month, day of week) over all its dates, holidays included,
+   while the timetable is that of an ordinary one.
 7. **Later, in any order**:
    directional stops and the transfer rules above;
    curated `transfer_times.csv`;
