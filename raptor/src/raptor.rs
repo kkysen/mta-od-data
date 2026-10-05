@@ -131,7 +131,13 @@ impl<'a> Router<'a> {
     pub fn departures(&self, origins: &[StopIdx], from: Secs, until: Secs) -> Vec<Secs> {
         let mut starts: Vec<(StopIdx, Secs)> = origins.iter().map(|&o| (o, 0)).collect();
         for &o in origins {
-            starts.extend(&self.tt.footpaths[o as usize]);
+            // Not to another origin, already a start without the walk:
+            // its departures less the walk would be runs finding nothing new.
+            starts.extend(
+                self.tt.footpaths[o as usize]
+                    .iter()
+                    .filter(|(s, _)| !origins.contains(s)),
+            );
         }
         let mut times = Vec::new();
         for (s, walk) in starts {
@@ -698,5 +704,22 @@ mod tests {
             profile(&tt, "A", "C", ("08:00:00", "09:00:00")),
             ["08:05:00 feeder A-B, fast B-C", "08:00:00 slow A-C"]
         );
+    }
+
+    #[test]
+    fn departures_skip_footpaths_between_origins() {
+        let tt = timetable(
+            TRIPS,
+            STOP_TIMES,
+            "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nA,B,2,60\nB,A,2,60\n",
+        );
+        let router = Router::new(&tt);
+        // From A and B: their own trains, and none of either's less the walk from the other.
+        let times = router.departures(
+            &[stop(&tt, "A"), stop(&tt, "B")],
+            t("08:00:00"),
+            t("08:12:00"),
+        );
+        assert_eq!(times, [t("08:11:00"), t("08:10:00"), t("08:00:00")]);
     }
 }
