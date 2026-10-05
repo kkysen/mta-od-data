@@ -374,6 +374,11 @@ Complexity is added only once the simple version works end to end.
    This is the representative-date rule.
    The OD data averages each (month, day of week) over all its dates, holidays included,
    while the timetable is that of an ordinary one.
+   `mta-od-data analyze track-ridership --stop <id> ...` reads the manifest
+   and averages, weighted by `days`, the riders on paths
+   with a ride between two consecutive stops both in the given set,
+   e.g. `--stop R14 --stop B08 --stop Q03 --stop Q04 --stop Q05`
+   for Second Av Subway Phase 1.
 7. **Later, in any order**:
    directional stops and the transfer rules above;
    curated `transfer_times.csv`;
