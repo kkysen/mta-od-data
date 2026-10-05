@@ -76,9 +76,15 @@ pub struct Router<'a> {
     stop_patterns: Vec<Vec<(u32, u32)>>,
 }
 
-/// One query's labels, per round.
+/// Labels per round, kept across runs of one range query.
+///
+/// A label is only lowered, never reset,
+/// so after runs at departures `d1 > d2 > ...`,
+/// a label lowered in the run at `d` is a journey leaving at `d`
+/// that beats every journey leaving later with no more rides.
 pub struct Labels<'a> {
     router: &'a Router<'a>,
+    /// The latest run's departure.
     depart: Secs,
     /// `ride_arrival[k][s]`: arriving at `s` on the `k`th ride.
     ride_arrival: Vec<Vec<Secs>>,
@@ -99,47 +105,115 @@ impl<'a> Router<'a> {
         Self { tt, stop_patterns }
     }
 
-    /// Every stop's earliest arrivals from `origins`, leaving at `depart`.
-    pub fn query(&'a self, origins: &[StopIdx], depart: Secs) -> Labels<'a> {
+    pub fn labels(&'a self) -> Labels<'a> {
         let n = self.tt.stops.len();
         let rounds = MAX_RIDES + 1;
-        let mut l = Labels {
+        Labels {
             router: self,
-            depart,
+            depart: NEVER,
             ride_arrival: vec![vec![NEVER; n]; rounds],
             ride_from: vec![vec![None; n]; rounds],
             ready: vec![vec![NEVER; n]; rounds],
             ready_from: vec![vec![None; n]; rounds],
-        };
-        // The earliest over all rounds so far, for pruning:
-        // a later round's label is only kept if it beats every earlier one.
-        let mut best_ride = vec![NEVER; n];
-        let mut best_ready = vec![NEVER; n];
+        }
+    }
+
+    /// Every stop's earliest arrivals from `origins`, leaving at `depart`.
+    pub fn query(&'a self, origins: &[StopIdx], depart: Secs) -> Labels<'a> {
+        let mut labels = self.labels();
+        labels.run(origins, depart);
+        labels
+    }
+
+    /// Every time in `[from, until)` a journey from `origins` can start
+    /// by boarding a train, at an origin or after a footpath from one,
+    /// latest first, as range RAPTOR runs them.
+    pub fn departures(&self, origins: &[StopIdx], from: Secs, until: Secs) -> Vec<Secs> {
+        let mut starts: Vec<(StopIdx, Secs)> = origins.iter().map(|&o| (o, 0)).collect();
+        for &o in origins {
+            starts.extend(&self.tt.footpaths[o as usize]);
+        }
+        let mut times = Vec::new();
+        for (s, walk) in starts {
+            for &(p, pos) in &self.stop_patterns[s as usize] {
+                let trips = &self.tt.patterns[p as usize].trips;
+                times.extend(
+                    trips
+                        .iter()
+                        .map(|t| t.times[pos as usize].1 - walk)
+                        .filter(|t| (from..until).contains(t)),
+                );
+            }
+        }
+        times.sort_unstable_by(|a, b| b.cmp(a));
+        times.dedup();
+        times
+    }
+
+    /// The Pareto set over (departure, arrival, rides)
+    /// of journeys from `origins` departing in `[from, until)`,
+    /// to each set of stops in `targets`, latest departure first.
+    pub fn profile(
+        &'a self,
+        origins: &[StopIdx],
+        from: Secs,
+        until: Secs,
+        targets: &[&[StopIdx]],
+    ) -> Vec<Vec<Journey>> {
+        let mut labels = self.labels();
+        let mut journeys = vec![Vec::new(); targets.len()];
+        // Each target set's earliest arrival per round, over the runs so far.
+        let mut best = vec![[NEVER; MAX_RIDES + 1]; targets.len()];
+        for depart in self.departures(origins, from, until) {
+            labels.run(origins, depart);
+            for ((target, best), journeys) in targets.iter().zip(&mut best).zip(&mut journeys) {
+                let mut fewer = NEVER;
+                for (k, best) in best.iter_mut().enumerate().skip(1) {
+                    let (arrive, stop) = labels.earliest(k, target);
+                    // Lowered this run, so it leaves now,
+                    // and beats every journey with fewer rides leaving now or later.
+                    if arrive < *best && arrive < fewer {
+                        journeys.push(labels.extract(k, stop));
+                    }
+                    *best = arrive;
+                    fewer = fewer.min(arrive);
+                }
+            }
+        }
+        journeys
+    }
+}
+
+impl Labels<'_> {
+    /// Lowers labels with journeys from `origins` leaving at `depart`.
+    /// Runs of a range query must go latest first.
+    pub fn run(&mut self, origins: &[StopIdx], depart: Secs) {
+        debug_assert!(depart <= self.depart, "runs must go latest first");
+        self.depart = depart;
+        let tt = self.router.tt;
 
         let mut marked = Vec::new();
         for &o in origins {
-            l.ready[0][o as usize] = depart;
-            l.ready_from[0][o as usize] = Some(Ready::Origin);
-            best_ready[o as usize] = depart;
-            marked.push(o);
+            if self.lower_ready(0, o, depart, Ready::Origin) {
+                marked.push(o);
+            }
         }
         for &o in origins {
-            for &(to, walk) in &self.tt.footpaths[o as usize] {
-                let t = depart + walk;
-                if t < best_ready[to as usize] {
-                    l.ready[0][to as usize] = t;
-                    l.ready_from[0][to as usize] = Some(Ready::Walk { from: o });
-                    best_ready[to as usize] = t;
+            for &(to, walk) in &tt.footpaths[o as usize] {
+                if self.lower_ready(0, to, depart + walk, Ready::Walk { from: o }) {
                     marked.push(to);
                 }
             }
         }
 
-        for k in 1..rounds {
+        for k in 1..self.ride_arrival.len() {
+            if marked.is_empty() {
+                break;
+            }
             // Each pattern serving a marked stop, from its earliest marked position.
             let mut scan: Vec<(u32, u32)> = Vec::new();
             for &s in &marked {
-                for &(p, pos) in &self.stop_patterns[s as usize] {
+                for &(p, pos) in &self.router.stop_patterns[s as usize] {
                     match scan.iter_mut().find(|(q, _)| *q == p) {
                         Some((_, from)) => *from = (*from).min(pos),
                         None => scan.push((p, pos)),
@@ -150,35 +224,29 @@ impl<'a> Router<'a> {
 
             let mut improved = Vec::new();
             for (p, from) in scan {
-                let pattern = &self.tt.patterns[p as usize];
+                let pattern = &tt.patterns[p as usize];
                 // The trip being ridden, and where it was boarded.
                 let mut riding: Option<(usize, u32)> = None;
                 for pos in from as usize..pattern.stops.len() {
-                    let s = pattern.stops[pos] as usize;
+                    let s = pattern.stops[pos];
                     if let Some((trip, board_pos)) = riding {
                         let arrive = pattern.trips[trip].times[pos].0;
-                        if arrive < best_ride[s] {
-                            l.ride_arrival[k][s] = arrive;
-                            l.ride_from[k][s] = Some(Ride {
-                                pattern: p,
-                                trip: trip as u32,
-                                board_pos,
-                                alight_pos: pos as u32,
-                            });
-                            best_ride[s] = arrive;
-                            improved.push(s as StopIdx);
+                        let ride = Ride {
+                            pattern: p,
+                            trip: trip as u32,
+                            board_pos,
+                            alight_pos: pos as u32,
+                        };
+                        if self.lower_ride(k, s, arrive, ride) {
+                            improved.push(s);
                         }
                     }
                     // Catch an earlier trip here, if the previous round makes one reachable.
-                    let ready = l.ready[k - 1][s];
+                    let ready = self.ready[k - 1][s as usize];
                     if ready == NEVER {
                         continue;
                     }
-                    let can_improve = match riding {
-                        Some((trip, _)) => ready < pattern.trips[trip].times[pos].1,
-                        None => true,
-                    };
-                    if can_improve {
+                    if riding.is_none_or(|(trip, _)| ready < pattern.trips[trip].times[pos].1) {
                         // FIFO patterns are sorted by departure at every stop.
                         let trip = pattern.trips.partition_point(|t| t.times[pos].1 < ready);
                         if trip < pattern.trips.len() && riding.is_none_or(|(r, _)| trip < r) {
@@ -189,55 +257,70 @@ impl<'a> Router<'a> {
             }
 
             marked.clear();
+            improved.sort_unstable();
+            improved.dedup();
             for &s in &improved {
-                let arrive = l.ride_arrival[k][s as usize];
-                let t = arrive + self.tt.min_change[s as usize];
-                if t < best_ready[s as usize] {
-                    l.ready[k][s as usize] = t;
-                    l.ready_from[k][s as usize] = Some(Ready::Change);
-                    best_ready[s as usize] = t;
+                let arrive = self.ride_arrival[k][s as usize];
+                if self.lower_ready(k, s, arrive + tt.min_change[s as usize], Ready::Change) {
                     marked.push(s);
                 }
             }
             for &s in &improved {
-                let arrive = l.ride_arrival[k][s as usize];
-                for &(to, walk) in &self.tt.footpaths[s as usize] {
-                    let t = arrive + walk;
-                    if t < best_ready[to as usize] {
-                        l.ready[k][to as usize] = t;
-                        l.ready_from[k][to as usize] = Some(Ready::Walk { from: s });
-                        best_ready[to as usize] = t;
+                let arrive = self.ride_arrival[k][s as usize];
+                for &(to, walk) in &tt.footpaths[s as usize] {
+                    if self.lower_ready(k, to, arrive + walk, Ready::Walk { from: s }) {
                         marked.push(to);
                     }
                 }
             }
             marked.sort_unstable();
             marked.dedup();
-            if marked.is_empty() {
-                break;
-            }
         }
-        l
     }
-}
 
-impl Labels<'_> {
+    /// Lowers `ride_arrival[k][s]` if `arrive` beats it
+    /// and every arrival there with fewer rides.
+    fn lower_ride(&mut self, k: usize, s: StopIdx, arrive: Secs, ride: Ride) -> bool {
+        let s = s as usize;
+        if (0..=k).any(|j| self.ride_arrival[j][s] <= arrive) {
+            return false;
+        }
+        self.ride_arrival[k][s] = arrive;
+        self.ride_from[k][s] = Some(ride);
+        true
+    }
+
+    /// Lowers `ready[k][s]` if `t` beats it and every readiness there with fewer rides.
+    fn lower_ready(&mut self, k: usize, s: StopIdx, t: Secs, how: Ready) -> bool {
+        let s = s as usize;
+        if (0..=k).any(|j| self.ready[j][s] <= t) {
+            return false;
+        }
+        self.ready[k][s] = t;
+        self.ready_from[k][s] = Some(how);
+        true
+    }
+
+    /// The earliest arrival at any of `targets` on the `k`th ride, and where.
+    fn earliest(&self, k: usize, targets: &[StopIdx]) -> (Secs, StopIdx) {
+        targets
+            .iter()
+            .map(|&t| (self.ride_arrival[k][t as usize], t))
+            .min()
+            .unwrap_or((NEVER, 0))
+    }
+
     /// The Pareto set of journeys to any of `targets`, fewest rides first:
     /// each arrives strictly earlier than every one with fewer rides.
     pub fn journeys(&self, targets: &[StopIdx]) -> Vec<Journey> {
         let mut journeys = Vec::new();
-        let mut best = NEVER;
+        let mut fewer = NEVER;
         for k in 1..self.ride_arrival.len() {
-            let Some(&target) = targets
-                .iter()
-                .filter(|&&t| self.ride_arrival[k][t as usize] < best)
-                .min_by_key(|&&t| self.ride_arrival[k][t as usize])
-            else {
-                continue;
-            };
-            let journey = self.extract(k, target);
-            best = journey.arrive;
-            journeys.push(journey);
+            let (arrive, stop) = self.earliest(k, targets);
+            if arrive < fewer {
+                journeys.push(self.extract(k, stop));
+                fewer = arrive;
+            }
         }
         journeys
     }
@@ -278,11 +361,33 @@ impl Labels<'_> {
             }
         }
         legs.reverse();
-        Journey {
+        let journey = Journey {
             depart: self.depart,
             arrive: self.ride_arrival[rides][target as usize],
             legs,
+        };
+        debug_assert!(journey.is_consistent(), "{journey:?}");
+        journey
+    }
+}
+
+impl Journey {
+    /// Each leg starts no earlier than the one before it ends,
+    /// the first no earlier than the journey's departure.
+    fn is_consistent(&self) -> bool {
+        let mut t = self.depart;
+        for leg in &self.legs {
+            match *leg {
+                Leg::Ride { depart, arrive, .. } => {
+                    if depart < t {
+                        return false;
+                    }
+                    t = arrive;
+                }
+                Leg::Walk { duration, .. } => t += duration,
+            }
         }
+        t == self.arrive
     }
 }
 
@@ -299,7 +404,6 @@ mod tests {
     /// A --1-- B --1-- C            (route 1, slow)
     ///         B --2-- D            (route 2)
     /// A --3-- E                    (route 3), E <-> B footpath
-    /// A --4------------------ C    (route 4, one fast trip)
     /// ```
     const STOPS: &str = "stop_id,stop_name\nA,A\nB,B\nC,C\nD,D\nE,E\n";
     const CALENDAR: &str = "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date\n\
@@ -511,5 +615,88 @@ mod tests {
             .query(&[stop(&tt, "D")], t("08:00:00"))
             .journeys(&[stop(&tt, "A")]);
         assert!(js.is_empty());
+    }
+
+    fn profile(tt: &Timetable, from: &str, to: &str, window: (&str, &str)) -> Vec<String> {
+        let router = Router::new(tt);
+        let (origins, targets) = ([stop(tt, from)], [stop(tt, to)]);
+        let journeys = router.profile(&origins, t(window.0), t(window.1), &[&targets]);
+        journeys[0]
+            .iter()
+            .map(|j| format!("{} {}", crate::hms(j.depart), summary(tt, j).join(", ")))
+            .collect()
+    }
+
+    #[test]
+    fn departures_latest_first_including_footpaths() {
+        let trips = "route_id,trip_id,service_id\n3,r3,W\n2,r2a,W\n2,r2b,W\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            r3,E,08:00:00,08:00:00,1\nr3,A,08:09:00,08:09:00,2\n\
+            r2a,B,08:11:00,08:11:00,1\nr2a,D,08:20:00,08:20:00,2\n\
+            r2b,B,08:15:00,08:15:00,1\nr2b,D,08:24:00,08:24:00,2\n";
+        let transfers =
+            "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nE,B,2,120\nB,E,2,120\n";
+        let tt = timetable(trips, stop_times, transfers);
+        let router = Router::new(&tt);
+        // From E: its own 08:00, and B's trains less the 2 min walk.
+        let times = router.departures(&[stop(&tt, "E")], t("08:00:00"), t("08:13:00"));
+        assert_eq!(times, [t("08:09:00"), t("08:00:00")]);
+    }
+
+    #[test]
+    fn profile_keeps_each_departure_that_arrives_earlier() {
+        let tt = timetable(
+            TRIPS,
+            STOP_TIMES,
+            "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n",
+        );
+        assert_eq!(
+            profile(&tt, "A", "C", ("07:00:00", "09:00:00")),
+            ["08:20:00 r1b A-C", "08:00:00 r1a A-C"]
+        );
+        // The window is half-open, and the 08:20 is outside it.
+        assert_eq!(
+            profile(&tt, "A", "C", ("07:00:00", "08:20:00")),
+            ["08:00:00 r1a A-C"]
+        );
+    }
+
+    #[test]
+    fn profile_drops_earlier_departure_arriving_later() {
+        // The 08:00 local arrives after the 08:10 express.
+        let trips = "route_id,trip_id,service_id\n1,local,W\n1,express,W\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            local,A,08:00:00,08:00:00,1\nlocal,C,09:00:00,09:00:00,2\n\
+            express,A,08:10:00,08:10:00,1\nexpress,C,08:40:00,08:40:00,2\n";
+        let tt = timetable(
+            trips,
+            stop_times,
+            "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n",
+        );
+        assert_eq!(
+            profile(&tt, "A", "C", ("08:00:00", "09:00:00")),
+            ["08:10:00 express A-C"]
+        );
+    }
+
+    #[test]
+    fn profile_keeps_fewer_rides_leaving_earlier() {
+        // 08:00 one ride arriving 08:50; 08:05 two rides arriving 08:40.
+        // Neither dominates: one leaves earlier with fewer rides.
+        // A label from the later, two-ride run mustn't prune the earlier one-ride journey.
+        let trips = "route_id,trip_id,service_id\n1,slow,W\n2,feeder,W\n5,fast,W\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            slow,A,08:00:00,08:00:00,1\nslow,C,08:50:00,08:50:00,2\n\
+            feeder,A,08:05:00,08:05:00,1\nfeeder,B,08:10:00,08:10:00,2\n\
+            fast,B,08:10:00,08:10:00,1\nfast,C,08:40:00,08:40:00,2\n";
+        let tt = timetable(
+            trips,
+            stop_times,
+            "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nB,B,2,0\n",
+        );
+        assert_eq!(
+            profile(&tt, "A", "C", ("08:00:00", "09:00:00")),
+            ["08:05:00 feeder A-B, fast B-C", "08:00:00 slow A-C"]
+        );
     }
 }

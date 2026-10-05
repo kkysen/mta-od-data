@@ -278,6 +278,21 @@ Complexity is added only once the simple version works end to end.
    `raptor route --feed <zip> --date <date> --from <stops> --to <stops> --depart <time>`
    prints a query's journeys.
 4. **rRAPTOR**: all departures in an hour, Pareto (arrival, rides) set.
+   Runs go latest departure first, lowering labels never reset,
+   so a label lowered in the run at `d` is a journey leaving at `d`
+   that beats every journey leaving later with no more rides.
+   Pruning is per round (a label must beat its own round and fewer rides),
+   not across all rounds as in phase 3:
+   otherwise a later departure's 3-ride arrival
+   would prune an earlier departure's 1-ride journey arriving at the same time,
+   which neither dominates.
+   Departures run are every train departure at an origin,
+   or at a stop one footpath away less the walk.
+   `raptor profile --feed <zip> --date <date> --from <stops> --to <stops> --after <time> --before <time>`
+   prints a window's journeys.
+   An hour from one origin takes ~25ms on one core
+   (after ~0.2s to load the feed),
+   so every origin for every hour of a date is minutes before parallelizing.
 5. **Assignment**: OD Parquet in, leg + journey Parquet out,
    ridership split by logit over generalized cost
    with a single flat transfer penalty.
