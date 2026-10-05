@@ -3,6 +3,9 @@
 .ruff_cache/
 __pycache__/
 
+# Rust
+raptor/target/
+
 # Data
 *.csv
 *.csv.xz
