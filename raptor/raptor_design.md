@@ -247,11 +247,23 @@ integrated uniformly across departures in the hour.
 Run once per rider class (speed-first, comfort-first)
 with that class's weights, then mixed by class fraction.
 
-All weights live in one config file,
+All weights live in one config file (`raptor/assign.json5`),
 so tuning is a config change, not a code change.
-Initial values are guesses; calibrating them
-(e.g. against the MTA's published journey-metrics datasets)
-is a later step.
+
+They start **neutral**: wait and walk weigh the same as riding,
+and there is no transfer penalty,
+so riders split by travel time alone.
+Any other starting value would be invented:
+the MTA describes its multipliers but doesn't publish them,
+and doesn't regularly publish per-line ridership to calibrate against
+(producing that is much of this project's point).
+A flat transfer penalty is also the wrong shape:
+a cross-platform transfer costs nothing,
+and one to an express can even be preferred (a negative penalty),
+so penalties need to be per transfer class,
+which needs directional stops first.
+The logit scale has no neutral value;
+0.2/min is a placeholder without a source.
 
 Note the criteria RAPTOR itself optimizes are only (arrival, rides).
 Transfer *quality* enters through walk time in the timetable
@@ -310,13 +322,45 @@ Complexity is added only once the simple version works end to end.
    For 2025-09-10 (a Wednesday): 1,510,563 rows, 4,323,207.1421 riders,
    424 origins, matching DuckDB; every stop maps and is served; ~2.4s.
    No row has the same origin and destination.
-6. **Assignment**: OD Parquet in, leg + journey Parquet out,
-   ridership split by logit over generalized cost
-   with a single flat transfer penalty.
+6. **Assignment**: `raptor assign --feed <zip> --date <date>`
+   splits the date's OD rows across their journeys
+   and writes path-level Parquet (`data/raptor/paths-<date>.parquet`):
+   per (hour, origin, destination, path),
+   the share and riders, and mean wait, in-vehicle, walk, and total seconds,
+   with the feed, date, and config text in the file's metadata.
+   A path is its rides as `<route> <board>><alight>` and walks as `walk <from>><to>`,
+   by GTFS stop ID (names repeat: `127` and `R16` are both Times Sq-42 St).
+   Trip-level output (which train) is a later flag.
+   - One profile per origin complex over the whole date
+     (through `NEXT_DATE_HORIZON`, for riders entering late),
+     to every destination complex at once.
+   - Riders enter uniformly over their row's hour,
+     with no time from fare gate to platform.
+     A rider entering at `t` chooses among the Pareto set over (arrival, rides)
+     of journeys departing at or after `t`.
+     That set changes only at departures,
+     and every journey's cost depends on `t` the same way,
+     so shares are constant between consecutive departures.
+   - A rider arrives on alighting at any stop of the destination complex.
+   - A same-stop change counts its minimum change time as walk, not wait.
+   - Only Pareto journeys get riders:
+     a second route with the same rides arriving later gets none,
+     until McRAPTOR.
+   - Unassigned riders are reported by cause
+     (no served stop, unreachable in `MAX_RIDES`, entering after the last departure),
+     and assigned plus unassigned must equal the input.
+   For 2025-09-10 with neutral weights:
+   4,323,207.1421 riders in, 34.0016 unassigned
+   (1.9 unreachable in 3 rides, 32.1 after the last departure),
+   conservation error 1e-6;
+   51.8% 1 ride, 40.6% 2, 7.6% 3; mean journey 25.5 min;
+   5.2M path rows; ~7s to assign on 12 cores, ~19s in all.
 7. **Later, in any order**:
    directional stops and the transfer rules above;
    curated `transfer_times.csv`;
-   per-class transfer penalties and the two rider classes;
+   per-class transfer penalties (0 cross-platform, possibly negative to an express)
+   and the two rider classes;
+   a basis for the cost weights and logit scale, now neutral or placeholder;
    passing-stop tie-breaker;
    supplemented-feed planned work;
    departure-time skew within the hour;

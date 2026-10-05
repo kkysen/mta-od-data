@@ -105,7 +105,7 @@ impl<'a> Router<'a> {
         Self { tt, stop_patterns }
     }
 
-    pub fn labels(&'a self) -> Labels<'a> {
+    pub fn labels(&self) -> Labels<'_> {
         let n = self.tt.stops.len();
         let rounds = MAX_RIDES + 1;
         Labels {
@@ -119,7 +119,7 @@ impl<'a> Router<'a> {
     }
 
     /// Every stop's earliest arrivals from `origins`, leaving at `depart`.
-    pub fn query(&'a self, origins: &[StopIdx], depart: Secs) -> Labels<'a> {
+    pub fn query(&self, origins: &[StopIdx], depart: Secs) -> Labels<'_> {
         let mut labels = self.labels();
         labels.run(origins, depart);
         labels
@@ -160,7 +160,7 @@ impl<'a> Router<'a> {
     /// of journeys from `origins` departing in `[from, until)`,
     /// to each set of stops in `targets`, latest departure first.
     pub fn profile(
-        &'a self,
+        &self,
         origins: &[StopIdx],
         from: Secs,
         until: Secs,
