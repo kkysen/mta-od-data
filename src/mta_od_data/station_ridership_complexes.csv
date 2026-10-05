@@ -61,7 +61,7 @@ station,complex_id
 20 Av (N),75
 207 St (1),298
 21 St (G),282
-21 St-Queensbridge (F),221
+21 St-Queensbridge (M),221
 215 St (1),297
 "219 St (2,5)",420
 "225 St (2,5)",419
@@ -99,7 +99,7 @@ station,complex_id
 46 St-Bliss St (7),458
 "47-50 Sts-Rockefeller Center (B,D,F,M)",225
 "49 St (N,R,W)",10
-"5 Av-53 St (E,M)",276
+"5 Av-53 St (E,F)",276
 "5 Av-59 St (N,R,W)",8
 50 St (1),316
 "50 St (C,E)",162
@@ -107,7 +107,7 @@ station,complex_id
 52 St (7),457
 53 St (R),34
 55 St (D),62
-57 St (F),224
+57 St (M),224
 "57 St-7 Av (N,Q,R,W)",9
 "59 St (N,R)",35
 "59 St-Columbus Circle (A,B,C,D,1)",614
@@ -138,7 +138,7 @@ station,complex_id
 82 St-Jackson Hts (7),453
 85 St-Forest Pkwy (J),84
 86 St (Q),476
-86 St. (1),311
+86 St (1),311
 "86 St. (4,5,6)",397
 "86 St. (B,C)",158
 86 St. (N),79
@@ -218,7 +218,7 @@ Castle Hill Av (6),365
 Cathedral Pkwy-110 St (1),308
 "Cathedral Pkwy-110 St (B,C)",155
 Central Av (M),114
-"Central Park North-110 St (2,3)",441
+"Central Park North-110 St (2,3)/Malcolm X Plaza-110 St",441
 "Chambers St (1,2,3)",327
 "Chambers St (A,C)/WTC (E)/Park Place (2,3)/Cortlandt (R,W)",624
 "Chauncey St (J,Z)",93
@@ -234,7 +234,7 @@ Clinton-Washington Avs (C),177
 Clinton-Washington Avs (G),291
 "Coney Island-Stillwell Av (D,F,N,Q)",58
 Cortelyou Rd (Q),46
-"Court Sq (E,G,M,7)",606
+"Court Sq (E,G,F,7)",606
 "Court St (R)/Borough Hall (2,3,4,5)",620
 "Crescent St (J,Z)",87
 "Crown Heights-Utica Av (3,4)",345
@@ -319,8 +319,8 @@ Knickerbocker Av (M),113
 Kosciuszko St (J),96
 Lafayette Av (C),176
 "Lexington Av (N,Q,R)/59 St (4,5,6)",613
-"Lexington Av-53 St (E,M)/51 St (6)",612
-"Lexington Av-63 St (F,Q)",223
+"Lexington Av-53 St (E,F)/51 St (6)",612
+"Lexington Av-63 St (M,Q)",223
 Liberty Av (C),185
 Livonia Av (L),135
 Longwood Av (6),372
@@ -370,7 +370,7 @@ Pennsylvania Av (3),350
 "Prospect Av (2,5)",432
 Prospect Av (R),30
 "Prospect Park (B,Q,S)",42
-"Queens Plaza (E,M,R)",273
+"Queens Plaza (E,F,R)",273
 "Queensboro Plaza (N,W,7)",461
 Ralph Av (C),182
 Rector St (1),329
@@ -379,7 +379,7 @@ Rockaway Av (3),348
 Rockaway Av (C),183
 Rockaway Blvd (A),192
 "Rockaway Park-Beach 116 St (A,S)",203
-Roosevelt Island (F),222
+Roosevelt Island (M),222
 Saratoga Av (3),347
 Seneca Av (M),111
 "Sheepshead Bay (B,Q)",54

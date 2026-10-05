@@ -1,13 +1,17 @@
-"""Scale the OD data's weekdays to another year's station entries.
+"""Scale the OD data's weekdays by each station's change in entries since another year.
 
 The OD data starts in 2023, but the MTA's annual station ridership spreadsheet
-has each station complex's average weekday entries back to 2019,
-from the turnstile counts.
+has each station complex's counted average weekday entries back to 2019.
+Each complex grows by its counted entries in the target year
+over those in the OD data's year, both from the spreadsheet,
+so the OD data only supplies the pattern of who goes where, not a level to compare.
+Both count swipes and taps, and so does the OD data
+(scaled to each origin's swipes, not for fare evasion),
+so none of them include fare evaders.
 Scaling an OD slice by iterative proportional fitting (Fratar)
-so each complex's trips from and to it match that year's entries
-keeps the slice's pattern of who goes where,
-while restoring each station's volume.
-A station's daily exits are taken to equal its entries,
+to its own trips from and to each complex, grown,
+keeps the slice's pattern, closures, and seasonality.
+A station's daily exits are taken to grow like its entries,
 the turnstile exit counts being incomplete (exits through emergency gates).
 """
 
@@ -26,14 +30,14 @@ from mta_od_data.prepare import DEFAULT_PARQUET, RIDERSHIP_DECIMAL
 
 app = Typer()
 
-# "2024 Subway ridership data", from
-# https://www.mta.info/agency/new-york-city-transit/subway-bus-ridership-2024:
-# average weekday, weekend, and annual entries per station complex, 2019 to 2024.
-SPREADSHEET_URL = "https://www.mta.info/document/175471"
-DEFAULT_SPREADSHEET = DATA / "mta_subway_ridership_2019_2024.xlsx"
+# The 2025 subway ridership data, from
+# https://www.mta.info/agency/new-york-city-transit/ridership/2025:
+# average weekday, weekend, and annual entries per station complex, 2019 to 2025.
+SPREADSHEET_URL = "https://www.mta.info/document/213556"
+DEFAULT_SPREADSHEET = DATA / "mta_subway_ridership_2019_2025.xlsx"
 # The spreadsheet's station names, matched to complex IDs by hand.
 # The spreadsheet's Times Sq row also counts 42 St-Bryant Pk/5 Av,
-# a separate complex here, so that row maps to both.
+# a separate complex here, so that row maps to both, both growing as the row does.
 MAPPING = Path(__file__).parent / "station_ridership_complexes.csv"
 # Iterating until every complex's trips from and to it are within this of its target,
 # or for at most so many iterations, when a slice can't fit exactly.
@@ -56,26 +60,19 @@ def average_weekday_entries(spreadsheet: Path, year: int) -> dict[str, float]:
     return entries
 
 
-def complex_targets(
-    entries: dict[str, float], complex_weights: dict[int, float]
-) -> dict[int, float]:
-    """Each complex's entries: a station row's, split across its complexes by weight."""
+def complex_growth(
+    to: dict[str, float], since: dict[str, float]
+) -> tuple[dict[int, float], float]:
+    """Each complex's growth, `to` over `since` entries of its station row,
+    and the systemwide growth, for complexes the spreadsheet doesn't have."""
     complexes_of: dict[str, list[int]] = defaultdict(list)
     with MAPPING.open() as f:
         for row in csv.DictReader(f):
             complexes_of[row["station"]].append(int(row["complex_id"]))
-    if missing := sorted(set(entries) - set(complexes_of)):
+    if missing := sorted(set(to) - set(complexes_of)):
         raise ValueError(f"{MAPPING}: no complex for {missing}")
-    targets: dict[int, float] = {}
-    for station, value in entries.items():
-        complexes = complexes_of[station]
-        weight = sum(complex_weights.get(c, 0.0) for c in complexes)
-        for c in complexes:
-            share = (
-                complex_weights.get(c, 0.0) / weight if weight else 1 / len(complexes)
-            )
-            targets[c] = value * share
-    return targets
+    growth = {c: to[s] / since[s] for s in to for c in complexes_of[s]}
+    return growth, sum(to.values()) / sum(since.values())
 
 
 @app.command()
@@ -90,10 +87,9 @@ def scale_od(
 ) -> None:
     """Scale `--od-year`'s weekday OD slices to `--year`'s station entries.
 
-    Each complex grows by its `--year` entries over its `--od-year` average,
+    Each complex grows by its counted `--year` over `--od-year` entries,
     applied to each (month, weekday) slice's own trips from and to it,
-    so an average over slices is the target year's average weekday,
-    while a slice's own closures and seasonality stay.
+    so a slice's own closures and seasonality stay.
 
     \b
     Examples:
@@ -115,35 +111,23 @@ def scale_od(
         """,
         {"od": str(od), "od_year": od_year},
     )
-    # Each complex's average entries a slice, like the targets' a day.
-    weights = dict(
-        con.execute(
-            """
-            SELECT o, sum(v) / (SELECT count(DISTINCT (month, dow)) FROM daily)
-            FROM daily GROUP BY o
-            """
-        ).fetchall()
+    growth, systemwide = complex_growth(
+        average_weekday_entries(spreadsheet, year),
+        average_weekday_entries(spreadsheet, od_year),
     )
-    targets = complex_targets(average_weekday_entries(spreadsheet, year), weights)
     # The subway spreadsheet has no Staten Island Railway,
     # but the OD data has its two fare-controlled stations, St George and Tompkinsville:
-    # those scale by the systemwide ratio.
-    if missing := sorted(set(weights) - set(targets)):
-        ratio = sum(targets[c] for c in weights if c in targets) / sum(
-            w for c, w in weights.items() if c in targets
-        )
+    # those grow systemwide.
+    complexes = [c for (c,) in con.execute("SELECT DISTINCT o FROM daily").fetchall()]
+    if missing := sorted(set(complexes) - set(growth)):
         print(
-            f"no {year} entries for complexes {missing}: "
-            f"scaling by the systemwide {ratio:.3f}"
+            f"no entries for complexes {missing}: "
+            f"growing by the systemwide {systemwide:.3f}"
         )
         for c in missing:
-            targets[c] = weights[c] * ratio
-    # Each complex's growth: the target year's entries over the OD year's average.
+            growth[c] = systemwide
     con.execute("CREATE OR REPLACE TEMP TABLE growth (c BIGINT, g DOUBLE)")
-    con.executemany(
-        "INSERT INTO growth VALUES (?, ?)",
-        [(c, t / weights[c]) for c, t in targets.items()],
-    )
+    con.executemany("INSERT INTO growth VALUES (?, ?)", list(growth.items()))
     # Each slice's trips from and to a complex, grown:
     # so a complex closed or busier in one slice stays so, scaled.
     # Trips to are normalized to the same total as trips from, for a feasible fit.
@@ -253,6 +237,6 @@ def scale_od(
     ).fetchone()
     assert total is not None, "aggregate query always returns one row"
     print(
-        f"wrote {out}: {total[0]:,.0f} riders a weekday slice "
-        f"(targets sum to {sum(targets.values()):,.0f})"
+        f"wrote {out}: {total[0]:,.0f} riders a weekday slice on average "
+        f"(systemwide growth {systemwide:.3f})"
     )
