@@ -53,6 +53,23 @@ enum Command {
         #[arg(long, value_parser = parse_secs)]
         depart: Secs,
     },
+    /// Every Pareto-optimal journey between two stops departing in a window.
+    Profile {
+        #[arg(long)]
+        feed: PathBuf,
+        #[arg(long)]
+        date: Date,
+        #[arg(long, num_args = 1.., required = true)]
+        from: Vec<String>,
+        #[arg(long, num_args = 1.., required = true)]
+        to: Vec<String>,
+        /// Window start, `HH:MM:SS`, inclusive.
+        #[arg(long, value_parser = parse_secs)]
+        after: Secs,
+        /// Window end, `HH:MM:SS`, exclusive.
+        #[arg(long, value_parser = parse_secs)]
+        before: Secs,
+    },
 }
 
 fn parse_secs(s: &str) -> Result<Secs, String> {
@@ -82,20 +99,24 @@ fn main() -> Result<()> {
             depart,
         } => {
             let tt = Timetable::build(&Feed::open(&feed)?, date)?;
-            let stops = |ids: &[String]| {
-                ids.iter()
-                    .map(|id| tt.stop(id).with_context(|| format!("no stop {id}")))
-                    .collect::<Result<Vec<_>>>()
-            };
-            let (from, to) = (stops(&from)?, stops(&to)?);
+            let (from, to) = (stops(&tt, &from)?, stops(&tt, &to)?);
             let router = Router::new(&tt);
-            let journeys = router.query(&from, depart).journeys(&to);
-            if journeys.is_empty() {
-                println!("no journey");
-            }
-            for journey in &journeys {
-                print_journey(&tt, journey);
-            }
+            print_journeys(&tt, &router.query(&from, depart).journeys(&to));
+        }
+        Command::Profile {
+            feed,
+            date,
+            from,
+            to,
+            after,
+            before,
+        } => {
+            let tt = Timetable::build(&Feed::open(&feed)?, date)?;
+            let (from, to) = (stops(&tt, &from)?, stops(&tt, &to)?);
+            let router = Router::new(&tt);
+            let mut journeys = router.profile(&from, after, before, &[&to]);
+            journeys[0].sort_by_key(|j| (j.depart, j.rides()));
+            print_journeys(&tt, &journeys[0]);
         }
     }
     Ok(())
@@ -156,7 +177,22 @@ fn print_report(tt: &Timetable) {
     );
 }
 
-fn hms(t: Secs) -> String {
+fn stops(tt: &Timetable, ids: &[String]) -> Result<Vec<u32>> {
+    ids.iter()
+        .map(|id| tt.stop(id).with_context(|| format!("no stop {id}")))
+        .collect()
+}
+
+fn print_journeys(tt: &Timetable, journeys: &[Journey]) {
+    if journeys.is_empty() {
+        println!("no journey");
+    }
+    for journey in journeys {
+        print_journey(tt, journey);
+    }
+}
+
+pub fn hms(t: Secs) -> String {
     let sign = if t < 0 { "-" } else { "" };
     let t = t.abs();
     format!("{sign}{:02}:{:02}:{:02}", t / 3600, t / 60 % 60, t % 60)
@@ -168,7 +204,8 @@ fn print_journey(tt: &Timetable, j: &Journey) {
         format!("{} ({})", stop.name, stop.id)
     };
     println!(
-        "{} rides, arrive {} ({} min)",
+        "depart {}, {} rides, arrive {} ({} min)",
+        hms(j.depart),
         j.rides(),
         hms(j.arrive),
         (j.arrive - j.depart) / 60
