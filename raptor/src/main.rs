@@ -1,5 +1,6 @@
 //! RAPTOR journey assignment for the MTA OD data; see `raptor_design.md`.
 
+mod assign;
 mod calendar;
 mod gtfs;
 mod od;
@@ -12,6 +13,7 @@ use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use jiff::civil::Date;
 
+use crate::assign::{Config, assign, write_paths};
 use crate::gtfs::{Feed, Secs, parse_time};
 use crate::od::{Complexes, load_slice};
 use crate::raptor::{Journey, Leg, Router};
@@ -68,6 +70,23 @@ enum Command {
         /// The station reference CSV, from `mta-od-data prepare`.
         #[arg(long, default_value = "../data/stations.csv")]
         stations: PathBuf,
+    },
+    /// Split a date's OD rows across their journeys, and write the paths taken.
+    Assign {
+        #[arg(long)]
+        feed: PathBuf,
+        #[arg(long)]
+        date: Date,
+        #[arg(long, default_value = "../data/mta_od.parquet")]
+        od: PathBuf,
+        #[arg(long, default_value = "../data/stations.csv")]
+        stations: PathBuf,
+        /// Generalized cost weights.
+        #[arg(long, default_value = "assign.json5")]
+        config: PathBuf,
+        /// Output Parquet (default: `../data/raptor/paths-<date>.parquet`).
+        #[arg(long)]
+        out: Option<PathBuf>,
     },
     /// Every Pareto-optimal journey between two stops departing in a window.
     Profile {
@@ -129,6 +148,32 @@ fn main() -> Result<()> {
             let complexes = Complexes::load(&stations, &tt)?;
             let rows = load_slice(&od, date)?;
             print_od(&complexes, &rows);
+        }
+        Command::Assign {
+            feed,
+            date,
+            od,
+            stations,
+            config,
+            out,
+        } => {
+            let start = std::time::Instant::now();
+            let (config_values, config_text) = Config::load(&config)?;
+            let tt = Timetable::build(&Feed::open(&feed)?, date)?;
+            let complexes = Complexes::load(&stations, &tt)?;
+            let rows = load_slice(&od, date)?;
+            println!("loaded in {:.1?}", start.elapsed());
+            let (paths, unassigned) = assign(&tt, &complexes, &rows, &config_values);
+            println!("assigned in {:.1?}", start.elapsed());
+            let out = out.unwrap_or_else(|| format!("../data/raptor/paths-{date}.parquet").into());
+            let metadata = vec![
+                ("feed".to_string(), feed.display().to_string()),
+                ("date".to_string(), date.to_string()),
+                ("config".to_string(), config_text),
+            ];
+            write_paths(&out, &paths, date, metadata)?;
+            println!("wrote {} paths to {}", paths.len(), out.display());
+            print_assignment(&rows, &paths, &unassigned);
         }
         Command::Profile {
             feed,
@@ -305,4 +350,38 @@ fn print_od(complexes: &Complexes, rows: &[od::OdRow]) {
 /// Not `Sum`, which gives -0.0 for nothing.
 fn riders<'a>(rows: impl Iterator<Item = &'a od::OdRow>) -> f64 {
     rows.fold(0.0, |sum, r| sum + r.riders)
+}
+
+fn print_assignment(
+    rows: &[od::OdRow],
+    paths: &[assign::PathRow],
+    unassigned: &assign::Unassigned,
+) {
+    let input = riders(rows.iter());
+    let assigned = paths.iter().fold(0.0, |sum, p| sum + p.riders);
+    println!(
+        "riders: {input:.4} in, {assigned:.4} assigned, {:.4} unassigned",
+        unassigned.total()
+    );
+    println!(
+        "  unassigned: {:.4} no served stop, {:.4} unreachable in {} rides, {:.4} after the last departure",
+        unassigned.no_stops,
+        unassigned.unreachable,
+        raptor::MAX_RIDES,
+        unassigned.no_departure
+    );
+    println!(
+        "  conservation error: {:.6}",
+        input - assigned - unassigned.total()
+    );
+    let mut by_rides = [0.0; raptor::MAX_RIDES + 1];
+    let mut minutes = 0.0;
+    for p in paths {
+        by_rides[p.rides as usize] += p.riders;
+        minutes += p.riders * p.total / 60.0;
+    }
+    for (k, r) in by_rides.iter().enumerate().skip(1) {
+        println!("  {k} rides: {:.1}%", 100.0 * r / assigned);
+    }
+    println!("  mean journey: {:.1} min", minutes / assigned);
 }

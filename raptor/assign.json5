@@ -1,0 +1,21 @@
+// Generalized cost weights for splitting each OD row's riders
+// across its Pareto-optimal journeys (`raptor assign`; see `raptor_design.md`).
+// Neutral to start: every second of a journey costs the same,
+// so riders split by travel time alone, until there's a basis for anything else.
+{
+  // Minutes of perceived cost per minute waiting on a platform,
+  // at the origin or between trains.
+  wait_weight: 1.0,
+  // Per minute walking between platforms,
+  // or changing trains at one stop (its `transfers.txt` minimum change time).
+  walk_weight: 1.0,
+  // Minutes added per transfer, on top of its walk and wait.
+  // 0 to start: a cross-platform transfer costs nothing,
+  // and one to an express can even be preferred,
+  // so a flat penalty is the wrong shape anyway (see `raptor_design.md`).
+  transfer_penalty_min: 0.0,
+  // Logit scale per minute of cost:
+  // a journey costing 1/scale more minutes gets 1/e of the riders.
+  // A placeholder: no neutral value exists, and this one has no source.
+  logit_scale_per_min: 0.2,
+}
