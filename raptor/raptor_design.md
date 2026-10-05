@@ -301,10 +301,18 @@ Complexity is added only once the simple version works end to end.
    An hour from one origin takes ~25ms on one core
    (after ~0.2s to load the feed),
    so every origin for every hour of a date is minutes before parallelizing.
-5. **Assignment**: OD Parquet in, leg + journey Parquet out,
+5. **OD slice**: `raptor od --feed <zip> --date <date>`
+   reads the OD Parquet's rows for the date's (year, month, day of week)
+   with the `parquet` crate,
+   and maps each complex to its stops via `data/stations.csv`'s
+   `gtfs_stop_id`/`complex_id`, reporting stops the timetable lacks or doesn't serve.
+   For 2025-09-10 (a Wednesday): 1,510,563 rows, 4,323,207.1421 riders,
+   424 origins, matching DuckDB; every stop maps and is served; ~2.4s.
+   No row has the same origin and destination.
+6. **Assignment**: OD Parquet in, leg + journey Parquet out,
    ridership split by logit over generalized cost
    with a single flat transfer penalty.
-6. **Later, in any order**:
+7. **Later, in any order**:
    directional stops and the transfer rules above;
    curated `transfer_times.csv`;
    per-class transfer penalties and the two rider classes;
