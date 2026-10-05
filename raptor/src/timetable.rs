@@ -24,7 +24,6 @@ type PatternKey<'a> = (&'a str, Option<u8>, Vec<StopIdx>);
 #[derive(Debug)]
 pub struct Stop {
     pub id: String,
-    #[expect(dead_code, reason = "for journey output, phase 5")]
     pub name: String,
 }
 
@@ -41,7 +40,6 @@ pub struct TripTimes {
 /// none overtaking another, sorted by departure.
 #[derive(Debug)]
 pub struct Pattern {
-    #[expect(dead_code, reason = "for journey output, phase 5")]
     pub route_id: String,
     #[expect(dead_code, reason = "for journey output, phase 5")]
     pub direction_id: Option<u8>,
@@ -86,6 +84,13 @@ pub struct Report {
 }
 
 impl Timetable {
+    pub fn stop(&self, id: &str) -> Option<StopIdx> {
+        self.stops
+            .iter()
+            .position(|s| s.id == id)
+            .map(|i| i as StopIdx)
+    }
+
     pub fn build(feed: &Feed, date: Date) -> Result<Self> {
         let mut report = Report::default();
 

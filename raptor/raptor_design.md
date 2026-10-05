@@ -269,6 +269,14 @@ Complexity is added only once the simple version works end to end.
    `raptor timetable --feed <zip> --date <date>` prints what it found.
 3. **RAPTOR**: plain round-based earliest arrival, per-round labels,
    max 3 rides, unit-tested on tiny hand-built feeds.
+   Round `k` keeps a label only if it beats every round before it,
+   so the rounds reaching a target are its Pareto set over (arrival, rides).
+   Each round has two labels per stop:
+   arriving by train, and ready to board,
+   which is arrival plus the stop's change time, or a footpath's walk time
+   (not both: `transfers.txt` times between stops are the whole transfer).
+   `raptor route --feed <zip> --date <date> --from <stops> --to <stops> --depart <time>`
+   prints a query's journeys.
 4. **rRAPTOR**: all departures in an hour, Pareto (arrival, rides) set.
 5. **Assignment**: OD Parquet in, leg + journey Parquet out,
    ridership split by logit over generalized cost
