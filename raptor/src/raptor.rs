@@ -41,6 +41,9 @@ pub enum Leg {
     Ride {
         pattern: u32,
         trip: u32,
+        /// Positions in the pattern's stops, for the stops passed between.
+        board_pos: u32,
+        alight_pos: u32,
         board_stop: StopIdx,
         alight_stop: StopIdx,
         depart: Secs,
@@ -343,6 +346,8 @@ impl Labels<'_> {
             legs.push(Leg::Ride {
                 pattern: r.pattern,
                 trip: r.trip,
+                board_pos: r.board_pos,
+                alight_pos: r.alight_pos,
                 board_stop,
                 alight_stop: stop,
                 depart: times[r.board_pos as usize].1,

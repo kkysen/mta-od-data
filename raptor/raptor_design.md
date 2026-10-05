@@ -328,8 +328,13 @@ Complexity is added only once the simple version works end to end.
    per (hour, origin, destination, path),
    the share and riders, and mean wait, in-vehicle, walk, and total seconds,
    with the feed, date, and config text in the file's metadata.
-   A path is its rides as `<route> <board>><alight>` and walks as `walk <from>><to>`,
+   A path is its rides as `<route> <board>><each stop passed>><alight>`
+   and walks as `walk <from>><to>`,
    by GTFS stop ID (names repeat: `127` and `R16` are both Times Sq-42 St).
+   Listing every stop passed means riders on a stretch of track
+   are found from consecutive stops on it,
+   whatever their origin and destination,
+   not inferred from where they board or alight.
    Trip-level output (which train) is a later flag.
    - One profile per origin complex over the whole date
      (through `NEXT_DATE_HORIZON`, for riders entering late),
