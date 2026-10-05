@@ -112,7 +112,29 @@ the passing-stop tie-breaker) without crowding, at least initially.
    sorted by departure; verify FIFO (no overtaking within a pattern)
    and split a pattern if it isn't.
 3. Include trips from the previous service day still running after midnight
-   (times >= 24:00), shifted by -24h.
+   (times >= 24:00), shifted by -24h,
+   so times are signed seconds.
+   The MTA files trips starting after midnight under the new day's service
+   (`...-Sunday-00_000600_...`), so these don't double up;
+   the timetable reports any trip with exactly another's times.
+   On a feed version's first date the previous date is outside it,
+   and its overnight trips are missing (reported, not an error).
+   Consecutive versions abut (one ends 2025-11-01, the next starts 2025-11-02),
+   so taking overnight trips from the previous version is a later fix.
+
+GTFS times count from "noon minus 12h", not wall-clock midnight,
+so on daylight-saving change dates (2025-11-02, 2026-03-08)
+they're an hour off the OD data's wall-clock hours.
+The representative-date rule must skip those.
+
+Feed version selection is explicit (`--feed`) for now.
+Some versions cover the same dates,
+so automatic selection will mean
+the latest-fetched version whose calendar covers the date.
+
+On the 2025-10-18 version, a Wednesday is 8474 trips
+plus 262 overnight from Tuesday (matching a DuckDB count),
+in 211 patterns, none needing a FIFO split.
 
 Stops are the directional platform stops (`101N`, `101S`),
 not parent stations:
@@ -123,9 +145,25 @@ via the station reference CSV's `gtfs_stop_id`.
 
 ### Transfers
 
-**Phase 1 takes `transfers.txt` at its word**,
-keyed on parent stops as the feed does.
-Everything below this paragraph is the plan for making it accurate later.
+**Phase 2 takes `transfers.txt` at its word**,
+keyed on parent stops as the feed does:
+
+- a same-stop row (`127,127,2,0`) is the minimum time
+  between alighting and boarding at that stop,
+  kept separate from footpaths so RAPTOR charges it
+  (`nycriders` makes every same-stop change free);
+- a stop with no same-stop row gets `DEFAULT_MIN_CHANGE`, 180s,
+  what the feed gives almost every stop it lists
+  (33 served stops on the 2025-10-18 version, single-line stops);
+- other rows are footpaths;
+- `transfer_type` 3 (not possible) rows are dropped.
+
+The timetable reports asymmetric footpaths
+and footpaths not transitively closed,
+since RAPTOR relaxes footpaths once a round and assumes closure.
+Every version so far has none of either.
+
+Everything below is the plan for making it accurate later.
 
 GTFS `transfers.txt` is not good enough on its own.
 Current feed (2026-08 version):
@@ -228,6 +266,7 @@ Complexity is added only once the simple version works end to end.
 2. **Timetable**: load one feed, resolve services for one date,
    build FIFO patterns. Stops at the parent level;
    transfers straight from `transfers.txt`.
+   `raptor timetable --feed <zip> --date <date>` prints what it found.
 3. **RAPTOR**: plain round-based earliest arrival, per-round labels,
    max 3 rides, unit-tested on tiny hand-built feeds.
 4. **rRAPTOR**: all departures in an hour, Pareto (arrival, rides) set.
