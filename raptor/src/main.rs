@@ -2,6 +2,7 @@
 
 mod calendar;
 mod gtfs;
+mod od;
 mod raptor;
 mod timetable;
 
@@ -12,6 +13,7 @@ use clap::{Parser, Subcommand};
 use jiff::civil::Date;
 
 use crate::gtfs::{Feed, Secs, parse_time};
+use crate::od::{Complexes, load_slice};
 use crate::raptor::{Journey, Leg, Router};
 use crate::timetable::{DEFAULT_MIN_CHANGE, NEXT_DATE_HORIZON, Timetable};
 
@@ -52,6 +54,20 @@ enum Command {
         /// Departure time, `HH:MM:SS` from the service date's start.
         #[arg(long, value_parser = parse_secs)]
         depart: Secs,
+    },
+    /// Load the OD rows for a date's (year, month, day of week),
+    /// and map their station complexes to the date's timetable.
+    Od {
+        #[arg(long)]
+        feed: PathBuf,
+        #[arg(long)]
+        date: Date,
+        /// The OD Parquet, from `mta-od-data prepare`.
+        #[arg(long, default_value = "../data/mta_od.parquet")]
+        od: PathBuf,
+        /// The station reference CSV, from `mta-od-data prepare`.
+        #[arg(long, default_value = "../data/stations.csv")]
+        stations: PathBuf,
     },
     /// Every Pareto-optimal journey between two stops departing in a window.
     Profile {
@@ -102,6 +118,17 @@ fn main() -> Result<()> {
             let (from, to) = (stops(&tt, &from)?, stops(&tt, &to)?);
             let router = Router::new(&tt);
             print_journeys(&tt, &router.query(&from, depart).journeys(&to));
+        }
+        Command::Od {
+            feed,
+            date,
+            od,
+            stations,
+        } => {
+            let tt = Timetable::build(&Feed::open(&feed)?, date)?;
+            let complexes = Complexes::load(&stations, &tt)?;
+            let rows = load_slice(&od, date)?;
+            print_od(&complexes, &rows);
         }
         Command::Profile {
             feed,
@@ -240,4 +267,42 @@ fn print_journey(tt: &Timetable, j: &Journey) {
             }
         }
     }
+}
+
+fn print_od(complexes: &Complexes, rows: &[od::OdRow]) {
+    use std::collections::BTreeSet;
+    let total = riders(rows.iter());
+    let origins: BTreeSet<_> = rows.iter().map(|r| r.origin).collect();
+    let destinations: BTreeSet<_> = rows.iter().map(|r| r.destination).collect();
+    let hours: BTreeSet<_> = rows.iter().map(|r| r.hour).collect();
+    println!("rows: {}", rows.len());
+    println!("riders: {total:.4}");
+    println!(
+        "origins: {}, destinations: {}, hours: {hours:?}",
+        origins.len(),
+        destinations.len()
+    );
+    println!("stops not in the timetable: {:?}", complexes.unknown_stops);
+    println!(
+        "stops not served on the date: {:?}",
+        complexes.unserved_stops
+    );
+    let stopless = |c: &od::ComplexId| complexes.stops.get(c).is_none_or(Vec::is_empty);
+    let unmapped: BTreeSet<_> = origins
+        .iter()
+        .chain(&destinations)
+        .filter(|c| stopless(c))
+        .collect();
+    let unmapped_riders = riders(
+        rows.iter()
+            .filter(|r| stopless(&r.origin) || stopless(&r.destination)),
+    );
+    println!("complexes with no served stop: {unmapped:?} ({unmapped_riders:.4} riders)");
+    let same = riders(rows.iter().filter(|r| r.origin == r.destination));
+    println!("riders with the same origin and destination: {same:.4}");
+}
+
+/// Not `Sum`, which gives -0.0 for nothing.
+fn riders<'a>(rows: impl Iterator<Item = &'a od::OdRow>) -> f64 {
+    rows.fold(0.0, |sum, r| sum + r.riders)
 }
