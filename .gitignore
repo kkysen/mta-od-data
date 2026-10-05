@@ -17,6 +17,8 @@ data/*
 # so checked in rather than refetched from `data.ny.gov` by `mta-od-data prepare`.
 !data/complexes.csv
 !data/stations.csv
+# Hand-reviewed, so checked in rather than regenerated.
+!src/mta_od_data/station_ridership_complexes.csv
 
 # Contains useful settings for JSON schemas.
 !.vscode/
