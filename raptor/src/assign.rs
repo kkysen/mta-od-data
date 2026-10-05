@@ -47,8 +47,12 @@ pub struct PathRow {
     pub hour: u8,
     pub origin: ComplexId,
     pub destination: ComplexId,
-    /// Rides as `<route> <board stop>><alight stop>` and walks as `walk <from>><to>`,
+    /// Rides as `<route> <board stop>><each stop passed>><alight stop>`
+    /// and walks as `walk <from>><to>`,
     /// joined by ` | `, with GTFS stop IDs.
+    /// Every stop a ride passes is there,
+    /// so riders on a stretch of track can be found
+    /// whatever their origin and destination.
     pub path: String,
     pub rides: u8,
     /// Of the row's riders.
@@ -286,15 +290,18 @@ fn path(tt: &Timetable, j: &Journey) -> String {
         .map(|leg| match *leg {
             Leg::Ride {
                 pattern,
-                board_stop,
-                alight_stop,
+                board_pos,
+                alight_pos,
                 ..
-            } => format!(
-                "{} {}>{}",
-                tt.patterns[pattern as usize].route_id,
-                id(board_stop),
-                id(alight_stop)
-            ),
+            } => {
+                let pattern = &tt.patterns[pattern as usize];
+                let stops = pattern.stops[board_pos as usize..=alight_pos as usize]
+                    .iter()
+                    .map(|&s| id(s))
+                    .collect::<Vec<_>>()
+                    .join(">");
+                format!("{} {stops}", pattern.route_id)
+            }
             Leg::Walk { from, to, .. } => format!("walk {}>{}", id(from), id(to)),
         })
         .collect::<Vec<_>>()
@@ -562,6 +569,18 @@ mod tests {
             ..NEUTRAL
         };
         assert!(share(&penalized, "2 A>B | 5 B>C") < share(&penalized, "1 A>C"));
+    }
+
+    #[test]
+    fn path_lists_every_stop_passed() {
+        let trips = "route_id,trip_id,service_id\n1,t1,W\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            t1,A,08:10:00,08:10:00,1\nt1,B,08:20:00,08:20:00,2\n\
+            t1,C,08:30:00,08:30:00,3\nt1,D,08:40:00,08:40:00,4\n";
+        let tt = timetable(trips, stop_times, NO_TRANSFERS);
+        let (paths, _) = assign(&tt, &complexes(&tt), &[row(0, 2)], &NEUTRAL);
+        let paths: Vec<_> = paths.iter().map(|p| p.path.as_str()).collect();
+        assert_eq!(paths, ["1 A>B>C"]);
     }
 
     #[test]
