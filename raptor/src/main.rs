@@ -13,7 +13,7 @@ use jiff::civil::Date;
 
 use crate::gtfs::{Feed, Secs, parse_time};
 use crate::raptor::{Journey, Leg, Router};
-use crate::timetable::{DEFAULT_MIN_CHANGE, Timetable};
+use crate::timetable::{DEFAULT_MIN_CHANGE, NEXT_DATE_HORIZON, Timetable};
 
 #[derive(Parser)]
 struct Cli {
@@ -134,6 +134,14 @@ fn print_report(tt: &Timetable) {
         "trips: {} today + {} overnight from the previous date",
         r.trips, r.overnight_trips
     );
+    println!(
+        "  + {} from the next date starting before {}",
+        r.next_date_trips,
+        hms(NEXT_DATE_HORIZON)
+    );
+    if r.next_date_missing {
+        println!("warning: the next date is outside the feed, so its early trips are missing");
+    }
     if r.previous_date_missing {
         println!(
             "warning: the previous date is outside the feed, so its overnight trips are missing"

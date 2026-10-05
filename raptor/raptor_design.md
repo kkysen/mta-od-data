@@ -121,6 +121,14 @@ the passing-stop tie-breaker) without crowding, at least initially.
    and its overnight trips are missing (reported, not an error).
    Consecutive versions abut (one ends 2025-11-01, the next starts 2025-11-02),
    so taking overnight trips from the previous version is a later fix.
+4. Include the next date's trips starting before 03:00
+   (`NEXT_DATE_HORIZON`), shifted by +24h,
+   for journeys late in the date:
+   since the MTA files trips starting after midnight under the next date,
+   the date's own trips stop at midnight,
+   and without these a rider at 23:50 couldn't board a train at 00:06.
+   Missing on a version's last date, as above.
+   On the 2025-10-18 version a Wednesday gets 318 of these, no duplicates.
 
 GTFS times count from "noon minus 12h", not wall-clock midnight,
 so on daylight-saving change dates (2025-11-02, 2026-03-08)
