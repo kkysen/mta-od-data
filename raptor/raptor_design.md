@@ -49,7 +49,8 @@ Worth keeping:
 
 - patterns keyed on (route, direction, exact stop sequence);
 - midnight-wrapped copies of trips with times >= 24:00;
-- max 3 rounds (2 transfers) as the practical cap;
+- a cap on rounds (theirs is 3, i.e. 2 transfers),
+  though not their value: 4-ride trips are real (see Phases, Later);
 - the author ships a patched `stop_times_fixed.txt`,
   so expect the raw feed to need cleaning
   (their README: "timetables are a bit wonky").
@@ -216,7 +217,7 @@ Range RAPTOR per (origin complex, hour):
 run RAPTOR for every departure in the hour, latest first,
 reusing labels across departures (standard rRAPTOR),
 from all directional stops of the origin complex.
-Labels are per round `k` (at most 3 rides),
+Labels are per round `k` (at most `MAX_RIDES` rides, 3 for now),
 with a backpointer per (round, stop),
 so every Pareto-optimal (arrival, rides) journey per departure
 is extractable without ambiguity.
@@ -319,6 +320,9 @@ Complexity is added only once the simple version works end to end.
    passing-stop tie-breaker;
    supplemented-feed planned work;
    departure-time skew within the hour;
+   raising `MAX_RIDES` from 3 (taken from `nycriders` unexamined;
+   4-ride trips are real), measuring the ride-count split,
+   runtime, and 4+-ride paths it adds;
    McRAPTOR if needed; crowding.
 
 ## Implementation

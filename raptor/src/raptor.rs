@@ -10,7 +10,7 @@
 use crate::gtfs::Secs;
 use crate::timetable::{StopIdx, Timetable};
 
-/// Most rides in a journey (2 transfers), as `nycriders` found enough.
+/// Most rides in a journey. 3 is `nycriders`' cap, unexamined; raising it is a todo.
 pub const MAX_RIDES: usize = 3;
 
 const NEVER: Secs = Secs::MAX;
