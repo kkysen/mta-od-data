@@ -29,6 +29,19 @@ pub struct Config {
     pub walk_weight: f64,
     pub transfer_penalty_min: f64,
     pub logit_scale_per_min: f64,
+    #[serde(default)]
+    pub transfers: Transfers,
+}
+
+/// Where transfer times come from.
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum Transfers {
+    /// `transfers.txt` at its word (`Timetable::build`).
+    #[default]
+    Gtfs,
+    /// `nycriders`' rules (`Timetable::use_walk_distance_transfers`).
+    WalkDistance,
 }
 
 impl Config {
@@ -462,6 +475,7 @@ mod tests {
         walk_weight: 1.0,
         transfer_penalty_min: 0.0,
         logit_scale_per_min: 0.2,
+        transfers: Transfers::Gtfs,
     };
 
     fn timetable(trips: &str, stop_times: &str, transfers: &str) -> Timetable {

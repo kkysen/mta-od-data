@@ -172,6 +172,14 @@ and footpaths not transitively closed,
 since RAPTOR relaxes footpaths once a round and assumes closure.
 Every version so far has none of either.
 
+`transfers: "walk_distance"` in `raptor/assign.json5`
+switches to `nycriders`' rules instead, for comparing with it:
+every same-stop change is free,
+`transfers.txt`'s footpaths between different stops are kept,
+and every other pair of a complex's stops gets a footpath
+of 60s plus their straight-line distance at 1.2 m/s.
+Cross-platform changes are free under both.
+
 Everything below is the plan for making it accurate later.
 
 GTFS `transfers.txt` is not good enough on its own.

@@ -14,7 +14,7 @@ use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use jiff::civil::{Date, Weekday};
 
-use crate::assign::{Config, Unassigned, assign, write_paths};
+use crate::assign::{Config, Transfers, Unassigned, assign, write_paths};
 use crate::batch::{load_versions, pick_dates};
 use crate::gtfs::{Feed, Secs, parse_time};
 use crate::od::{Complexes, load_slice};
@@ -158,8 +158,11 @@ fn assign_date(
     out: &Path,
 ) -> Result<AssignSummary> {
     let start = std::time::Instant::now();
-    let tt = Timetable::build(feed, date)?;
+    let mut tt = Timetable::build(feed, date)?;
     let complexes = Complexes::load(inputs.stations, &tt)?;
+    if inputs.config.0.transfers == Transfers::WalkDistance {
+        tt.use_walk_distance_transfers(complexes.stops.values().map(Vec::as_slice));
+    }
     let rows = load_slice(inputs.od, date)?;
     println!("loaded in {:.1?}", start.elapsed());
     let (paths, unassigned) = assign(&tt, &complexes, &rows, &inputs.config.0);

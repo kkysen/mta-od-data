@@ -59,6 +59,10 @@ pub struct Stop {
     pub stop_id: String,
     pub stop_name: String,
     #[serde(default)]
+    pub stop_lat: Option<f64>,
+    #[serde(default)]
+    pub stop_lon: Option<f64>,
+    #[serde(default)]
     pub parent_station: Option<String>,
 }
 
