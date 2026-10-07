@@ -1,5 +1,5 @@
 // Generalized cost weights for splitting each OD row's riders
-// across its Pareto-optimal journeys (`raptor assign`; see `raptor_design.md`).
+// across its Pareto-optimal journeys (`mta-od-data raptor assign`; see `raptor_design.md`).
 // Neutral to start: every second of a journey costs the same,
 // so riders split by travel time alone, until there's a basis for anything else.
 {
