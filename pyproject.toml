@@ -14,8 +14,26 @@ dependencies = [
 mta-od-data = "mta_od_data.cli:app"
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["maturin>=1.15,<2"]
+build-backend = "maturin"
+
+# The `raptor` crate, built as the `mta_od_data._raptor` extension module.
+[tool.maturin]
+manifest-path = "raptor/Cargo.toml"
+python-source = "src"
+module-name = "mta_od_data._raptor"
+bindings = "pyo3"
+# Routing a date takes minutes unoptimized, even for an editable install.
+profile = "release"
+
+# Rebuild the extension when the crate changes, not just `pyproject.toml`.
+[tool.uv]
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "raptor/Cargo.toml" },
+    { file = "raptor/Cargo.lock" },
+    { file = "raptor/src/**/*.rs" },
+]
 
 [dependency-groups]
 dev = [

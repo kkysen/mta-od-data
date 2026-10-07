@@ -410,13 +410,15 @@ Parallelize across origin complexes with `rayon`.
 Read/write Parquet with `arrow`/`parquet` crates
 (or `polars` if it saves enough code).
 
-A standalone binary, not a Python extension:
-it reads OD Parquet and writes leg/journey Parquet,
-so the Python side only needs a subprocess call,
-and the `hatchling` build stays as is
-(PyO3 would mean switching to `maturin`).
-Parquet is the whole interface,
-so moving to PyO3 later stays possible if a tight loop needs it.
+A Python extension module, `mta_od_data._raptor`, through PyO3,
+built by `maturin` as the package's build backend
+(in release mode, even for an editable install),
+so `uv sync` rebuilds it whenever the crate changes.
+Path rows stay in Rust, which writes their Parquet:
+Python gets back only a date's summary,
+so the boundary carries no per-row data.
+The calls release the GIL, so `rayon` gets every core.
+The `raptor` binary still works alongside it, for now.
 
 Layout: a Cargo crate at `raptor/`,
 with GTFS loading, timetable building, transfers, rRAPTOR,

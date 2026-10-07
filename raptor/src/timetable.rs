@@ -49,7 +49,6 @@ pub struct TripTimes {
 #[derive(Debug)]
 pub struct Pattern {
     pub route_id: String,
-    #[expect(dead_code, reason = "for journey output, phase 5")]
     pub direction_id: Option<u8>,
     pub stops: Vec<StopIdx>,
     pub trips: Vec<TripTimes>,

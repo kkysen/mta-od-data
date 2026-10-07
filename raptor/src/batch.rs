@@ -8,10 +8,13 @@ use jiff::ToSpan;
 use jiff::civil::{Date, Weekday};
 use jiff::tz::TimeZone;
 
+use pyo3::pyclass;
+
 use crate::calendar::span;
 use crate::gtfs::Feed;
 
 /// A feed version on disk, with its `calendar.txt` span.
+#[pyclass(frozen, module = "mta_od_data._raptor")]
 pub struct Version {
     pub path: PathBuf,
     pub feed: Feed,
@@ -28,33 +31,33 @@ pub fn load_versions(dir: &Path) -> Result<Vec<Version>> {
         .collect::<Result<_, _>>()?;
     paths.retain(|p| p.extension().is_some_and(|e| e == "zip"));
     paths.sort();
-    paths
-        .into_iter()
-        .map(|path| {
-            let feed = Feed::open(&path)?;
-            let (start, end) =
-                span(&feed).with_context(|| format!("{} has no calendar", path.display()))?;
-            Ok(Version {
-                path,
-                feed,
-                start,
-                end,
-            })
+    paths.into_iter().map(|path| Version::open(&path)).collect()
+}
+
+impl Version {
+    pub fn open(path: &Path) -> Result<Self> {
+        let feed = Feed::open(path)?;
+        let (start, end) =
+            span(&feed).with_context(|| format!("{} has no calendar", path.display()))?;
+        Ok(Self {
+            path: path.to_owned(),
+            feed,
+            start,
+            end,
         })
-        .collect()
+    }
 }
 
 /// The latest-fetched version covering `date` and both its neighbors,
 /// so its overnight trips from the previous date and early ones from the next are there.
-pub fn version_for(versions: &[Version], date: Date) -> Option<&Version> {
+pub fn version_for(versions: &[&Version], date: Date) -> Option<usize> {
     let (before, after) = (
         date.checked_sub(1.day()).ok()?,
         date.checked_add(1.day()).ok()?,
     );
     versions
         .iter()
-        .rev()
-        .find(|v| v.start <= before && after <= v.end)
+        .rposition(|v| v.start <= before && after <= v.end)
 }
 
 /// Whether `date` has a daylight-saving change in New York,
@@ -67,9 +70,10 @@ fn dst_change(date: Date) -> Result<bool> {
 }
 
 /// One (month, weekday)'s representative date.
-pub struct Pick<'a> {
+pub struct Pick {
     pub date: Date,
-    pub version: &'a Version,
+    /// Its feed version, as an index into the versions picked from.
+    pub version: usize,
     /// How many of the month's dates in the range fall on this weekday:
     /// its weight in an average over the range.
     pub days: usize,
@@ -80,12 +84,12 @@ pub struct Pick<'a> {
 /// covered with its neighbors by a feed version,
 /// no `calendar_dates.txt` exception in that version, and no daylight-saving change.
 /// Middle, to stay clear of a version's edges.
-pub fn pick_dates<'a>(
-    versions: &'a [Version],
+pub fn pick_dates(
+    versions: &[&Version],
     from: Date,
     to: Date,
     weekdays: &[Weekday],
-) -> Result<Vec<Pick<'a>>> {
+) -> Result<Vec<Pick>> {
     let mut picks = Vec::new();
     let mut month = from.first_of_month();
     while month <= to {
@@ -100,7 +104,8 @@ pub fn pick_dates<'a>(
                 let Some(v) = version_for(versions, d) else {
                     continue;
                 };
-                if v.feed.calendar_dates.iter().any(|c| c.date == d) || dst_change(d)? {
+                let exception = versions[v].feed.calendar_dates.iter().any(|c| c.date == d);
+                if exception || dst_change(d)? {
                     continue;
                 }
                 usable.push((d, v));
@@ -165,10 +170,11 @@ mod tests {
             version("newer", "20250930", &format!("{header}W,20250901,2\n")),
         ];
         let date = |m, d| Date::new(2025, m, d).unwrap();
-        let picks = pick_dates(&versions, date(8, 11), date(10, 31), &[Weekday::Monday]).unwrap();
+        let refs: Vec<_> = versions.iter().collect();
+        let picks = pick_dates(&refs, date(8, 11), date(10, 31), &[Weekday::Monday]).unwrap();
         let got: Vec<_> = picks
             .iter()
-            .map(|p| (p.date, p.version.path.to_str().unwrap(), p.days))
+            .map(|p| (p.date, versions[p.version].path.to_str().unwrap(), p.days))
             .collect();
         assert_eq!(
             got,

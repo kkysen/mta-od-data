@@ -634,7 +634,13 @@ mod tests {
         let journeys = router.profile(&origins, t(window.0), t(window.1), &[&targets]);
         journeys[0]
             .iter()
-            .map(|j| format!("{} {}", crate::hms(j.depart), summary(tt, j).join(", ")))
+            .map(|j| {
+                format!(
+                    "{} {}",
+                    crate::report::hms(j.depart),
+                    summary(tt, j).join(", ")
+                )
+            })
             .collect()
     }
 
