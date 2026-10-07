@@ -295,7 +295,7 @@ Complexity is added only once the simple version works end to end.
 2. **Timetable**: load one feed, resolve services for one date,
    build FIFO patterns. Stops at the parent level;
    transfers straight from `transfers.txt`.
-   `raptor timetable --feed <zip> --date <date>` prints what it found.
+   `mta-od-data raptor timetable --feed <zip> --date <date>` prints what it found.
 3. **RAPTOR**: plain round-based earliest arrival, per-round labels,
    max 3 rides, unit-tested on tiny hand-built feeds.
    Round `k` keeps a label only if it beats every round before it,
@@ -304,7 +304,7 @@ Complexity is added only once the simple version works end to end.
    arriving by train, and ready to board,
    which is arrival plus the stop's change time, or a footpath's walk time
    (not both: `transfers.txt` times between stops are the whole transfer).
-   `raptor route --feed <zip> --date <date> --from <stops> --to <stops> --depart <time>`
+   `mta-od-data raptor route --feed <zip> --date <date> --origin <stop> --destination <stop> --depart <time>`
    prints a query's journeys.
 4. **rRAPTOR**: all departures in an hour, Pareto (arrival, rides) set.
    Runs go latest departure first, lowering labels never reset,
@@ -317,12 +317,12 @@ Complexity is added only once the simple version works end to end.
    which neither dominates.
    Departures run are every train departure at an origin,
    or at a stop one footpath away less the walk.
-   `raptor profile --feed <zip> --date <date> --from <stops> --to <stops> --after <time> --before <time>`
+   `mta-od-data raptor profile --feed <zip> --date <date> --origin <stop> --destination <stop> --after <time> --before <time>`
    prints a window's journeys.
    An hour from one origin takes ~25ms on one core
    (after ~0.2s to load the feed),
    so every origin for every hour of a date is minutes before parallelizing.
-5. **OD slice**: `raptor od --feed <zip> --date <date>`
+5. **OD slice**: `mta-od-data raptor od --feed <zip> --date <date>`
    reads the OD Parquet's rows for the date's (year, month, day of week)
    with the `parquet` crate,
    and maps each complex to its stops via `data/stations.csv`'s
@@ -330,7 +330,7 @@ Complexity is added only once the simple version works end to end.
    For 2025-09-10 (a Wednesday): 1,510,563 rows, 4,323,207.1421 riders,
    424 origins, matching DuckDB; every stop maps and is served; ~2.4s.
    No row has the same origin and destination.
-6. **Assignment**: `raptor assign --feed <zip> --date <date>`
+6. **Assignment**: `mta-od-data raptor assign --feed <zip> --date <date>`
    splits the date's OD rows across their journeys
    and writes path-level Parquet (`data/raptor/paths-<date>.parquet`):
    per (hour, origin, destination, path),
@@ -368,7 +368,7 @@ Complexity is added only once the simple version works end to end.
    conservation error 1e-6;
    51.8% 1 ride, 40.6% 2, 7.6% 3; mean journey 25.5 min;
    5.2M path rows; ~7s to assign on 12 cores, ~19s in all.
-   `raptor assign-range --from <date> --to <date>` assigns
+   `mta-od-data raptor assign-range --from <date> --to <date>` assigns
    every (month, weekday Monday to Friday) in the range on one date each,
    writing `data/raptor/paths-<date>.parquet` and `data/raptor/manifest.csv`
    (date, feed, how many of the month's dates in the range share its weekday,
@@ -418,7 +418,8 @@ Path rows stay in Rust, which writes their Parquet:
 Python gets back only a date's summary,
 so the boundary carries no per-row data.
 The calls release the GIL, so `rayon` gets every core.
-The `raptor` binary still works alongside it, for now.
+Python drives it: the `mta-od-data raptor` commands,
+and `assign-range`'s loop over dates and its manifest.
 
 Layout: a Cargo crate at `raptor/`,
 with GTFS loading, timetable building, transfers, rRAPTOR,

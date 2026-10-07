@@ -1,4 +1,4 @@
-"""Riders on a stretch of track, from `raptor assign-range`'s path Parquets.
+"""Riders on a stretch of track, from `mta-od-data raptor assign-range`'s path Parquets.
 
 A path counts if any of its rides passes between two consecutive stops
 both on the stretch, whatever its origin and destination:
@@ -70,10 +70,11 @@ def track_ridership(
         ),
     ],
     manifest: Annotated[
-        Path, Option(help="`raptor assign-range`'s manifest")
+        Path, Option(help="`mta-od-data raptor assign-range`'s manifest")
     ] = DEFAULT_MANIFEST,
 ) -> None:
-    """Average weekday riders on a stretch of track, over `raptor assign-range`'s dates.
+    """Average weekday riders on a stretch of track,
+    over `mta-od-data raptor assign-range`'s dates.
 
     Each date stands for its `days` (the month's dates in the range on its weekday),
     so the average weights it by them.
@@ -85,7 +86,8 @@ def track_ridership(
     print("| --- | --- | ---: | ---: |")
     with manifest.open() as f:
         for row in DictReader(f):
-            # Written relative to `raptor/`, so found beside the manifest instead.
+            # Found beside the manifest, wherever it was written from:
+            # older manifests' paths are relative to `raptor/`.
             paths = manifest.parent / Path(row["paths"]).name
             riders = riders_on_stretch(paths, stop)
             days = int(row["days"])
