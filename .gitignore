@@ -5,6 +5,8 @@ __pycache__/
 
 # Rust
 raptor/target/
+# The `raptor` extension module, built by `maturin`.
+src/mta_od_data/_raptor.*.so
 
 # Data
 *.csv
