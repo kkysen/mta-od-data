@@ -18,4 +18,10 @@
   // a journey costing 1/scale more minutes gets 1/e of the riders.
   // A placeholder: no neutral value exists, and this one has no source.
   logit_scale_per_min: 0.2,
+  // Where transfer times come from:
+  // "gtfs", `transfers.txt` at its word,
+  // or "walk_distance", `nycriders`' rules: changing trains at one stop is free,
+  // and a complex's stops without a `transfers.txt` footpath are
+  // 60s plus their straight-line distance at 1.2 m/s apart.
+  transfers: "gtfs",
 }

@@ -30,6 +30,8 @@ type PatternKey<'a> = (&'a str, Option<u8>, Vec<StopIdx>);
 pub struct Stop {
     pub id: String,
     pub name: String,
+    /// `(latitude, longitude)`, if `stops.txt` has them.
+    pub coords: Option<(f64, f64)>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -112,6 +114,7 @@ impl Timetable {
             stops.push(Stop {
                 id: stop.stop_id.clone(),
                 name: stop.stop_name.clone(),
+                coords: stop.stop_lat.zip(stop.stop_lon),
             });
         }
         for stop in &feed.stops {
@@ -283,6 +286,49 @@ impl Timetable {
             report,
         })
     }
+}
+
+/// Fixed time to walk between a complex's stops, on top of the distance:
+/// stairs, doors, overhead (`nycriders`' `BASE_TRANSFER_TIME`).
+pub const BASE_WALK: Secs = 60;
+/// Walking speed in a station, in meters a second (`nycriders`' `WALK_SPEED`).
+pub const WALK_SPEED: f64 = 1.2;
+
+impl Timetable {
+    /// `nycriders`' transfer rules instead of `transfers.txt`'s at its word:
+    /// changing trains at one stop is free,
+    /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
+    /// of `BASE_WALK` plus the straight-line distance at `WALK_SPEED`.
+    pub fn use_walk_distance_transfers<'a>(
+        &mut self,
+        complexes: impl Iterator<Item = &'a [StopIdx]>,
+    ) {
+        self.min_change.fill(0);
+        for stops in complexes {
+            for &a in stops {
+                for &b in stops {
+                    let has_path = self.footpaths[a as usize].iter().any(|&(s, _)| s == b);
+                    if a == b || has_path {
+                        continue;
+                    }
+                    let (Some(from), Some(to)) =
+                        (self.stops[a as usize].coords, self.stops[b as usize].coords)
+                    else {
+                        continue;
+                    };
+                    let walk = BASE_WALK + (distance_m(from, to) / WALK_SPEED) as Secs;
+                    self.footpaths[a as usize].push((b, walk));
+                }
+            }
+        }
+    }
+}
+
+/// Approximate meters between two nearby `(latitude, longitude)` points.
+fn distance_m((lat1, lon1): (f64, f64), (lat2, lon2): (f64, f64)) -> f64 {
+    let dy = (lat2 - lat1) * 111_320.0;
+    let dx = (lon2 - lon1) * 111_320.0 * ((lat1 + lat2) / 2.0).to_radians().cos();
+    dx.hypot(dy)
 }
 
 fn parent_of(stop: &crate::gtfs::Stop) -> Option<&str> {
@@ -477,6 +523,39 @@ mod tests {
     }
 
     #[test]
+    fn walk_distance_transfers() {
+        // A and B 120m apart, C 240m north of A; one complex of all three.
+        let stops = "stop_id,stop_name,stop_lat,stop_lon\n\
+            A,A,40.0,-74.0\nB,B,40.0,-73.99859\nC,C,40.002156,-74.0\n";
+        let files = HashMap::from([
+            ("stops.txt", stops),
+            ("trips.txt", "route_id,trip_id,service_id\n1,t,Weekday\n"),
+            (
+                "stop_times.txt",
+                "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+                 t,A,08:00:00,08:00:00,1\nt,B,08:10:00,08:10:00,2\n",
+            ),
+            ("calendar.txt", CALENDAR),
+            (
+                "transfers.txt",
+                "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n\
+                 A,A,2,180\nA,B,2,300\n",
+            ),
+        ]);
+        let feed = Feed::load(&mut { files }).unwrap();
+        let mut tt = Timetable::build(&feed, wednesday()).unwrap();
+        tt.use_walk_distance_transfers([[0, 1, 2].as_slice()].into_iter());
+
+        assert_eq!(tt.min_change, [0, 0, 0]);
+        let walk = |a: usize, b: StopIdx| tt.footpaths[a].iter().find(|p| p.0 == b).unwrap().1;
+        // `transfers.txt`'s stays; the rest are 60s plus the distance at 1.2 m/s.
+        assert_eq!(walk(0, 1), 300);
+        assert_eq!(walk(1, 0), 60 + 100);
+        assert_eq!(walk(0, 2), 60 + 200);
+        assert_eq!(walk(2, 1), 60 + 223);
+    }
+
+    #[test]
     fn transfers_at_their_word() {
         let tt = build(TRIPS, STOP_TIMES, TRANSFERS, wednesday());
         assert_eq!(tt.min_change, [0, DEFAULT_MIN_CHANGE, DEFAULT_MIN_CHANGE]);
@@ -488,6 +567,15 @@ mod tests {
             tt.report.unclosed_footpaths,
             [("A".into(), "B".into(), "C".into())]
         );
+    }
+
+    #[test]
+    fn cross_platform_free_under_both_rules() {
+        // `A`'s same-stop row is 0 in `transfers.txt`: a cross-platform change.
+        let mut tt = build(TRIPS, STOP_TIMES, TRANSFERS, wednesday());
+        assert_eq!(tt.min_change[0], 0);
+        tt.use_walk_distance_transfers(std::iter::empty());
+        assert_eq!(tt.min_change[0], 0);
     }
 
     #[test]
