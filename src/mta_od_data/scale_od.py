@@ -17,6 +17,7 @@ the turnstile exit counts being incomplete (exits through emergency gates).
 
 import csv
 from collections import defaultdict
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Annotated
 from urllib.request import urlretrieve
@@ -60,19 +61,42 @@ def average_weekday_entries(spreadsheet: Path, year: int) -> dict[str, float]:
     return entries
 
 
+def station_complexes() -> dict[str, list[int]]:
+    """Each spreadsheet station row's complexes."""
+    complexes_of: dict[str, list[int]] = defaultdict(list)
+    with MAPPING.open() as f:
+        for row in csv.DictReader(f):
+            complexes_of[row["station"]].append(int(row["complex_id"]))
+    return complexes_of
+
+
 def complex_growth(
     to: dict[str, float], since: dict[str, float]
 ) -> tuple[dict[int, float], float]:
     """Each complex's growth, `to` over `since` entries of its station row,
     and the systemwide growth, for complexes the spreadsheet doesn't have."""
-    complexes_of: dict[str, list[int]] = defaultdict(list)
-    with MAPPING.open() as f:
-        for row in csv.DictReader(f):
-            complexes_of[row["station"]].append(int(row["complex_id"]))
+    complexes_of = station_complexes()
     if missing := sorted(set(to) - set(complexes_of)):
         raise ValueError(f"{MAPPING}: no complex for {missing}")
     growth = {c: to[s] / since[s] for s in to for c in complexes_of[s]}
     return growth, sum(to.values()) / sum(since.values())
+
+
+def od_entries(rows: Iterable[str]) -> dict[str, float]:
+    """Each station row's average weekday trips from it in the `daily` table:
+    the OD data's own count of its entries, averaged over the slices."""
+    complexes_of = station_complexes()
+    trips_from = dict(
+        connection()
+        .execute(
+            """
+            SELECT o, sum(v) / (SELECT count(DISTINCT (month, dow)) FROM daily)
+            FROM daily GROUP BY o
+            """
+        )
+        .fetchall()
+    )
+    return {s: sum(trips_from.get(c, 0.0) for c in complexes_of[s]) for s in rows}
 
 
 @app.command()
@@ -84,6 +108,17 @@ def scale_od(
     spreadsheet: Annotated[
         Path, Option(help="The MTA station ridership spreadsheet (fetched if missing)")
     ] = DEFAULT_SPREADSHEET,
+    to_counts: Annotated[
+        bool,
+        Option(
+            help=(
+                "Grow each complex to its counted `--year` entries "
+                "from the OD data's own `--od-year` level, "
+                "not by its counted growth since `--od-year`: "
+                "the OD data runs about 1% under the counts, more in Manhattan"
+            )
+        ),
+    ] = False,
 ) -> None:
     """Scale `--od-year`'s weekday OD slices to `--year`'s station entries.
 
@@ -91,9 +126,15 @@ def scale_od(
     applied to each (month, weekday) slice's own trips from and to it,
     so a slice's own closures and seasonality stay.
 
+    With `--to-counts`, each complex grows to its counted `--year` entries
+    from the OD data's own `--od-year` level instead,
+    so `--year` can be `--od-year` itself, to level the OD data with the counts.
+
     \b
     Examples:
         mta-od-data scale-od --year 2019 --out data/mta_od_scaled_to_2019.parquet
+        mta-od-data scale-od --year 2025 --to-counts \
+            --out data/mta_od_2025_counted.parquet
     """
     if not spreadsheet.exists():
         print(f"fetching {SPREADSHEET_URL}")
@@ -111,10 +152,11 @@ def scale_od(
         """,
         {"od": str(od), "od_year": od_year},
     )
-    growth, systemwide = complex_growth(
-        average_weekday_entries(spreadsheet, year),
-        average_weekday_entries(spreadsheet, od_year),
+    to = average_weekday_entries(spreadsheet, year)
+    since = (
+        od_entries(to) if to_counts else average_weekday_entries(spreadsheet, od_year)
     )
+    growth, systemwide = complex_growth(to, since)
     # The subway spreadsheet has no Staten Island Railway,
     # but the OD data has its two fare-controlled stations, St George and Tompkinsville:
     # those grow systemwide.
