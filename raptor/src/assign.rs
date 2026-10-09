@@ -372,7 +372,16 @@ fn assign_row(row: &OdRow, intervals: &[Interval]) -> (Vec<PathRow>, f64) {
     (paths, assigned)
 }
 
+/// Riders' precision in the path Parquet: the OD Parquet's `DECIMAL(9,4)`.
+const RIDERS_PRECISION: u8 = 9;
+const RIDERS_SCALE: i8 = 4;
+
 /// Writes path rows as zstd Parquet, with `metadata` as its key-value metadata.
+///
+/// Riders as the OD Parquet's `DECIMAL(9,4)` and times as whole seconds:
+/// a split rider count or an averaged time uses every bit of an `f64`,
+/// which barely compresses.
+/// No share or total time: riders over the OD row's, and the times' sum.
 pub fn write_paths(
     out: &Path,
     paths: &[PathRow],
@@ -382,7 +391,7 @@ pub fn write_paths(
     use std::sync::Arc;
 
     use arrow_array::{
-        ArrayRef, Float64Array, RecordBatch, StringArray, UInt8Array, UInt16Array, UInt32Array,
+        ArrayRef, Decimal128Array, RecordBatch, StringArray, UInt8Array, UInt16Array, UInt32Array,
     };
     use parquet::arrow::ArrowWriter;
     use parquet::basic::{Compression, ZstdLevel};
@@ -390,9 +399,15 @@ pub fn write_paths(
     use parquet::file::properties::WriterProperties;
 
     let n = paths.len();
-    let f64s = |f: fn(&PathRow) -> f64| -> ArrayRef {
-        Arc::new(Float64Array::from_iter_values(paths.iter().map(f)))
+    let seconds = |f: fn(&PathRow) -> f64| -> ArrayRef {
+        Arc::new(UInt32Array::from_iter_values(
+            paths.iter().map(|p| f(p).round() as u32),
+        ))
     };
+    let unit = 10f64.powi(RIDERS_SCALE.into());
+    let riders =
+        Decimal128Array::from_iter_values(paths.iter().map(|p| (p.riders * unit).round() as i128))
+            .with_precision_and_scale(RIDERS_PRECISION, RIDERS_SCALE)?;
     let batch = RecordBatch::try_from_iter([
         (
             "year",
@@ -432,12 +447,10 @@ pub fn write_paths(
             "rides",
             Arc::new(UInt8Array::from_iter_values(paths.iter().map(|p| p.rides))),
         ),
-        ("share", f64s(|p| p.share)),
-        ("riders", f64s(|p| p.riders)),
-        ("wait_s", f64s(|p| p.wait)),
-        ("in_vehicle_s", f64s(|p| p.in_vehicle)),
-        ("walk_s", f64s(|p| p.walk)),
-        ("total_s", f64s(|p| p.total)),
+        ("riders", Arc::new(riders)),
+        ("wait_s", seconds(|p| p.wait)),
+        ("in_vehicle_s", seconds(|p| p.in_vehicle)),
+        ("walk_s", seconds(|p| p.walk)),
     ])?;
     let props = WriterProperties::builder()
         .set_compression(Compression::ZSTD(ZstdLevel::try_new(3)?))
