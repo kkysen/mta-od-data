@@ -10,6 +10,7 @@
 
 use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
+use std::rc::Rc;
 
 use anyhow::{Context, Result};
 use rayon::prelude::*;
@@ -18,7 +19,7 @@ use serde::Deserialize;
 use crate::gtfs::{DAY, Secs};
 use crate::od::{ComplexId, Complexes, OdRow};
 use crate::raptor::{Journey, Leg, MAX_RIDES, Router};
-use crate::timetable::{NEXT_DATE_HORIZON, Timetable};
+use crate::timetable::{NEXT_DATE_HORIZON, StopIdx, Timetable};
 
 const HOUR: Secs = 60 * 60;
 
@@ -189,7 +190,7 @@ struct Interval {
 }
 
 struct Choice {
-    path: String,
+    path: Rc<str>,
     rides: u8,
     share: f64,
     arrive: Secs,
@@ -201,6 +202,8 @@ struct Choice {
 /// earliest first.
 fn intervals(tt: &Timetable, journeys: &[Journey], config: &Config) -> Vec<Interval> {
     let mut intervals = Vec::new();
+    // A pair's journeys mostly repeat a few paths, departure after departure.
+    let mut paths = Paths::default();
     // The latest journey seen per ride count:
     // the earliest arriving of those departing at or after the current departure,
     // since the profile dropped any arriving no earlier than a later one.
@@ -225,7 +228,7 @@ fn intervals(tt: &Timetable, journeys: &[Journey], config: &Config) -> Vec<Inter
         intervals.push(Interval {
             after,
             until: depart,
-            choices: choices(tt, &candidates, depart, config),
+            choices: choices(tt, &mut paths, &candidates, depart, config),
         });
     }
     intervals.reverse();
@@ -233,13 +236,19 @@ fn intervals(tt: &Timetable, journeys: &[Journey], config: &Config) -> Vec<Inter
 }
 
 /// Each candidate's share, by logit over generalized cost for a rider entering at `t`.
-fn choices(tt: &Timetable, candidates: &[&Journey], t: Secs, config: &Config) -> Vec<Choice> {
+fn choices(
+    tt: &Timetable,
+    paths: &mut Paths,
+    candidates: &[&Journey],
+    t: Secs,
+    config: &Config,
+) -> Vec<Choice> {
     let mut choices: Vec<Choice> = candidates
         .iter()
         .map(|j| {
             let (in_vehicle, walk) = in_vehicle_and_walk(tt, j);
             Choice {
-                path: path(tt, j),
+                path: paths.get(tt, j),
                 rides: j.rides() as u8,
                 share: 0.0,
                 arrive: j.arrive,
@@ -296,6 +305,51 @@ fn in_vehicle_and_walk(tt: &Timetable, j: &Journey) -> (Secs, Secs) {
     (in_vehicle, walk)
 }
 
+/// A leg, as far as its path's text goes.
+#[derive(PartialEq, Eq, Hash)]
+enum LegKey {
+    Ride {
+        pattern: u32,
+        board_pos: u32,
+        alight_pos: u32,
+    },
+    Walk {
+        from: StopIdx,
+        to: StopIdx,
+    },
+}
+
+/// Each path's text, built once:
+/// building it is most of the work of assigning a pair otherwise.
+#[derive(Default)]
+struct Paths(HashMap<Vec<LegKey>, Rc<str>>);
+
+impl Paths {
+    fn get(&mut self, tt: &Timetable, j: &Journey) -> Rc<str> {
+        let key = j
+            .legs
+            .iter()
+            .map(|leg| match *leg {
+                Leg::Ride {
+                    pattern,
+                    board_pos,
+                    alight_pos,
+                    ..
+                } => LegKey::Ride {
+                    pattern,
+                    board_pos,
+                    alight_pos,
+                },
+                Leg::Walk { from, to, .. } => LegKey::Walk { from, to },
+            })
+            .collect();
+        self.0
+            .entry(key)
+            .or_insert_with(|| path(tt, j).into())
+            .clone()
+    }
+}
+
 fn path(tt: &Timetable, j: &Journey) -> String {
     let id = |s: u32| tt.stops[s as usize].id.as_str();
     j.legs
@@ -345,7 +399,7 @@ fn assign_row(row: &OdRow, intervals: &[Interval]) -> (Vec<PathRow>, f64) {
         assigned += weight;
         for o in &interval.choices {
             let share = weight * o.share;
-            let acc = accs.entry(&o.path).or_default();
+            let acc = accs.entry(&*o.path).or_default();
             acc.rides = o.rides;
             acc.share += share;
             acc.wait += share * (f64::from(o.arrive) - mid - f64::from(o.in_vehicle + o.walk));
