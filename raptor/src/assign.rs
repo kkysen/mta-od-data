@@ -680,7 +680,13 @@ pub fn write_paths(
         ])?)
     };
     let props = WriterProperties::builder()
-        .set_compression(Compression::ZSTD(ZstdLevel::try_new(3)?))
+        // Level 1, not 3: a third faster, for ~1% more.
+        .set_compression(Compression::ZSTD(ZstdLevel::try_new(1)?))
+        // Dictionary encoding hashed every value of every column,
+        // ~40% of writing, for ~3% smaller files than zstd alone:
+        // only the paths, long and repeated, are worth it.
+        .set_dictionary_enabled(false)
+        .set_column_dictionary_enabled("path".into(), true)
         // Min and max path text are of no use, and comparing every path's took time.
         .set_column_statistics_enabled("path".into(), EnabledStatistics::None)
         .set_key_value_metadata(Some(
