@@ -213,11 +213,11 @@ pub fn od(complexes: &Complexes, rows: &[OdRow]) -> String {
 
 /// Not `Sum`, which gives -0.0 for nothing.
 pub fn riders<'a>(rows: impl Iterator<Item = &'a OdRow>) -> f64 {
-    rows.fold(0.0, |sum, r| sum + r.riders)
+    rows.fold(0.0, |sum, r| sum + r.riders.to_f64())
 }
 
 pub fn assigned(paths: &[PathRow]) -> f64 {
-    paths.iter().fold(0.0, |sum, p| sum + p.riders)
+    paths.iter().fold(0.0, |sum, p| sum + p.riders.to_f64())
 }
 
 /// How long loading and assigning took, cumulatively from the start.
@@ -251,16 +251,19 @@ pub fn assignment(
         MAX_RIDES,
         unassigned.no_departure
     );
+    // Not exactly 0: each path's riders are rounded to a ten-thousandth, as written,
+    // and the many paths with only a sliver of a row's riders round down,
+    // ~2 riders a date.
     line!(
         out,
-        "  conservation error: {:.6}",
+        "  conservation error: {:.6} (paths' riders rounded to 0.0001)",
         input - assigned - unassigned.total()
     );
     let mut by_rides = [0.0; MAX_RIDES + 1];
     let mut minutes = 0.0;
     for p in paths {
-        by_rides[p.rides as usize] += p.riders;
-        minutes += p.riders * p.total / 60.0;
+        by_rides[p.rides as usize] += p.riders.to_f64();
+        minutes += p.riders.to_f64() * f64::from(p.total()) / 60.0;
     }
     for (k, r) in by_rides.iter().enumerate().skip(1) {
         line!(out, "  {k} rides: {:.1}%", 100.0 * r / assigned);

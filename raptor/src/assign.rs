@@ -18,7 +18,7 @@ use rustc_hash::FxHashMap;
 use serde::Deserialize;
 
 use crate::gtfs::{DAY, Secs};
-use crate::od::{ComplexId, Complexes, OdRow};
+use crate::od::{ComplexId, Complexes, OdRow, Riders};
 use crate::raptor::{Journey, Leg, MAX_RIDES, Router};
 use crate::timetable::{NEXT_DATE_HORIZON, StopIdx, Timetable};
 
@@ -71,14 +71,20 @@ pub struct PathRow {
     /// Its text is in the assignment's `PathTexts`.
     pub path: PathId,
     pub rides: u8,
-    /// Of the row's riders.
-    pub share: f64,
-    pub riders: f64,
-    /// Averages over the row's riders on this path, in seconds.
-    pub wait: f64,
-    pub in_vehicle: f64,
-    pub walk: f64,
-    pub total: f64,
+    /// Rounded as the path Parquet stores it.
+    pub riders: Riders,
+    /// Averages over the row's riders on this path, in whole seconds,
+    /// as the path Parquet stores them.
+    pub wait: u32,
+    pub in_vehicle: u32,
+    pub walk: u32,
+}
+
+impl PathRow {
+    /// Seconds from entering the origin to leaving the train at the destination.
+    pub fn total(&self) -> u32 {
+        self.wait + self.in_vehicle + self.walk
+    }
 }
 
 /// Riders not assigned, by why.
@@ -202,16 +208,16 @@ fn assign_origin(
     let mut paths = Vec::new();
     for row in rows {
         if origin_stops.is_empty() || stops_of(complexes, row.destination).is_empty() {
-            unassigned.no_stops += row.riders;
+            unassigned.no_stops += row.riders.to_f64();
             continue;
         }
         let intervals = &intervals[&row.destination];
         if intervals.is_empty() {
-            unassigned.unreachable += row.riders;
+            unassigned.unreachable += row.riders.to_f64();
             continue;
         }
         let (row_paths, assigned) = assign_row(row, intervals);
-        unassigned.no_departure += row.riders * (1.0 - assigned);
+        unassigned.no_departure += row.riders.to_f64() * (1.0 - assigned);
         paths.extend(row_paths);
     }
     (paths, texts, unassigned)
@@ -467,12 +473,10 @@ fn assign_row(row: &OdRow, intervals: &[Interval]) -> (Vec<PathRow>, f64) {
             destination: row.destination,
             path,
             rides: a.rides,
-            share: a.share,
-            riders: a.share * row.riders,
-            wait: a.wait / a.share,
-            in_vehicle: a.in_vehicle / a.share,
-            walk: a.walk / a.share,
-            total: (a.wait + a.in_vehicle + a.walk) / a.share,
+            riders: Riders::from_f64(a.share * row.riders.to_f64()),
+            wait: (a.wait / a.share).round() as u32,
+            in_vehicle: (a.in_vehicle / a.share).round() as u32,
+            walk: (a.walk / a.share).round() as u32,
         })
         .collect();
     (paths, assigned)
@@ -480,7 +484,6 @@ fn assign_row(row: &OdRow, intervals: &[Interval]) -> (Vec<PathRow>, f64) {
 
 /// Riders' precision in the path Parquet: the OD Parquet's `DECIMAL(9,4)`.
 const RIDERS_PRECISION: u8 = 9;
-const RIDERS_SCALE: i8 = 4;
 
 /// Writes path rows as zstd Parquet, with `metadata` as its key-value metadata.
 ///
@@ -507,15 +510,11 @@ pub fn write_paths(
     use parquet::file::properties::WriterProperties;
 
     let n = paths.len();
-    let seconds = |f: fn(&PathRow) -> f64| -> ArrayRef {
-        Arc::new(UInt32Array::from_iter_values(
-            paths.iter().map(|p| f(p).round() as u32),
-        ))
+    let seconds = |f: fn(&PathRow) -> u32| -> ArrayRef {
+        Arc::new(UInt32Array::from_iter_values(paths.iter().map(f)))
     };
-    let unit = 10f64.powi(RIDERS_SCALE.into());
-    let riders =
-        Decimal128Array::from_iter_values(paths.iter().map(|p| (p.riders * unit).round() as i128))
-            .with_precision_and_scale(RIDERS_PRECISION, RIDERS_SCALE)?;
+    let riders = Decimal128Array::from_iter_values(paths.iter().map(|p| i128::from(p.riders.0)))
+        .with_precision_and_scale(RIDERS_PRECISION, Riders::SCALE)?;
     let batch = RecordBatch::try_from_iter([
         (
             "year",
@@ -536,13 +535,13 @@ pub fn write_paths(
         (
             "origin",
             Arc::new(UInt32Array::from_iter_values(
-                paths.iter().map(|p| p.origin),
+                paths.iter().map(|p| u32::from(p.origin)),
             )),
         ),
         (
             "destination",
             Arc::new(UInt32Array::from_iter_values(
-                paths.iter().map(|p| p.destination),
+                paths.iter().map(|p| u32::from(p.destination)),
             )),
         ),
         (
@@ -617,7 +616,7 @@ mod tests {
     fn complexes(tt: &Timetable) -> Complexes {
         Complexes {
             stops: (0..tt.stops.len() as u32)
-                .map(|s| (s, vec![s]))
+                .map(|s| (s as ComplexId, vec![s]))
                 .chain([(9, vec![])])
                 .collect(),
             unknown_stops: Vec::new(),
@@ -630,7 +629,7 @@ mod tests {
             hour: 8,
             origin,
             destination,
-            riders: 60.0,
+            riders: Riders::from_f64(60.0),
         }
     }
 
@@ -649,13 +648,11 @@ mod tests {
         assert_eq!(paths.len(), 1);
         let p = &paths[0];
         assert_eq!((&texts[p.path], p.rides), ("1 A>C", 1));
-        assert!((p.share - 40.0 / 60.0).abs() < 1e-12);
-        assert!((p.riders - 40.0).abs() < 1e-9);
+        assert_eq!(p.riders, Riders::from_f64(40.0));
         assert!((unassigned.no_departure - 20.0).abs() < 1e-9);
         // Waits average 5 min over the first 10 min, 15 over the next 30.
-        assert!((p.wait - (10.0 * 5.0 + 30.0 * 15.0) / 40.0 * 60.0).abs() < 1e-9);
-        assert_eq!((p.in_vehicle, p.walk), (20.0 * 60.0, 0.0));
-        assert!((p.total - (p.wait + p.in_vehicle + p.walk)).abs() < 1e-9);
+        assert_eq!(p.wait, (10 * 5 + 30 * 15) * 60 / 40);
+        assert_eq!((p.in_vehicle, p.walk), (20 * 60, 0));
     }
 
     #[test]
@@ -673,17 +670,19 @@ mod tests {
 
         let by_path: HashMap<_, _> = paths.iter().map(|p| (&texts[p.path], p)).collect();
         let (slow, fast) = (by_path["1 A>C"], by_path["2 A>B | 5 B>C"]);
-        // Only riders entering by 08:10 have a train: 1/6 of the hour.
-        assert!((slow.share + fast.share - 1.0 / 6.0).abs() < 1e-12);
+        let (slow_riders, fast_riders) = (slow.riders.to_f64(), fast.riders.to_f64());
+        // Only riders entering by 08:10 have a train: 1/6 of the hour,
+        // each path's riders rounded to a ten-thousandth.
+        assert!((slow_riders + fast_riders - 60.0 / 6.0).abs() <= 1e-4);
         assert!((unassigned.no_departure - 50.0).abs() < 1e-9);
         // Neutral weights: costs differ by the 20 min arrival difference.
-        assert!((slow.share / fast.share - (-0.2f64 * 20.0).exp()).abs() < 1e-12);
+        assert!((slow_riders / fast_riders - (-0.2f64 * 20.0).exp()).abs() < 1e-5);
         // The same-stop change is walk, not wait.
-        assert!((fast.walk - 60.0).abs() < 1e-9);
-        assert!((fast.in_vehicle - 19.0 * 60.0).abs() < 1e-9);
+        assert_eq!(fast.walk, 60);
+        assert_eq!(fast.in_vehicle, 19 * 60);
         // Entering at 08:05 on average, arriving 08:30.
-        assert!((fast.total - 25.0 * 60.0).abs() < 1e-9);
-        assert!((fast.wait - 5.0 * 60.0).abs() < 1e-9);
+        assert_eq!(fast.total(), 25 * 60);
+        assert_eq!(fast.wait, 5 * 60);
     }
 
     #[test]
@@ -695,17 +694,21 @@ mod tests {
             fast,B,08:21:00,08:21:00,1\nfast,C,08:30:00,08:30:00,2\n";
         let transfers = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nB,B,2,60\n";
         let tt = timetable(trips, stop_times, transfers);
-        let share = |config: &Config, path: &str| {
+        let riders = |config: &Config, path: &str| {
             let (paths, texts, _) = assign(&tt, &complexes(&tt), &[row(0, 2)], config);
-            paths.iter().find(|p| &texts[p.path] == path).unwrap().share
+            paths
+                .iter()
+                .find(|p| &texts[p.path] == path)
+                .unwrap()
+                .riders
         };
         // 1 min faster with a transfer: favored when transfers are free.
-        assert!(share(&NEUTRAL, "2 A>B | 5 B>C") > share(&NEUTRAL, "1 A>C"));
+        assert!(riders(&NEUTRAL, "2 A>B | 5 B>C") > riders(&NEUTRAL, "1 A>C"));
         let penalized = Config {
             transfer_penalty_min: 5.0,
             ..NEUTRAL
         };
-        assert!(share(&penalized, "2 A>B | 5 B>C") < share(&penalized, "1 A>C"));
+        assert!(riders(&penalized, "2 A>B | 5 B>C") < riders(&penalized, "1 A>C"));
     }
 
     #[test]
@@ -734,7 +737,7 @@ mod tests {
         assert_eq!(unassigned.unreachable, 60.0);
         assert!((unassigned.no_departure - 50.0).abs() < 1e-9);
         // Every rider is assigned or counted as unassigned.
-        let assigned: f64 = paths.iter().map(|p| p.riders).sum();
-        assert!((assigned + unassigned.total() - 240.0).abs() < 1e-9);
+        let assigned: f64 = paths.iter().map(|p| p.riders.to_f64()).sum();
+        assert!((assigned + unassigned.total() - 240.0).abs() <= 1e-4 * paths.len() as f64);
     }
 }

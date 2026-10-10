@@ -17,7 +17,28 @@ use serde::Deserialize;
 
 use crate::timetable::{StopIdx, Timetable};
 
-pub type ComplexId = u32;
+/// Station complex IDs run to ~640.
+pub type ComplexId = u16;
+
+/// Riders in ten-thousandths: the OD Parquet's `DECIMAL(9,4)`, exactly,
+/// in half an `f64`'s space (an `f32` can't hold 4 decimal places past 1,024).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Riders(pub u32);
+
+impl Riders {
+    /// Decimal places.
+    pub const SCALE: i8 = 4;
+    const UNIT: f64 = 1e4;
+
+    /// Rounded to the nearest ten-thousandth.
+    pub fn from_f64(riders: f64) -> Self {
+        Self((riders * Self::UNIT).round() as u32)
+    }
+
+    pub fn to_f64(self) -> f64 {
+        f64::from(self.0) / Self::UNIT
+    }
+}
 
 /// One OD row: average riders on a (month, day of week) from one complex to another,
 /// entering in one hour.
@@ -26,7 +47,7 @@ pub struct OdRow {
     pub hour: u8,
     pub origin: ComplexId,
     pub destination: ComplexId,
-    pub riders: f64,
+    pub riders: Riders,
 }
 
 const YEAR: &str = "Year";
@@ -117,8 +138,10 @@ fn read_batch(
     let DataType::Decimal128(_, scale) = *ridership.data_type() else {
         bail!("{RIDERSHIP:?} is {}, not a decimal", ridership.data_type());
     };
+    if scale != Riders::SCALE {
+        bail!("{RIDERSHIP:?} has scale {scale}, not {}", Riders::SCALE);
+    }
     let ridership = ridership.as_primitive::<Decimal128Type>();
-    let unit = 10f64.powi(i32::from(scale));
 
     for i in 0..batch.num_rows() {
         if years.value(i) != year || months.value(i) != month || days.value(i) != day {
@@ -139,7 +162,7 @@ fn read_batch(
             hour: u8::try_from(hours.value(i))?,
             origin: ComplexId::try_from(origins.value(i))?,
             destination: ComplexId::try_from(destinations.value(i))?,
-            riders: ridership.value(i) as f64 / unit,
+            riders: Riders(u32::try_from(ridership.value(i))?),
         });
     }
     Ok(())
@@ -240,7 +263,7 @@ mod tests {
                 hour: 8,
                 origin: 1,
                 destination: 2,
-                riders: 1.2345,
+                riders: Riders(12345),
             }]
         );
     }
