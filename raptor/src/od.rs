@@ -3,6 +3,7 @@
 
 use std::collections::{BTreeMap, HashSet};
 use std::fs::File;
+use std::ops::Range;
 use std::path::Path;
 
 use anyhow::{Context, Result, bail};
@@ -10,12 +11,13 @@ use arrow_array::cast::AsArray;
 use arrow_array::types::{Decimal128Type, Int64Type};
 use arrow_array::{Array, RecordBatch};
 use arrow_schema::DataType;
+use jiff::ToSpan;
 use jiff::civil::{Date, Weekday};
 use parquet::arrow::ProjectionMask;
 use parquet::arrow::arrow_reader::ParquetRecordBatchReaderBuilder;
 use serde::Deserialize;
 
-use crate::timetable::{StopIdx, Timetable};
+use crate::timetable::{SERVICE_DAY_START, StopIdx, Timetable};
 
 /// Station complex IDs run to ~640.
 pub type ComplexId = u16;
@@ -72,14 +74,16 @@ pub fn day_of_week(date: Date) -> &'static str {
 }
 
 /// Rows of the OD Parquet (`mta-od-data prepare`'s output)
-/// for `date`'s year, month, and day of week.
-pub fn load_slice(path: &Path, date: Date) -> Result<Vec<OdRow>> {
-    let mut slices = load_slices(path, &[date])?;
-    Ok(slices.pop().unwrap_or_default())
+/// for `date`'s service day (see `SERVICE_DAY_START`):
+/// its (year, month, day of week)'s hours from the start,
+/// and the next date's before it, as hours from 24.
+pub fn load_service_day(path: &Path, date: Date) -> Result<Vec<OdRow>> {
+    let mut days = load_service_days(path, &[date])?;
+    Ok(days.pop().unwrap_or_default())
 }
 
-/// `load_slice` for each of `dates`, in one read of the file.
-pub fn load_slices(path: &Path, dates: &[Date]) -> Result<Vec<Vec<OdRow>>> {
+/// `load_service_day` for each of `dates`, in one read of the file.
+pub fn load_service_days(path: &Path, dates: &[Date]) -> Result<Vec<Vec<OdRow>>> {
     let file = File::open(path).with_context(|| format!("opening {}", path.display()))?;
     let builder = ParquetRecordBatchReaderBuilder::try_new(file)?;
     let schema = builder.parquet_schema();
@@ -105,14 +109,12 @@ pub fn load_slices(path: &Path, dates: &[Date]) -> Result<Vec<Vec<OdRow>>> {
     let mask = ProjectionMask::leaves(schema, indices);
     let reader = builder.with_projection(mask).build()?;
 
-    let slices: Vec<Slice> = dates
-        .iter()
-        .map(|&date| Slice {
-            year: i64::from(date.year()),
-            month: i64::from(date.month()),
-            day: day_of_week(date),
-        })
-        .collect();
+    let start = i64::from(SERVICE_DAY_START / (60 * 60));
+    let mut slices = Vec::new();
+    for (k, &date) in dates.iter().enumerate() {
+        slices.push(Slice::new(date, start..24, 0, k));
+        slices.push(Slice::new(date.checked_add(1.day())?, 0..start, 24, k));
+    }
     let mut rows = vec![Vec::new(); dates.len()];
     for batch in reader {
         read_batch(&batch?, &slices, &mut rows)?;
@@ -120,14 +122,33 @@ pub fn load_slices(path: &Path, dates: &[Date]) -> Result<Vec<Vec<OdRow>>> {
     Ok(rows)
 }
 
-/// One (year, month, day of week) of the OD data.
+/// Some hours of one (year, month, day of week) of the OD data,
+/// and the service day they go to.
 struct Slice {
     year: i64,
     month: i64,
     day: &'static str,
+    hours: Range<i64>,
+    /// Added to their hours, onto the service day's clock.
+    shift: u8,
+    /// Which service day.
+    to: usize,
 }
 
-/// Appends `batch`'s rows in each of `slices` to that slice's `rows`.
+impl Slice {
+    fn new(date: Date, hours: Range<i64>, shift: u8, to: usize) -> Self {
+        Self {
+            year: i64::from(date.year()),
+            month: i64::from(date.month()),
+            day: day_of_week(date),
+            hours,
+            shift,
+            to,
+        }
+    }
+}
+
+/// Appends `batch`'s rows in each of `slices` to its service day's `rows`.
 fn read_batch(batch: &RecordBatch, slices: &[Slice], rows: &mut [Vec<OdRow>]) -> Result<()> {
     let column = |name: &str| {
         batch
@@ -155,13 +176,16 @@ fn read_batch(batch: &RecordBatch, slices: &[Slice], rows: &mut [Vec<OdRow>]) ->
     let ridership = ridership.as_primitive::<Decimal128Type>();
 
     for i in 0..batch.num_rows() {
-        let (year, month) = (years.value(i), months.value(i));
-        // Two dates of one (year, month, day of week) both get its rows.
+        let (year, month, hour) = (years.value(i), months.value(i), hours.value(i));
+        // Two service days may share a (year, month, day of week): both get its rows.
         let mut matching = slices
             .iter()
-            .enumerate()
-            .filter(|(_, s)| s.year == year && s.month == month && s.day == days.value(i))
-            .map(|(k, _)| k)
+            .filter(|s| {
+                s.year == year
+                    && s.month == month
+                    && s.hours.contains(&hour)
+                    && s.day == days.value(i)
+            })
             .peekable();
         if matching.peek().is_none() {
             continue;
@@ -178,13 +202,16 @@ fn read_batch(batch: &RecordBatch, slices: &[Slice], rows: &mut [Vec<OdRow>]) ->
             bail!("OD row with a null");
         }
         let row = OdRow {
-            hour: u8::try_from(hours.value(i))?,
+            hour: u8::try_from(hour)?,
             origin: ComplexId::try_from(origins.value(i))?,
             destination: ComplexId::try_from(destinations.value(i))?,
             riders: Riders(u32::try_from(ridership.value(i))?),
         };
-        for k in matching {
-            rows[k].push(row.clone());
+        for s in matching {
+            rows[s.to].push(OdRow {
+                hour: row.hour + s.shift,
+                ..row.clone()
+            });
         }
     }
     Ok(())
@@ -243,11 +270,11 @@ mod tests {
     use parquet::arrow::ArrowWriter;
 
     #[test]
-    fn slice_of_parquet() {
+    fn service_day_of_parquet() {
         let ints = |v: &[i64]| Arc::new(Int64Array::from(v.to_vec())) as Arc<dyn Array>;
         let batch = RecordBatch::try_from_iter([
-            (YEAR, ints(&[2025, 2025, 2025, 2024])),
-            (MONTH, ints(&[9, 9, 10, 9])),
+            (YEAR, ints(&[2025, 2025, 2025, 2024, 2025, 2025, 2025])),
+            (MONTH, ints(&[9, 9, 10, 9, 9, 9, 9])),
             (
                 DAY_OF_WEEK,
                 Arc::new(StringArray::from(vec![
@@ -255,15 +282,18 @@ mod tests {
                     "Tuesday",
                     "Wednesday",
                     "Wednesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Thursday",
                 ])) as _,
             ),
-            (HOUR, ints(&[8, 8, 8, 8])),
-            (ORIGIN, ints(&[1, 1, 1, 1])),
-            (DESTINATION, ints(&[2, 2, 2, 2])),
+            (HOUR, ints(&[8, 8, 8, 8, 2, 3, 4])),
+            (ORIGIN, ints(&[1, 1, 1, 1, 1, 1, 1])),
+            (DESTINATION, ints(&[2, 2, 2, 2, 2, 2, 2])),
             (
                 RIDERSHIP,
                 Arc::new(
-                    Decimal128Array::from(vec![12_345, 1, 1, 1])
+                    Decimal128Array::from(vec![12_345, 1, 1, 1, 1, 7, 1])
                         .with_precision_and_scale(9, 4)
                         .unwrap(),
                 ) as _,
@@ -277,17 +307,16 @@ mod tests {
         writer.write(&batch).unwrap();
         writer.close().unwrap();
 
-        let rows = load_slice(&path, Date::new(2025, 9, 3).unwrap());
+        let rows = load_service_day(&path, Date::new(2025, 9, 3).unwrap());
         std::fs::remove_file(&path).unwrap();
-        assert_eq!(
-            rows.unwrap(),
-            [OdRow {
-                hour: 8,
-                origin: 1,
-                destination: 2,
-                riders: Riders(12345),
-            }]
-        );
+        let row = |hour, riders| OdRow {
+            hour,
+            origin: 1,
+            destination: 2,
+            riders: Riders(riders),
+        };
+        // Wednesday's 02:00 is Tuesday's service day's, and Thursday's 03:00 Wednesday's.
+        assert_eq!(rows.unwrap(), [row(8, 12_345), row(27, 7)]);
     }
 
     #[test]

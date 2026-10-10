@@ -23,7 +23,7 @@ use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use crate::assign::{Config, Transfers, Unassigned, route, split, write_paths};
 use crate::batch::{Version, load_versions, pick_dates};
 use crate::gtfs::{Feed, Secs, parse_time};
-use crate::od::{Complexes, load_slice, load_slices};
+use crate::od::{Complexes, load_service_day, load_service_days};
 use crate::raptor::Router;
 use crate::report::Timings;
 use crate::timetable::Timetable;
@@ -88,7 +88,7 @@ struct Group {
 
 /// Assigns each job's date as `assign_date` does,
 /// but routes each distinct timetable once, for every date with it:
-/// a feed version's Tuesdays to Thursdays mostly share one.
+/// a feed version's Mondays to Thursdays mostly share one.
 /// Summaries are in `jobs`' order.
 pub fn assign_dates(
     jobs: &[Job],
@@ -141,7 +141,7 @@ pub fn assign_dates(
             let dates = dates(group);
             scope.spawn(move || -> Result<_> {
                 let start = Instant::now();
-                let slices = load_slices(od, &dates)?;
+                let slices = load_service_days(od, &dates)?;
                 Ok((slices, start.elapsed()))
             })
         };
@@ -402,7 +402,7 @@ fn od_report(
     py.detach(|| {
         let tt = Timetable::build(&Feed::open(&feed)?, date)?;
         let complexes = Complexes::load(&stations, &tt)?;
-        let rows = load_slice(&od, date)?;
+        let rows = load_service_day(&od, date)?;
         Ok(report::od(&complexes, &rows))
     })
 }

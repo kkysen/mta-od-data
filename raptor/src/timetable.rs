@@ -16,10 +16,14 @@ use crate::gtfs::{DAY, Feed, Secs};
 /// 180s is what the feed gives almost every stop it does list.
 pub const DEFAULT_MIN_CHANGE: Secs = 180;
 
-/// The next date's trips starting before this are included, shifted forward a day,
-/// for journeys late in the date: the MTA files a trip starting after midnight
-/// under the next date's service, so the date's own trips stop at midnight.
-pub const NEXT_DATE_HORIZON: Secs = 3 * 60 * 60;
+/// A date's service day runs from 04:00 to 04:00 the next morning,
+/// around when the subway is quietest, so a night counts with the evening before it.
+/// Its OD rows are the date's hours 4 to 23 and the next date's 0 to 3, as hours 24 to 27.
+pub const SERVICE_DAY_START: Secs = 4 * 60 * 60;
+pub const SERVICE_DAY_END: Secs = DAY + SERVICE_DAY_START;
+/// Trips starting before this are included and their departures routed,
+/// for riders entering just before the service day ends.
+pub const DEPARTURES_UNTIL: Secs = SERVICE_DAY_END + 3 * 60 * 60;
 
 pub type StopIdx = u32;
 
@@ -70,11 +74,13 @@ pub struct Timetable {
 #[derive(Debug, Default)]
 pub struct Report {
     pub services: Vec<String>,
+    /// The date's trips running in its service day.
     pub trips: usize,
+    /// The previous date's trips still running at `SERVICE_DAY_START`.
     pub overnight_trips: usize,
     /// The previous date is outside the feed, so its overnight trips are missing.
     pub previous_date_missing: bool,
-    /// The next date's trips starting before `NEXT_DATE_HORIZON`.
+    /// The next date's trips starting before `DEPARTURES_UNTIL`.
     pub next_date_trips: usize,
     /// The next date is outside the feed, so its early trips are missing.
     pub next_date_missing: bool,
@@ -204,28 +210,25 @@ impl Timetable {
             check_times(&trip.trip_id, &times)?;
 
             let key = (trip.route_id.as_str(), trip.direction_id, pattern_stops);
-            if runs_today {
-                report.trips += 1;
+            // A trip filed under the previous date, the date, or the next,
+            // shifted onto the date's clock, if it runs in the service day:
+            // the MTA files a trip starting after midnight under the next date's service,
+            // and one running past midnight as `24:xx` under its own.
+            for (day, runs, count) in [
+                (-1, runs_yesterday, &mut report.overnight_trips),
+                (0, runs_today, &mut report.trips),
+                (1, runs_tomorrow, &mut report.next_date_trips),
+            ] {
+                let shift = Secs::from(day) * DAY;
+                let (first, last) = (times[0].1 + shift, times[times.len() - 1].0 + shift);
+                if !runs || last < SERVICE_DAY_START || first >= DEPARTURES_UNTIL {
+                    continue;
+                }
+                *count += 1;
                 groups.entry(key.clone()).or_default().push(TripTimes {
                     trip_id: trip.trip_id.clone(),
-                    day: 0,
-                    times: times.clone(),
-                });
-            }
-            if runs_yesterday && times.last().is_some_and(|&(arr, _)| arr >= DAY) {
-                report.overnight_trips += 1;
-                groups.entry(key.clone()).or_default().push(TripTimes {
-                    trip_id: trip.trip_id.clone(),
-                    day: -1,
-                    times: times.iter().map(|&(a, d)| (a - DAY, d - DAY)).collect(),
-                });
-            }
-            if runs_tomorrow && times[0].1 < NEXT_DATE_HORIZON {
-                report.next_date_trips += 1;
-                groups.entry(key).or_default().push(TripTimes {
-                    trip_id: trip.trip_id.clone(),
-                    day: 1,
-                    times: times.iter().map(|&(a, d)| (a + DAY, d + DAY)).collect(),
+                    day,
+                    times: times.iter().map(|&(a, d)| (a + shift, d + shift)).collect(),
                 });
             }
         }
@@ -462,12 +465,9 @@ mod tests {
             .iter()
             .map(|p| p.trips.iter().map(|t| t.trip_id.as_str()).collect())
             .collect();
-        assert_eq!(
-            trip_ids,
-            [vec!["owl", "early", "late", "owl"], vec!["overtaker"]]
-        );
+        assert_eq!(trip_ids, [vec!["early", "late", "owl"], vec!["overtaker"]]);
         // `late`'s rows were out of order in the file.
-        let late = &tt.patterns[0].trips[2];
+        let late = &tt.patterns[0].trips[1];
         assert_eq!(
             late.times,
             [
@@ -479,17 +479,29 @@ mod tests {
 
     #[test]
     fn overnight_trips_from_previous_date() {
-        let tt = build(TRIPS, STOP_TIMES, TRANSFERS, wednesday());
-        // Tuesday's `owl` runs early Wednesday, shifted back a day;
-        // Wednesday's own `owl` stays at 24:30.
-        let owls: Vec<_> = tt.patterns[0]
+        let trips = "route_id,trip_id,service_id,direction_id\n\
+            1,owl,Weekday,0\n1,dawn,Weekday,0\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            owl,AN,24:30:00,24:30:00,1\nowl,BN,24:40:00,24:40:00,2\n\
+            dawn,AN,27:50:00,27:50:00,1\ndawn,BN,28:10:00,28:10:00,2\n";
+        let tt = build(trips, stop_times, TRANSFERS, wednesday());
+        // Tuesday's `owl` ends before Wednesday's service day starts at 04:00,
+        // but its `dawn` runs into it, shifted back a day;
+        // Wednesday's own run past midnight.
+        let got: Vec<_> = tt.patterns[0]
             .trips
             .iter()
-            .filter(|t| t.trip_id == "owl")
-            .map(|t| (t.day, t.times[0].0))
+            .map(|t| (t.trip_id.as_str(), t.day, t.times[0].0))
             .collect();
-        assert_eq!(owls, [(-1, 30 * 60), (0, DAY + 30 * 60)]);
-        assert_eq!(tt.report.trips, 4);
+        assert_eq!(
+            got,
+            [
+                ("dawn", -1, 3 * 3600 + 50 * 60),
+                ("owl", 0, DAY + 30 * 60),
+                ("dawn", 0, DAY + 3 * 3600 + 50 * 60),
+            ]
+        );
+        assert_eq!(tt.report.trips, 2);
         assert_eq!(tt.report.overnight_trips, 1);
         assert!(!tt.report.previous_date_missing);
     }
@@ -502,21 +514,16 @@ mod tests {
             dawn,AN,00:10:00,00:10:00,1\ndawn,BN,00:20:00,00:20:00,2\n\
             early,AN,08:00:00,08:00:00,1\nearly,BN,08:10:00,08:10:00,2\n";
         let tt = build(trips, stop_times, TRANSFERS, wednesday());
-        // Thursday's `dawn` runs late Wednesday, shifted forward a day;
-        // Thursday's `early` starts after the horizon.
+        // Wednesday's `dawn` is in Tuesday's service day;
+        // Thursday's runs late in Wednesday's, shifted forward a day,
+        // but Thursday's `early` starts after `DEPARTURES_UNTIL`.
         let got: Vec<_> = tt.patterns[0]
             .trips
             .iter()
             .map(|t| (t.trip_id.as_str(), t.day, t.times[0].0))
             .collect();
-        assert_eq!(
-            got,
-            [
-                ("dawn", 0, 10 * 60),
-                ("early", 0, 8 * 3600),
-                ("dawn", 1, DAY + 10 * 60)
-            ]
-        );
+        assert_eq!(got, [("early", 0, 8 * 3600), ("dawn", 1, DAY + 10 * 60)]);
+        assert_eq!(tt.report.trips, 1);
         assert_eq!(tt.report.next_date_trips, 1);
         assert!(!tt.report.next_date_missing);
         assert!(tt.report.duplicate_trips.is_empty());

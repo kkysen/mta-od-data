@@ -18,10 +18,10 @@ use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rustc_hash::FxHashMap;
 use serde::Deserialize;
 
-use crate::gtfs::{DAY, Secs};
+use crate::gtfs::Secs;
 use crate::od::{ComplexId, Complexes, OdRow, Riders};
 use crate::raptor::{Journey, Leg, Legs, MAX_RIDES, Router};
-use crate::timetable::{NEXT_DATE_HORIZON, StopIdx, Timetable};
+use crate::timetable::{DEPARTURES_UNTIL, SERVICE_DAY_START, StopIdx, Timetable};
 
 const HOUR: Secs = 60 * 60;
 
@@ -233,7 +233,7 @@ fn route_origin(
         (Legs::default(), vec![Vec::new(); targets.len()])
     } else {
         // Through the next date's early trips, for riders entering late.
-        router.profile(origin_stops, 0, DAY + NEXT_DATE_HORIZON, &targets)
+        router.profile(origin_stops, SERVICE_DAY_START, DEPARTURES_UNTIL, &targets)
     };
     // An origin's journeys mostly repeat a few paths, departure after departure.
     let mut paths = Paths::default();

@@ -106,7 +106,8 @@ def od(
     od: Od = DEFAULT_PARQUET,
     stations: Stations = DEFAULT_STATIONS,
 ) -> None:
-    """Load the OD rows for a date's (year, month, day of week),
+    """Load the OD rows for a date's service day, 04:00 to 04:00:
+    its (year, month, day of week)'s hours 4 to 23 and the next date's 0 to 3,
     and map their station complexes to the date's timetable."""
     print(od_report(feed, date, od, stations), end="")
 
