@@ -20,7 +20,7 @@ use serde::Deserialize;
 
 use crate::gtfs::{DAY, Secs};
 use crate::od::{ComplexId, Complexes, OdRow, Riders};
-use crate::raptor::{Journey, Leg, MAX_RIDES, Router};
+use crate::raptor::{Journey, Leg, Legs, MAX_RIDES, Router};
 use crate::timetable::{NEXT_DATE_HORIZON, StopIdx, Timetable};
 
 const HOUR: Secs = 60 * 60;
@@ -191,20 +191,22 @@ fn assign_origin(
         .iter()
         .map(|&d| stops_of(complexes, d))
         .collect();
-    let profiles = if origin_stops.is_empty() {
-        vec![Vec::new(); targets.len()]
+    let (legs, profiles) = if origin_stops.is_empty() {
+        (Legs::default(), vec![Vec::new(); targets.len()])
     } else {
         // Through the next date's early trips, for riders entering late.
         router.profile(origin_stops, 0, DAY + NEXT_DATE_HORIZON, &targets)
     };
     // An origin's journeys mostly repeat a few paths, departure after departure.
     let mut paths = Paths::default();
-    // Each destination's journeys are dropped once its intervals are built.
+    // Each destination's journeys are dropped once its intervals are built,
+    // and the origin's legs once every destination's are.
     let intervals: FxHashMap<ComplexId, Vec<Interval>> = destinations
         .iter()
         .zip(profiles)
-        .map(|(&d, journeys)| (d, intervals(tt, &mut paths, &journeys, config)))
+        .map(|(&d, journeys)| (d, intervals(tt, &mut paths, &legs, &journeys, config)))
         .collect();
+    drop(legs);
     // Drops the interner's maps now, not at the end of the function.
     let Paths { texts, .. } = paths;
 
@@ -247,6 +249,7 @@ struct Choice {
 fn intervals(
     tt: &Timetable,
     paths: &mut Paths,
+    legs: &Legs,
     journeys: &[Journey],
     config: &Config,
 ) -> Vec<Interval> {
@@ -275,7 +278,7 @@ fn intervals(
         intervals.push(Interval {
             after,
             until: depart,
-            choices: choices(tt, paths, &candidates, depart, config),
+            choices: choices(tt, paths, legs, &candidates, depart, config),
         });
     }
     intervals.reverse();
@@ -286,6 +289,7 @@ fn intervals(
 fn choices(
     tt: &Timetable,
     paths: &mut Paths,
+    legs: &Legs,
     candidates: &[&Journey],
     t: Secs,
     config: &Config,
@@ -293,9 +297,9 @@ fn choices(
     let mut choices: Vec<Choice> = candidates
         .iter()
         .map(|j| {
-            let (in_vehicle, walk) = in_vehicle_and_walk(tt, j);
+            let (in_vehicle, walk) = in_vehicle_and_walk(tt, legs.of(j));
             Choice {
-                path: paths.get(tt, j),
+                path: paths.get(tt, legs.of(j)),
                 rides: j.rides() as u8,
                 share: 0.0,
                 arrive: j.arrive,
@@ -325,10 +329,10 @@ fn choices(
 
 /// Time on trains, and walking: footpaths,
 /// plus each same-stop change's minimum change time.
-fn in_vehicle_and_walk(tt: &Timetable, j: &Journey) -> (Secs, Secs) {
+fn in_vehicle_and_walk(tt: &Timetable, legs: &[Leg]) -> (Secs, Secs) {
     let (mut in_vehicle, mut walk) = (0, 0);
     let mut alighted_at = None;
-    for leg in &j.legs {
+    for leg in legs {
         match *leg {
             Leg::Ride(r) => {
                 let board_stop = r.board_stop(tt);
@@ -375,7 +379,7 @@ struct Paths {
 }
 
 impl Paths {
-    fn get(&mut self, tt: &Timetable, j: &Journey) -> PathId {
+    fn get(&mut self, tt: &Timetable, legs: &[Leg]) -> PathId {
         let Self {
             by_legs,
             key,
@@ -383,7 +387,7 @@ impl Paths {
             texts,
         } = self;
         key.clear();
-        key.extend(j.legs.iter().map(|leg| match *leg {
+        key.extend(legs.iter().map(|leg| match *leg {
             Leg::Ride(r) => LegKey::Ride {
                 pattern: r.pattern,
                 board_pos: r.board_pos,
@@ -394,7 +398,7 @@ impl Paths {
         if let Some(&id) = by_legs.get(key.as_slice()) {
             return id;
         }
-        let text: Box<str> = path(tt, j).into();
+        let text: Box<str> = path(tt, legs).into();
         let id = *by_text.entry(text.clone()).or_insert_with(|| {
             let id = PathId(u32::try_from(texts.0.len()).expect("under 2^32 paths"));
             texts.0.push(text);
@@ -405,10 +409,9 @@ impl Paths {
     }
 }
 
-fn path(tt: &Timetable, j: &Journey) -> String {
+fn path(tt: &Timetable, legs: &[Leg]) -> String {
     let id = |s: u32| tt.stops[s as usize].id.as_str();
-    j.legs
-        .iter()
+    legs.iter()
         .map(|leg| match *leg {
             Leg::Ride(r) => {
                 let pattern = &tt.patterns[r.pattern as usize];

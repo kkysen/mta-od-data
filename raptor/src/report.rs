@@ -7,7 +7,7 @@ use std::time::Duration;
 use crate::assign::{PathRow, Unassigned};
 use crate::gtfs::{Feed, Secs};
 use crate::od::{ComplexId, Complexes, OdRow};
-use crate::raptor::{Journey, Leg, MAX_RIDES};
+use crate::raptor::{Journey, Leg, Legs, MAX_RIDES};
 use crate::timetable::{DEFAULT_MIN_CHANGE, NEXT_DATE_HORIZON, Timetable};
 
 /// At most this many examples of each problem.
@@ -120,7 +120,7 @@ pub fn timetable(tt: &Timetable) -> String {
     out
 }
 
-pub fn journeys(tt: &Timetable, journeys: &[Journey]) -> String {
+pub fn journeys(tt: &Timetable, legs: &Legs, journeys: &[Journey]) -> String {
     let mut out = String::new();
     if journeys.is_empty() {
         line!(out, "no journey");
@@ -138,7 +138,7 @@ pub fn journeys(tt: &Timetable, journeys: &[Journey]) -> String {
             hms(j.arrive),
             (j.arrive - j.depart) / 60
         );
-        for leg in &j.legs {
+        for leg in legs.of(j) {
             match *leg {
                 Leg::Ride(r) => line!(
                     out,
