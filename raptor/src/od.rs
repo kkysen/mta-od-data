@@ -74,6 +74,12 @@ pub fn day_of_week(date: Date) -> &'static str {
 /// Rows of the OD Parquet (`mta-od-data prepare`'s output)
 /// for `date`'s year, month, and day of week.
 pub fn load_slice(path: &Path, date: Date) -> Result<Vec<OdRow>> {
+    let mut slices = load_slices(path, &[date])?;
+    Ok(slices.pop().unwrap_or_default())
+}
+
+/// `load_slice` for each of `dates`, in one read of the file.
+pub fn load_slices(path: &Path, dates: &[Date]) -> Result<Vec<Vec<OdRow>>> {
     let file = File::open(path).with_context(|| format!("opening {}", path.display()))?;
     let builder = ParquetRecordBatchReaderBuilder::try_new(file)?;
     let schema = builder.parquet_schema();
@@ -99,25 +105,30 @@ pub fn load_slice(path: &Path, date: Date) -> Result<Vec<OdRow>> {
     let mask = ProjectionMask::leaves(schema, indices);
     let reader = builder.with_projection(mask).build()?;
 
-    let (year, month, day) = (
-        i64::from(date.year()),
-        i64::from(date.month()),
-        day_of_week(date),
-    );
-    let mut rows = Vec::new();
+    let slices: Vec<Slice> = dates
+        .iter()
+        .map(|&date| Slice {
+            year: i64::from(date.year()),
+            month: i64::from(date.month()),
+            day: day_of_week(date),
+        })
+        .collect();
+    let mut rows = vec![Vec::new(); dates.len()];
     for batch in reader {
-        read_batch(&batch?, year, month, day, &mut rows)?;
+        read_batch(&batch?, &slices, &mut rows)?;
     }
     Ok(rows)
 }
 
-fn read_batch(
-    batch: &RecordBatch,
+/// One (year, month, day of week) of the OD data.
+struct Slice {
     year: i64,
     month: i64,
-    day: &str,
-    rows: &mut Vec<OdRow>,
-) -> Result<()> {
+    day: &'static str,
+}
+
+/// Appends `batch`'s rows in each of `slices` to that slice's `rows`.
+fn read_batch(batch: &RecordBatch, slices: &[Slice], rows: &mut [Vec<OdRow>]) -> Result<()> {
     let column = |name: &str| {
         batch
             .column_by_name(name)
@@ -144,7 +155,15 @@ fn read_batch(
     let ridership = ridership.as_primitive::<Decimal128Type>();
 
     for i in 0..batch.num_rows() {
-        if years.value(i) != year || months.value(i) != month || days.value(i) != day {
+        let (year, month) = (years.value(i), months.value(i));
+        // Two dates of one (year, month, day of week) both get its rows.
+        let mut matching = slices
+            .iter()
+            .enumerate()
+            .filter(|(_, s)| s.year == year && s.month == month && s.day == days.value(i))
+            .map(|(k, _)| k)
+            .peekable();
+        if matching.peek().is_none() {
             continue;
         }
         if [
@@ -158,12 +177,15 @@ fn read_batch(
         {
             bail!("OD row with a null");
         }
-        rows.push(OdRow {
+        let row = OdRow {
             hour: u8::try_from(hours.value(i))?,
             origin: ComplexId::try_from(origins.value(i))?,
             destination: ComplexId::try_from(destinations.value(i))?,
             riders: Riders(u32::try_from(ridership.value(i))?),
-        });
+        };
+        for k in matching {
+            rows[k].push(row.clone());
+        }
     }
     Ok(())
 }

@@ -213,10 +213,14 @@ pub fn assigned(paths: &[PathRow]) -> f64 {
     paths.iter().fold(0.0, |sum, p| sum + p.riders.to_f64())
 }
 
-/// How long loading and assigning took, cumulatively from the start.
+/// How long each stage took.
+/// Loading and routing may be shared with other dates on a timetable routing alike.
 pub struct Timings {
     pub loaded: Duration,
-    pub assigned: Duration,
+    pub routed: Duration,
+    /// How many dates shared the routing.
+    pub dates: usize,
+    pub split: Duration,
 }
 
 pub fn assignment(
@@ -227,7 +231,13 @@ pub fn assignment(
 ) -> String {
     let mut out = String::new();
     line!(out, "loaded in {:.1?}", timings.loaded);
-    line!(out, "assigned in {:.1?}", timings.assigned);
+    line!(
+        out,
+        "routed in {:.1?}, for {} date(s)",
+        timings.routed,
+        timings.dates
+    );
+    line!(out, "split in {:.1?}", timings.split);
     line!(out, "{} paths", paths.len());
     let input = riders(rows.iter());
     let assigned = assigned(paths);

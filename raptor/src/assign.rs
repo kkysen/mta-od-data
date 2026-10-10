@@ -111,20 +111,67 @@ impl Unassigned {
     }
 }
 
+/// Routes `rows`' OD pairs on `tt` and splits their riders: `route`, then `split`.
 pub fn assign(
     tt: &Timetable,
     complexes: &Complexes,
     rows: &[OdRow],
     config: &Config,
 ) -> (Vec<PathRow>, PathTexts, Unassigned) {
+    split(&route(tt, complexes, rows, config), complexes, rows)
+}
+
+/// Every origin's choice intervals to each of its destinations on one timetable.
+/// Riders' choices depend only on the timetable and config,
+/// so dates whose timetables route alike share these.
+pub struct Routes(BTreeMap<ComplexId, OriginRoutes>);
+
+pub struct OriginRoutes {
+    intervals: FxHashMap<ComplexId, Vec<Interval>>,
+    texts: PathTexts,
+}
+
+/// Routes every OD pair in `rows` (of any number of dates) on `tt`.
+pub fn route<'a>(
+    tt: &Timetable,
+    complexes: &Complexes,
+    rows: impl IntoIterator<Item = &'a OdRow>,
+    config: &Config,
+) -> Routes {
     let router = Router::new(tt);
+    let mut pairs: BTreeMap<ComplexId, Vec<ComplexId>> = BTreeMap::new();
+    for row in rows {
+        pairs.entry(row.origin).or_default().push(row.destination);
+    }
+    for destinations in pairs.values_mut() {
+        destinations.sort_unstable();
+        destinations.dedup();
+    }
+    Routes(
+        pairs
+            .par_iter()
+            .map(|(&origin, destinations)| {
+                let routes = route_origin(tt, &router, complexes, origin, destinations, config);
+                (origin, routes)
+            })
+            .collect(),
+    )
+}
+
+/// Splits `rows`' riders over their journeys in `routes`,
+/// which must have routed every OD pair in `rows`.
+pub fn split(
+    routes: &Routes,
+    complexes: &Complexes,
+    rows: &[OdRow],
+) -> (Vec<PathRow>, PathTexts, Unassigned) {
     let mut by_origin: BTreeMap<ComplexId, Vec<&OdRow>> = BTreeMap::new();
     for row in rows {
         by_origin.entry(row.origin).or_default().push(row);
     }
     let results: Vec<_> = by_origin
         .par_iter()
-        .map(|(&origin, rows)| assign_origin(tt, &router, complexes, origin, rows, config))
+        .map(|(&origin, rows)| split_origin(&routes.0[&origin], complexes, origin, rows))
         .collect();
 
     // `collect` keeps `by_origin`'s order, and each origin's rows come sorted,
@@ -169,19 +216,15 @@ fn stops_of(complexes: &Complexes, c: ComplexId) -> &[u32] {
     complexes.stops.get(&c).map_or(&[], Vec::as_slice)
 }
 
-fn assign_origin(
+fn route_origin(
     tt: &Timetable,
     router: &Router,
     complexes: &Complexes,
     origin: ComplexId,
-    rows: &[&OdRow],
+    destinations: &[ComplexId],
     config: &Config,
-) -> (Vec<PathRow>, PathTexts, Unassigned) {
-    let mut unassigned = Unassigned::default();
+) -> OriginRoutes {
     let origin_stops = stops_of(complexes, origin);
-    let mut destinations: Vec<ComplexId> = rows.iter().map(|r| r.destination).collect();
-    destinations.sort_unstable();
-    destinations.dedup();
     let targets: Vec<&[u32]> = destinations
         .iter()
         .map(|&d| stops_of(complexes, d))
@@ -196,22 +239,32 @@ fn assign_origin(
     let mut paths = Paths::default();
     // Each destination's journeys are dropped once its intervals are built,
     // and the origin's legs once every destination's are.
-    let intervals: FxHashMap<ComplexId, Vec<Interval>> = destinations
+    let intervals = destinations
         .iter()
         .zip(profiles)
         .map(|(&d, journeys)| (d, intervals(tt, &mut paths, &legs, &journeys, config)))
         .collect();
     drop(legs);
-    // Drops the interner's maps now, not at the end of the function.
+    // Drops the interner's maps now, not when the routes are.
     let Paths { texts, .. } = paths;
+    OriginRoutes { intervals, texts }
+}
 
+fn split_origin(
+    routes: &OriginRoutes,
+    complexes: &Complexes,
+    origin: ComplexId,
+    rows: &[&OdRow],
+) -> (Vec<PathRow>, PathTexts, Unassigned) {
+    let mut unassigned = Unassigned::default();
+    let origin_stops = stops_of(complexes, origin);
     let mut paths = Vec::new();
     for row in rows {
         if origin_stops.is_empty() || stops_of(complexes, row.destination).is_empty() {
             unassigned.no_stops += row.riders.to_f64();
             continue;
         }
-        let intervals = &intervals[&row.destination];
+        let intervals = &routes.intervals[&row.destination];
         if intervals.is_empty() {
             unassigned.unreachable += row.riders.to_f64();
             continue;
@@ -220,7 +273,28 @@ fn assign_origin(
         unassigned.no_departure += row.riders.to_f64() * (1.0 - assigned);
         paths.extend(row_paths);
     }
-    // On this origin's thread, so `assign` needn't sort all of a date's rows on one.
+    // Only the texts of paths this date's riders take, renumbered in their old order,
+    // when the routes are shared with other dates'.
+    let mut renumber = vec![false; routes.texts.0.len()];
+    for p in &paths {
+        renumber[p.path.0 as usize] = true;
+    }
+    let mut texts = PathTexts::default();
+    let renumber: Vec<PathId> = renumber
+        .into_iter()
+        .zip(&routes.texts.0)
+        .map(|(used, text)| {
+            let id = PathId(texts.0.len() as u32);
+            if used {
+                texts.0.push(text.clone());
+            }
+            id
+        })
+        .collect();
+    for p in &mut paths {
+        p.path = renumber[p.path.0 as usize];
+    }
+    // On this origin's thread, so `split` needn't sort all of a date's rows on one.
     paths.sort_by(|a, b| {
         (a.destination, a.hour, &texts[a.path]).cmp(&(b.destination, b.hour, &texts[b.path]))
     });

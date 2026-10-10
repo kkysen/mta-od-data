@@ -377,6 +377,14 @@ Complexity is added only once the simple version works end to end.
    (date, feed, how many of the month's dates in the range share its weekday,
    and the run's rider totals),
    so an average over the range weights each date by its `days`.
+   Riders' choices depend only on the timetable and config,
+   so dates whose timetables route alike
+   (the same stops, patterns, trip times, and transfers,
+   whatever the trip IDs or feed version)
+   share one routing, and only split their own OD rows over it:
+   a feed version's Tuesdays to Thursdays mostly share one,
+   and Mondays and Fridays one each.
+   August 2025 to October 2026 is 75 dates on 17 distinct timetables.
    The date is the middle usable one:
    covered with both neighbors by a feed version
    (the latest-fetched such, from `data/gtfs/`),
@@ -422,7 +430,10 @@ Python gets back only a date's summary,
 so the boundary carries no per-row data.
 The calls release the GIL, so `rayon` gets every core.
 Python drives it: the `mta-od-data raptor` commands,
-and `assign-range`'s loop over dates and its manifest.
+and `assign-range`'s picking of dates and its manifest.
+`assign_dates` takes all of a range's dates at once, to group them by timetable;
+it loads the next timetable's OD rows while routing this one's,
+and writes several dates' paths while splitting the next's.
 
 Layout: a Cargo crate at `raptor/`,
 with GTFS loading, timetable building, transfers, rRAPTOR,

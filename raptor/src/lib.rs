@@ -10,6 +10,7 @@ pub mod raptor;
 pub mod report;
 pub mod timetable;
 
+use std::collections::VecDeque;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
@@ -17,11 +18,12 @@ use anyhow::{Context, Result};
 use jiff::civil::{Date, Weekday};
 use pyo3::types::{PyModule, PyModuleMethods};
 use pyo3::{Bound, PyResult, Python, pyclass, pyfunction, pymethods, pymodule, wrap_pyfunction};
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
-use crate::assign::{Config, Transfers, Unassigned, assign, write_paths};
+use crate::assign::{Config, Transfers, Unassigned, route, split, write_paths};
 use crate::batch::{Version, load_versions, pick_dates};
 use crate::gtfs::{Feed, Secs, parse_time};
-use crate::od::{Complexes, load_slice};
+use crate::od::{Complexes, load_slice, load_slices};
 use crate::raptor::Router;
 use crate::report::Timings;
 use crate::timetable::Timetable;
@@ -50,6 +52,13 @@ pub struct AssignSummary {
     pub report: String,
 }
 
+/// One date to assign, on its feed version, writing its paths to `out`.
+pub struct Job<'a> {
+    pub version: &'a Version,
+    pub date: Date,
+    pub out: PathBuf,
+}
+
 /// Assigns `date`'s OD rows on `version`'s timetable for it,
 /// with the config at `config`, and writes the paths to `out`.
 pub fn assign_date(
@@ -60,43 +69,165 @@ pub fn assign_date(
     config: &Path,
     out: &Path,
 ) -> Result<AssignSummary> {
+    let job = Job {
+        version,
+        date,
+        out: out.to_owned(),
+    };
+    let mut summaries = assign_dates(&[job], od, stations, config)?;
+    Ok(summaries.pop().expect("one summary per job"))
+}
+
+/// Dates whose timetables route alike, sharing one routing.
+struct Group {
+    tt: Timetable,
+    complexes: Complexes,
+    /// Indices into the jobs.
+    jobs: Vec<usize>,
+}
+
+/// Assigns each job's date as `assign_date` does,
+/// but routes each distinct timetable once, for every date with it:
+/// a feed version's Tuesdays to Thursdays mostly share one.
+/// Summaries are in `jobs`' order.
+pub fn assign_dates(
+    jobs: &[Job],
+    od: &Path,
+    stations: &Path,
+    config: &Path,
+) -> Result<Vec<AssignSummary>> {
     // Writes `dhat-heap.json` to the working directory when dropped.
     #[cfg(feature = "dhat-heap")]
     let _profiler = dhat::Profiler::new_heap();
-    let start = Instant::now();
     let (config, config_text) = Config::load(config)?;
-    let mut tt = Timetable::build(&version.feed, date)?;
-    let complexes = Complexes::load(stations, &tt)?;
-    if config.transfers == Transfers::WalkDistance {
-        tt.use_walk_distance_transfers(complexes.stops.values().map(Vec::as_slice));
+
+    let start = Instant::now();
+    let timetables: Vec<(Timetable, Complexes)> = jobs
+        .par_iter()
+        .map(|job| -> Result<_> {
+            let mut tt = Timetable::build(&job.version.feed, job.date)?;
+            let complexes = Complexes::load(stations, &tt)?;
+            if config.transfers == Transfers::WalkDistance {
+                tt.use_walk_distance_transfers(complexes.stops.values().map(Vec::as_slice));
+            }
+            Ok((tt, complexes))
+        })
+        .collect::<Result<_>>()?;
+    let mut groups: Vec<Group> = Vec::new();
+    for (i, (tt, complexes)) in timetables.into_iter().enumerate() {
+        match groups.iter_mut().find(|g| g.tt.routes_like(&tt)) {
+            Some(group) => group.jobs.push(i),
+            None => groups.push(Group {
+                tt,
+                complexes,
+                jobs: vec![i],
+            }),
+        }
     }
-    let rows = load_slice(od, date)?;
-    let loaded = start.elapsed();
-    let (paths, texts, unassigned) = assign(&tt, &complexes, &rows, &config);
-    let timings = Timings {
-        loaded,
-        assigned: start.elapsed(),
-    };
-    let metadata = vec![
-        ("feed".to_string(), version.path.display().to_string()),
-        ("date".to_string(), date.to_string()),
-        ("config".to_string(), config_text),
-    ];
-    write_paths(out, &paths, &texts, date, metadata)?;
-    let Unassigned {
-        no_stops,
-        unreachable,
-        no_departure,
-    } = unassigned;
-    Ok(AssignSummary {
-        riders_in: report::riders(rows.iter()),
-        riders_assigned: report::assigned(&paths),
-        unassigned_no_stops: no_stops,
-        unassigned_unreachable: unreachable,
-        unassigned_no_departure: no_departure,
-        paths: paths.len(),
-        report: report::assignment(&rows, &paths, &unassigned, &timings),
-    })
+    eprintln!(
+        "built {} timetables, {} distinct, in {:.1?}",
+        jobs.len(),
+        groups.len(),
+        start.elapsed()
+    );
+
+    let mut summaries: Vec<Option<AssignSummary>> = jobs.iter().map(|_| None).collect();
+    let dates = |group: &Group| -> Vec<Date> { group.jobs.iter().map(|&i| jobs[i].date).collect() };
+    // Loading and writing each take one core, routing and splitting every core:
+    // the next timetable's dates load while this one's route,
+    // and up to `WRITERS` dates write while the next split.
+    std::thread::scope(|scope| -> Result<()> {
+        let load = |group: &Group| {
+            let dates = dates(group);
+            scope.spawn(move || -> Result<_> {
+                let start = Instant::now();
+                let slices = load_slices(od, &dates)?;
+                Ok((slices, start.elapsed()))
+            })
+        };
+        let mut loading = groups.first().map(load);
+        let mut writing = VecDeque::new();
+        for (g, group) in groups.iter().enumerate() {
+            let (slices, loaded) = join(loading.take().expect("loading this group"))?;
+            loading = groups.get(g + 1).map(load);
+            let start = Instant::now();
+            let routes = route(
+                &group.tt,
+                &group.complexes,
+                slices.iter().flatten(),
+                &config,
+            );
+            let routed = start.elapsed();
+            let dates = dates(group);
+            eprintln!(
+                "routed timetable {} of {} in {routed:.1?}, for {}",
+                g + 1,
+                groups.len(),
+                dates
+                    .iter()
+                    .map(Date::to_string)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            );
+            for (&i, rows) in group.jobs.iter().zip(&slices) {
+                let job = &jobs[i];
+                let start = Instant::now();
+                let (paths, texts, unassigned) = split(&routes, &group.complexes, rows);
+                let timings = Timings {
+                    loaded,
+                    routed,
+                    dates: dates.len(),
+                    split: start.elapsed(),
+                };
+                let metadata = vec![
+                    ("feed".to_string(), job.version.path.display().to_string()),
+                    ("date".to_string(), job.date.to_string()),
+                    ("config".to_string(), config_text.clone()),
+                ];
+                let Unassigned {
+                    no_stops,
+                    unreachable,
+                    no_departure,
+                } = unassigned;
+                summaries[i] = Some(AssignSummary {
+                    riders_in: report::riders(rows.iter()),
+                    riders_assigned: report::assigned(&paths),
+                    unassigned_no_stops: no_stops,
+                    unassigned_unreachable: unreachable,
+                    unassigned_no_departure: no_departure,
+                    paths: paths.len(),
+                    report: report::assignment(rows, &paths, &unassigned, &timings),
+                });
+                if writing.len() == WRITERS {
+                    join(writing.pop_front().expect("WRITERS > 0"))?;
+                }
+                writing.push_back(scope.spawn(move || -> Result<()> {
+                    let start = Instant::now();
+                    write_paths(&job.out, &paths, &texts, job.date, metadata)?;
+                    eprintln!("wrote {} in {:.1?}", job.out.display(), start.elapsed());
+                    Ok(())
+                }));
+            }
+        }
+        for handle in writing {
+            join(handle)?;
+        }
+        Ok(())
+    })?;
+    Ok(summaries
+        .into_iter()
+        .map(|s| s.expect("every job is in a group"))
+        .collect())
+}
+
+/// Dates written at once: each holds its paths, ~150 MB, until written.
+const WRITERS: usize = 4;
+
+/// Joins a thread, passing on its panic.
+fn join<T>(handle: std::thread::ScopedJoinHandle<'_, T>) -> T {
+    handle
+        .join()
+        .unwrap_or_else(|panic| std::panic::resume_unwind(panic))
 }
 
 fn stops(tt: &Timetable, ids: &[String]) -> Result<Vec<u32>> {
@@ -179,6 +310,26 @@ fn py_assign_date(
 ) -> Result<AssignSummary> {
     let version = version.get();
     py.detach(|| assign_date(version, date, &od, &stations, &config, &out))
+}
+
+/// `assign_dates` on `(version, date, out)` jobs, without holding the GIL.
+#[pyfunction(name = "assign_dates")]
+fn py_assign_dates(
+    py: Python<'_>,
+    jobs: Vec<(Bound<'_, Version>, Date, PathBuf)>,
+    od: PathBuf,
+    stations: PathBuf,
+    config: PathBuf,
+) -> Result<Vec<AssignSummary>> {
+    let jobs: Vec<Job> = jobs
+        .iter()
+        .map(|(version, date, out)| Job {
+            version: version.get(),
+            date: *date,
+            out: out.clone(),
+        })
+        .collect();
+    py.detach(|| assign_dates(&jobs, &od, &stations, &config))
 }
 
 /// A summary of the feed zip at `feed`.
@@ -265,6 +416,7 @@ fn raptor_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(py_load_versions, m)?)?;
     m.add_function(wrap_pyfunction!(py_pick_weekdays, m)?)?;
     m.add_function(wrap_pyfunction!(py_assign_date, m)?)?;
+    m.add_function(wrap_pyfunction!(py_assign_dates, m)?)?;
     m.add_function(wrap_pyfunction!(feed_report, m)?)?;
     m.add_function(wrap_pyfunction!(timetable_report, m)?)?;
     m.add_function(wrap_pyfunction!(route_report, m)?)?;

@@ -4,7 +4,6 @@ The routing is the `raptor` crate's, through `mta_od_data._raptor`;
 this drives it and writes the manifest of dates run.
 """
 
-from concurrent.futures import ThreadPoolExecutor
 from csv import DictWriter
 from datetime import date
 from pathlib import Path
@@ -14,9 +13,9 @@ from typer import Option, Typer
 
 from mta_od_data import DATA, ROOT
 from mta_od_data._raptor import (
-    AssignSummary,
     Version,
     assign_date,
+    assign_dates,
     feed_report,
     load_versions,
     od_report,
@@ -149,21 +148,11 @@ def assign_range(
     out_dir: Annotated[
         Path, Option(help="Where the path Parquets and manifest.csv go")
     ] = DEFAULT_OUT_DIR,
-    jobs: Annotated[
-        int,
-        Option(
-            min=1,
-            help=(
-                "Dates assigned at once: each routes on every core, "
-                "but loads and writes on one, so a second overlaps those. "
-                "Each takes ~3 GB at its peak"
-            ),
-        ),
-    ] = 2,
 ) -> None:
     """`assign` each (month, weekday) in a date range on a representative date,
     with the latest feed version covering it,
     and write a manifest of the dates run and how many days each stands for.
+    Dates whose timetables route alike share one routing.
 
     \b
     Examples:
@@ -171,38 +160,37 @@ def assign_range(
     """
     picks = pick_weekdays(load_versions(gtfs_dir), start, end)
     out_dir.mkdir(parents=True, exist_ok=True)
+    outs = [out_dir / f"paths-{day}.parquet" for day, _, _ in picks]
+    summaries = assign_dates(
+        [
+            (version, day, out)
+            for (day, version, _), out in zip(picks, outs, strict=True)
+        ],
+        od,
+        stations,
+        config,
+    )
     manifest_path = out_dir / "manifest.csv"
     with manifest_path.open("w", newline="") as f:
         manifest = DictWriter(f, MANIFEST_FIELDS)
         manifest.writeheader()
-        with ThreadPoolExecutor(jobs) as pool:
-            # `assign_date` releases the GIL; `map` keeps the manifest in date order.
-            def run(pick: tuple[date, Version, int]) -> AssignSummary:
-                day, version, _ = pick
-                out = out_dir / f"paths-{day}.parquet"
-                return assign_date(version, day, od, stations, config, out)
-
-            for (day, version, days), s in zip(
-                picks, pool.map(run, picks), strict=True
-            ):
-                out = out_dir / f"paths-{day}.parquet"
-                print(f"== {day} ({day:%A})", flush=True)
-                print(s.report, end="", flush=True)
-                manifest.writerow(
-                    {
-                        "date": day,
-                        "year": day.year,
-                        "month": day.month,
-                        "day_of_week": f"{day:%A}",
-                        "days": days,
-                        "feed": version.path,
-                        "paths": out,
-                        "riders_in": s.riders_in,
-                        "riders_assigned": s.riders_assigned,
-                        "unassigned_no_stops": s.unassigned_no_stops,
-                        "unassigned_unreachable": s.unassigned_unreachable,
-                        "unassigned_no_departure": s.unassigned_no_departure,
-                    }
-                )
-                f.flush()
+        for (day, version, days), out, s in zip(picks, outs, summaries, strict=True):
+            print(f"== {day} ({day:%A})")
+            print(s.report, end="")
+            manifest.writerow(
+                {
+                    "date": day,
+                    "year": day.year,
+                    "month": day.month,
+                    "day_of_week": f"{day:%A}",
+                    "days": days,
+                    "feed": version.path,
+                    "paths": out,
+                    "riders_in": s.riders_in,
+                    "riders_assigned": s.riders_assigned,
+                    "unassigned_no_stops": s.unassigned_no_stops,
+                    "unassigned_unreachable": s.unassigned_unreachable,
+                    "unassigned_no_departure": s.unassigned_no_departure,
+                }
+            )
     print(f"wrote {manifest_path}")
