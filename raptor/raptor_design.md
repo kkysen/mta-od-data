@@ -334,7 +334,8 @@ Complexity is added only once the simple version works end to end.
    splits the date's OD rows across their journeys
    and writes path-level Parquet (`data/raptor/paths-<date>.parquet`):
    per (hour, origin, destination, path),
-   the share and riders, and mean wait, in-vehicle, walk, and total seconds,
+   the riders (`DECIMAL(9,4)`, as the OD Parquet's),
+   and mean wait, in-vehicle, and walk seconds (whole),
    with the feed, date, and config text in the file's metadata.
    A path is its rides as `<route> <board>><each stop passed>><alight>`
    and walks as `walk <from>><to>`,
@@ -361,7 +362,9 @@ Complexity is added only once the simple version works end to end.
      until McRAPTOR.
    - Unassigned riders are reported by cause
      (no served stop, unreachable in `MAX_RIDES`, entering after the last departure),
-     and assigned plus unassigned must equal the input.
+     and assigned plus unassigned must equal the input,
+     but for rounding each path's riders to a ten-thousandth:
+     paths with a sliver of a row's riders round down, ~2 riders a date.
    For 2025-09-10 with neutral weights:
    4,323,207.1421 riders in, 34.0016 unassigned
    (1.9 unreachable in 3 rides, 32.1 after the last departure),
