@@ -24,6 +24,9 @@ class DayType(StrEnum):
 
 
 WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+
+# DuckDB's spill directory: on disk, since `/tmp` here is tmpfs (RAM).
+SCRATCH = Path.home() / ".cache" / "mta-od-scratch"
 DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {
     DayType.WEEKDAY: WEEKDAYS,
     DayType.SATURDAY: ("Saturday",),
@@ -221,8 +224,19 @@ def connection() -> duckdb.DuckDBPyConnection:
     default, and reusing a connection measures no faster than opening
     one, the extract being in the page cache and the time going to
     decompressing and aggregating it either way.
+
+    Capped, since by default DuckDB takes most of RAM and every core:
+    uncapped work over the OD data has run this 15 GB WSL box out of memory
+    and crashed it. Spills go to a disk-backed directory, not `/tmp` (tmpfs, RAM).
     """
-    return duckdb.connect()
+    SCRATCH.mkdir(parents=True, exist_ok=True)
+    return duckdb.connect(
+        config={
+            "memory_limit": "3GB",
+            "threads": 4,
+            "temp_directory": str(SCRATCH),
+        }
+    )
 
 
 def read_csv_text(path: Path) -> str:

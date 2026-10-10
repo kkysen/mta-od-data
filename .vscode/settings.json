@@ -7,6 +7,21 @@
         }
     },
     "ruff.importStrategy": "fromEnvironment",
+    "[rust]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "rust-lang.rust-analyzer"
+    },
+    // The crate isn't at the repo root, where rust-analyzer looks for one.
+    "rust-analyzer.linkedProjects": [
+        "raptor/Cargo.toml"
+    ],
+    // `pyo3`'s build script needs the Python the extension is built for.
+    "rust-analyzer.cargo.extraEnv": {
+        "PYO3_PYTHON": "${workspaceFolder}/.venv/bin/python"
+    },
+    // Its own target directory, so its checks don't wait on `uv sync`'s build or `cargo`'s.
+    "rust-analyzer.cargo.targetDir": true,
+    "rust-analyzer.check.command": "clippy",
     "files.associations": {
         "**/*.json5": "jsonc"
     },
