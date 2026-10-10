@@ -13,6 +13,7 @@ use std::ops::Index;
 use std::path::Path;
 
 use anyhow::{Context, Result};
+use parquet::file::properties::DEFAULT_MAX_ROW_GROUP_ROW_COUNT;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rustc_hash::FxHashMap;
 use serde::Deserialize;
@@ -470,6 +471,9 @@ fn assign_row(row: &OdRow, intervals: &[Interval]) -> (Vec<PathRow>, f64) {
 /// Riders' precision in the path Parquet: the OD Parquet's `DECIMAL(9,4)`.
 const RIDERS_PRECISION: u8 = 9;
 
+/// Rows per row group of the path Parquet: the `parquet` crate's default.
+const ROW_GROUP_SIZE: usize = DEFAULT_MAX_ROW_GROUP_ROW_COUNT;
+
 /// Writes path rows as zstd Parquet, with `metadata` as its key-value metadata.
 ///
 /// Riders as the OD Parquet's `DECIMAL(9,4)` and times as whole seconds:
@@ -494,58 +498,62 @@ pub fn write_paths(
     use parquet::file::metadata::KeyValue;
     use parquet::file::properties::WriterProperties;
 
-    let n = paths.len();
-    let seconds = |f: fn(&PathRow) -> u32| -> ArrayRef {
-        Arc::new(UInt32Array::from_iter_values(paths.iter().map(f)))
+    // Each path's text once, shared by every chunk's dictionary.
+    let texts: ArrayRef = Arc::new(StringArray::from_iter_values(texts.0.iter().map(|t| &**t)));
+    let batch = |paths: &[PathRow]| -> Result<RecordBatch> {
+        let n = paths.len();
+        let seconds = |f: fn(&PathRow) -> u32| -> ArrayRef {
+            Arc::new(UInt32Array::from_iter_values(paths.iter().map(f)))
+        };
+        let riders =
+            Decimal128Array::from_iter_values(paths.iter().map(|p| i128::from(p.riders.0)))
+                .with_precision_and_scale(RIDERS_PRECISION, Riders::SCALE)?;
+        Ok(RecordBatch::try_from_iter([
+            (
+                "year",
+                Arc::new(UInt16Array::from(vec![date.year() as u16; n])) as ArrayRef,
+            ),
+            (
+                "month",
+                Arc::new(UInt8Array::from(vec![date.month() as u8; n])),
+            ),
+            (
+                "day_of_week",
+                Arc::new(StringArray::from(vec![crate::od::day_of_week(date); n])),
+            ),
+            (
+                "hour",
+                Arc::new(UInt8Array::from_iter_values(paths.iter().map(|p| p.hour))),
+            ),
+            (
+                "origin",
+                Arc::new(UInt32Array::from_iter_values(
+                    paths.iter().map(|p| u32::from(p.origin)),
+                )),
+            ),
+            (
+                "destination",
+                Arc::new(UInt32Array::from_iter_values(
+                    paths.iter().map(|p| u32::from(p.destination)),
+                )),
+            ),
+            (
+                "path",
+                Arc::new(DictionaryArray::<UInt32Type>::try_new(
+                    UInt32Array::from_iter_values(paths.iter().map(|p| p.path.0)),
+                    Arc::clone(&texts),
+                )?),
+            ),
+            (
+                "rides",
+                Arc::new(UInt8Array::from_iter_values(paths.iter().map(|p| p.rides))),
+            ),
+            ("riders", Arc::new(riders)),
+            ("wait_s", seconds(|p| p.wait)),
+            ("in_vehicle_s", seconds(|p| p.in_vehicle)),
+            ("walk_s", seconds(|p| p.walk)),
+        ])?)
     };
-    let riders = Decimal128Array::from_iter_values(paths.iter().map(|p| i128::from(p.riders.0)))
-        .with_precision_and_scale(RIDERS_PRECISION, Riders::SCALE)?;
-    let batch = RecordBatch::try_from_iter([
-        (
-            "year",
-            Arc::new(UInt16Array::from(vec![date.year() as u16; n])) as ArrayRef,
-        ),
-        (
-            "month",
-            Arc::new(UInt8Array::from(vec![date.month() as u8; n])),
-        ),
-        (
-            "day_of_week",
-            Arc::new(StringArray::from(vec![crate::od::day_of_week(date); n])),
-        ),
-        (
-            "hour",
-            Arc::new(UInt8Array::from_iter_values(paths.iter().map(|p| p.hour))),
-        ),
-        (
-            "origin",
-            Arc::new(UInt32Array::from_iter_values(
-                paths.iter().map(|p| u32::from(p.origin)),
-            )),
-        ),
-        (
-            "destination",
-            Arc::new(UInt32Array::from_iter_values(
-                paths.iter().map(|p| u32::from(p.destination)),
-            )),
-        ),
-        (
-            "path",
-            // Each text once, not once per row: ~500 MB of a date's otherwise.
-            Arc::new(DictionaryArray::<UInt32Type>::try_new(
-                UInt32Array::from_iter_values(paths.iter().map(|p| p.path.0)),
-                Arc::new(StringArray::from_iter_values(texts.0.iter().map(|t| &**t))),
-            )?),
-        ),
-        (
-            "rides",
-            Arc::new(UInt8Array::from_iter_values(paths.iter().map(|p| p.rides))),
-        ),
-        ("riders", Arc::new(riders)),
-        ("wait_s", seconds(|p| p.wait)),
-        ("in_vehicle_s", seconds(|p| p.in_vehicle)),
-        ("walk_s", seconds(|p| p.walk)),
-    ])?;
     let props = WriterProperties::builder()
         .set_compression(Compression::ZSTD(ZstdLevel::try_new(3)?))
         .set_key_value_metadata(Some(
@@ -559,8 +567,16 @@ pub fn write_paths(
         std::fs::create_dir_all(dir)?;
     }
     let file = std::fs::File::create(out).with_context(|| format!("creating {}", out.display()))?;
-    let mut writer = ArrowWriter::try_new(file, batch.schema(), Some(props))?;
-    writer.write(&batch)?;
+    // A chunk of rows at a time, not all of a date's ~5.7M at once:
+    // its arrays took ~500 MB.
+    // One chunk per row group, as the writer would split them anyway.
+    let mut chunks = paths.chunks(ROW_GROUP_SIZE);
+    let first = batch(chunks.next().unwrap_or_default())?;
+    let mut writer = ArrowWriter::try_new(file, first.schema(), Some(props))?;
+    writer.write(&first)?;
+    for chunk in chunks {
+        writer.write(&batch(chunk)?)?;
+    }
     writer.close()?;
     Ok(())
 }
