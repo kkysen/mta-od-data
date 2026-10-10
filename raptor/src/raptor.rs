@@ -95,7 +95,12 @@ pub struct Labels<'a> {
     /// `ready[k][s]`: able to board at `s` after `k` rides.
     ready: Vec<Vec<Secs>>,
     ready_from: Vec<Vec<Option<Ready>>>,
+    /// Scratch for a round: each pattern's earliest marked position,
+    /// `UNMARKED` for a pattern no marked stop serves.
+    scan_from: Vec<u32>,
 }
+
+const UNMARKED: u32 = u32::MAX;
 
 impl<'a> Router<'a> {
     pub fn new(tt: &'a Timetable) -> Self {
@@ -118,6 +123,7 @@ impl<'a> Router<'a> {
             ride_from: vec![vec![None; n]; rounds],
             ready: vec![vec![NEVER; n]; rounds],
             ready_from: vec![vec![None; n]; rounds],
+            scan_from: vec![UNMARKED; self.tt.patterns.len()],
         }
     }
 
@@ -221,13 +227,19 @@ impl Labels<'_> {
             }
             // Each pattern serving a marked stop, from its earliest marked position.
             let mut scan: Vec<(u32, u32)> = Vec::new();
+            let mut patterns = Vec::new();
             for &s in &marked {
                 for &(p, pos) in &self.router.stop_patterns[s as usize] {
-                    match scan.iter_mut().find(|(q, _)| *q == p) {
-                        Some((_, from)) => *from = (*from).min(pos),
-                        None => scan.push((p, pos)),
+                    let from = &mut self.scan_from[p as usize];
+                    if *from == UNMARKED {
+                        patterns.push(p);
                     }
+                    *from = (*from).min(pos);
                 }
+            }
+            for p in patterns {
+                let from = std::mem::replace(&mut self.scan_from[p as usize], UNMARKED);
+                scan.push((p, from));
             }
             scan.sort_unstable();
 
