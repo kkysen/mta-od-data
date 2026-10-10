@@ -63,7 +63,7 @@ pub fn assign_date(
     }
     let rows = load_slice(od, date)?;
     let loaded = start.elapsed();
-    let (paths, unassigned) = assign(&tt, &complexes, &rows, &config);
+    let (paths, texts, unassigned) = assign(&tt, &complexes, &rows, &config);
     let timings = Timings {
         loaded,
         assigned: start.elapsed(),
@@ -73,7 +73,7 @@ pub fn assign_date(
         ("date".to_string(), date.to_string()),
         ("config".to_string(), config_text),
     ];
-    write_paths(out, &paths, date, metadata)?;
+    write_paths(out, &paths, &texts, date, metadata)?;
     let Unassigned {
         no_stops,
         unreachable,
