@@ -127,7 +127,7 @@ pub fn assign(
 pub struct Routes(BTreeMap<ComplexId, OriginRoutes>);
 
 pub struct OriginRoutes {
-    intervals: FxHashMap<ComplexId, Vec<Interval>>,
+    intervals: FxHashMap<ComplexId, Intervals>,
     texts: PathTexts,
 }
 
@@ -301,13 +301,36 @@ fn split_origin(
     (paths, texts, unassigned)
 }
 
-/// Riders entering in `(after, until]` choose among the same journeys.
-struct Interval {
-    after: Secs,
-    until: Secs,
+/// One OD pair's choice intervals, earliest first:
+/// riders entering in an interval `(after, until]` choose among the same journeys,
+/// and each interval starts where the one before ends.
+/// An OD pair has ~175 intervals of ~1.4 choices each,
+/// so in two flat arrays, not a `Vec` of choices per interval.
+#[derive(Default)]
+struct Intervals {
+    /// Each interval's `until`, and where its choices end in `choices`:
+    /// they start where the one before's end.
+    ends: Vec<(Secs, u32)>,
     choices: Vec<Choice>,
 }
 
+impl Intervals {
+    fn is_empty(&self) -> bool {
+        self.ends.is_empty()
+    }
+
+    /// Each interval's `(after, until, choices)`, earliest first.
+    fn iter(&self) -> impl Iterator<Item = (Secs, Secs, &[Choice])> {
+        let (mut after, mut start) = (Secs::MIN, 0);
+        self.ends.iter().map(move |&(until, end)| {
+            let interval = (after, until, &self.choices[start as usize..end as usize]);
+            (after, start) = (until, end);
+            interval
+        })
+    }
+}
+
+#[derive(Clone, Copy)]
 struct Choice {
     path: PathId,
     rides: u8,
@@ -317,20 +340,21 @@ struct Choice {
     walk: Secs,
 }
 
-/// The choice intervals of one OD pair's profile (latest departure first),
-/// earliest first.
+/// The choice intervals of one OD pair's profile (latest departure first).
 fn intervals(
     tt: &Timetable,
     paths: &mut Paths,
     legs: &Legs,
     journeys: &[Journey],
     config: &Config,
-) -> Vec<Interval> {
-    let mut intervals = Vec::new();
+) -> Intervals {
+    // Built latest first, then reversed.
+    let mut latest_first = Intervals::default();
     // The latest journey seen per ride count:
     // the earliest arriving of those departing at or after the current departure,
     // since the profile dropped any arriving no earlier than a later one.
     let mut latest: [Option<&Journey>; MAX_RIDES + 1] = [None; MAX_RIDES + 1];
+    let mut candidates = Vec::with_capacity(MAX_RIDES);
     let mut i = 0;
     while i < journeys.len() {
         let depart = journeys[i].depart;
@@ -338,9 +362,8 @@ fn intervals(
             latest[journeys[i].rides()] = Some(&journeys[i]);
             i += 1;
         }
-        let after = journeys.get(i).map_or(Secs::MIN, |j| j.depart);
         // Pareto over (arrival, rides): each arriving before every one with fewer rides.
-        let mut candidates = Vec::new();
+        candidates.clear();
         let mut fewer = Secs::MAX;
         for j in latest.iter().flatten() {
             if j.arrive < fewer {
@@ -348,56 +371,69 @@ fn intervals(
                 candidates.push(*j);
             }
         }
-        intervals.push(Interval {
-            after,
-            until: depart,
-            choices: choices(tt, paths, legs, &candidates, depart, config),
-        });
+        let choices = &mut latest_first.choices;
+        choices_into(tt, paths, legs, &candidates, depart, config, choices);
+        let end = u32::try_from(choices.len()).expect("under 2^32 choices");
+        latest_first.ends.push((depart, end));
     }
-    intervals.reverse();
+    let mut intervals = Intervals {
+        ends: Vec::with_capacity(latest_first.ends.len()),
+        choices: Vec::with_capacity(latest_first.choices.len()),
+    };
+    for (k, &(until, end)) in latest_first.ends.iter().enumerate().rev() {
+        let start = k.checked_sub(1).map_or(0, |k| latest_first.ends[k].1);
+        let choices = &latest_first.choices[start as usize..end as usize];
+        intervals.choices.extend_from_slice(choices);
+        intervals.ends.push((until, intervals.choices.len() as u32));
+    }
     intervals
 }
 
-/// Each candidate's share, by logit over generalized cost for a rider entering at `t`.
-fn choices(
+/// Appends each candidate's choice to `choices`,
+/// its share by logit over generalized cost for a rider entering at `t`.
+fn choices_into(
     tt: &Timetable,
     paths: &mut Paths,
     legs: &Legs,
     candidates: &[&Journey],
     t: Secs,
     config: &Config,
-) -> Vec<Choice> {
-    let mut choices: Vec<Choice> = candidates
-        .iter()
-        .map(|j| {
-            let (in_vehicle, walk) = in_vehicle_and_walk(tt, legs.of(j));
-            Choice {
-                path: paths.get(tt, legs.of(j)),
-                rides: j.rides() as u8,
-                share: 0.0,
-                arrive: j.arrive,
-                in_vehicle,
-                walk,
-            }
-        })
-        .collect();
+    choices: &mut Vec<Choice>,
+) {
+    let start = choices.len();
+    choices.extend(candidates.iter().map(|j| {
+        let (in_vehicle, walk) = in_vehicle_and_walk(tt, legs.of(j));
+        Choice {
+            path: paths.get(tt, legs.of(j)),
+            rides: j.rides() as u8,
+            share: 0.0,
+            arrive: j.arrive,
+            in_vehicle,
+            walk,
+        }
+    }));
+    let choices = &mut choices[start..];
     let cost = |o: &Choice| {
         let wait = (o.arrive - t - o.in_vehicle - o.walk) as f64;
         (o.in_vehicle as f64 + config.wait_weight * wait + config.walk_weight * o.walk as f64)
             / 60.0
             + config.transfer_penalty_min * f64::from(o.rides - 1)
     };
-    let costs: Vec<f64> = choices.iter().map(cost).collect();
-    let min = costs.iter().copied().fold(f64::INFINITY, f64::min);
-    let weights: Vec<f64> = costs
-        .iter()
-        .map(|c| (-config.logit_scale_per_min * (c - min)).exp())
-        .collect();
-    let sum: f64 = weights.iter().sum();
-    for (c, w) in choices.iter_mut().zip(weights) {
-        c.share = w / sum;
+    // Each share holds its cost, then its weight, then its share.
+    for c in choices.iter_mut() {
+        c.share = cost(c);
     }
-    choices
+    let min = choices
+        .iter()
+        .map(|c| c.share)
+        .fold(f64::INFINITY, f64::min);
+    for c in choices.iter_mut() {
+        c.share = (-config.logit_scale_per_min * (c.share - min)).exp();
+    }
+    let sum: f64 = choices.iter().map(|c| c.share).sum();
+    for c in choices.iter_mut() {
+        c.share /= sum;
+    }
 }
 
 /// Time on trains, and walking: footpaths,
@@ -503,7 +539,7 @@ fn path(tt: &Timetable, legs: &[Leg]) -> String {
 
 /// One row's paths, and the share of its riders assigned:
 /// short of 1 by those entering after the last departure.
-fn assign_row(row: &OdRow, intervals: &[Interval]) -> (Vec<PathRow>, f64) {
+fn assign_row(row: &OdRow, intervals: &Intervals) -> (Vec<PathRow>, f64) {
     let (start, end) = (Secs::from(row.hour) * HOUR, Secs::from(row.hour + 1) * HOUR);
     #[derive(Default)]
     struct Acc {
@@ -515,15 +551,15 @@ fn assign_row(row: &OdRow, intervals: &[Interval]) -> (Vec<PathRow>, f64) {
     }
     let mut accs: BTreeMap<PathId, Acc> = BTreeMap::new();
     let mut assigned = 0.0;
-    for interval in intervals {
-        let (lo, hi) = (interval.after.max(start), interval.until.min(end));
+    for (after, until, choices) in intervals.iter() {
+        let (lo, hi) = (after.max(start), until.min(end));
         if lo >= hi {
             continue;
         }
         let weight = f64::from(hi - lo) / f64::from(HOUR);
         let mid = f64::from(lo + hi) / 2.0;
         assigned += weight;
-        for o in &interval.choices {
+        for o in choices {
             let share = weight * o.share;
             let acc = accs.entry(o.path).or_default();
             acc.rides = o.rides;
