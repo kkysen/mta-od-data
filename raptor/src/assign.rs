@@ -127,8 +127,12 @@ pub fn assign(
         .map(|(&origin, rows)| assign_origin(tt, &router, complexes, origin, rows, config))
         .collect();
 
-    let mut paths = Vec::new();
-    let mut texts = PathTexts::default();
+    // `collect` keeps `by_origin`'s order, and each origin's rows come sorted,
+    // so the rows are in (origin, destination, hour, path) order as they're appended.
+    let mut paths = Vec::with_capacity(results.iter().map(|(p, _, _)| p.len()).sum());
+    let mut texts = PathTexts(Vec::with_capacity(
+        results.iter().map(|(_, t, _)| t.0.len()).sum(),
+    ));
     let mut unassigned = Unassigned::default();
     for (p, t, u) in results {
         // Each origin's ids index its own texts, so they move up past those before them.
@@ -141,15 +145,6 @@ pub fn assign(
         texts.0.extend(t.0);
         unassigned.add(&u);
     }
-    // `rayon` doesn't fix the order.
-    paths.sort_by(|a, b| {
-        (a.origin, a.destination, a.hour, &texts[a.path]).cmp(&(
-            b.origin,
-            b.destination,
-            b.hour,
-            &texts[b.path],
-        ))
-    });
     (paths, texts, unassigned)
 }
 
@@ -225,6 +220,10 @@ fn assign_origin(
         unassigned.no_departure += row.riders.to_f64() * (1.0 - assigned);
         paths.extend(row_paths);
     }
+    // On this origin's thread, so `assign` needn't sort all of a date's rows on one.
+    paths.sort_by(|a, b| {
+        (a.destination, a.hour, &texts[a.path]).cmp(&(b.destination, b.hour, &texts[b.path]))
+    });
     (paths, texts, unassigned)
 }
 
