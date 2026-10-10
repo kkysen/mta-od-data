@@ -348,7 +348,7 @@ fn in_vehicle_and_walk(tt: &Timetable, j: &Journey) -> (Secs, Secs) {
 }
 
 /// A leg, as far as its path's text goes.
-#[derive(PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 enum LegKey {
     Ride {
         pattern: u32,
@@ -365,7 +365,10 @@ enum LegKey {
 /// each journey's text built once, and each text given one `PathId`.
 #[derive(Default)]
 struct Paths {
-    by_legs: FxHashMap<Vec<LegKey>, PathId>,
+    by_legs: FxHashMap<Box<[LegKey]>, PathId>,
+    /// The journey being looked up's key, reused:
+    /// most lookups find their path, so they allocate nothing.
+    key: Vec<LegKey>,
     // Different legs can read the same, e.g. two patterns of a route over the same stops.
     by_text: FxHashMap<Box<str>, PathId>,
     texts: PathTexts,
@@ -373,31 +376,32 @@ struct Paths {
 
 impl Paths {
     fn get(&mut self, tt: &Timetable, j: &Journey) -> PathId {
-        let key = j
-            .legs
-            .iter()
-            .map(|leg| match *leg {
-                Leg::Ride(r) => LegKey::Ride {
-                    pattern: r.pattern,
-                    board_pos: r.board_pos,
-                    alight_pos: r.alight_pos,
-                },
-                Leg::Walk { from, to, .. } => LegKey::Walk { from, to },
-            })
-            .collect();
         let Self {
             by_legs,
+            key,
             by_text,
             texts,
         } = self;
-        *by_legs.entry(key).or_insert_with(|| {
-            let text: Box<str> = path(tt, j).into();
-            *by_text.entry(text.clone()).or_insert_with(|| {
-                let id = PathId(u32::try_from(texts.0.len()).expect("under 2^32 paths"));
-                texts.0.push(text);
-                id
-            })
-        })
+        key.clear();
+        key.extend(j.legs.iter().map(|leg| match *leg {
+            Leg::Ride(r) => LegKey::Ride {
+                pattern: r.pattern,
+                board_pos: r.board_pos,
+                alight_pos: r.alight_pos,
+            },
+            Leg::Walk { from, to, .. } => LegKey::Walk { from, to },
+        }));
+        if let Some(&id) = by_legs.get(key.as_slice()) {
+            return id;
+        }
+        let text: Box<str> = path(tt, j).into();
+        let id = *by_text.entry(text.clone()).or_insert_with(|| {
+            let id = PathId(u32::try_from(texts.0.len()).expect("under 2^32 paths"));
+            texts.0.push(text);
+            id
+        });
+        by_legs.insert(key.as_slice().into(), id);
+        id
     }
 }
 
