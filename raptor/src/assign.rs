@@ -498,7 +498,8 @@ pub fn write_paths(
     use std::sync::Arc;
 
     use arrow_array::{
-        ArrayRef, Decimal128Array, RecordBatch, StringArray, UInt8Array, UInt16Array, UInt32Array,
+        ArrayRef, Decimal128Array, DictionaryArray, RecordBatch, StringArray, UInt8Array,
+        UInt16Array, UInt32Array, types::UInt32Type,
     };
     use parquet::arrow::ArrowWriter;
     use parquet::basic::{Compression, ZstdLevel};
@@ -546,9 +547,11 @@ pub fn write_paths(
         ),
         (
             "path",
-            Arc::new(StringArray::from_iter_values(
-                paths.iter().map(|p| &texts[p.path]),
-            )),
+            // Each text once, not once per row: ~500 MB of a date's otherwise.
+            Arc::new(DictionaryArray::<UInt32Type>::try_new(
+                UInt32Array::from_iter_values(paths.iter().map(|p| p.path.0)),
+                Arc::new(StringArray::from_iter_values(texts.0.iter().map(|t| &**t))),
+            )?),
         ),
         (
             "rides",
