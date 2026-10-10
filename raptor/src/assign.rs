@@ -8,12 +8,13 @@
 //! and every journey's cost depends on `t` the same way (waiting longer at the origin),
 //! so the shares are constant between consecutive departures.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 use std::path::Path;
 use std::rc::Rc;
 
 use anyhow::{Context, Result};
 use rayon::prelude::*;
+use rustc_hash::FxHashMap;
 use serde::Deserialize;
 
 use crate::gtfs::{DAY, Secs};
@@ -158,7 +159,7 @@ fn assign_origin(
         // Through the next date's early trips, for riders entering late.
         router.profile(origin_stops, 0, DAY + NEXT_DATE_HORIZON, &targets)
     };
-    let intervals: HashMap<ComplexId, Vec<Interval>> = destinations
+    let intervals: FxHashMap<ComplexId, Vec<Interval>> = destinations
         .iter()
         .zip(&profiles)
         .map(|(&d, journeys)| (d, intervals(tt, journeys, config)))
@@ -322,7 +323,7 @@ enum LegKey {
 /// Each path's text, built once:
 /// building it is most of the work of assigning a pair otherwise.
 #[derive(Default)]
-struct Paths(HashMap<Vec<LegKey>, Rc<str>>);
+struct Paths(FxHashMap<Vec<LegKey>, Rc<str>>);
 
 impl Paths {
     fn get(&mut self, tt: &Timetable, j: &Journey) -> Rc<str> {
