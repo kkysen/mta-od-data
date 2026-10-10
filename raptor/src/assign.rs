@@ -607,6 +607,7 @@ pub fn write_paths(
 ) -> Result<()> {
     use std::sync::Arc;
 
+    use arrow_array::builder::StringBuilder;
     use arrow_array::{
         ArrayRef, Decimal128Array, DictionaryArray, RecordBatch, StringArray, UInt8Array,
         UInt16Array, UInt32Array, types::UInt32Type,
@@ -614,10 +615,16 @@ pub fn write_paths(
     use parquet::arrow::ArrowWriter;
     use parquet::basic::{Compression, ZstdLevel};
     use parquet::file::metadata::KeyValue;
-    use parquet::file::properties::WriterProperties;
+    use parquet::file::properties::{EnabledStatistics, WriterProperties};
 
     // Each path's text once, shared by every chunk's dictionary.
-    let texts: ArrayRef = Arc::new(StringArray::from_iter_values(texts.0.iter().map(|t| &**t)));
+    // Sized up front, not grown (and copied) as it goes.
+    let bytes = texts.0.iter().map(|t| t.len()).sum();
+    let mut builder = StringBuilder::with_capacity(texts.0.len(), bytes);
+    for text in &texts.0 {
+        builder.append_value(text);
+    }
+    let texts: ArrayRef = Arc::new(builder.finish());
     let batch = |paths: &[PathRow]| -> Result<RecordBatch> {
         let n = paths.len();
         let seconds = |f: fn(&PathRow) -> u32| -> ArrayRef {
@@ -674,6 +681,8 @@ pub fn write_paths(
     };
     let props = WriterProperties::builder()
         .set_compression(Compression::ZSTD(ZstdLevel::try_new(3)?))
+        // Min and max path text are of no use, and comparing every path's took time.
+        .set_column_statistics_enabled("path".into(), EnabledStatistics::None)
         .set_key_value_metadata(Some(
             metadata
                 .into_iter()
