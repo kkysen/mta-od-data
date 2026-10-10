@@ -8,7 +8,7 @@
 //! so a journey is always extracted from the round that computed it.
 
 use crate::gtfs::Secs;
-use crate::timetable::{StopIdx, Timetable};
+use crate::timetable::{Pattern, StopIdx, Timetable};
 
 /// Most rides in a journey. 3 is `nycriders`' cap, unexamined; raising it is a todo.
 pub const MAX_RIDES: usize = 3;
@@ -27,34 +27,54 @@ enum Ready {
     },
 }
 
-/// How a stop was reached by train.
+/// A ride on one trip of a pattern, between two of its stops:
+/// how a stop was reached by train, and a journey's leg on one.
+/// Its stops and times are looked up, not stored:
+/// a date's profiles hold millions of these.
 #[derive(Clone, Copy, Debug, PartialEq)]
-struct Ride {
-    pattern: u32,
-    trip: u32,
-    board_pos: u32,
-    alight_pos: u32,
+pub struct Ride {
+    pub pattern: u32,
+    pub trip: u32,
+    /// Positions in the pattern's stops, for the stops passed between.
+    /// A pattern has well under 2^16 stops (`Router::new` checks).
+    pub board_pos: u16,
+    pub alight_pos: u16,
+}
+
+impl Ride {
+    fn pattern<'tt>(&self, tt: &'tt Timetable) -> &'tt Pattern {
+        &tt.patterns[self.pattern as usize]
+    }
+
+    pub fn board_stop(&self, tt: &Timetable) -> StopIdx {
+        self.pattern(tt).stops[usize::from(self.board_pos)]
+    }
+
+    pub fn alight_stop(&self, tt: &Timetable) -> StopIdx {
+        self.pattern(tt).stops[usize::from(self.alight_pos)]
+    }
+
+    pub fn depart(&self, tt: &Timetable) -> Secs {
+        self.pattern(tt).trips[self.trip as usize].times[usize::from(self.board_pos)].1
+    }
+
+    pub fn arrive(&self, tt: &Timetable) -> Secs {
+        self.pattern(tt).trips[self.trip as usize].times[usize::from(self.alight_pos)].0
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Leg {
-    Ride {
-        pattern: u32,
-        trip: u32,
-        /// Positions in the pattern's stops, for the stops passed between.
-        board_pos: u32,
-        alight_pos: u32,
-        board_stop: StopIdx,
-        alight_stop: StopIdx,
-        depart: Secs,
-        arrive: Secs,
-    },
+    Ride(Ride),
     Walk {
         from: StopIdx,
         to: StopIdx,
         duration: Secs,
     },
 }
+
+// Down from 36 when a ride stored its stops and times.
+const _: () = assert!(size_of::<Leg>() == 16);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Journey {
@@ -67,7 +87,7 @@ impl Journey {
     pub fn rides(&self) -> usize {
         self.legs
             .iter()
-            .filter(|l| matches!(l, Leg::Ride { .. }))
+            .filter(|l| matches!(l, Leg::Ride(_)))
             .count()
     }
 }
@@ -106,6 +126,11 @@ impl<'a> Router<'a> {
     pub fn new(tt: &'a Timetable) -> Self {
         let mut stop_patterns = vec![Vec::new(); tt.stops.len()];
         for (p, pattern) in tt.patterns.iter().enumerate() {
+            assert!(
+                u16::try_from(pattern.stops.len()).is_ok(),
+                "a pattern with {} stops: `Ride` positions are `u16`",
+                pattern.stops.len()
+            );
             for (pos, &s) in pattern.stops.iter().enumerate() {
                 stop_patterns[s as usize].push((p as u32, pos as u32));
             }
@@ -247,7 +272,7 @@ impl Labels<'_> {
             for (p, from) in scan {
                 let pattern = &tt.patterns[p as usize];
                 // The trip being ridden, and where it was boarded.
-                let mut riding: Option<(usize, u32)> = None;
+                let mut riding: Option<(usize, u16)> = None;
                 for pos in from as usize..pattern.stops.len() {
                     let s = pattern.stops[pos];
                     if let Some((trip, board_pos)) = riding {
@@ -256,7 +281,7 @@ impl Labels<'_> {
                             pattern: p,
                             trip: trip as u32,
                             board_pos,
-                            alight_pos: pos as u32,
+                            alight_pos: pos as u16,
                         };
                         if self.lower_ride(k, s, arrive, ride) {
                             improved.push(s);
@@ -271,7 +296,7 @@ impl Labels<'_> {
                         // FIFO patterns are sorted by departure at every stop.
                         let trip = pattern.trips.partition_point(|t| t.times[pos].1 < ready);
                         if trip < pattern.trips.len() && riding.is_none_or(|(r, _)| trip < r) {
-                            riding = Some((trip, pos as u32));
+                            riding = Some((trip, pos as u16));
                         }
                     }
                 }
@@ -352,20 +377,8 @@ impl Labels<'_> {
         let mut stop = target;
         for k in (1..=rides).rev() {
             let r = self.ride_from[k][stop as usize].expect("a reached stop has a ride label");
-            let pattern = &tt.patterns[r.pattern as usize];
-            let times = &pattern.trips[r.trip as usize].times;
-            let board_stop = pattern.stops[r.board_pos as usize];
-            legs.push(Leg::Ride {
-                pattern: r.pattern,
-                trip: r.trip,
-                board_pos: r.board_pos,
-                alight_pos: r.alight_pos,
-                board_stop,
-                alight_stop: stop,
-                depart: times[r.board_pos as usize].1,
-                arrive: times[r.alight_pos as usize].0,
-            });
-            stop = board_stop;
+            legs.push(Leg::Ride(r));
+            stop = r.board_stop(tt);
             match self.ready_from[k - 1][stop as usize].expect("a boarded stop has a ready label") {
                 Ready::Origin | Ready::Change => {}
                 Ready::Walk { from } => {
@@ -389,7 +402,7 @@ impl Labels<'_> {
             arrive: self.ride_arrival[rides][target as usize],
             legs,
         };
-        debug_assert!(journey.is_consistent(), "{journey:?}");
+        debug_assert!(journey.is_consistent(tt), "{journey:?}");
         journey
     }
 }
@@ -397,15 +410,15 @@ impl Labels<'_> {
 impl Journey {
     /// Each leg starts no earlier than the one before it ends,
     /// the first no earlier than the journey's departure.
-    fn is_consistent(&self) -> bool {
+    fn is_consistent(&self, tt: &Timetable) -> bool {
         let mut t = self.depart;
         for leg in &self.legs {
             match *leg {
-                Leg::Ride { depart, arrive, .. } => {
-                    if depart < t {
+                Leg::Ride(r) => {
+                    if r.depart(tt) < t {
                         return false;
                     }
-                    t = arrive;
+                    t = r.arrive(tt);
                 }
                 Leg::Walk { duration, .. } => t += duration,
             }
@@ -457,17 +470,11 @@ mod tests {
         j.legs
             .iter()
             .map(|l| match *l {
-                Leg::Ride {
-                    pattern,
-                    trip,
-                    board_stop,
-                    alight_stop,
-                    ..
-                } => format!(
+                Leg::Ride(r) => format!(
                     "{} {}-{}",
-                    tt.patterns[pattern as usize].trips[trip as usize].trip_id,
-                    tt.stops[board_stop as usize].id,
-                    tt.stops[alight_stop as usize].id,
+                    tt.patterns[r.pattern as usize].trips[r.trip as usize].trip_id,
+                    tt.stops[r.board_stop(tt) as usize].id,
+                    tt.stops[r.alight_stop(tt) as usize].id,
                 ),
                 Leg::Walk { from, to, .. } => {
                     format!(

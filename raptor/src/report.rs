@@ -140,21 +140,14 @@ pub fn journeys(tt: &Timetable, journeys: &[Journey]) -> String {
         );
         for leg in &j.legs {
             match *leg {
-                Leg::Ride {
-                    pattern,
-                    board_stop,
-                    alight_stop,
-                    depart,
-                    arrive,
-                    ..
-                } => line!(
+                Leg::Ride(r) => line!(
                     out,
                     "  {} {} {} -> {} {}",
-                    tt.patterns[pattern as usize].route_id,
-                    hms(depart),
-                    name(board_stop),
-                    hms(arrive),
-                    name(alight_stop),
+                    tt.patterns[r.pattern as usize].route_id,
+                    hms(r.depart(tt)),
+                    name(r.board_stop(tt)),
+                    hms(r.arrive(tt)),
+                    name(r.alight_stop(tt)),
                 ),
                 Leg::Walk { from, to, duration } => {
                     line!(out, "  walk {}s {} -> {}", duration, name(from), name(to))
