@@ -112,27 +112,34 @@ the passing-stop tie-breaker) without crowding, at least initially.
 2. Build patterns: trips grouped by (route, direction, stop sequence),
    sorted by departure; verify FIFO (no overtaking within a pattern)
    and split a pattern if it isn't.
-3. Include trips from the previous service day still running after midnight
-   (times >= 24:00), shifted by -24h,
-   so times are signed seconds.
-   The MTA files trips starting after midnight under the new day's service
+3. A date's service day runs from 04:00 to 04:00 the next morning
+   (`SERVICE_DAY_START`), around when the subway is quietest,
+   so a night counts with the evening before it, as the MTA plans service.
+   Its timetable has every trip running in it, shifted onto the date's clock,
+   so times are signed seconds:
+   the date's own, including those past midnight (`24:xx` to `27:xx`);
+   the previous date's still running at 04:00, shifted by -24h;
+   and the next date's starting before 07:00 (`DEPARTURES_UNTIL`), shifted by +24h,
+   for riders entering just before 04:00.
+   The date's own trips ending before 04:00 are the previous service day's.
+   The MTA files trips starting after midnight under the new date's service
    (`...-Sunday-00_000600_...`), so these don't double up;
    the timetable reports any trip with exactly another's times.
-   On a feed version's first date the previous date is outside it,
-   and its overnight trips are missing (reported, not an error).
+   On a feed version's first or last date the previous or next date is outside it,
+   and its trips are missing (reported, not an error).
    Consecutive versions abut (one ends 2025-11-01, the next starts 2025-11-02),
-   so taking overnight trips from the previous version is a later fix.
-4. Include the next date's trips starting before 03:00
-   (`NEXT_DATE_HORIZON`), shifted by +24h,
-   for journeys late in the date:
-   since the MTA files trips starting after midnight under the next date,
-   the date's own trips stop at midnight,
-   and without these a rider at 23:50 couldn't board a train at 00:06.
-   Missing on a version's last date, as above.
-   On the 2025-10-18 version a Wednesday gets 318 of these, no duplicates.
+   so taking those trips from the neighboring version is a later fix.
+   On the 2025-10-18 version, 2025-09-10 (a Wednesday) is 8137 of its trips,
+   none from Tuesday, and 1213 from Thursday, with no duplicates.
+   The service day's OD rows are the date's hours 4 to 23
+   and the next date's hours 0 to 3, as hours 24 to 27:
+   the OD data's hours are of calendar dates.
+   So a Friday's rows end with the average Saturday's small hours,
+   and a Monday's lose the average Monday's to the Sunday before.
 
 GTFS times count from "noon minus 12h", not wall-clock midnight,
-so on daylight-saving change dates (2025-11-02, 2026-03-08)
+so on service days with a daylight-saving change
+(Saturdays 2025-11-01 and 2026-03-07, as the change is at 02:00 Sunday)
 they're an hour off the OD data's wall-clock hours.
 The representative-date rule must skip those.
 
@@ -141,8 +148,7 @@ Some versions cover the same dates,
 so automatic selection will mean
 the latest-fetched version whose calendar covers the date.
 
-On the 2025-10-18 version, a Wednesday is 8474 trips
-plus 262 overnight from Tuesday (matching a DuckDB count),
+On the 2025-10-18 version, a Wednesday is 9350 trips
 in 211 patterns, none needing a FIFO split.
 
 Stops are the directional platform stops (`101N`, `101S`),
@@ -334,6 +340,7 @@ Complexity is added only once the simple version works end to end.
    splits the date's OD rows across their journeys
    and writes path-level Parquet (`data/raptor/paths-<date>.parquet`):
    per (hour, origin, destination, path),
+   with hours 4 to 27 of the service day,
    the riders (`DECIMAL(9,4)`, as the OD Parquet's),
    and mean wait, in-vehicle, and walk seconds (whole),
    with the feed, date, and config text in the file's metadata.
@@ -345,8 +352,8 @@ Complexity is added only once the simple version works end to end.
    whatever their origin and destination,
    not inferred from where they board or alight.
    Trip-level output (which train) is a later flag.
-   - One profile per origin complex over the whole date
-     (through `NEXT_DATE_HORIZON`, for riders entering late),
+   - One profile per origin complex over the service day
+     (through `DEPARTURES_UNTIL`, for riders entering late),
      to every destination complex at once.
    - Riders enter uniformly over their row's hour,
      with no time from fare gate to platform.
@@ -382,14 +389,15 @@ Complexity is added only once the simple version works end to end.
    (the same stops, patterns, trip times, and transfers,
    whatever the trip IDs or feed version)
    share one routing, and only split their own OD rows over it:
-   a feed version's Tuesdays to Thursdays mostly share one,
-   and Mondays and Fridays one each.
-   August 2025 to October 2026 is 75 dates on 17 distinct timetables.
+   a feed version's Mondays to Thursdays mostly share one,
+   and Fridays, running into Saturday, another.
+   August 2025 to December 2025 is 25 dates on 6 distinct timetables.
    The date is the middle usable one:
    covered with both neighbors by a feed version
    (the latest-fetched such, from `data/gtfs/`),
-   with no `calendar_dates.txt` exception (holidays),
-   and no daylight-saving change.
+   with no `calendar_dates.txt` exception (holidays) on it or the next date,
+   whose early trips its service day runs on,
+   and no daylight-saving change in its service day.
    This is the representative-date rule.
    The OD data averages each (month, day of week) over all its dates, holidays included,
    while the timetable is that of an ordinary one.

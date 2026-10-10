@@ -5,10 +5,10 @@ use std::fmt::Write;
 use std::time::Duration;
 
 use crate::assign::{PathRow, Unassigned};
-use crate::gtfs::{Feed, Secs};
+use crate::gtfs::{DAY, Feed, Secs};
 use crate::od::{ComplexId, Complexes, OdRow};
 use crate::raptor::{Journey, Leg, Legs, MAX_RIDES};
-use crate::timetable::{DEFAULT_MIN_CHANGE, NEXT_DATE_HORIZON, Timetable};
+use crate::timetable::{DEFAULT_MIN_CHANGE, DEPARTURES_UNTIL, SERVICE_DAY_START, Timetable};
 
 /// At most this many examples of each problem.
 const EXAMPLES: usize = 5;
@@ -45,7 +45,8 @@ pub fn timetable(tt: &Timetable) -> String {
     line!(out, "services: {}", r.services.join(", "));
     line!(
         out,
-        "trips: {} today + {} overnight from the previous date",
+        "service day from {}: {} of its trips + {} from the previous date still running",
+        hms(SERVICE_DAY_START),
         r.trips,
         r.overnight_trips
     );
@@ -53,7 +54,7 @@ pub fn timetable(tt: &Timetable) -> String {
         out,
         "  + {} from the next date starting before {}",
         r.next_date_trips,
-        hms(NEXT_DATE_HORIZON)
+        hms(DEPARTURES_UNTIL - DAY)
     );
     if r.next_date_missing {
         line!(

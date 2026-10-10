@@ -5,13 +5,14 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 use jiff::ToSpan;
-use jiff::civil::{Date, Weekday};
+use jiff::civil::{Date, Time, Weekday};
 use jiff::tz::TimeZone;
 
 use pyo3::pyclass;
 
 use crate::calendar::span;
 use crate::gtfs::Feed;
+use crate::timetable::SERVICE_DAY_START;
 
 /// A feed version on disk, with its `calendar.txt` span.
 #[pyclass(frozen, module = "mta_od_data._raptor")]
@@ -60,13 +61,16 @@ pub fn version_for(versions: &[&Version], date: Date) -> Option<usize> {
         .rposition(|v| v.start <= before && after <= v.end)
 }
 
-/// Whether `date` has a daylight-saving change in New York,
+/// Whether `date`'s service day (see `SERVICE_DAY_START`)
+/// has a daylight-saving change in New York,
 /// when GTFS times are an hour off wall-clock time.
 fn dst_change(date: Date) -> Result<bool> {
     let tz = TimeZone::get("America/New_York")?;
-    let start = date.to_zoned(tz.clone())?.offset();
-    let end = date.checked_add(1.day())?.to_zoned(tz)?.offset();
-    Ok(start != end)
+    let start_of = |date: Date| -> Result<_> {
+        let start = date.to_datetime(Time::midnight()) + SERVICE_DAY_START.seconds();
+        Ok(start.to_zoned(tz.clone())?.offset())
+    };
+    Ok(start_of(date)? != start_of(date.checked_add(1.day())?)?)
 }
 
 /// One (month, weekday)'s representative date.
@@ -82,7 +86,8 @@ pub struct Pick {
 /// For each (month, weekday) in `[from, to]` with `weekdays`,
 /// the middle date usable for routing:
 /// covered with its neighbors by a feed version,
-/// no `calendar_dates.txt` exception in that version, and no daylight-saving change.
+/// no `calendar_dates.txt` exception in that version on it or the next date,
+/// and no daylight-saving change in its service day.
 /// Middle, to stay clear of a version's edges.
 pub fn pick_dates(
     versions: &[&Version],
@@ -104,7 +109,13 @@ pub fn pick_dates(
                 let Some(v) = version_for(versions, d) else {
                     continue;
                 };
-                let exception = versions[v].feed.calendar_dates.iter().any(|c| c.date == d);
+                // The service day runs into the next date, on its early trips.
+                let next = d.checked_add(1.day())?;
+                let exception = versions[v]
+                    .feed
+                    .calendar_dates
+                    .iter()
+                    .any(|c| c.date == d || c.date == next);
                 if exception || dst_change(d)? {
                     continue;
                 }
@@ -193,8 +204,10 @@ mod tests {
 
     #[test]
     fn dst_dates() {
-        assert!(dst_change(Date::new(2025, 11, 2).unwrap()).unwrap());
-        assert!(dst_change(Date::new(2025, 3, 9).unwrap()).unwrap());
-        assert!(!dst_change(Date::new(2025, 11, 3).unwrap()).unwrap());
+        // The changes are at 02:00 on Sundays, in Saturday's service day.
+        assert!(dst_change(Date::new(2025, 11, 1).unwrap()).unwrap());
+        assert!(dst_change(Date::new(2025, 3, 8).unwrap()).unwrap());
+        assert!(!dst_change(Date::new(2025, 11, 2).unwrap()).unwrap());
+        assert!(!dst_change(Date::new(2025, 3, 9).unwrap()).unwrap());
     }
 }
