@@ -95,6 +95,31 @@ pub struct Report {
 }
 
 impl Timetable {
+    /// Whether routing on `self` and `other` finds the same journeys:
+    /// the same stops, patterns, trip times, and transfers,
+    /// whatever their dates, trip IDs, or which date each trip is filed under.
+    pub fn routes_like(&self, other: &Self) -> bool {
+        let same_pattern = |a: &Pattern, b: &Pattern| {
+            (&a.route_id, a.direction_id, &a.stops) == (&b.route_id, b.direction_id, &b.stops)
+                && a.trips
+                    .iter()
+                    .map(|t| &t.times)
+                    .eq(b.trips.iter().map(|t| &t.times))
+        };
+        self.stops
+            .iter()
+            .map(|s| &s.id)
+            .eq(other.stops.iter().map(|s| &s.id))
+            && self.min_change == other.min_change
+            && self.footpaths == other.footpaths
+            && self.patterns.len() == other.patterns.len()
+            && self
+                .patterns
+                .iter()
+                .zip(&other.patterns)
+                .all(|(a, b)| same_pattern(a, b))
+    }
+
     pub fn stop(&self, id: &str) -> Option<StopIdx> {
         self.stops
             .iter()
