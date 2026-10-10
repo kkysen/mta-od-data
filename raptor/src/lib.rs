@@ -25,6 +25,11 @@ use crate::raptor::Router;
 use crate::report::Timings;
 use crate::timetable::Timetable;
 
+/// Assigning a date allocates path text, journeys, and intervals on every core:
+/// glibc's `malloc` and `free` took ~26% of a date's samples.
+#[global_allocator]
+static ALLOCATOR: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 /// What `assign_date` did.
 #[pyclass(frozen, get_all, module = "mta_od_data._raptor")]
 pub struct AssignSummary {
