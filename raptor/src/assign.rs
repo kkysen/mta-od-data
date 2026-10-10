@@ -13,7 +13,7 @@ use std::ops::Index;
 use std::path::Path;
 
 use anyhow::{Context, Result};
-use rayon::prelude::*;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rustc_hash::FxHashMap;
 use serde::Deserialize;
 

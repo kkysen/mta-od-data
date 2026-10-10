@@ -15,7 +15,8 @@ use std::time::Instant;
 
 use anyhow::{Context, Result};
 use jiff::civil::{Date, Weekday};
-use pyo3::prelude::*;
+use pyo3::types::{PyModule, PyModuleMethods};
+use pyo3::{Bound, PyResult, Python, pyclass, pyfunction, pymethods, pymodule, wrap_pyfunction};
 
 use crate::assign::{Config, Transfers, Unassigned, assign, write_paths};
 use crate::batch::{Version, load_versions, pick_dates};
