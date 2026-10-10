@@ -327,18 +327,13 @@ fn in_vehicle_and_walk(tt: &Timetable, j: &Journey) -> (Secs, Secs) {
     let mut alighted_at = None;
     for leg in &j.legs {
         match *leg {
-            Leg::Ride {
-                board_stop,
-                alight_stop,
-                depart,
-                arrive,
-                ..
-            } => {
+            Leg::Ride(r) => {
+                let board_stop = r.board_stop(tt);
                 if alighted_at == Some(board_stop) {
                     walk += tt.min_change[board_stop as usize];
                 }
-                in_vehicle += arrive - depart;
-                alighted_at = Some(alight_stop);
+                in_vehicle += r.arrive(tt) - r.depart(tt);
+                alighted_at = Some(r.alight_stop(tt));
             }
             Leg::Walk { duration, .. } => {
                 walk += duration;
@@ -354,8 +349,8 @@ fn in_vehicle_and_walk(tt: &Timetable, j: &Journey) -> (Secs, Secs) {
 enum LegKey {
     Ride {
         pattern: u32,
-        board_pos: u32,
-        alight_pos: u32,
+        board_pos: u16,
+        alight_pos: u16,
     },
     Walk {
         from: StopIdx,
@@ -379,15 +374,10 @@ impl Paths {
             .legs
             .iter()
             .map(|leg| match *leg {
-                Leg::Ride {
-                    pattern,
-                    board_pos,
-                    alight_pos,
-                    ..
-                } => LegKey::Ride {
-                    pattern,
-                    board_pos,
-                    alight_pos,
+                Leg::Ride(r) => LegKey::Ride {
+                    pattern: r.pattern,
+                    board_pos: r.board_pos,
+                    alight_pos: r.alight_pos,
                 },
                 Leg::Walk { from, to, .. } => LegKey::Walk { from, to },
             })
@@ -413,14 +403,9 @@ fn path(tt: &Timetable, j: &Journey) -> String {
     j.legs
         .iter()
         .map(|leg| match *leg {
-            Leg::Ride {
-                pattern,
-                board_pos,
-                alight_pos,
-                ..
-            } => {
-                let pattern = &tt.patterns[pattern as usize];
-                let stops = pattern.stops[board_pos as usize..=alight_pos as usize]
+            Leg::Ride(r) => {
+                let pattern = &tt.patterns[r.pattern as usize];
+                let stops = pattern.stops[usize::from(r.board_pos)..=usize::from(r.alight_pos)]
                     .iter()
                     .map(|&s| id(s))
                     .collect::<Vec<_>>()
