@@ -7,6 +7,8 @@
 //! Every label has its own backpointer per round,
 //! so a journey is always extracted from the round that computed it.
 
+use std::ops::Range;
+
 use crate::gtfs::Secs;
 use crate::timetable::{Pattern, StopIdx, Timetable};
 
@@ -76,19 +78,31 @@ pub enum Leg {
 // Down from 36 when a ride stored its stops and times.
 const _: () = assert!(size_of::<Leg>() == 16);
 
+/// A journey, whose legs are in the `Legs` it was extracted into.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Journey {
     pub depart: Secs,
     pub arrive: Secs,
-    pub legs: Vec<Leg>,
+    rides: u8,
+    /// Where its legs are in its `Legs`.
+    legs: Range<u32>,
 }
 
 impl Journey {
     pub fn rides(&self) -> usize {
-        self.legs
-            .iter()
-            .filter(|l| matches!(l, Leg::Ride(_)))
-            .count()
+        usize::from(self.rides)
+    }
+}
+
+/// The legs of a query's journeys, all in one `Vec`:
+/// a `Vec` per journey was ~900k allocations live at once,
+/// assigning a sample of a date's OD rows.
+#[derive(Debug, Default)]
+pub struct Legs(Vec<Leg>);
+
+impl Legs {
+    pub fn of(&self, j: &Journey) -> &[Leg] {
+        &self.0[j.legs.start as usize..j.legs.end as usize]
     }
 }
 
@@ -199,8 +213,9 @@ impl<'a> Router<'a> {
         from: Secs,
         until: Secs,
         targets: &[&[StopIdx]],
-    ) -> Vec<Vec<Journey>> {
+    ) -> (Legs, Vec<Vec<Journey>>) {
         let mut labels = self.labels();
+        let mut legs = Legs::default();
         let mut journeys = vec![Vec::new(); targets.len()];
         // Each target set's earliest arrival per round, over the runs so far.
         let mut best = vec![[NEVER; MAX_RIDES + 1]; targets.len()];
@@ -213,14 +228,14 @@ impl<'a> Router<'a> {
                     // Lowered this run, so it leaves now,
                     // and beats every journey with fewer rides leaving now or later.
                     if arrive < *best && arrive < fewer {
-                        journeys.push(labels.extract(k, stop));
+                        journeys.push(labels.extract(k, stop, &mut legs));
                     }
                     *best = arrive;
                     fewer = fewer.min(arrive);
                 }
             }
         }
-        journeys
+        (legs, journeys)
     }
 }
 
@@ -358,22 +373,24 @@ impl Labels<'_> {
 
     /// The Pareto set of journeys to any of `targets`, fewest rides first:
     /// each arrives strictly earlier than every one with fewer rides.
-    pub fn journeys(&self, targets: &[StopIdx]) -> Vec<Journey> {
+    pub fn journeys(&self, targets: &[StopIdx]) -> (Legs, Vec<Journey>) {
+        let mut legs = Legs::default();
         let mut journeys = Vec::new();
         let mut fewer = NEVER;
         for k in 1..self.ride_arrival.len() {
             let (arrive, stop) = self.earliest(k, targets);
             if arrive < fewer {
-                journeys.push(self.extract(k, stop));
+                journeys.push(self.extract(k, stop, &mut legs));
                 fewer = arrive;
             }
         }
-        journeys
+        (legs, journeys)
     }
 
-    fn extract(&self, rides: usize, target: StopIdx) -> Journey {
+    /// The journey on `rides` rides to `target`, its legs appended to `legs`.
+    fn extract(&self, rides: usize, target: StopIdx, Legs(legs): &mut Legs) -> Journey {
         let tt = self.router.tt;
-        let mut legs = Vec::new();
+        let start = legs.len();
         let mut stop = target;
         for k in (1..=rides).rev() {
             let r = self.ride_from[k][stop as usize].expect("a reached stop has a ride label");
@@ -396,13 +413,15 @@ impl Labels<'_> {
                 }
             }
         }
-        legs.reverse();
+        legs[start..].reverse();
         let journey = Journey {
             depart: self.depart,
             arrive: self.ride_arrival[rides][target as usize],
-            legs,
+            rides: u8::try_from(rides).expect("`MAX_RIDES` fits a `u8`"),
+            legs: u32::try_from(start).expect("under 2^32 legs")
+                ..u32::try_from(legs.len()).expect("under 2^32 legs"),
         };
-        debug_assert!(journey.is_consistent(tt), "{journey:?}");
+        debug_assert!(journey.is_consistent(tt, &legs[start..]), "{journey:?}");
         journey
     }
 }
@@ -410,9 +429,9 @@ impl Labels<'_> {
 impl Journey {
     /// Each leg starts no earlier than the one before it ends,
     /// the first no earlier than the journey's departure.
-    fn is_consistent(&self, tt: &Timetable) -> bool {
+    fn is_consistent(&self, tt: &Timetable, legs: &[Leg]) -> bool {
         let mut t = self.depart;
-        for leg in &self.legs {
+        for leg in legs {
             match *leg {
                 Leg::Ride(r) => {
                     if r.depart(tt) < t {
@@ -466,9 +485,8 @@ mod tests {
     }
 
     /// `(trip_id, board stop, alight stop)` of each ride, and walks as `walk`.
-    fn summary(tt: &Timetable, j: &Journey) -> Vec<String> {
-        j.legs
-            .iter()
+    fn summary(tt: &Timetable, legs: &[Leg]) -> Vec<String> {
+        legs.iter()
             .map(|l| match *l {
                 Leg::Ride(r) => format!(
                     "{} {}-{}",
@@ -502,11 +520,11 @@ mod tests {
             "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n",
         );
         let router = Router::new(&tt);
-        let js = router
+        let (legs, js) = router
             .query(&[stop(&tt, "A")], t("08:01:00"))
             .journeys(&[stop(&tt, "C")]);
         assert_eq!(js.len(), 1);
-        assert_eq!(summary(&tt, &js[0]), ["r1b A-C"]);
+        assert_eq!(summary(&tt, legs.of(&js[0])), ["r1b A-C"]);
         assert_eq!(js[0].arrive, t("08:50:00"));
     }
 
@@ -515,10 +533,12 @@ mod tests {
         let a_to_d = |transfers: &str| {
             let tt = timetable(TRIPS, STOP_TIMES, transfers);
             let router = Router::new(&tt);
-            let js = router
+            let (legs, js) = router
                 .query(&[stop(&tt, "A")], t("08:00:00"))
                 .journeys(&[stop(&tt, "D")]);
-            js.iter().map(|j| summary(&tt, j)).collect::<Vec<_>>()
+            js.iter()
+                .map(|j| summary(&tt, legs.of(j)))
+                .collect::<Vec<_>>()
         };
         let header = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n";
         // Cross-platform at B: make the 08:11.
@@ -547,13 +567,16 @@ mod tests {
             E,B,2,120\nB,E,2,120\nE,E,2,600\n";
         let tt = timetable(trips, stop_times, transfers);
         let router = Router::new(&tt);
-        let js = router
+        let (legs, js) = router
             .query(&[stop(&tt, "A")], t("08:00:00"))
             .journeys(&[stop(&tt, "D")]);
         assert_eq!(js.len(), 1);
-        assert_eq!(summary(&tt, &js[0]), ["r3 A-E", "walk E-B", "r2a B-D"]);
         assert_eq!(
-            js[0].legs[1],
+            summary(&tt, legs.of(&js[0])),
+            ["r3 A-E", "walk E-B", "r2a B-D"]
+        );
+        assert_eq!(
+            legs.of(&js[0])[1],
             Leg::Walk {
                 from: stop(&tt, "E"),
                 to: stop(&tt, "B"),
@@ -577,12 +600,12 @@ mod tests {
             "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nB,B,2,0\n",
         );
         let router = Router::new(&tt);
-        let js = router
+        let (legs, js) = router
             .query(&[stop(&tt, "A")], t("08:00:00"))
             .journeys(&[stop(&tt, "C")]);
         let got: Vec<_> = js
             .iter()
-            .map(|j| (j.rides(), j.arrive, summary(&tt, j)))
+            .map(|j| (j.rides(), j.arrive, summary(&tt, legs.of(j))))
             .collect();
         assert_eq!(
             got,
@@ -610,7 +633,7 @@ mod tests {
             "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nB,B,2,0\n",
         );
         let router = Router::new(&tt);
-        let js = router
+        let (_, js) = router
             .query(&[stop(&tt, "A")], t("08:00:00"))
             .journeys(&[stop(&tt, "C")]);
         assert_eq!(js.len(), 1);
@@ -626,11 +649,11 @@ mod tests {
         );
         let router = Router::new(&tt);
         // From A or B, to C or D: B-D on r2a is earliest.
-        let js = router
+        let (legs, js) = router
             .query(&[stop(&tt, "A"), stop(&tt, "B")], t("08:05:00"))
             .journeys(&[stop(&tt, "C"), stop(&tt, "D")]);
         assert_eq!(js.len(), 1);
-        assert_eq!(summary(&tt, &js[0]), ["r2a B-D"]);
+        assert_eq!(summary(&tt, legs.of(&js[0])), ["r2a B-D"]);
     }
 
     #[test]
@@ -641,7 +664,7 @@ mod tests {
             "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n",
         );
         let router = Router::new(&tt);
-        let js = router
+        let (_, js) = router
             .query(&[stop(&tt, "D")], t("08:00:00"))
             .journeys(&[stop(&tt, "A")]);
         assert!(js.is_empty());
@@ -650,14 +673,14 @@ mod tests {
     fn profile(tt: &Timetable, from: &str, to: &str, window: (&str, &str)) -> Vec<String> {
         let router = Router::new(tt);
         let (origins, targets) = ([stop(tt, from)], [stop(tt, to)]);
-        let journeys = router.profile(&origins, t(window.0), t(window.1), &[&targets]);
+        let (legs, journeys) = router.profile(&origins, t(window.0), t(window.1), &[&targets]);
         journeys[0]
             .iter()
             .map(|j| {
                 format!(
                     "{} {}",
                     crate::report::hms(j.depart),
-                    summary(tt, j).join(", ")
+                    summary(tt, legs.of(j)).join(", ")
                 )
             })
             .collect()

@@ -211,10 +211,8 @@ fn route_report(
         let tt = Timetable::build(&Feed::open(&feed)?, date)?;
         let (from, to) = (stops(&tt, &origins)?, stops(&tt, &destinations)?);
         let router = Router::new(&tt);
-        Ok(report::journeys(
-            &tt,
-            &router.query(&from, depart).journeys(&to),
-        ))
+        let (legs, journeys) = router.query(&from, depart).journeys(&to);
+        Ok(report::journeys(&tt, &legs, &journeys))
     })
 }
 
@@ -234,9 +232,9 @@ fn profile_report(
         let tt = Timetable::build(&Feed::open(&feed)?, date)?;
         let (from, to) = (stops(&tt, &origins)?, stops(&tt, &destinations)?);
         let router = Router::new(&tt);
-        let mut journeys = router.profile(&from, after, before, &[&to]);
+        let (legs, mut journeys) = router.profile(&from, after, before, &[&to]);
         journeys[0].sort_by_key(|j| (j.depart, j.rides()));
-        Ok(report::journeys(&tt, &journeys[0]))
+        Ok(report::journeys(&tt, &legs, &journeys[0]))
     })
 }
 
