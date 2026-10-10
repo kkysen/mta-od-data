@@ -28,8 +28,13 @@ use crate::timetable::Timetable;
 
 /// Assigning a date allocates path text, journeys, and intervals on every core:
 /// glibc's `malloc` and `free` took ~26% of a date's samples.
+#[cfg(not(feature = "dhat-heap"))]
 #[global_allocator]
 static ALLOCATOR: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
+#[cfg(feature = "dhat-heap")]
+#[global_allocator]
+static ALLOCATOR: dhat::Alloc = dhat::Alloc;
 
 /// What `assign_date` did.
 #[pyclass(frozen, get_all, module = "mta_od_data._raptor")]
@@ -55,6 +60,9 @@ pub fn assign_date(
     config: &Path,
     out: &Path,
 ) -> Result<AssignSummary> {
+    // Writes `dhat-heap.json` to the working directory when dropped.
+    #[cfg(feature = "dhat-heap")]
+    let _profiler = dhat::Profiler::new_heap();
     let start = Instant::now();
     let (config, config_text) = Config::load(config)?;
     let mut tt = Timetable::build(&version.feed, date)?;
