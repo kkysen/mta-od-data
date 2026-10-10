@@ -199,12 +199,14 @@ fn assign_origin(
     };
     // An origin's journeys mostly repeat a few paths, departure after departure.
     let mut paths = Paths::default();
+    // Each destination's journeys are dropped once its intervals are built.
     let intervals: FxHashMap<ComplexId, Vec<Interval>> = destinations
         .iter()
-        .zip(&profiles)
-        .map(|(&d, journeys)| (d, intervals(tt, &mut paths, journeys, config)))
+        .zip(profiles)
+        .map(|(&d, journeys)| (d, intervals(tt, &mut paths, &journeys, config)))
         .collect();
-    let texts = paths.texts;
+    // Drops the interner's maps now, not at the end of the function.
+    let Paths { texts, .. } = paths;
 
     let mut paths = Vec::new();
     for row in rows {
