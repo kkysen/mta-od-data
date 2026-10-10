@@ -9,8 +9,8 @@
 //! so the shares are constant between consecutive departures.
 
 use std::collections::BTreeMap;
+use std::ops::Index;
 use std::path::Path;
-use std::rc::Rc;
 
 use anyhow::{Context, Result};
 use rayon::prelude::*;
@@ -68,7 +68,8 @@ pub struct PathRow {
     /// Every stop a ride passes is there,
     /// so riders on a stretch of track can be found
     /// whatever their origin and destination.
-    pub path: String,
+    /// Its text is in the assignment's `PathTexts`.
+    pub path: PathId,
     pub rides: u8,
     /// Of the row's riders.
     pub share: f64,
@@ -108,7 +109,7 @@ pub fn assign(
     complexes: &Complexes,
     rows: &[OdRow],
     config: &Config,
-) -> (Vec<PathRow>, Unassigned) {
+) -> (Vec<PathRow>, PathTexts, Unassigned) {
     let router = Router::new(tt);
     let mut by_origin: BTreeMap<ComplexId, Vec<&OdRow>> = BTreeMap::new();
     for row in rows {
@@ -120,16 +121,46 @@ pub fn assign(
         .collect();
 
     let mut paths = Vec::new();
+    let mut texts = PathTexts::default();
     let mut unassigned = Unassigned::default();
-    for (p, u) in results {
-        paths.extend(p);
+    for (p, t, u) in results {
+        // Each origin's ids index its own texts, so they move up past those before them.
+        // No two origins share a path: each starts at its own origin's stops.
+        let offset = u32::try_from(texts.0.len()).expect("under 2^32 paths");
+        paths.extend(p.into_iter().map(|row| PathRow {
+            path: PathId(row.path.0 + offset),
+            ..row
+        }));
+        texts.0.extend(t.0);
         unassigned.add(&u);
     }
     // `rayon` doesn't fix the order.
     paths.sort_by(|a, b| {
-        (a.origin, a.destination, a.hour, &a.path).cmp(&(b.origin, b.destination, b.hour, &b.path))
+        (a.origin, a.destination, a.hour, &texts[a.path]).cmp(&(
+            b.origin,
+            b.destination,
+            b.hour,
+            &texts[b.path],
+        ))
     });
-    (paths, unassigned)
+    (paths, texts, unassigned)
+}
+
+/// A path's index in its assignment's `PathTexts`:
+/// a date has ~1.5M distinct paths, so `u32`, not `u16`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct PathId(u32);
+
+/// Each path's text, by `PathId`.
+#[derive(Debug, Default)]
+pub struct PathTexts(Vec<Box<str>>);
+
+impl Index<PathId> for PathTexts {
+    type Output = str;
+
+    fn index(&self, id: PathId) -> &str {
+        &self.0[id.0 as usize]
+    }
 }
 
 fn stops_of(complexes: &Complexes, c: ComplexId) -> &[u32] {
@@ -143,7 +174,7 @@ fn assign_origin(
     origin: ComplexId,
     rows: &[&OdRow],
     config: &Config,
-) -> (Vec<PathRow>, Unassigned) {
+) -> (Vec<PathRow>, PathTexts, Unassigned) {
     let mut unassigned = Unassigned::default();
     let origin_stops = stops_of(complexes, origin);
     let mut destinations: Vec<ComplexId> = rows.iter().map(|r| r.destination).collect();
@@ -159,11 +190,14 @@ fn assign_origin(
         // Through the next date's early trips, for riders entering late.
         router.profile(origin_stops, 0, DAY + NEXT_DATE_HORIZON, &targets)
     };
+    // An origin's journeys mostly repeat a few paths, departure after departure.
+    let mut paths = Paths::default();
     let intervals: FxHashMap<ComplexId, Vec<Interval>> = destinations
         .iter()
         .zip(&profiles)
-        .map(|(&d, journeys)| (d, intervals(tt, journeys, config)))
+        .map(|(&d, journeys)| (d, intervals(tt, &mut paths, journeys, config)))
         .collect();
+    let texts = paths.texts;
 
     let mut paths = Vec::new();
     for row in rows {
@@ -180,7 +214,7 @@ fn assign_origin(
         unassigned.no_departure += row.riders * (1.0 - assigned);
         paths.extend(row_paths);
     }
-    (paths, unassigned)
+    (paths, texts, unassigned)
 }
 
 /// Riders entering in `(after, until]` choose among the same journeys.
@@ -191,7 +225,7 @@ struct Interval {
 }
 
 struct Choice {
-    path: Rc<str>,
+    path: PathId,
     rides: u8,
     share: f64,
     arrive: Secs,
@@ -201,10 +235,13 @@ struct Choice {
 
 /// The choice intervals of one OD pair's profile (latest departure first),
 /// earliest first.
-fn intervals(tt: &Timetable, journeys: &[Journey], config: &Config) -> Vec<Interval> {
+fn intervals(
+    tt: &Timetable,
+    paths: &mut Paths,
+    journeys: &[Journey],
+    config: &Config,
+) -> Vec<Interval> {
     let mut intervals = Vec::new();
-    // A pair's journeys mostly repeat a few paths, departure after departure.
-    let mut paths = Paths::default();
     // The latest journey seen per ride count:
     // the earliest arriving of those departing at or after the current departure,
     // since the profile dropped any arriving no earlier than a later one.
@@ -229,7 +266,7 @@ fn intervals(tt: &Timetable, journeys: &[Journey], config: &Config) -> Vec<Inter
         intervals.push(Interval {
             after,
             until: depart,
-            choices: choices(tt, &mut paths, &candidates, depart, config),
+            choices: choices(tt, paths, &candidates, depart, config),
         });
     }
     intervals.reverse();
@@ -320,13 +357,18 @@ enum LegKey {
     },
 }
 
-/// Each path's text, built once:
-/// building it is most of the work of assigning a pair otherwise.
+/// An origin's paths, interned:
+/// each journey's text built once, and each text given one `PathId`.
 #[derive(Default)]
-struct Paths(FxHashMap<Vec<LegKey>, Rc<str>>);
+struct Paths {
+    by_legs: FxHashMap<Vec<LegKey>, PathId>,
+    // Different legs can read the same, e.g. two patterns of a route over the same stops.
+    by_text: FxHashMap<Box<str>, PathId>,
+    texts: PathTexts,
+}
 
 impl Paths {
-    fn get(&mut self, tt: &Timetable, j: &Journey) -> Rc<str> {
+    fn get(&mut self, tt: &Timetable, j: &Journey) -> PathId {
         let key = j
             .legs
             .iter()
@@ -344,10 +386,19 @@ impl Paths {
                 Leg::Walk { from, to, .. } => LegKey::Walk { from, to },
             })
             .collect();
-        self.0
-            .entry(key)
-            .or_insert_with(|| path(tt, j).into())
-            .clone()
+        let Self {
+            by_legs,
+            by_text,
+            texts,
+        } = self;
+        *by_legs.entry(key).or_insert_with(|| {
+            let text: Box<str> = path(tt, j).into();
+            *by_text.entry(text.clone()).or_insert_with(|| {
+                let id = PathId(u32::try_from(texts.0.len()).expect("under 2^32 paths"));
+                texts.0.push(text);
+                id
+            })
+        })
     }
 }
 
@@ -388,7 +439,7 @@ fn assign_row(row: &OdRow, intervals: &[Interval]) -> (Vec<PathRow>, f64) {
         in_vehicle: f64,
         walk: f64,
     }
-    let mut accs: BTreeMap<&str, Acc> = BTreeMap::new();
+    let mut accs: BTreeMap<PathId, Acc> = BTreeMap::new();
     let mut assigned = 0.0;
     for interval in intervals {
         let (lo, hi) = (interval.after.max(start), interval.until.min(end));
@@ -400,7 +451,7 @@ fn assign_row(row: &OdRow, intervals: &[Interval]) -> (Vec<PathRow>, f64) {
         assigned += weight;
         for o in &interval.choices {
             let share = weight * o.share;
-            let acc = accs.entry(&*o.path).or_default();
+            let acc = accs.entry(o.path).or_default();
             acc.rides = o.rides;
             acc.share += share;
             acc.wait += share * (f64::from(o.arrive) - mid - f64::from(o.in_vehicle + o.walk));
@@ -414,7 +465,7 @@ fn assign_row(row: &OdRow, intervals: &[Interval]) -> (Vec<PathRow>, f64) {
             hour: row.hour,
             origin: row.origin,
             destination: row.destination,
-            path: path.to_string(),
+            path,
             rides: a.rides,
             share: a.share,
             riders: a.share * row.riders,
@@ -440,6 +491,7 @@ const RIDERS_SCALE: i8 = 4;
 pub fn write_paths(
     out: &Path,
     paths: &[PathRow],
+    texts: &PathTexts,
     date: jiff::civil::Date,
     metadata: Vec<(String, String)>,
 ) -> Result<()> {
@@ -495,7 +547,7 @@ pub fn write_paths(
         (
             "path",
             Arc::new(StringArray::from_iter_values(
-                paths.iter().map(|p| p.path.as_str()),
+                paths.iter().map(|p| &texts[p.path]),
             )),
         ),
         (
@@ -589,11 +641,11 @@ mod tests {
             t1,A,08:10:00,08:10:00,1\nt1,C,08:30:00,08:30:00,2\n\
             t2,A,08:40:00,08:40:00,1\nt2,C,09:00:00,09:00:00,2\n";
         let tt = timetable(trips, stop_times, NO_TRANSFERS);
-        let (paths, unassigned) = assign(&tt, &complexes(&tt), &[row(0, 2)], &NEUTRAL);
+        let (paths, texts, unassigned) = assign(&tt, &complexes(&tt), &[row(0, 2)], &NEUTRAL);
 
         assert_eq!(paths.len(), 1);
         let p = &paths[0];
-        assert_eq!((p.path.as_str(), p.rides), ("1 A>C", 1));
+        assert_eq!((&texts[p.path], p.rides), ("1 A>C", 1));
         assert!((p.share - 40.0 / 60.0).abs() < 1e-12);
         assert!((p.riders - 40.0).abs() < 1e-9);
         assert!((unassigned.no_departure - 20.0).abs() < 1e-9);
@@ -614,9 +666,9 @@ mod tests {
             fast,B,08:21:00,08:21:00,1\nfast,C,08:30:00,08:30:00,2\n";
         let transfers = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nB,B,2,60\n";
         let tt = timetable(trips, stop_times, transfers);
-        let (paths, unassigned) = assign(&tt, &complexes(&tt), &[row(0, 2)], &NEUTRAL);
+        let (paths, texts, unassigned) = assign(&tt, &complexes(&tt), &[row(0, 2)], &NEUTRAL);
 
-        let by_path: HashMap<_, _> = paths.iter().map(|p| (p.path.as_str(), p)).collect();
+        let by_path: HashMap<_, _> = paths.iter().map(|p| (&texts[p.path], p)).collect();
         let (slow, fast) = (by_path["1 A>C"], by_path["2 A>B | 5 B>C"]);
         // Only riders entering by 08:10 have a train: 1/6 of the hour.
         assert!((slow.share + fast.share - 1.0 / 6.0).abs() < 1e-12);
@@ -641,8 +693,8 @@ mod tests {
         let transfers = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nB,B,2,60\n";
         let tt = timetable(trips, stop_times, transfers);
         let share = |config: &Config, path: &str| {
-            let (paths, _) = assign(&tt, &complexes(&tt), &[row(0, 2)], config);
-            paths.iter().find(|p| p.path == path).unwrap().share
+            let (paths, texts, _) = assign(&tt, &complexes(&tt), &[row(0, 2)], config);
+            paths.iter().find(|p| &texts[p.path] == path).unwrap().share
         };
         // 1 min faster with a transfer: favored when transfers are free.
         assert!(share(&NEUTRAL, "2 A>B | 5 B>C") > share(&NEUTRAL, "1 A>C"));
@@ -660,8 +712,8 @@ mod tests {
             t1,A,08:10:00,08:10:00,1\nt1,B,08:20:00,08:20:00,2\n\
             t1,C,08:30:00,08:30:00,3\nt1,D,08:40:00,08:40:00,4\n";
         let tt = timetable(trips, stop_times, NO_TRANSFERS);
-        let (paths, _) = assign(&tt, &complexes(&tt), &[row(0, 2)], &NEUTRAL);
-        let paths: Vec<_> = paths.iter().map(|p| p.path.as_str()).collect();
+        let (paths, texts, _) = assign(&tt, &complexes(&tt), &[row(0, 2)], &NEUTRAL);
+        let paths: Vec<_> = paths.iter().map(|p| &texts[p.path]).collect();
         assert_eq!(paths, ["1 A>B>C"]);
     }
 
@@ -673,7 +725,7 @@ mod tests {
             t1,A,08:10:00,08:10:00,1\nt1,C,08:30:00,08:30:00,2\n";
         let tt = timetable(trips, stop_times, NO_TRANSFERS);
         let rows = [row(0, 2), row(0, 3), row(0, 9), row(9, 2)];
-        let (paths, unassigned) = assign(&tt, &complexes(&tt), &rows, &NEUTRAL);
+        let (paths, _, unassigned) = assign(&tt, &complexes(&tt), &rows, &NEUTRAL);
 
         assert_eq!(unassigned.no_stops, 120.0);
         assert_eq!(unassigned.unreachable, 60.0);
