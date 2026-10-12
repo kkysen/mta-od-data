@@ -32,12 +32,15 @@ from typer import Option, Typer
 
 from mta_od_data.analyze.common import Coord, connection, haversine
 from mta_od_data.analyze.path_riders import (
+    AS_ROUTED,
+    Counting,
     DatePaths,
-    OdScale,
+    EvasionYear,
+    FareEvasionOption,
     RoutedOd,
     ScaledOd,
+    counting,
     date_paths,
-    od_scale,
     paths_params,
     paths_query,
     read_manifest,
@@ -92,7 +95,7 @@ def group_of(route: str, grouping: Grouping) -> str | None:
 
 # Riders on paths with a ride on each group's routes, each path once per group.
 # A ride is `<route> <stop>>...`; walks don't count.
-# `{paths}` is `paths_query`'s, each path's riders, perhaps scaled.
+# `{paths}` is `paths_query`'s, each path's riders as counted.
 RIDERS_QUERY = """
     WITH paths AS ({paths}),
     groups AS (
@@ -113,14 +116,14 @@ RIDERS_QUERY = """
 
 
 def riders_by_group(
-    d: DatePaths, groups: Mapping[str, str], scale: OdScale | None = None
+    d: DatePaths, groups: Mapping[str, str], c: Counting = AS_ROUTED
 ) -> dict[str, float]:
     """Riders on one date's paths on each group, from each route's group."""
     entries = [{"k": route, "v": group} for route, group in groups.items()]
-    params = paths_params(d, scale) | {"texts": str(d.texts), "groups": entries}
+    params = paths_params(d, c) | {"texts": str(d.texts), "groups": entries}
     rows = (
         connection()
-        .execute(RIDERS_QUERY.format(paths=paths_query(scale)), params)
+        .execute(RIDERS_QUERY.format(paths=paths_query(c)), params)
         .fetchall()
     )
     return {group: float(riders) for group, riders in rows}
@@ -320,7 +323,7 @@ class Totals:
 
 
 def day_totals(
-    d: DatePaths, feed: Feed, grouping: Grouping, scale: OdScale | None
+    d: DatePaths, feed: Feed, grouping: Grouping, c: Counting
 ) -> dict[str, Totals]:
     patterns = feed.patterns_on(d.day)
     lengths = segment_lengths(patterns)
@@ -331,7 +334,7 @@ def day_totals(
     for p, n in patterns.items():
         if p.route in groups:
             by_group[groups[p.route]][p] = n
-    riders = riders_by_group(d, groups, scale)
+    riders = riders_by_group(d, groups, c)
     return {
         group: Totals(
             riders=riders.get(group, 0.0),
@@ -359,6 +362,8 @@ def line_ridership(
     ] = DEFAULT_MANIFEST,
     scaled_od: ScaledOd = None,
     routed_od: RoutedOd = DEFAULT_PARQUET,
+    fare_evasion: FareEvasionOption = False,
+    evasion_year: EvasionYear = None,
 ) -> None:
     """Average weekday riders on each line, per route km, and per train-km,
     over `mta-od-data raptor assign-range`'s dates.
@@ -367,14 +372,14 @@ def line_ridership(
     route km and train-km included, from each date's own feed.
     """
     rows = read_manifest(manifest)
-    scale = od_scale(scaled_od, routed_od, rows)
+    c = counting(rows, scaled_od, routed_od, fare_evasion, evasion_year)
     totals: defaultdict[str, Totals] = defaultdict(Totals)
     total_days = 0
     for row in rows:
         feed = load_feed(DEFAULT_GTFS_DIR / Path(row["feed"]).name)
         days = int(row["days"])
         d = date_paths(manifest, row)
-        for group, t in day_totals(d, feed, by, scale).items():
+        for group, t in day_totals(d, feed, by, c).items():
             totals[group].add(t, days)
         total_days += days
 

@@ -14,12 +14,15 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import connection
 from mta_od_data.analyze.path_riders import (
+    AS_ROUTED,
+    Counting,
     DatePaths,
-    OdScale,
+    EvasionYear,
+    FareEvasionOption,
     RoutedOd,
     ScaledOd,
+    counting,
     date_paths,
-    od_scale,
     paths_params,
     paths_query,
     read_manifest,
@@ -34,7 +37,7 @@ DEFAULT_MANIFEST = DATA / "raptor" / "manifest.csv"
 # A ride is `<route> <stop>><stop>>...`; walks (`walk <from>><to>`) don't count.
 # Whether a path rides the stretch depends only on the path,
 # so it's decided once per distinct path.
-# `{paths}` is `paths_query`'s, each path's riders, perhaps scaled.
+# `{paths}` is `paths_query`'s, each path's riders as counted.
 RIDERS_QUERY = """
     WITH paths AS ({paths}),
     rides AS (
@@ -60,14 +63,12 @@ RIDERS_QUERY = """
 """
 
 
-def riders_on_stretch(
-    d: DatePaths, stops: list[str], scale: OdScale | None = None
-) -> float:
+def riders_on_stretch(d: DatePaths, stops: list[str], c: Counting = AS_ROUTED) -> float:
     """Riders on one date's paths with a ride between consecutive `stops`."""
-    params = paths_params(d, scale) | {"texts": str(d.texts), "stops": stops}
+    params = paths_params(d, c) | {"texts": str(d.texts), "stops": stops}
     result: tuple[float] | None = (
         connection()
-        .execute(RIDERS_QUERY.format(paths=paths_query(scale)), params)
+        .execute(RIDERS_QUERY.format(paths=paths_query(c)), params)
         .fetchone()
     )
     assert result is not None, "aggregate query always returns one row"
@@ -91,6 +92,8 @@ def track_ridership(
     ] = DEFAULT_MANIFEST,
     scaled_od: ScaledOd = None,
     routed_od: RoutedOd = DEFAULT_PARQUET,
+    fare_evasion: FareEvasionOption = False,
+    evasion_year: EvasionYear = None,
 ) -> None:
     """Average weekday riders on a stretch of track,
     over `mta-od-data raptor assign-range`'s dates.
@@ -99,14 +102,14 @@ def track_ridership(
     so the average weights it by them.
     """
     rows = read_manifest(manifest)
-    scale = od_scale(scaled_od, routed_od, rows)
+    c = counting(rows, scaled_od, routed_od, fare_evasion, evasion_year)
     total_riders = 0.0
     total_days = 0
     by_month: dict[str, tuple[float, int]] = {}
     print("| date | weekday | days | riders on the stretch |")
     print("| --- | --- | ---: | ---: |")
     for row in rows:
-        riders = riders_on_stretch(date_paths(manifest, row), stop, scale)
+        riders = riders_on_stretch(date_paths(manifest, row), stop, c)
         days = int(row["days"])
         print(f"| {row['date']} | {row['day_of_week']} | {days} | {riders:,.0f} |")
         total_riders += riders * days

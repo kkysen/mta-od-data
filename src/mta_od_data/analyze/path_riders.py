@@ -1,11 +1,13 @@
 """Each path's riders in one date of `mta-od-data raptor assign-range`'s paths,
-as routed or as if the OD data had been scaled.
+as routed, as if the OD data had been scaled, or with fare evaders.
 
 Riders choose among journeys by the timetable and cost weights alone,
 not by how many others ride (there's no crowding),
 so routing scaled OD data would split each OD row's riders the same way.
 Each path's riders are then its OD row's scaled riders over the routed ones
 times its routed riders, and a scaled run needn't be routed at all.
+Likewise fare evaders, missing from the OD data (counted from swipes and taps):
+each path's riders over 1 less the evasion rate counts them too.
 """
 
 from collections.abc import Iterable
@@ -17,7 +19,9 @@ from typing import Annotated
 
 from typer import Option
 
+from mta_od_data import DATA
 from mta_od_data.analyze.common import connection
+from mta_od_data.prepare import fetch_csv
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,19 +75,92 @@ RoutedOd = Annotated[
 ]
 
 
+FareEvasionOption = Annotated[
+    bool,
+    Option(
+        "--fare-evasion",
+        help=(
+            "Count fare evaders too: riders over 1 less the evasion rate "
+            "in each date's quarter, from data.ny.gov"
+        ),
+    ),
+]
+EvasionYear = Annotated[
+    int | None,
+    Option(
+        help=(
+            "With --fare-evasion, the same quarter's rate in this year, "
+            "for OD data scaled to it, e.g. 2019"
+        )
+    ),
+]
+
+# "MTA NYCT Subway Fare Evasion: Beginning 2018": quarterly subway evasion rates,
+# estimated from traffic checkers' surveys, as on https://metrics.mta.info.
+FARE_EVASION_URL = (
+    "https://data.ny.gov/api/views/6kj3-ijvb/rows.csv?accessType=DOWNLOAD"
+)
+DEFAULT_FARE_EVASION = DATA / "fare_evasion.csv"
+
+
+@dataclass(frozen=True, slots=True)
+class FareEvasion:
+    """Each (year, quarter)'s evasion rate, and the year to take them from,
+    if not each date's own."""
+
+    rates: dict[tuple[int, int], float]
+    year: int | None
+
+    def rate(self, d: date) -> float:
+        key = (self.year or d.year, (d.month - 1) // 3 + 1)
+        if key not in self.rates:
+            raise ValueError(f"no fare evasion rate for {key[0]} Q{key[1]}")
+        return self.rates[key]
+
+
+def load_fare_evasion(
+    year: int | None, path: Path = DEFAULT_FARE_EVASION
+) -> FareEvasion:
+    fetch_csv(FARE_EVASION_URL, path, force=False)
+    rates: dict[tuple[int, int], float] = {}
+    with path.open() as f:
+        for row in DictReader(f):
+            # "2025-Q3"; a quarter not surveyed (2020-Q2) has no rate.
+            y, q = row["Time Period"].split("-Q")
+            if row["Fare Evasion"]:
+                rates[int(y), int(q)] = float(row["Fare Evasion"])
+    return FareEvasion(rates=rates, year=year)
+
+
+@dataclass(frozen=True, slots=True)
+class Counting:
+    """How paths' riders are counted: OD data scaled or not, evaders or not."""
+
+    scale: OdScale | None = None
+    evasion: FareEvasion | None = None
+
+
+AS_ROUTED = Counting()
+
+
+def counting(
+    rows: Iterable[dict[str, str]],
+    scaled_od: Path | None,
+    routed_od: Path,
+    fare_evasion: bool,
+    evasion_year: int | None,
+) -> Counting:
+    """The commands' options' `Counting`, for the manifest `rows`' dates."""
+    days = [date.fromisoformat(r["date"]) for r in rows]
+    return Counting(
+        scale=None if scaled_od is None else load_factors(routed_od, scaled_od, days),
+        evasion=load_fare_evasion(evasion_year) if fare_evasion else None,
+    )
+
+
 def read_manifest(manifest: Path) -> list[dict[str, str]]:
     with manifest.open() as f:
         return list(DictReader(f))
-
-
-def od_scale(
-    scaled: Path | None, routed: Path, rows: Iterable[dict[str, str]]
-) -> OdScale | None:
-    """The scale from `routed` to `scaled`, if any,
-    for the manifest `rows`' dates."""
-    if scaled is None:
-        return None
-    return load_factors(routed, scaled, (date.fromisoformat(r["date"]) for r in rows))
 
 
 # Each OD row's scaled riders over its routed ones, in the slices of `$slices`,
@@ -112,12 +189,14 @@ _OD_SLICE = """
     GROUP BY ALL
 """
 
-# A service day's hours 24 to 27 are the next date's 0 to 3, from its own OD slice.
+# A service day's hours 24 to 27 are the next date's 0 to 3, from its own OD slice,
+# and with its own fare evasion.
 _SCALED = """
     SELECT p.path_id, p.riders * coalesce(f.f, 0) AS riders
     FROM (
         SELECT
-            path_id, riders, origin, destination,
+            path_id, origin, destination,
+            riders * if(hour < 24, $evasion, $next_evasion) AS riders,
             if(hour < 24, $slice, $next_slice) AS s,
             hour % 24 AS h
         FROM read_parquet($paths)
@@ -158,18 +237,32 @@ def load_factors(routed: Path, scaled: Path, days: Iterable[date]) -> OdScale:
     return OdScale(slices=ids)
 
 
-def paths_query(scale: OdScale | None) -> str:
+_UNSCALED = """
+    SELECT path_id, riders * if(hour < 24, $evasion, $next_evasion) AS riders
+    FROM read_parquet($paths)
+"""
+
+
+def paths_query(c: Counting) -> str:
     """A query of `path_id` and `riders`, with `paths_params`' parameters."""
-    if scale is None:
-        return "SELECT path_id, riders FROM read_parquet($paths)"
-    return _SCALED
+    return _UNSCALED if c.scale is None else _SCALED
 
 
-def paths_params(d: DatePaths, scale: OdScale | None) -> dict[str, object]:
-    params: dict[str, object] = {"paths": str(d.paths)}
-    if scale is not None:
+def paths_params(d: DatePaths, c: Counting) -> dict[str, object]:
+    next_day = d.day + timedelta(days=1)
+
+    # Riders and evaders, over the paid riders that are 1 less the evasion rate.
+    def evasion(day: date) -> float:
+        return 1.0 if c.evasion is None else 1 / (1 - c.evasion.rate(day))
+
+    params: dict[str, object] = {
+        "paths": str(d.paths),
+        "evasion": evasion(d.day),
+        "next_evasion": evasion(next_day),
+    }
+    if (scale := c.scale) is not None:
         params |= {
             "slice": scale.slices[slice_of(d.day)],
-            "next_slice": scale.slices[slice_of(d.day + timedelta(days=1))],
+            "next_slice": scale.slices[slice_of(next_day)],
         }
     return params

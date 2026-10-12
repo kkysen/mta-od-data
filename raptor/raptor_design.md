@@ -428,6 +428,10 @@ Complexity is added only once the simple version works end to end.
    so each path's riders scale by its OD row's scaled riders over its routed ones.
    That matches a routed run on the scaled OD data to a rider.
    Once crowding is modeled, scaled OD data will need its own routing.
+   `--fare-evasion` likewise counts fare evaders, absent from the OD data:
+   each path's riders over 1 less the evasion rate in its date's quarter
+   (data.ny.gov's `6kj3-ijvb`, fetched to `data/fare_evasion.csv`),
+   or that quarter in `--evasion-year`'s for OD data scaled to another year.
 7. **Later, in any order**:
    directional stops and the transfer rules above;
    curated `transfer_times.csv`;
