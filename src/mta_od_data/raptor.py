@@ -59,13 +59,24 @@ Stops = Annotated[
 Od = Annotated[Path, Option(help="The OD Parquet, from `mta-od-data prepare`")]
 Stations = Annotated[Path, Option(help="The station reference CSV")]
 Config = Annotated[Path, Option(help="Generalized cost weights")]
+ZSTD_LEVELS = {"fast": 1, "medium": 6, "slow": 9}
+
+
+def parse_zstd_level(value: str) -> int:
+    """A zstd level, or one of `ZSTD_LEVELS`' names for one."""
+    return ZSTD_LEVELS.get(value) or int(value)
+
+
 ZstdLevel = Annotated[
     int,
     Option(
+        parser=parse_zstd_level,
+        metavar="[fast|medium|slow|LEVEL]",
         help=(
-            "zstd level of the path Parquets: 1 writes fastest; "
-            "e.g. 9 makes the path texts ~2/3 the size, for outputs to keep"
-        )
+            "zstd level of the path Parquets: fast (1) writes fastest; "
+            "medium (6) and slow (9) make the path texts ~2/3 the size, "
+            "for outputs to keep"
+        ),
     ),
 ]
 
