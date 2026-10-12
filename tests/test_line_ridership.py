@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 
 from mta_od_data.analyze.common import connection
@@ -7,6 +8,7 @@ from mta_od_data.analyze.line_ridership import (
     route_length,
     segment_lengths,
 )
+from mta_od_data.analyze.path_riders import DatePaths
 
 
 def write_paths(path: Path, texts: Path, rows: list[tuple[str, float]]) -> None:
@@ -42,7 +44,7 @@ def test_riders_once_per_group(tmp_path: Path) -> None:
         ],
     )
     groups = {"2": "7 Av", "3": "7 Av", "7": "Flushing", "E": "8 Av"}
-    assert riders_by_group(paths, texts, groups) == {
+    assert riders_by_group(DatePaths(date(2025, 9, 17), paths, texts), groups) == {
         "7 Av": 1.0,
         "Flushing": 2.0,
         "8 Av": 2.0,

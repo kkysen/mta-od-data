@@ -31,8 +31,20 @@ from zipfile import ZipFile
 from typer import Option, Typer
 
 from mta_od_data.analyze.common import Coord, connection, haversine
+from mta_od_data.analyze.path_riders import (
+    DatePaths,
+    OdScale,
+    RoutedOd,
+    ScaledOd,
+    date_paths,
+    od_scale,
+    paths_params,
+    paths_query,
+    read_manifest,
+)
 from mta_od_data.analyze.track_ridership import DEFAULT_MANIFEST
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR
+from mta_od_data.prepare import DEFAULT_PARQUET
 
 app = Typer()
 
@@ -80,8 +92,10 @@ def group_of(route: str, grouping: Grouping) -> str | None:
 
 # Riders on paths with a ride on each group's routes, each path once per group.
 # A ride is `<route> <stop>>...`; walks don't count.
+# `{paths}` is `paths_query`'s, each path's riders, perhaps scaled.
 RIDERS_QUERY = """
-    WITH groups AS (
+    WITH paths AS ({paths}),
+    groups AS (
         SELECT DISTINCT
             path_id, map_from_entries($groups)[split_part(leg, ' ', 1)] AS grp
         FROM (
@@ -92,23 +106,21 @@ RIDERS_QUERY = """
         WHERE NOT starts_with(leg, 'walk ')
     )
     SELECT grp, sum(riders)
-    FROM read_parquet($paths) JOIN groups USING (path_id)
+    FROM paths JOIN groups USING (path_id)
     WHERE grp IS NOT NULL
     GROUP BY grp
 """
 
 
 def riders_by_group(
-    paths: Path, texts: Path, groups: Mapping[str, str]
+    d: DatePaths, groups: Mapping[str, str], scale: OdScale | None = None
 ) -> dict[str, float]:
-    """Riders in one path Parquet, with its `texts`, on each group,
-    from each route's group."""
+    """Riders on one date's paths on each group, from each route's group."""
     entries = [{"k": route, "v": group} for route, group in groups.items()]
+    params = paths_params(d, scale) | {"texts": str(d.texts), "groups": entries}
     rows = (
         connection()
-        .execute(
-            RIDERS_QUERY, {"paths": str(paths), "texts": str(texts), "groups": entries}
-        )
+        .execute(RIDERS_QUERY.format(paths=paths_query(scale)), params)
         .fetchall()
     )
     return {group: float(riders) for group, riders in rows}
@@ -308,9 +320,9 @@ class Totals:
 
 
 def day_totals(
-    paths: Path, texts: Path, feed: Feed, day: date, grouping: Grouping
+    d: DatePaths, feed: Feed, grouping: Grouping, scale: OdScale | None
 ) -> dict[str, Totals]:
-    patterns = feed.patterns_on(day)
+    patterns = feed.patterns_on(d.day)
     lengths = segment_lengths(patterns)
     groups = {
         p.route: g for p in patterns if (g := group_of(p.route, grouping)) is not None
@@ -319,7 +331,7 @@ def day_totals(
     for p, n in patterns.items():
         if p.route in groups:
             by_group[groups[p.route]][p] = n
-    riders = riders_by_group(paths, texts, groups)
+    riders = riders_by_group(d, groups, scale)
     return {
         group: Totals(
             riders=riders.get(group, 0.0),
@@ -345,6 +357,8 @@ def line_ridership(
     manifest: Annotated[
         Path, Option(help="`mta-od-data raptor assign-range`'s manifest")
     ] = DEFAULT_MANIFEST,
+    scaled_od: ScaledOd = None,
+    routed_od: RoutedOd = DEFAULT_PARQUET,
 ) -> None:
     """Average weekday riders on each line, per route km, and per train-km,
     over `mta-od-data raptor assign-range`'s dates.
@@ -352,19 +366,17 @@ def line_ridership(
     Each date stands for its `days`, so the averages weight it by them,
     route km and train-km included, from each date's own feed.
     """
+    rows = read_manifest(manifest)
+    scale = od_scale(scaled_od, routed_od, rows)
     totals: defaultdict[str, Totals] = defaultdict(Totals)
     total_days = 0
-    with manifest.open() as f:
-        for row in DictReader(f):
-            # Found beside the manifest, as in `track-ridership`.
-            paths = manifest.parent / Path(row["paths"]).name
-            texts = manifest.parent / Path(row["path_texts"]).name
-            feed = load_feed(DEFAULT_GTFS_DIR / Path(row["feed"]).name)
-            days = int(row["days"])
-            day = date.fromisoformat(row["date"])
-            for group, t in day_totals(paths, texts, feed, day, grouping=by).items():
-                totals[group].add(t, days)
-            total_days += days
+    for row in rows:
+        feed = load_feed(DEFAULT_GTFS_DIR / Path(row["feed"]).name)
+        days = int(row["days"])
+        d = date_paths(manifest, row)
+        for group, t in day_totals(d, feed, by, scale).items():
+            totals[group].add(t, days)
+        total_days += days
 
     averages = {g: t.per_day(total_days) for g, t in totals.items()}
     print(f"Average weekday over {total_days} weekdays.")

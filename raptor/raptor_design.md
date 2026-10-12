@@ -422,6 +422,12 @@ Complexity is added only once the simple version works end to end.
    with a ride between two consecutive stops both in the given set,
    e.g. `--stop R14 --stop B08 --stop Q03 --stop Q04 --stop Q05`
    for Second Av Subway Phase 1.
+   It and `line-ridership` take `--scaled-od` (from `mta-od-data scale-od`)
+   to count riders as if routed with it, without routing:
+   with no crowding, riders' choices don't depend on how many ride,
+   so each path's riders scale by its OD row's scaled riders over its routed ones.
+   That matches a routed run on the scaled OD data to a rider.
+   Once crowding is modeled, scaled OD data will need its own routing.
 7. **Later, in any order**:
    directional stops and the transfer rules above;
    curated `transfer_times.csv`;

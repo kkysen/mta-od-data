@@ -1,6 +1,8 @@
+from datetime import date
 from pathlib import Path
 
 from mta_od_data.analyze.common import connection
+from mta_od_data.analyze.path_riders import DatePaths
 from mta_od_data.analyze.track_ridership import riders_on_stretch
 
 SAS_PHASE_1 = ["R14", "B08", "Q03", "Q04", "Q05"]
@@ -42,4 +44,7 @@ def test_riders_between_consecutive_stops_on_the_stretch(tmp_path: Path) -> None
             ("N R14>R13>B08", 32.0),
         ],
     )
-    assert riders_on_stretch(paths, texts, SAS_PHASE_1) == 7.0
+    assert (
+        riders_on_stretch(DatePaths(date(2025, 9, 17), paths, texts), SAS_PHASE_1)
+        == 7.0
+    )
