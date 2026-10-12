@@ -9,7 +9,7 @@ from datetime import date
 from pathlib import Path
 from typing import Annotated
 
-from typer import Option, Typer
+from typer import BadParameter, Option, Typer
 
 from mta_od_data import DATA, ROOT
 from mta_od_data._raptor import (
@@ -64,13 +64,22 @@ ZSTD_LEVELS = {"fast": 1, "medium": 6, "slow": 9}
 
 def parse_zstd_level(value: str) -> int:
     """A zstd level, or one of `ZSTD_LEVELS`' names for one."""
-    return ZSTD_LEVELS.get(value) or int(value)
+    if value in ZSTD_LEVELS:
+        return ZSTD_LEVELS[value]
+    try:
+        return int(value)
+    except ValueError:
+        raise BadParameter(
+            f"{value!r} is not fast, medium, slow, or a number",
+            param_hint="'--zstd-level'",
+        ) from None
 
 
+# A name or number, parsed by the commands with `parse_zstd_level`:
+# Typer has no union type for `int` with a default of "fast".
 ZstdLevel = Annotated[
-    int,
+    str,
     Option(
-        parser=parse_zstd_level,
         metavar="[fast|medium|slow|LEVEL]",
         help=(
             "zstd level of the path Parquets: fast (1) writes fastest; "
@@ -144,13 +153,19 @@ def assign(
         Path | None,
         Option(help="Output Parquet (default: data/raptor/paths-<date>.parquet)"),
     ] = None,
-    zstd_level: ZstdLevel = 1,
+    zstd_level: ZstdLevel = "fast",
 ) -> None:
     """Split a date's OD rows across their journeys, and write the paths taken."""
     out = out or DEFAULT_OUT_DIR / f"paths-{date}.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)
     summary = assign_date(
-        Version.open(feed), date, od, stations, config, out, zstd_level
+        Version.open(feed),
+        date,
+        od,
+        stations,
+        config,
+        out,
+        parse_zstd_level(zstd_level),
     )
     print(summary.report, end="")
     print(f"wrote {out}")
@@ -173,7 +188,7 @@ def assign_range(
     out_dir: Annotated[
         Path, Option(help="Where the path Parquets and manifest.csv go")
     ] = DEFAULT_OUT_DIR,
-    zstd_level: ZstdLevel = 1,
+    zstd_level: ZstdLevel = "fast",
 ) -> None:
     """`assign` each (month, weekday) in a date range on a representative date,
     with the latest feed version covering it,
@@ -195,7 +210,7 @@ def assign_range(
         od,
         stations,
         config,
-        zstd_level,
+        parse_zstd_level(zstd_level),
     )
     manifest_path = out_dir / "manifest.csv"
     with manifest_path.open("w", newline="") as f:
