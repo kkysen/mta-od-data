@@ -347,6 +347,8 @@ Complexity is added only once the simple version works end to end.
    Paths are by `path_id`, into `path-texts-<date>.parquet` beside it
    (`path_id`, `path`), written once for every date routed alike
    and named in the date's metadata and the manifest.
+   Rows are sorted by (origin, destination, path, hour),
+   and the integer columns delta-encoded where that's smaller,
    A path is its rides as `<route> <board>><each stop passed>><alight>`
    and walks as `walk <from>><to>`,
    by GTFS stop ID (names repeat: `127` and `R16` are both Times Sq-42 St).

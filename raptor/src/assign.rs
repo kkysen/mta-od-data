@@ -13,7 +13,7 @@ use std::ops::Index;
 use std::path::Path;
 
 use anyhow::{Context, Result};
-use parquet::basic::{Compression, ZstdLevel};
+use parquet::basic::{Compression, Encoding, ZstdLevel};
 use parquet::file::properties::{DEFAULT_MAX_ROW_GROUP_ROW_COUNT, WriterPropertiesBuilder};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rustc_hash::FxHashMap;
@@ -290,7 +290,9 @@ fn split_origin(
         p.path = PathId(p.path.0 + routes.offset);
     }
     // On this origin's thread, so `split` needn't sort all of a date's rows on one.
-    paths.sort_by_key(|p| (p.destination, p.hour, p.path));
+    // A path's hours together, not an hour's paths:
+    // its rows then repeat its id, rides, and walk, which compress to almost nothing.
+    paths.sort_by_key(|p| (p.destination, p.path, p.hour));
     (paths, unassigned)
 }
 
@@ -665,7 +667,22 @@ pub fn write_paths(
     // One chunk per row group, as the writer would split them anyway.
     let mut chunks = paths.chunks(ROW_GROUP_SIZE);
     let first = batch(chunks.next().unwrap_or_default())?;
-    let props = properties(metadata)?.build();
+    // Delta where consecutive rows' values are close, as sorted by `split`:
+    // in-vehicle times included, but not waits or walks, which delta made bigger.
+    // Riders too, ~7% smaller than plain
+    // (byte stream split was smaller still, but DuckDB reads it only for floats).
+    let mut props = properties(metadata)?;
+    for column in [
+        "hour",
+        "destination",
+        "path_id",
+        "rides",
+        "riders",
+        "in_vehicle_s",
+    ] {
+        props = props.set_column_encoding(column.into(), Encoding::DELTA_BINARY_PACKED);
+    }
+    let props = props.build();
     let mut writer = ArrowWriter::try_new(file, first.schema(), Some(props))?;
     writer.write(&first)?;
     for chunk in chunks {
@@ -693,7 +710,10 @@ pub fn write_path_texts(
         Field::new("path_id", DataType::UInt32, false),
         Field::new("path", DataType::Utf8, false),
     ]));
-    let props = properties(metadata)?.build();
+    let props = properties(metadata)?
+        // Ids count up by 1, so their deltas pack to nothing.
+        .set_column_encoding("path_id".into(), Encoding::DELTA_BINARY_PACKED)
+        .build();
     let mut writer = ArrowWriter::try_new(create(out)?, Arc::clone(&schema), Some(props))?;
     let mut id = 0u32;
     let texts: Vec<&str> = routes.texts().collect();
