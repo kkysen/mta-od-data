@@ -12,6 +12,7 @@ pub mod timetable;
 
 use std::collections::VecDeque;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use std::time::Instant;
 
 use anyhow::{Context, Result};
@@ -20,7 +21,7 @@ use pyo3::types::{PyModule, PyModuleMethods};
 use pyo3::{Bound, PyResult, Python, pyclass, pyfunction, pymethods, pymodule, wrap_pyfunction};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
-use crate::assign::{Config, Transfers, Unassigned, route, split, write_paths};
+use crate::assign::{Config, Transfers, Unassigned, route, split, write_path_texts, write_paths};
 use crate::batch::{Version, load_versions, pick_dates};
 use crate::gtfs::{Feed, Secs, parse_time};
 use crate::od::{Complexes, load_service_day, load_service_days};
@@ -48,11 +49,15 @@ pub struct AssignSummary {
     pub unassigned_no_departure: f64,
     /// How many path rows were written.
     pub paths: usize,
+    /// The Parquet of the paths' texts, by `path_id`,
+    /// shared with the other dates routed alike.
+    pub path_texts: PathBuf,
     /// `report::assignment`'s summary, for printing.
     pub report: String,
 }
 
 /// One date to assign, on its feed version, writing its paths to `out`.
+/// Their texts go beside the first `out` of the dates routed alike.
 pub struct Job<'a> {
     pub version: &'a Version,
     pub date: Date,
@@ -169,10 +174,39 @@ pub fn assign_dates(
                     .collect::<Vec<_>>()
                     .join(", ")
             );
+            let first = &jobs[group.jobs[0]];
+            let path_texts = path_texts_out(&first.out, first.date);
+            // Written with the dates' paths, as they split.
+            let routes = Arc::new(routes);
+            while writing.len() >= WRITERS {
+                join(writing.pop_front().expect("WRITERS > 0"))?;
+            }
+            writing.push_back({
+                let routes = Arc::clone(&routes);
+                let path_texts = path_texts.clone();
+                let metadata = vec![
+                    ("feed".to_string(), first.version.path.display().to_string()),
+                    (
+                        "dates".to_string(),
+                        dates
+                            .iter()
+                            .map(Date::to_string)
+                            .collect::<Vec<_>>()
+                            .join(","),
+                    ),
+                    ("config".to_string(), config_text.clone()),
+                ];
+                scope.spawn(move || -> Result<()> {
+                    let start = Instant::now();
+                    write_path_texts(&path_texts, &routes, metadata)?;
+                    eprintln!("wrote {} in {:.1?}", path_texts.display(), start.elapsed());
+                    Ok(())
+                })
+            });
             for (&i, rows) in group.jobs.iter().zip(&slices) {
                 let job = &jobs[i];
                 let start = Instant::now();
-                let (paths, texts, unassigned) = split(&routes, &group.complexes, rows);
+                let (paths, unassigned) = split(&routes, &group.complexes, rows);
                 let timings = Timings {
                     loaded,
                     routed,
@@ -183,6 +217,7 @@ pub fn assign_dates(
                     ("feed".to_string(), job.version.path.display().to_string()),
                     ("date".to_string(), job.date.to_string()),
                     ("config".to_string(), config_text.clone()),
+                    ("path_texts".to_string(), file_name(&path_texts)),
                 ];
                 let Unassigned {
                     no_stops,
@@ -196,14 +231,15 @@ pub fn assign_dates(
                     unassigned_unreachable: unreachable,
                     unassigned_no_departure: no_departure,
                     paths: paths.len(),
+                    path_texts: path_texts.clone(),
                     report: report::assignment(rows, &paths, &unassigned, &timings),
                 });
-                if writing.len() == WRITERS {
+                while writing.len() >= WRITERS {
                     join(writing.pop_front().expect("WRITERS > 0"))?;
                 }
                 writing.push_back(scope.spawn(move || -> Result<()> {
                     let start = Instant::now();
-                    write_paths(&job.out, &paths, &texts, job.date, metadata)?;
+                    write_paths(&job.out, &paths, job.date, metadata)?;
                     eprintln!("wrote {} in {:.1?}", job.out.display(), start.elapsed());
                     Ok(())
                 }));
@@ -220,7 +256,18 @@ pub fn assign_dates(
         .collect())
 }
 
-/// Dates written at once: each holds its paths, ~150 MB, until written.
+/// Where a group's path texts go: beside its first date's paths, `out`.
+fn path_texts_out(out: &Path, date: Date) -> PathBuf {
+    out.with_file_name(format!("path-texts-{date}.parquet"))
+}
+
+fn file_name(path: &Path) -> String {
+    path.file_name()
+        .map_or_else(String::new, |n| n.to_string_lossy().into_owned())
+}
+
+/// Files written at once: each date holds its paths, ~150 MB, until written,
+/// and each group's texts its routes.
 const WRITERS: usize = 4;
 
 /// Joins a thread, passing on its panic.

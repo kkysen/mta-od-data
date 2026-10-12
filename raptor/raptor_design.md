@@ -344,6 +344,9 @@ Complexity is added only once the simple version works end to end.
    the riders (`DECIMAL(9,4)`, as the OD Parquet's),
    and mean wait, in-vehicle, and walk seconds (whole),
    with the feed, date, and config text in the file's metadata.
+   Paths are by `path_id`, into `path-texts-<date>.parquet` beside it
+   (`path_id`, `path`), written once for every date routed alike
+   and named in the date's metadata and the manifest.
    A path is its rides as `<route> <board>><each stop passed>><alight>`
    and walks as `walk <from>><to>`,
    by GTFS stop ID (names repeat: `127` and `R16` are both Times Sq-42 St).
@@ -380,8 +383,9 @@ Complexity is added only once the simple version works end to end.
    5.2M path rows; ~7s to assign on 12 cores, ~19s in all.
    `mta-od-data raptor assign-range --from <date> --to <date>` assigns
    every (month, weekday Monday to Friday) in the range on one date each,
-   writing `data/raptor/paths-<date>.parquet` and `data/raptor/manifest.csv`
-   (date, feed, how many of the month's dates in the range share its weekday,
+   writing `data/raptor/paths-<date>.parquet`, their `path-texts-<date>.parquet`,
+   and `data/raptor/manifest.csv`
+   (date, feed, the paths and their texts' files, how many of the month's dates in the range share its weekday,
    and the run's rider totals),
    so an average over the range weights each date by its `days`.
    Riders' choices depend only on the timetable and config,

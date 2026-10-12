@@ -6,22 +6,27 @@ from mta_od_data.analyze.track_ridership import riders_on_stretch
 SAS_PHASE_1 = ["R14", "B08", "Q03", "Q04", "Q05"]
 
 
-def write_paths(path: Path, rows: list[tuple[str, float]]) -> None:
+def write_paths(path: Path, texts: Path, rows: list[tuple[str, float]]) -> None:
     values = ", ".join(f"({i}, '{p}', {r})" for i, (p, r) in enumerate(rows))
     connection().execute(
         f"""
         COPY (
-            SELECT 8 AS hour, i AS origin, 0 AS destination, path, riders
+            SELECT 8 AS hour, i AS origin, 0 AS destination, i AS path_id, riders
             FROM (VALUES {values}) t(i, path, riders)
-        ) TO '{path}' (FORMAT parquet)
+        ) TO '{path}' (FORMAT parquet);
+        COPY (
+            SELECT i AS path_id, path FROM (VALUES {values}) t(i, path, riders)
+        ) TO '{texts}' (FORMAT parquet)
         """
     )
 
 
 def test_riders_between_consecutive_stops_on_the_stretch(tmp_path: Path) -> None:
     paths = tmp_path / "paths.parquet"
+    texts = tmp_path / "path-texts.parquet"
     write_paths(
         paths,
+        texts,
         [
             # Through the 57 St-63 St connector only, boarding and alighting off it.
             ("Q R16>R14>B08 | walk B08>B08", 1.0),
@@ -37,4 +42,4 @@ def test_riders_between_consecutive_stops_on_the_stretch(tmp_path: Path) -> None
             ("N R14>R13>B08", 32.0),
         ],
     )
-    assert riders_on_stretch(paths, SAS_PHASE_1) == 7.0
+    assert riders_on_stretch(paths, texts, SAS_PHASE_1) == 7.0

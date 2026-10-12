@@ -9,22 +9,27 @@ from mta_od_data.analyze.line_ridership import (
 )
 
 
-def write_paths(path: Path, rows: list[tuple[str, float]]) -> None:
+def write_paths(path: Path, texts: Path, rows: list[tuple[str, float]]) -> None:
     values = ", ".join(f"({i}, '{p}', {r})" for i, (p, r) in enumerate(rows))
     connection().execute(
         f"""
         COPY (
-            SELECT 8 AS hour, i AS origin, 0 AS destination, path, riders
+            SELECT 8 AS hour, i AS origin, 0 AS destination, i AS path_id, riders
             FROM (VALUES {values}) t(i, path, riders)
-        ) TO '{path}' (FORMAT parquet)
+        ) TO '{path}' (FORMAT parquet);
+        COPY (
+            SELECT i AS path_id, path FROM (VALUES {values}) t(i, path, riders)
+        ) TO '{texts}' (FORMAT parquet)
         """
     )
 
 
 def test_riders_once_per_group(tmp_path: Path) -> None:
     paths = tmp_path / "paths.parquet"
+    texts = tmp_path / "path-texts.parquet"
     write_paths(
         paths,
+        texts,
         [
             # Two rides on one group: counted once.
             ("2 120>127 | 3 127>132", 1.0),
@@ -37,7 +42,11 @@ def test_riders_once_per_group(tmp_path: Path) -> None:
         ],
     )
     groups = {"2": "7 Av", "3": "7 Av", "7": "Flushing", "E": "8 Av"}
-    assert riders_by_group(paths, groups) == {"7 Av": 1.0, "Flushing": 2.0, "8 Av": 2.0}
+    assert riders_by_group(paths, texts, groups) == {
+        "7 Av": 1.0,
+        "Flushing": 2.0,
+        "8 Av": 2.0,
+    }
 
 
 def pattern(route: str, stops: str, lengths: list[float]) -> Pattern:

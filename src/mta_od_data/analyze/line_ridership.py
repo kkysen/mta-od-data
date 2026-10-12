@@ -82,26 +82,33 @@ def group_of(route: str, grouping: Grouping) -> str | None:
 # A ride is `<route> <stop>>...`; walks don't count.
 RIDERS_QUERY = """
     WITH groups AS (
-        SELECT DISTINCT path, map_from_entries($groups)[split_part(leg, ' ', 1)] AS grp
+        SELECT DISTINCT
+            path_id, map_from_entries($groups)[split_part(leg, ' ', 1)] AS grp
         FROM (
-            SELECT path, unnest(string_split(path, ' | ')) AS leg
-            FROM (SELECT DISTINCT path FROM read_parquet($paths))
+            SELECT path_id, unnest(string_split(path, ' | ')) AS leg
+            FROM read_parquet($texts)
+            WHERE path_id IN (SELECT path_id FROM read_parquet($paths))
         )
         WHERE NOT starts_with(leg, 'walk ')
     )
     SELECT grp, sum(riders)
-    FROM read_parquet($paths) JOIN groups USING (path)
+    FROM read_parquet($paths) JOIN groups USING (path_id)
     WHERE grp IS NOT NULL
     GROUP BY grp
 """
 
 
-def riders_by_group(paths: Path, groups: Mapping[str, str]) -> dict[str, float]:
-    """Riders in one path Parquet on each group, from each route's group."""
+def riders_by_group(
+    paths: Path, texts: Path, groups: Mapping[str, str]
+) -> dict[str, float]:
+    """Riders in one path Parquet, with its `texts`, on each group,
+    from each route's group."""
     entries = [{"k": route, "v": group} for route, group in groups.items()]
     rows = (
         connection()
-        .execute(RIDERS_QUERY, {"paths": str(paths), "groups": entries})
+        .execute(
+            RIDERS_QUERY, {"paths": str(paths), "texts": str(texts), "groups": entries}
+        )
         .fetchall()
     )
     return {group: float(riders) for group, riders in rows}
@@ -301,7 +308,7 @@ class Totals:
 
 
 def day_totals(
-    paths: Path, feed: Feed, day: date, grouping: Grouping
+    paths: Path, texts: Path, feed: Feed, day: date, grouping: Grouping
 ) -> dict[str, Totals]:
     patterns = feed.patterns_on(day)
     lengths = segment_lengths(patterns)
@@ -312,7 +319,7 @@ def day_totals(
     for p, n in patterns.items():
         if p.route in groups:
             by_group[groups[p.route]][p] = n
-    riders = riders_by_group(paths, groups)
+    riders = riders_by_group(paths, texts, groups)
     return {
         group: Totals(
             riders=riders.get(group, 0.0),
@@ -351,10 +358,11 @@ def line_ridership(
         for row in DictReader(f):
             # Found beside the manifest, as in `track-ridership`.
             paths = manifest.parent / Path(row["paths"]).name
+            texts = manifest.parent / Path(row["path_texts"]).name
             feed = load_feed(DEFAULT_GTFS_DIR / Path(row["feed"]).name)
             days = int(row["days"])
             day = date.fromisoformat(row["date"])
-            for group, t in day_totals(paths, feed, day, grouping=by).items():
+            for group, t in day_totals(paths, texts, feed, day, grouping=by).items():
                 totals[group].add(t, days)
             total_days += days
 

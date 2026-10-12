@@ -30,6 +30,7 @@ class AssignSummary:
     unassigned_unreachable: float
     unassigned_no_departure: float
     paths: int
+    path_texts: Path
     report: str
 
 def load_versions(dir: StrPath) -> list[Version]: ...

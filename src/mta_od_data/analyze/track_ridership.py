@@ -25,15 +25,16 @@ DEFAULT_MANIFEST = DATA / "raptor" / "manifest.csv"
 # so it's decided once per distinct path.
 RIDERS_QUERY = """
     WITH rides AS (
-        SELECT path, string_split(split_part(leg, ' ', 2), '>') AS stops
+        SELECT path_id, string_split(split_part(leg, ' ', 2), '>') AS stops
         FROM (
-            SELECT path, unnest(string_split(path, ' | ')) AS leg
-            FROM (SELECT DISTINCT path FROM read_parquet($paths))
+            SELECT path_id, unnest(string_split(path, ' | ')) AS leg
+            FROM read_parquet($texts)
+            WHERE path_id IN (SELECT path_id FROM read_parquet($paths))
         )
         WHERE NOT starts_with(leg, 'walk ')
     ),
     on_stretch AS (
-        SELECT DISTINCT path
+        SELECT DISTINCT path_id
         FROM rides
         WHERE len(list_filter(
             range(1, len(stops)),
@@ -42,15 +43,18 @@ RIDERS_QUERY = """
     )
     SELECT coalesce(sum(riders), 0)
     FROM read_parquet($paths)
-    WHERE path IN (SELECT path FROM on_stretch)
+    WHERE path_id IN (SELECT path_id FROM on_stretch)
 """
 
 
-def riders_on_stretch(paths: Path, stops: list[str]) -> float:
-    """Riders in one path Parquet with a ride between consecutive `stops`."""
+def riders_on_stretch(paths: Path, texts: Path, stops: list[str]) -> float:
+    """Riders in one path Parquet, with its `texts`,
+    with a ride between consecutive `stops`."""
     result: tuple[float] | None = (
         connection()
-        .execute(RIDERS_QUERY, {"paths": str(paths), "stops": stops})
+        .execute(
+            RIDERS_QUERY, {"paths": str(paths), "texts": str(texts), "stops": stops}
+        )
         .fetchone()
     )
     assert result is not None, "aggregate query always returns one row"
@@ -89,7 +93,8 @@ def track_ridership(
             # Found beside the manifest, wherever it was written from:
             # older manifests' paths are relative to `raptor/`.
             paths = manifest.parent / Path(row["paths"]).name
-            riders = riders_on_stretch(paths, stop)
+            texts = manifest.parent / Path(row["path_texts"]).name
+            riders = riders_on_stretch(paths, texts, stop)
             days = int(row["days"])
             print(f"| {row['date']} | {row['day_of_week']} | {days} | {riders:,.0f} |")
             total_riders += riders * days

@@ -13,7 +13,8 @@ use std::ops::Index;
 use std::path::Path;
 
 use anyhow::{Context, Result};
-use parquet::file::properties::DEFAULT_MAX_ROW_GROUP_ROW_COUNT;
+use parquet::basic::{Compression, ZstdLevel};
+use parquet::file::properties::{DEFAULT_MAX_ROW_GROUP_ROW_COUNT, WriterPropertiesBuilder};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rustc_hash::FxHashMap;
 use serde::Deserialize;
@@ -69,7 +70,8 @@ pub struct PathRow {
     /// Every stop a ride passes is there,
     /// so riders on a stretch of track can be found
     /// whatever their origin and destination.
-    /// Its text is in the assignment's `PathTexts`.
+    /// Its text is in the routing's `PathTexts`,
+    /// shared by every date routed with it.
     pub path: PathId,
     pub rides: u8,
     /// Rounded as the path Parquet stores it.
@@ -118,7 +120,10 @@ pub fn assign(
     rows: &[OdRow],
     config: &Config,
 ) -> (Vec<PathRow>, PathTexts, Unassigned) {
-    split(&route(tt, complexes, rows, config), complexes, rows)
+    let routes = route(tt, complexes, rows, config);
+    let (paths, unassigned) = split(&routes, complexes, rows);
+    let texts = PathTexts(routes.texts().map(Box::from).collect());
+    (paths, texts, unassigned)
 }
 
 /// Every origin's choice intervals to each of its destinations on one timetable.
@@ -126,9 +131,19 @@ pub fn assign(
 /// so dates whose timetables route alike share these.
 pub struct Routes(BTreeMap<ComplexId, OriginRoutes>);
 
+impl Routes {
+    /// Every routed path's text, by `PathId`:
+    /// each origin's after those of the origins before it.
+    pub fn texts(&self) -> impl Iterator<Item = &str> {
+        self.0.values().flat_map(|o| o.texts.0.iter().map(|t| &**t))
+    }
+}
+
 pub struct OriginRoutes {
     intervals: FxHashMap<ComplexId, Intervals>,
+    /// Indexed by this origin's own ids, which `offset` turns into `Routes`'.
     texts: PathTexts,
+    offset: u32,
 }
 
 /// Routes every OD pair in `rows` (of any number of dates) on `tt`.
@@ -147,24 +162,28 @@ pub fn route<'a>(
         destinations.sort_unstable();
         destinations.dedup();
     }
-    Routes(
-        pairs
-            .par_iter()
-            .map(|(&origin, destinations)| {
-                let routes = route_origin(tt, &router, complexes, origin, destinations, config);
-                (origin, routes)
-            })
-            .collect(),
-    )
+    let mut routes: BTreeMap<_, _> = pairs
+        .par_iter()
+        .map(|(&origin, destinations)| {
+            let routes = route_origin(tt, &router, complexes, origin, destinations, config);
+            (origin, routes)
+        })
+        .collect();
+    // No two origins share a path: each starts at its own origin's stops.
+    let mut offset = 0u32;
+    for o in routes.values_mut() {
+        o.offset = offset;
+        offset = offset
+            .checked_add(u32::try_from(o.texts.0.len()).expect("under 2^32 paths"))
+            .expect("under 2^32 paths");
+    }
+    Routes(routes)
 }
 
 /// Splits `rows`' riders over their journeys in `routes`,
 /// which must have routed every OD pair in `rows`.
-pub fn split(
-    routes: &Routes,
-    complexes: &Complexes,
-    rows: &[OdRow],
-) -> (Vec<PathRow>, PathTexts, Unassigned) {
+/// Paths are `routes`' ids, so their texts are `Routes::texts`.
+pub fn split(routes: &Routes, complexes: &Complexes, rows: &[OdRow]) -> (Vec<PathRow>, Unassigned) {
     let mut by_origin: BTreeMap<ComplexId, Vec<&OdRow>> = BTreeMap::new();
     for row in rows {
         by_origin.entry(row.origin).or_default().push(row);
@@ -176,26 +195,16 @@ pub fn split(
 
     // `collect` keeps `by_origin`'s order, and each origin's rows come sorted,
     // so the rows are in (origin, destination, hour, path) order as they're appended.
-    let mut paths = Vec::with_capacity(results.iter().map(|(p, _, _)| p.len()).sum());
-    let mut texts = PathTexts(Vec::with_capacity(
-        results.iter().map(|(_, t, _)| t.0.len()).sum(),
-    ));
+    let mut paths = Vec::with_capacity(results.iter().map(|(p, _)| p.len()).sum());
     let mut unassigned = Unassigned::default();
-    for (p, t, u) in results {
-        // Each origin's ids index its own texts, so they move up past those before them.
-        // No two origins share a path: each starts at its own origin's stops.
-        let offset = u32::try_from(texts.0.len()).expect("under 2^32 paths");
-        paths.extend(p.into_iter().map(|row| PathRow {
-            path: PathId(row.path.0 + offset),
-            ..row
-        }));
-        texts.0.extend(t.0);
+    for (p, u) in results {
+        paths.extend(p);
         unassigned.add(&u);
     }
-    (paths, texts, unassigned)
+    (paths, unassigned)
 }
 
-/// A path's index in its assignment's `PathTexts`:
+/// A path's index in its routing's `PathTexts`:
 /// a date has ~1.5M distinct paths, so `u32`, not `u16`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct PathId(u32);
@@ -247,7 +256,11 @@ fn route_origin(
     drop(legs);
     // Drops the interner's maps now, not when the routes are.
     let Paths { texts, .. } = paths;
-    OriginRoutes { intervals, texts }
+    OriginRoutes {
+        intervals,
+        texts,
+        offset: 0,
+    }
 }
 
 fn split_origin(
@@ -255,7 +268,7 @@ fn split_origin(
     complexes: &Complexes,
     origin: ComplexId,
     rows: &[&OdRow],
-) -> (Vec<PathRow>, PathTexts, Unassigned) {
+) -> (Vec<PathRow>, Unassigned) {
     let mut unassigned = Unassigned::default();
     let origin_stops = stops_of(complexes, origin);
     let mut paths = Vec::new();
@@ -273,32 +286,12 @@ fn split_origin(
         unassigned.no_departure += row.riders.to_f64() * (1.0 - assigned);
         paths.extend(row_paths);
     }
-    // Only the texts of paths this date's riders take, renumbered in their old order,
-    // when the routes are shared with other dates'.
-    let mut renumber = vec![false; routes.texts.0.len()];
-    for p in &paths {
-        renumber[p.path.0 as usize] = true;
-    }
-    let mut texts = PathTexts::default();
-    let renumber: Vec<PathId> = renumber
-        .into_iter()
-        .zip(&routes.texts.0)
-        .map(|(used, text)| {
-            let id = PathId(texts.0.len() as u32);
-            if used {
-                texts.0.push(text.clone());
-            }
-            id
-        })
-        .collect();
     for p in &mut paths {
-        p.path = renumber[p.path.0 as usize];
+        p.path = PathId(p.path.0 + routes.offset);
     }
     // On this origin's thread, so `split` needn't sort all of a date's rows on one.
-    paths.sort_by(|a, b| {
-        (a.destination, a.hour, &texts[a.path]).cmp(&(b.destination, b.hour, &texts[b.path]))
-    });
-    (paths, texts, unassigned)
+    paths.sort_by_key(|p| (p.destination, p.hour, p.path));
+    (paths, unassigned)
 }
 
 /// One OD pair's choice intervals, earliest first:
@@ -598,33 +591,21 @@ const ROW_GROUP_SIZE: usize = DEFAULT_MAX_ROW_GROUP_ROW_COUNT;
 /// a split rider count or an averaged time uses every bit of an `f64`,
 /// which barely compresses.
 /// No share or total time: riders over the OD row's, and the times' sum.
+/// Paths as their `path_id`s, whose texts `write_path_texts` writes
+/// once for every date routed alike.
 pub fn write_paths(
     out: &Path,
     paths: &[PathRow],
-    texts: &PathTexts,
     date: jiff::civil::Date,
     metadata: Vec<(String, String)>,
 ) -> Result<()> {
     use std::sync::Arc;
 
-    use arrow_array::builder::StringBuilder;
     use arrow_array::{
-        ArrayRef, Decimal128Array, DictionaryArray, RecordBatch, StringArray, UInt8Array,
-        UInt16Array, UInt32Array, types::UInt32Type,
+        ArrayRef, Decimal128Array, RecordBatch, StringArray, UInt8Array, UInt16Array, UInt32Array,
     };
     use parquet::arrow::ArrowWriter;
-    use parquet::basic::{Compression, ZstdLevel};
-    use parquet::file::metadata::KeyValue;
-    use parquet::file::properties::{EnabledStatistics, WriterProperties};
 
-    // Each path's text once, shared by every chunk's dictionary.
-    // Sized up front, not grown (and copied) as it goes.
-    let bytes = texts.0.iter().map(|t| t.len()).sum();
-    let mut builder = StringBuilder::with_capacity(texts.0.len(), bytes);
-    for text in &texts.0 {
-        builder.append_value(text);
-    }
-    let texts: ArrayRef = Arc::new(builder.finish());
     let batch = |paths: &[PathRow]| -> Result<RecordBatch> {
         let n = paths.len();
         let seconds = |f: fn(&PathRow) -> u32| -> ArrayRef {
@@ -663,11 +644,10 @@ pub fn write_paths(
                 )),
             ),
             (
-                "path",
-                Arc::new(DictionaryArray::<UInt32Type>::try_new(
-                    UInt32Array::from_iter_values(paths.iter().map(|p| p.path.0)),
-                    Arc::clone(&texts),
-                )?),
+                "path_id",
+                Arc::new(UInt32Array::from_iter_values(
+                    paths.iter().map(|p| p.path.0),
+                )),
             ),
             (
                 "rides",
@@ -679,32 +659,13 @@ pub fn write_paths(
             ("walk_s", seconds(|p| p.walk)),
         ])?)
     };
-    let props = WriterProperties::builder()
-        // Level 1, not 3: a third faster, for ~1% more.
-        .set_compression(Compression::ZSTD(ZstdLevel::try_new(1)?))
-        // Dictionary encoding hashed every value of every column,
-        // ~40% of writing, for ~3% smaller files than zstd alone:
-        // only the paths, long and repeated, are worth it.
-        .set_dictionary_enabled(false)
-        .set_column_dictionary_enabled("path".into(), true)
-        // Min and max path text are of no use, and comparing every path's took time.
-        .set_column_statistics_enabled("path".into(), EnabledStatistics::None)
-        .set_key_value_metadata(Some(
-            metadata
-                .into_iter()
-                .map(|(k, v)| KeyValue::new(k, v))
-                .collect(),
-        ))
-        .build();
-    if let Some(dir) = out.parent() {
-        std::fs::create_dir_all(dir)?;
-    }
-    let file = std::fs::File::create(out).with_context(|| format!("creating {}", out.display()))?;
+    let file = create(out)?;
     // A chunk of rows at a time, not all of a date's ~5.7M at once:
     // its arrays took ~500 MB.
     // One chunk per row group, as the writer would split them anyway.
     let mut chunks = paths.chunks(ROW_GROUP_SIZE);
     let first = batch(chunks.next().unwrap_or_default())?;
+    let props = properties(metadata)?.build();
     let mut writer = ArrowWriter::try_new(file, first.schema(), Some(props))?;
     writer.write(&first)?;
     for chunk in chunks {
@@ -712,6 +673,79 @@ pub fn write_paths(
     }
     writer.close()?;
     Ok(())
+}
+
+/// Writes every path `routes` routed, as `path_id` and `path` text,
+/// for the path Parquets of each date split on them.
+pub fn write_path_texts(
+    out: &Path,
+    routes: &Routes,
+    metadata: Vec<(String, String)>,
+) -> Result<()> {
+    use std::sync::Arc;
+
+    use arrow_array::builder::StringBuilder;
+    use arrow_array::{ArrayRef, RecordBatch, UInt32Array};
+    use arrow_schema::{DataType, Field, Schema};
+    use parquet::arrow::ArrowWriter;
+
+    let schema = Arc::new(Schema::new(vec![
+        Field::new("path_id", DataType::UInt32, false),
+        Field::new("path", DataType::Utf8, false),
+    ]));
+    let props = properties(metadata)?.build();
+    let mut writer = ArrowWriter::try_new(create(out)?, Arc::clone(&schema), Some(props))?;
+    let mut id = 0u32;
+    let texts: Vec<&str> = routes.texts().collect();
+    for chunk in texts.chunks(ROW_GROUP_SIZE) {
+        // Sized up front, not grown (and copied) as it goes.
+        let bytes = chunk.iter().map(|t| t.len()).sum();
+        let mut builder = StringBuilder::with_capacity(chunk.len(), bytes);
+        for text in chunk {
+            builder.append_value(text);
+        }
+        let n = chunk.len() as u32;
+        let batch = RecordBatch::try_new(
+            Arc::clone(&schema),
+            vec![
+                Arc::new(UInt32Array::from_iter_values(id..id + n)) as ArrayRef,
+                Arc::new(builder.finish()),
+            ],
+        )?;
+        id += n;
+        writer.write(&batch)?;
+    }
+    writer.close()?;
+    Ok(())
+}
+
+/// Creates `out` and its directory.
+fn create(out: &Path) -> Result<std::fs::File> {
+    if let Some(dir) = out.parent() {
+        std::fs::create_dir_all(dir)?;
+    }
+    std::fs::File::create(out).with_context(|| format!("creating {}", out.display()))
+}
+
+/// The path Parquets' writer properties, with `metadata` as key-value metadata.
+fn properties(metadata: Vec<(String, String)>) -> Result<WriterPropertiesBuilder> {
+    use parquet::file::metadata::KeyValue;
+    use parquet::file::properties::{EnabledStatistics, WriterProperties};
+
+    Ok(WriterProperties::builder()
+        // Level 1, not 3: a third faster, for ~1% more.
+        .set_compression(Compression::ZSTD(ZstdLevel::try_new(1)?))
+        // Dictionary encoding hashed every value of every column,
+        // ~40% of writing, for ~3% smaller files than zstd alone.
+        .set_dictionary_enabled(false)
+        // Min and max path text are of no use, and comparing every path's took time.
+        .set_column_statistics_enabled("path".into(), EnabledStatistics::None)
+        .set_key_value_metadata(Some(
+            metadata
+                .into_iter()
+                .map(|(k, v)| KeyValue::new(k, v))
+                .collect(),
+        )))
 }
 
 #[cfg(test)]
