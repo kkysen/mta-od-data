@@ -349,6 +349,7 @@ Complexity is added only once the simple version works end to end.
    and named in the date's metadata and the manifest.
    Rows are sorted by (origin, destination, path, hour),
    and the integer columns delta-encoded where that's smaller,
+   all zstd at `--zstd-level` (1, fastest, by default; e.g. 9 for outputs to keep).
    A path is its rides as `<route> <board>><each stop passed>><alight>`
    and walks as `walk <from>><to>`,
    by GTFS stop ID (names repeat: `127` and `R16` are both Times Sq-42 St).

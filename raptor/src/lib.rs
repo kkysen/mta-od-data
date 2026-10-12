@@ -65,7 +65,7 @@ pub struct Job<'a> {
 }
 
 /// Assigns `date`'s OD rows on `version`'s timetable for it,
-/// with the config at `config`, and writes the paths to `out`.
+/// with the config at `config`, and writes the paths to `out`, zstd at `zstd_level`.
 pub fn assign_date(
     version: &Version,
     date: Date,
@@ -73,13 +73,14 @@ pub fn assign_date(
     stations: &Path,
     config: &Path,
     out: &Path,
+    zstd_level: i32,
 ) -> Result<AssignSummary> {
     let job = Job {
         version,
         date,
         out: out.to_owned(),
     };
-    let mut summaries = assign_dates(&[job], od, stations, config)?;
+    let mut summaries = assign_dates(&[job], od, stations, config, zstd_level)?;
     Ok(summaries.pop().expect("one summary per job"))
 }
 
@@ -100,6 +101,7 @@ pub fn assign_dates(
     od: &Path,
     stations: &Path,
     config: &Path,
+    zstd_level: i32,
 ) -> Result<Vec<AssignSummary>> {
     // Writes `dhat-heap.json` to the working directory when dropped.
     #[cfg(feature = "dhat-heap")]
@@ -198,7 +200,7 @@ pub fn assign_dates(
                 ];
                 scope.spawn(move || -> Result<()> {
                     let start = Instant::now();
-                    write_path_texts(&path_texts, &routes, metadata)?;
+                    write_path_texts(&path_texts, &routes, metadata, zstd_level)?;
                     eprintln!("wrote {} in {:.1?}", path_texts.display(), start.elapsed());
                     Ok(())
                 })
@@ -239,7 +241,7 @@ pub fn assign_dates(
                 }
                 writing.push_back(scope.spawn(move || -> Result<()> {
                     let start = Instant::now();
-                    write_paths(&job.out, &paths, job.date, metadata)?;
+                    write_paths(&job.out, &paths, job.date, metadata, zstd_level)?;
                     eprintln!("wrote {} in {:.1?}", job.out.display(), start.elapsed());
                     Ok(())
                 }));
@@ -346,6 +348,7 @@ fn py_pick_weekdays<'py>(
 
 /// `assign_date`, without holding the GIL.
 #[pyfunction(name = "assign_date")]
+#[allow(clippy::too_many_arguments)]
 fn py_assign_date(
     py: Python<'_>,
     version: &Bound<'_, Version>,
@@ -354,9 +357,10 @@ fn py_assign_date(
     stations: PathBuf,
     config: PathBuf,
     out: PathBuf,
+    zstd_level: i32,
 ) -> Result<AssignSummary> {
     let version = version.get();
-    py.detach(|| assign_date(version, date, &od, &stations, &config, &out))
+    py.detach(|| assign_date(version, date, &od, &stations, &config, &out, zstd_level))
 }
 
 /// `assign_dates` on `(version, date, out)` jobs, without holding the GIL.
@@ -367,6 +371,7 @@ fn py_assign_dates(
     od: PathBuf,
     stations: PathBuf,
     config: PathBuf,
+    zstd_level: i32,
 ) -> Result<Vec<AssignSummary>> {
     let jobs: Vec<Job> = jobs
         .iter()
@@ -376,7 +381,7 @@ fn py_assign_dates(
             out: out.clone(),
         })
         .collect();
-    py.detach(|| assign_dates(&jobs, &od, &stations, &config))
+    py.detach(|| assign_dates(&jobs, &od, &stations, &config, zstd_level))
 }
 
 /// A summary of the feed zip at `feed`.

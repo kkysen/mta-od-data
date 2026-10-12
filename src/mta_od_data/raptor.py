@@ -59,6 +59,15 @@ Stops = Annotated[
 Od = Annotated[Path, Option(help="The OD Parquet, from `mta-od-data prepare`")]
 Stations = Annotated[Path, Option(help="The station reference CSV")]
 Config = Annotated[Path, Option(help="Generalized cost weights")]
+ZstdLevel = Annotated[
+    int,
+    Option(
+        help=(
+            "zstd level of the path Parquets: 1 writes fastest; "
+            "e.g. 9 makes the path texts ~2/3 the size, for outputs to keep"
+        )
+    ),
+]
 
 
 @app.command()
@@ -124,11 +133,14 @@ def assign(
         Path | None,
         Option(help="Output Parquet (default: data/raptor/paths-<date>.parquet)"),
     ] = None,
+    zstd_level: ZstdLevel = 1,
 ) -> None:
     """Split a date's OD rows across their journeys, and write the paths taken."""
     out = out or DEFAULT_OUT_DIR / f"paths-{date}.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)
-    summary = assign_date(Version.open(feed), date, od, stations, config, out)
+    summary = assign_date(
+        Version.open(feed), date, od, stations, config, out, zstd_level
+    )
     print(summary.report, end="")
     print(f"wrote {out}")
 
@@ -150,6 +162,7 @@ def assign_range(
     out_dir: Annotated[
         Path, Option(help="Where the path Parquets and manifest.csv go")
     ] = DEFAULT_OUT_DIR,
+    zstd_level: ZstdLevel = 1,
 ) -> None:
     """`assign` each (month, weekday) in a date range on a representative date,
     with the latest feed version covering it,
@@ -171,6 +184,7 @@ def assign_range(
         od,
         stations,
         config,
+        zstd_level,
     )
     manifest_path = out_dir / "manifest.csv"
     with manifest_path.open("w", newline="") as f:

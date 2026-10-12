@@ -600,6 +600,7 @@ pub fn write_paths(
     paths: &[PathRow],
     date: jiff::civil::Date,
     metadata: Vec<(String, String)>,
+    zstd_level: i32,
 ) -> Result<()> {
     use std::sync::Arc;
 
@@ -671,7 +672,7 @@ pub fn write_paths(
     // in-vehicle times included, but not waits or walks, which delta made bigger.
     // Riders too, ~7% smaller than plain
     // (byte stream split was smaller still, but DuckDB reads it only for floats).
-    let mut props = properties(metadata)?;
+    let mut props = properties(metadata, zstd_level)?;
     for column in [
         "hour",
         "destination",
@@ -698,6 +699,7 @@ pub fn write_path_texts(
     out: &Path,
     routes: &Routes,
     metadata: Vec<(String, String)>,
+    zstd_level: i32,
 ) -> Result<()> {
     use std::sync::Arc;
 
@@ -710,7 +712,7 @@ pub fn write_path_texts(
         Field::new("path_id", DataType::UInt32, false),
         Field::new("path", DataType::Utf8, false),
     ]));
-    let props = properties(metadata)?
+    let props = properties(metadata, zstd_level)?
         // Ids count up by 1, so their deltas pack to nothing.
         .set_column_encoding("path_id".into(), Encoding::DELTA_BINARY_PACKED)
         .build();
@@ -748,13 +750,18 @@ fn create(out: &Path) -> Result<std::fs::File> {
 }
 
 /// The path Parquets' writer properties, with `metadata` as key-value metadata.
-fn properties(metadata: Vec<(String, String)>) -> Result<WriterPropertiesBuilder> {
+///
+/// zstd at `zstd_level`: 1, the fastest, unless the files are to be kept.
+/// Level 1 was a third faster to write than 3, for ~1% more.
+/// The path texts barely shrink until level 5:
+/// September's are 21 MB at 1 to 4, 14.5 MB at 6 (5 times as long to write),
+/// and 13 MB at 9 (10 times as long).
+fn properties(metadata: Vec<(String, String)>, zstd_level: i32) -> Result<WriterPropertiesBuilder> {
     use parquet::file::metadata::KeyValue;
     use parquet::file::properties::{EnabledStatistics, WriterProperties};
 
     Ok(WriterProperties::builder()
-        // Level 1, not 3: a third faster, for ~1% more.
-        .set_compression(Compression::ZSTD(ZstdLevel::try_new(1)?))
+        .set_compression(Compression::ZSTD(ZstdLevel::try_new(zstd_level)?))
         // Dictionary encoding hashed every value of every column,
         // ~40% of writing, for ~3% smaller files than zstd alone.
         .set_dictionary_enabled(false)

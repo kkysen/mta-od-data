@@ -44,12 +44,14 @@ def assign_date(
     stations: StrPath,
     config: StrPath,
     out: StrPath,
+    zstd_level: int,
 ) -> AssignSummary: ...
 def assign_dates(
     jobs: list[tuple[Version, date, StrPath]],
     od: StrPath,
     stations: StrPath,
     config: StrPath,
+    zstd_level: int,
 ) -> list[AssignSummary]: ...
 def feed_report(feed: StrPath) -> str: ...
 def timetable_report(feed: StrPath, date: date) -> str: ...
