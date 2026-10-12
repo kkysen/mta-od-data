@@ -50,7 +50,7 @@ Worth keeping:
 - patterns keyed on (route, direction, exact stop sequence);
 - midnight-wrapped copies of trips with times >= 24:00;
 - a cap on rounds (theirs is 3, i.e. 2 transfers),
-  though not their value: 4-ride trips are real (see Phases, Later);
+  though not their value: 4-ride trips are real, so ours is 4;
 - the author ships a patched `stop_times_fixed.txt`,
   so expect the raw feed to need cleaning
   (their README: "timetables are a bit wonky").
@@ -231,7 +231,7 @@ Range RAPTOR per (origin complex, hour):
 run RAPTOR for every departure in the hour, latest first,
 reusing labels across departures (standard rRAPTOR),
 from all directional stops of the origin complex.
-Labels are per round `k` (at most `MAX_RIDES` rides, 3 for now),
+Labels are per round `k` (at most `MAX_RIDES` rides, 4),
 with a backpointer per (round, stop),
 so every Pareto-optimal (arrival, rides) journey per departure
 is extractable without ambiguity.
@@ -303,7 +303,7 @@ Complexity is added only once the simple version works end to end.
    transfers straight from `transfers.txt`.
    `mta-od-data raptor timetable --feed <zip> --date <date>` prints what it found.
 3. **RAPTOR**: plain round-based earliest arrival, per-round labels,
-   max 3 rides, unit-tested on tiny hand-built feeds.
+   max 4 rides (3 at first, as `nycriders`), unit-tested on tiny hand-built feeds.
    Round `k` keeps a label only if it beats every round before it,
    so the rounds reaching a target are its Pareto set over (arrival, rides).
    Each round has two labels per stop:
@@ -384,6 +384,15 @@ Complexity is added only once the simple version works end to end.
    conservation error 1e-6;
    51.8% 1 ride, 40.6% 2, 7.6% 3; mean journey 25.5 min;
    5.2M path rows; ~7s to assign on 12 cores, ~19s in all.
+   That was with at most 3 rides.
+   At 4, over August to December 2025's 25 dates,
+   0.7% of riders take 4 rides (29.6k of 4.05M an average weekday),
+   mostly from 2- and 3-ride paths;
+   the 1.3 a day unreachable in 3 rides all reach,
+   and the 5.7 a day entering after the last departure find one.
+   Lines change by -0.1% to +1.9% (the G most), the Franklin Av shuttle by +14%,
+   and SAS Phase 1 by -0.02%;
+   routing takes ~1.7 times as long, and the run 55s, not 41s.
    `mta-od-data raptor assign-range --from <date> --to <date>` assigns
    every (month, weekday Monday to Friday) in the range on one date each,
    writing `data/raptor/paths-<date>.parquet`, their `path-texts-<date>.parquet`,
@@ -422,9 +431,6 @@ Complexity is added only once the simple version works end to end.
    passing-stop tie-breaker;
    supplemented-feed planned work;
    departure-time skew within the hour;
-   raising `MAX_RIDES` from 3 (taken from `nycriders` unexamined;
-   4-ride trips are real), measuring the ride-count split,
-   runtime, and 4+-ride paths it adds;
    McRAPTOR if needed; crowding.
 
 ## Implementation

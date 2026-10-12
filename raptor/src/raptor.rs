@@ -12,8 +12,9 @@ use std::ops::Range;
 use crate::gtfs::Secs;
 use crate::timetable::{Pattern, StopIdx, Timetable};
 
-/// Most rides in a journey. 3 is `nycriders`' cap, unexamined; raising it is a todo.
-pub const MAX_RIDES: usize = 3;
+/// Most rides in a journey: 4, as riders take 4-ride trips;
+/// `nycriders`' cap of 3 cut them off.
+pub const MAX_RIDES: usize = 4;
 
 const NEVER: Secs = Secs::MAX;
 
