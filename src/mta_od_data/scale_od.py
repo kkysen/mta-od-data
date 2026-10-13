@@ -212,38 +212,58 @@ def scale_od(
         SELECT DISTINCT month, dow, d, 1.0::DOUBLE AS f FROM daily;
         """
     )
-    # Columns fit exactly after `b`; how far rows are off, and by how many riders.
+    # Columns fit exactly after `b`; how far rows are off, and by how many riders,
+    # over the trips in `{trips}`.
     row_errors = """
         SELECT s.month, s.dow, s.o, s.s, t.t, abs(s.s / t.t - 1) AS error
         FROM (
             SELECT month, dow, o, sum(v * a.f * b.f) AS s
-            FROM daily JOIN a USING (month, dow, o) JOIN b USING (month, dow, d)
+            FROM {trips} JOIN a USING (month, dow, o) JOIN b USING (month, dow, d)
             GROUP BY ALL
         ) s JOIN row_target t ON t.month = s.month AND t.dow = s.dow AND t.c = s.o
     """
+    # Slices fit independently, so each stops once it fits,
+    # and later iterations refit only the slices still off, not every slice.
+    con.execute("CREATE OR REPLACE TEMP TABLE fitting AS FROM daily")
     iterations = 0
     while iterations < MAX_ITERATIONS:
         iterations += 1
         con.execute(
             """
-            CREATE OR REPLACE TEMP TABLE a AS
+            CREATE OR REPLACE TEMP TABLE slices AS
+            SELECT DISTINCT month, dow FROM fitting;
+            DELETE FROM a WHERE (month, dow) IN (FROM slices);
+            INSERT INTO a
             SELECT month, dow, o, t.t / sum(v * b.f) AS f
-            FROM daily JOIN b USING (month, dow, d)
-            JOIN row_target t ON t.month = daily.month AND t.dow = daily.dow AND t.c = o
+            FROM fitting JOIN b USING (month, dow, d)
+            JOIN row_target t
+                ON t.month = fitting.month AND t.dow = fitting.dow AND t.c = o
             GROUP BY month, dow, o, t.t;
-            CREATE OR REPLACE TEMP TABLE b AS
+            DELETE FROM b WHERE (month, dow) IN (FROM slices);
+            INSERT INTO b
             SELECT month, dow, d, t.t / sum(v * a.f) AS f
-            FROM daily JOIN a USING (month, dow, o)
-            JOIN col_target t ON t.month = daily.month AND t.dow = daily.dow AND t.c = d
+            FROM fitting JOIN a USING (month, dow, o)
+            JOIN col_target t
+                ON t.month = fitting.month AND t.dow = fitting.dow AND t.c = d
             GROUP BY month, dow, d, t.t;
             """
         )
-        result: tuple[float] | None = con.execute(
-            f"SELECT max(error) FROM ({row_errors})"
+        con.execute(
+            f"""
+            CREATE OR REPLACE TEMP TABLE fitting AS
+            FROM fitting SEMI JOIN (
+                SELECT month, dow FROM ({row_errors.format(trips="fitting")})
+                GROUP BY ALL HAVING max(error) >= {TOLERANCE}
+            ) USING (month, dow)
+            """
+        )
+        remaining: tuple[int] | None = con.execute(
+            "SELECT count(*) FROM fitting"
         ).fetchone()
-        assert result is not None, "aggregate query always returns one row"
-        if result[0] < TOLERANCE:
+        assert remaining is not None, "aggregate query always returns one row"
+        if remaining[0] == 0:
             break
+    row_errors = row_errors.format(trips="daily")
     # Not always exact: a complex all but cut off in a slice
     # (e.g. by a service suspension) can't always reach its target through what's left.
     summary: tuple[float, float] | None = con.execute(
