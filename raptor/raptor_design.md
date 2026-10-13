@@ -423,7 +423,7 @@ Complexity is added only once the simple version works end to end.
    e.g. `--stop R14 --stop B08 --stop Q03 --stop Q04 --stop Q05`
    for Second Av Subway Phase 1.
    It and `line-ridership` take `--od-factors`
-   (from `mta-od-data scale-od`, beside its scaled OD data as `.factors.parquet`)
+   (from `mta-od-data scale-od`, e.g. `data/mta_od_scaled_to_2019.factors.parquet`)
    to count riders as if routed with the scaled OD data, without routing:
    with no crowding, riders' choices don't depend on how many ride,
    and `scale-od` scales each OD row by its origin's and destination's factors
@@ -437,7 +437,7 @@ Complexity is added only once the simple version works end to end.
    each path's riders over 1 less the evasion rate in its date's quarter
    (data.ny.gov's `6kj3-ijvb`, fetched to `data/fare_evasion.csv`),
    or with `--od-factors`, that quarter's in the year scaled to,
-   which the factors record (as does the scaled OD data, in its Parquet metadata).
+   which the factors record.
 7. **Later, in any order**:
    directional stops and the transfer rules above;
    curated `transfer_times.csv`;

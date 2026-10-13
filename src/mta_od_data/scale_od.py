@@ -27,7 +27,7 @@ from typer import Option, Typer
 
 from mta_od_data import DATA
 from mta_od_data.analyze.common import connection
-from mta_od_data.prepare import DEFAULT_PARQUET, RIDERSHIP_DECIMAL
+from mta_od_data.prepare import DEFAULT_PARQUET
 
 app = Typer()
 
@@ -102,16 +102,15 @@ def od_entries(rows: Iterable[str]) -> dict[str, float]:
 @app.command()
 def scale_od(
     year: Annotated[int, Option(help="The year whose station entries to scale to")],
-    out: Annotated[Path, Option(help="Output Parquet, in the OD Parquet's schema")],
-    factors: Annotated[
-        Path | None,
+    out: Annotated[
+        Path,
         Option(
             help=(
                 "Output Parquet of each slice's origin and destination factors, "
-                "for `analyze`'s --od-factors [default: --out's, as .factors.parquet]"
+                "for `analyze`'s --od-factors"
             )
         ),
-    ] = None,
+    ],
     od: Annotated[Path, Option(help="The OD Parquet")] = DEFAULT_PARQUET,
     od_year: Annotated[int, Option(help="The OD data's year to scale")] = 2025,
     spreadsheet: Annotated[
@@ -129,7 +128,9 @@ def scale_od(
         ),
     ] = False,
 ) -> None:
-    """Scale `--od-year`'s weekday OD slices to `--year`'s station entries.
+    """Fit factors scaling `--od-year`'s weekday OD slices to `--year`'s entries:
+    each OD row scales by its origin's and destination's factors in its slice,
+    to its complexes' station entries.
 
     Each complex grows by its counted `--year` over `--od-year` entries,
     applied to each (month, weekday) slice's own trips from and to it,
@@ -141,9 +142,10 @@ def scale_od(
 
     \b
     Examples:
-        mta-od-data scale-od --year 2019 --out data/mta_od_scaled_to_2019.parquet
+        mta-od-data scale-od --year 2019 \
+            --out data/mta_od_scaled_to_2019.factors.parquet
         mta-od-data scale-od --year 2025 --to-counts \
-            --out data/mta_od_2025_counted.parquet
+            --out data/mta_od_2025_counted.factors.parquet
     """
     if not spreadsheet.exists():
         print(f"fetching {SPREADSHEET_URL}")
@@ -258,9 +260,9 @@ def scale_od(
         ).fetchall()
         print(f"worst (month, day, complex, trips from, target, error): {worst}")
 
-    # Each scaled OD row is its row times its origin's and destination's factors,
-    # so these are all of the scaling, for scaling anything split from OD rows.
-    factors = factors or out.with_suffix(".factors.parquet")
+    # A scaled OD row is its row times its origin's and destination's factors,
+    # so these are all of the scaling, for scaling anything split from OD rows,
+    # as `analyze` does `raptor`'s paths.
     con.execute(
         """
         COPY (
@@ -270,45 +272,21 @@ def scale_od(
             FROM (SELECT month, dow, o AS c, f FROM a) a
             FULL JOIN (SELECT month, dow, d AS c, f FROM b) b USING (month, dow, c)
             ORDER BY ALL
-        ) TO $factors (
+        ) TO $out (
             FORMAT parquet, COMPRESSION zstd,
             KV_METADATA {scaled_to_year: $year, od_year: $od_year}
         )
         """,
-        {"year": year, "od_year": od_year, "factors": str(factors)},
-    )
-    print(f"wrote {factors}")
-
-    con.execute(
-        f"""
-        COPY (
-            SELECT p.Year, p.Month, p."Day of Week", p."Hour of Day",
-                   p."Origin Station Complex ID", p."Destination Station Complex ID",
-                   (p."Estimated Average Ridership" * a.f * b.f)::{RIDERSHIP_DECIMAL}
-                       AS "Estimated Average Ridership"
-            FROM read_parquet($od) p
-            JOIN a ON a.month = p.Month AND a.dow = p."Day of Week"
-                  AND a.o = p."Origin Station Complex ID"
-            JOIN b ON b.month = p.Month AND b.dow = p."Day of Week"
-                  AND b.d = p."Destination Station Complex ID"
-            WHERE p.Year = $od_year
-            ORDER BY "Origin Station Complex ID", "Destination Station Complex ID",
-                     "Day of Week", "Hour of Day"
-        ) TO $out (
-            FORMAT parquet, COMPRESSION zstd, PARQUET_VERSION v2,
-            KV_METADATA {{scaled_to_year: $year, od_year: $od_year}}
-        )
-        """,
-        {"od": str(od), "od_year": od_year, "year": year, "out": str(out)},
+        {"year": year, "od_year": od_year, "out": str(out)},
     )
     total: tuple[float] | None = con.execute(
         """
         SELECT avg(s) FROM (
-            SELECT Month, "Day of Week", sum("Estimated Average Ridership") s
-            FROM read_parquet($out) GROUP BY ALL
+            SELECT month, dow, sum(v * a.f * b.f) AS s
+            FROM daily JOIN a USING (month, dow, o) JOIN b USING (month, dow, d)
+            GROUP BY ALL
         )
-        """,
-        {"out": str(out)},
+        """
     ).fetchone()
     assert total is not None, "aggregate query always returns one row"
     print(
