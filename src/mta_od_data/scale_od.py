@@ -103,6 +103,15 @@ def od_entries(rows: Iterable[str]) -> dict[str, float]:
 def scale_od(
     year: Annotated[int, Option(help="The year whose station entries to scale to")],
     out: Annotated[Path, Option(help="Output Parquet, in the OD Parquet's schema")],
+    factors: Annotated[
+        Path | None,
+        Option(
+            help=(
+                "Output Parquet of each slice's origin and destination factors, "
+                "for `analyze`'s --od-factors [default: --out's, as .factors.parquet]"
+            )
+        ),
+    ] = None,
     od: Annotated[Path, Option(help="The OD Parquet")] = DEFAULT_PARQUET,
     od_year: Annotated[int, Option(help="The OD data's year to scale")] = 2025,
     spreadsheet: Annotated[
@@ -249,6 +258,27 @@ def scale_od(
         ).fetchall()
         print(f"worst (month, day, complex, trips from, target, error): {worst}")
 
+    # Each scaled OD row is its row times its origin's and destination's factors,
+    # so these are all of the scaling, for scaling anything split from OD rows.
+    factors = factors or out.with_suffix(".factors.parquet")
+    con.execute(
+        """
+        COPY (
+            SELECT $year::USMALLINT AS "Scaled To Year", month::UTINYINT AS "Month",
+                   dow AS "Day of Week", c::USMALLINT AS "Station Complex ID",
+                   a.f AS "Origin Factor", b.f AS "Destination Factor"
+            FROM (SELECT month, dow, o AS c, f FROM a) a
+            FULL JOIN (SELECT month, dow, d AS c, f FROM b) b USING (month, dow, c)
+            ORDER BY ALL
+        ) TO $factors (
+            FORMAT parquet, COMPRESSION zstd,
+            KV_METADATA {scaled_to_year: $year, od_year: $od_year}
+        )
+        """,
+        {"year": year, "od_year": od_year, "factors": str(factors)},
+    )
+    print(f"wrote {factors}")
+
     con.execute(
         f"""
         COPY (
@@ -264,9 +294,12 @@ def scale_od(
             WHERE p.Year = $od_year
             ORDER BY "Origin Station Complex ID", "Destination Station Complex ID",
                      "Day of Week", "Hour of Day"
-        ) TO $out (FORMAT parquet, COMPRESSION zstd, PARQUET_VERSION v2)
+        ) TO $out (
+            FORMAT parquet, COMPRESSION zstd, PARQUET_VERSION v2,
+            KV_METADATA {{scaled_to_year: $year, od_year: $od_year}}
+        )
         """,
-        {"od": str(od), "od_year": od_year, "out": str(out)},
+        {"od": str(od), "od_year": od_year, "year": year, "out": str(out)},
     )
     total: tuple[float] | None = con.execute(
         """

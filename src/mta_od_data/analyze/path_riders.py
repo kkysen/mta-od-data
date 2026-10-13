@@ -4,13 +4,13 @@ as routed, as if the OD data had been scaled, or with fare evaders.
 Riders choose among journeys by the timetable and cost weights alone,
 not by how many others ride (there's no crowding),
 so routing scaled OD data would split each OD row's riders the same way.
-Each path's riders are then its OD row's scaled riders over the routed ones
-times its routed riders, and a scaled run needn't be routed at all.
+`mta-od-data scale-od` scales each OD row by its origin's and destination's factors
+in its (month, weekday) slice, so each path's riders scale by them too,
+and a scaled run needn't be routed at all.
 Likewise fare evaders, missing from the OD data (counted from swipes and taps):
 each path's riders over 1 less the evasion rate counts them too.
 """
 
-from collections.abc import Iterable
 from csv import DictReader
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -44,34 +44,32 @@ def date_paths(manifest: Path, row: dict[str, str]) -> DatePaths:
     )
 
 
-type Slice = tuple[int, int, str]
-"""An OD slice: (year, month, day of week)."""
+type Slice = tuple[int, str]
+"""An OD slice: (month, day of week)."""
 
 
 def slice_of(d: date) -> Slice:
-    return (d.year, d.month, f"{d:%A}")
+    return (d.month, f"{d:%A}")
 
 
 @dataclass(frozen=True, slots=True)
 class OdScale:
-    """Scaling from the OD data the paths were routed with
-    to OD data from `mta-od-data scale-od`, row for row,
-    as `load_factors` loaded it: each slice's id in its table."""
+    """`mta-od-data scale-od`'s factors, as `load_factors` loaded them:
+    the year scaled to, and the slices scaled (weekdays only)."""
 
-    slices: dict[Slice, int]
+    year: int
+    slices: frozenset[Slice]
 
 
-ScaledOd = Annotated[
+OdFactors = Annotated[
     Path | None,
     Option(
         help=(
-            "Count riders as if routed with this OD data, "
-            "from `mta-od-data scale-od`, e.g. data/mta_od_scaled_to_2019.parquet"
+            "Count riders as if routed with OD data scaled by these factors, "
+            "from `mta-od-data scale-od`, "
+            "e.g. data/mta_od_scaled_to_2019.factors.parquet"
         )
     ),
-]
-RoutedOd = Annotated[
-    Path, Option(help="The OD data the paths were routed with, for --scaled-od")
 ]
 
 
@@ -81,17 +79,9 @@ FareEvasionOption = Annotated[
         "--fare-evasion",
         help=(
             "Count fare evaders too: riders over 1 less the evasion rate "
-            "in each date's quarter, from data.ny.gov"
+            "in each date's quarter, from data.ny.gov, "
+            "or with --od-factors, the same quarter's in the year scaled to"
         ),
-    ),
-]
-EvasionYear = Annotated[
-    int | None,
-    Option(
-        help=(
-            "With --fare-evasion, the same quarter's rate in this year, "
-            "for OD data scaled to it, e.g. 2019"
-        )
     ),
 ]
 
@@ -143,18 +133,16 @@ class Counting:
 AS_ROUTED = Counting()
 
 
-def counting(
-    rows: Iterable[dict[str, str]],
-    scaled_od: Path | None,
-    routed_od: Path,
-    fare_evasion: bool,
-    evasion_year: int | None,
-) -> Counting:
-    """The commands' options' `Counting`, for the manifest `rows`' dates."""
-    days = [date.fromisoformat(r["date"]) for r in rows]
+def counting(od_factors: Path | None, fare_evasion: bool) -> Counting:
+    """The commands' options' `Counting`."""
+    scale = None if od_factors is None else load_factors(od_factors)
     return Counting(
-        scale=None if scaled_od is None else load_factors(routed_od, scaled_od, days),
-        evasion=load_fare_evasion(evasion_year) if fare_evasion else None,
+        scale=scale,
+        evasion=(
+            load_fare_evasion(None if scale is None else scale.year)
+            if fare_evasion
+            else None
+        ),
     )
 
 
@@ -163,78 +151,50 @@ def read_manifest(manifest: Path) -> list[dict[str, str]]:
         return list(DictReader(f))
 
 
-# Each OD row's scaled riders over its routed ones, in the slices of `$slices`,
-# by slice id `s`: each OD file is read once for every date, not once a date.
-_FACTORS = """
-    CREATE OR REPLACE TEMP TABLE od_factors_unsorted AS
-    WITH slices AS (
-        SELECT s.y, s.m, s.dow, s.s FROM (SELECT unnest($slices) AS s)
-    ),
-    routed AS ({routed}),
-    scaled AS ({scaled})
-    SELECT s, h, origin, destination,
-        coalesce(scaled.riders / nullif(routed.riders, 0), 0)::FLOAT AS f
-    FROM routed LEFT JOIN scaled USING (s, h, origin, destination)
-"""
-
-# An OD file's riders in `slices`, keyed as path rows are.
-_OD_SLICE = """
-    SELECT
-        s, "Hour of Day"::UTINYINT AS h,
-        "Origin Station Complex ID"::USMALLINT AS origin,
-        "Destination Station Complex ID"::USMALLINT AS destination,
-        sum("Estimated Average Ridership") AS riders
-    FROM read_parquet({od}) JOIN slices
-        ON "Year" = y AND "Month" = m AND "Day of Week" = dow
-    GROUP BY ALL
-"""
-
-# A service day's hours 24 to 27 are the next date's 0 to 3, from its own OD slice,
+# A service day's hours 24 to 27 are the next date's 0 to 3, in its own OD slice,
 # and with its own fare evasion.
+# A complex with no factor in a slice had no trips from or to it there.
 _SCALED = """
-    SELECT p.path_id, p.riders * coalesce(f.f, 0) AS riders
+    SELECT path_id, riders * coalesce(o.f, 0) * coalesce(d.f, 0) AS riders
     FROM (
         SELECT
             path_id, origin, destination,
             riders * if(hour < 24, $evasion, $next_evasion) AS riders,
-            if(hour < 24, $slice, $next_slice) AS s,
-            hour % 24 AS h
+            if(hour < 24, $month, $next_month) AS month,
+            if(hour < 24, $dow, $next_dow) AS dow
         FROM read_parquet($paths)
     ) p
-    LEFT JOIN (
-        SELECT * FROM od_factors WHERE s = $slice OR s = $next_slice
-    ) f USING (s, h, origin, destination)
+    LEFT JOIN od_origin_factors o
+        ON o.month = p.month AND o.dow = p.dow AND o.c = p.origin
+    LEFT JOIN od_destination_factors d
+        ON d.month = p.month AND d.dow = p.dow AND d.c = p.destination
 """
 
 
-def load_factors(routed: Path, scaled: Path, days: Iterable[date]) -> OdScale:
-    """Load the factors scaling `routed` to `scaled`, for the service days `days`."""
-    slices = {slice_of(d) for day in days for d in (day, day + timedelta(days=1))}
-    ids = {sl: i for i, sl in enumerate(sorted(slices))}
+def load_factors(path: Path) -> OdScale:
+    """Load `mta-od-data scale-od`'s factors, for `_SCALED`."""
     db = connection()
-    db.execute(
-        _FACTORS.format(
-            routed=_OD_SLICE.format(od="$routed"), scaled=_OD_SLICE.format(od="$scaled")
-        ),
-        {
-            "routed": str(routed),
-            "scaled": str(scaled),
-            "slices": [
-                {"y": y, "m": m, "dow": dow, "s": i} for (y, m, dow), i in ids.items()
-            ],
-        },
-    )
-    # Slice by slice, so each date reads its two slices' row groups, not all of them:
-    # sorting it all at once ran out of memory.
-    db.execute(
-        "CREATE OR REPLACE TEMP TABLE od_factors AS FROM od_factors_unsorted LIMIT 0"
-    )
-    for i in ids.values():
+    for side in ["Origin", "Destination"]:
         db.execute(
-            "INSERT INTO od_factors FROM od_factors_unsorted WHERE s = $s", {"s": i}
+            f"""
+            CREATE OR REPLACE TEMP TABLE od_{side.lower()}_factors AS
+            SELECT "Month" AS month, "Day of Week" AS dow,
+                "Station Complex ID" AS c, "{side} Factor" AS f
+            FROM read_parquet($path) WHERE "{side} Factor" IS NOT NULL
+            """,
+            {"path": str(path)},
         )
-    db.execute("DROP TABLE od_factors_unsorted")
-    return OdScale(slices=ids)
+    rows = db.execute(
+        """
+        SELECT DISTINCT "Scaled To Year", "Month", "Day of Week"
+        FROM read_parquet($path)
+        """,
+        {"path": str(path)},
+    ).fetchall()
+    years = {y for y, _, _ in rows}
+    if len(years) != 1:
+        raise ValueError(f"{path}: not scaled to one year: {sorted(years)}")
+    return OdScale(year=years.pop(), slices=frozenset((m, dow) for _, m, dow in rows))
 
 
 _UNSCALED = """
@@ -261,8 +221,17 @@ def paths_params(d: DatePaths, c: Counting) -> dict[str, object]:
         "next_evasion": evasion(next_day),
     }
     if (scale := c.scale) is not None:
+        here = slice_of(d.day)
+        if here not in scale.slices:
+            raise ValueError(f"{d.day}: no OD factors for {here}")
+        # Scaling is weekdays only, so a Friday's late night,
+        # Saturday's early hours, scales as Friday does.
+        after = slice_of(next_day)
+        after = after if after in scale.slices else here
         params |= {
-            "slice": scale.slices[slice_of(d.day)],
-            "next_slice": scale.slices[slice_of(next_day)],
+            "month": here[0],
+            "dow": here[1],
+            "next_month": after[0],
+            "next_dow": after[1],
         }
     return params

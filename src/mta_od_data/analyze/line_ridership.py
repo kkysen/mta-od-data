@@ -35,10 +35,8 @@ from mta_od_data.analyze.path_riders import (
     AS_ROUTED,
     Counting,
     DatePaths,
-    EvasionYear,
     FareEvasionOption,
-    RoutedOd,
-    ScaledOd,
+    OdFactors,
     counting,
     date_paths,
     paths_params,
@@ -47,7 +45,6 @@ from mta_od_data.analyze.path_riders import (
 )
 from mta_od_data.analyze.track_ridership import DEFAULT_MANIFEST
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR
-from mta_od_data.prepare import DEFAULT_PARQUET
 
 app = Typer()
 
@@ -360,10 +357,8 @@ def line_ridership(
     manifest: Annotated[
         Path, Option(help="`mta-od-data raptor assign-range`'s manifest")
     ] = DEFAULT_MANIFEST,
-    scaled_od: ScaledOd = None,
-    routed_od: RoutedOd = DEFAULT_PARQUET,
+    od_factors: OdFactors = None,
     fare_evasion: FareEvasionOption = False,
-    evasion_year: EvasionYear = None,
 ) -> None:
     """Average weekday riders on each line, per route km, and per train-km,
     over `mta-od-data raptor assign-range`'s dates.
@@ -372,7 +367,7 @@ def line_ridership(
     route km and train-km included, from each date's own feed.
     """
     rows = read_manifest(manifest)
-    c = counting(rows, scaled_od, routed_od, fare_evasion, evasion_year)
+    c = counting(od_factors, fare_evasion)
     totals: defaultdict[str, Totals] = defaultdict(Totals)
     total_days = 0
     for row in rows:

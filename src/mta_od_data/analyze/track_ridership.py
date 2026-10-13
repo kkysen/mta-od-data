@@ -17,17 +17,14 @@ from mta_od_data.analyze.path_riders import (
     AS_ROUTED,
     Counting,
     DatePaths,
-    EvasionYear,
     FareEvasionOption,
-    RoutedOd,
-    ScaledOd,
+    OdFactors,
     counting,
     date_paths,
     paths_params,
     paths_query,
     read_manifest,
 )
-from mta_od_data.prepare import DEFAULT_PARQUET
 
 app = Typer()
 
@@ -90,10 +87,8 @@ def track_ridership(
     manifest: Annotated[
         Path, Option(help="`mta-od-data raptor assign-range`'s manifest")
     ] = DEFAULT_MANIFEST,
-    scaled_od: ScaledOd = None,
-    routed_od: RoutedOd = DEFAULT_PARQUET,
+    od_factors: OdFactors = None,
     fare_evasion: FareEvasionOption = False,
-    evasion_year: EvasionYear = None,
 ) -> None:
     """Average weekday riders on a stretch of track,
     over `mta-od-data raptor assign-range`'s dates.
@@ -102,7 +97,7 @@ def track_ridership(
     so the average weights it by them.
     """
     rows = read_manifest(manifest)
-    c = counting(rows, scaled_od, routed_od, fare_evasion, evasion_year)
+    c = counting(od_factors, fare_evasion)
     total_riders = 0.0
     total_days = 0
     by_month: dict[str, tuple[float, int]] = {}
