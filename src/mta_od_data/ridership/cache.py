@@ -2,18 +2,22 @@
 is laid out again in seconds, not recomputed in half a minute.
 
 A cache is read back only if nothing its rows could depend on has changed,
-which is kept broad rather than listed, since a missed input is a stale report
+which is found rather than listed, since a missed input is a stale report
 the snapshot tests would pass:
-- every file in the package (its code and data files, like `platforms.csv`)
-  but its `.md` reports and `RENDER_ONLY`'s, which only name and lay out rows,
-  and `uv.lock`, for DuckDB's version and the rest, and Python's version;
+- the source of `compute.py` and every module of the package it imports,
+  transitively (`modules`): not the rest of `analyze/`, say,
+  nor `ridership/__init__.py`, which only names and lays out rows;
+- every data file in the package (like `platforms.csv`)
+  but its `.md` reports and `RENDER_ONLY`'s;
+- `uv.lock`, for DuckDB's version and the rest, and Python's version;
 - every file under `data/`, the argument paths, and every file beside the manifest
   (size and modification time);
 - `compute`'s arguments.
-So it misses more than it has to (a change to an `analyze` report's code, say),
+So it can miss more than it has to (a change to `platform_areas.csv`, say),
 but never serves rows from other inputs.
 """
 
+import ast
 import os
 import pickle
 import sys
@@ -30,6 +34,8 @@ PACKAGE = Path(__file__).parent.parent
 HERE = Path(__file__).parent
 # Read only to lay out rows, by `__init__.py`.
 RENDER_ONLY = frozenset({HERE / "__init__.py", HERE / "direction_labels.json5"})
+# What computes the rows, and what's imported from it is followed from.
+COMPUTE = "mta_od_data.ridership.compute"
 
 
 def files(root: Path) -> list[Path]:
@@ -39,6 +45,56 @@ def files(root: Path) -> list[Path]:
         dirs[:] = sorted(d for d in dirs if d != "__pycache__")
         found += (Path(parent) / n for n in sorted(names))
     return [f for f in found if ROWS not in f.parents]
+
+
+def module_file(name: str) -> Path | None:
+    """A module of the package's source, or `None` if it's not one."""
+    if name.split(".")[0] != PACKAGE.name:
+        return None
+    path = PACKAGE.parent.joinpath(*name.split("."))
+    for file in (path.with_suffix(".py"), path / "__init__.py"):
+        if file.exists():
+            return file
+    return None
+
+
+def modules(root: str) -> list[Path]:
+    """The source of `root` and of every module of the package it imports,
+    transitively, with their packages' `__init__.py`s,
+    whose own imports aren't followed: they're for the CLI, not what's imported.
+    An import of a module with no source to hash, like the Rust extension's,
+    is an error rather than left out."""
+    found: dict[str, Path] = {}
+    todo = [root]
+    while todo:
+        name = todo.pop()
+        if name in found or name.split(".")[0] != PACKAGE.name:
+            continue
+        file = module_file(name)
+        if file is None:
+            raise ValueError(f"{name} has no source to key `ridership`'s cache on")
+        found[name] = file
+        parts = name.split(".")
+        for i in range(1, len(parts)):
+            parent = ".".join(parts[:i])
+            found.setdefault(parent, PACKAGE.parent.joinpath(*parts[:i], "__init__.py"))
+        package = name if file.name == "__init__.py" else name.rpartition(".")[0]
+        for node in ast.walk(ast.parse(file.read_text(), str(file))):
+            if isinstance(node, ast.Import):
+                todo += (a.name for a in node.names)
+            elif isinstance(node, ast.ImportFrom):
+                base = node.module or ""
+                if node.level:
+                    up = package.rsplit(".", node.level - 1)[0]
+                    base = f"{up}.{base}" if base else up
+                todo.append(base)
+                # `from package import module`, not just a name in it.
+                todo += (
+                    f"{base}.{a.name}"
+                    for a in node.names
+                    if module_file(f"{base}.{a.name}") is not None
+                )
+    return sorted(found.values())
 
 
 def stat(path: Path) -> tuple[str, int, int]:
@@ -51,9 +107,13 @@ def key(args: tuple[object, ...], paths: list[Path]) -> str:
     h = sha256()
     h.update(sys.version.encode())
     h.update((ROOT / "uv.lock").read_bytes())
-    for f in files(PACKAGE):
-        if f in RENDER_ONLY or f.suffix == ".md":
-            continue
+    code = [f for f in modules(COMPUTE) if f not in RENDER_ONLY]
+    data = [
+        f
+        for f in files(PACKAGE)
+        if f.suffix not in {".py", ".md", ".pyi", ".so"} and f not in RENDER_ONLY
+    ]
+    for f in [*code, *data]:
         h.update(str(f.relative_to(PACKAGE)).encode())
         h.update(f.read_bytes())
     for f in [*files(DATA), *paths]:
