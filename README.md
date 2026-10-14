@@ -108,6 +108,18 @@ Anyone (including a fresh clone) can then get it without rebuilding from the 27G
 gh release download od-data --pattern mta_od_2025.parquet --dir data
 ```
 
+Other years' extracts are assets beside it, each built to its own Parquet,
+e.g. 2026's (January to August, 242MB, from a 16GB CSV):
+
+```sh
+uv run mta-od-data prepare \
+    --csv 'data/MTA_Subway_Origin-Destination_Ridership_Estimate__2026_*.csv' \
+    --out data/mta_od_2026.parquet
+gh release upload od-data data/mta_od_2026.parquet --clobber
+
+gh release download od-data --pattern mta_od_2026.parquet --dir data
+```
+
 ### `mta-od-data analyze one-seat-rides`
 
 Does the actual classification:
