@@ -1,0 +1,10 @@
+// Named lines for `mta-od-data ridership --by line`:
+// a path rides a line if one of its rides passes between two consecutive stops
+// both in the line's `stops` (GTFS parent stop IDs), whatever its route.
+{
+  "SAS Phase 1": {
+    // 57 St-7 Av, Lexington Av/63 St, 72 St, 86 St, 96 St:
+    // the 63 St connector and the Second Av Subway's first phase.
+    stops: ["R14", "B08", "Q03", "Q04", "Q05"],
+  },
+}

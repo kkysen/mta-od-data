@@ -170,6 +170,9 @@ class Feed:
     calendar: list[tuple[str, frozenset[int], date, date]]
     # `calendar_dates.txt`: (service, date) to whether it's added (or removed).
     exceptions: dict[tuple[str, date], bool]
+    # Each route's consecutive parent stops to their platforms' directions,
+    # e.g. ("1", "120", "121"): ("N", "N") for `120N` then `121N`.
+    directions: dict[tuple[str, str, str], tuple[str, str]]
 
     def services_on(self, day: date) -> set[str]:
         services = {
@@ -251,12 +254,15 @@ def load_feed(path: Path) -> Feed:
         route, service, shape = trips[trip]
         keys[route, service, shape, tuple(s for _, s in sorted(times))] += 1
     patterns: Counter[Pattern] = Counter()
+    directions: dict[tuple[str, str, str], tuple[str, str]] = {}
     for (route, service, shape, stops), n in keys.items():
+        for a, b in pairwise(stops):
+            directions[route, a[:-1], b[:-1]] = (a[-1], b[-1])
         lengths = along_shape(shapes.get(shape, []), [coords[s] for s in stops])
         # Parent stops: `101N` is `101`'s northbound platform.
         parents = tuple(s[:-1] for s in stops)
         patterns[Pattern(route, service, parents, tuple(lengths))] += n
-    return Feed(dict(patterns), calendar, exceptions)
+    return Feed(dict(patterns), calendar, exceptions, directions)
 
 
 def segment_lengths(patterns: Iterable[Pattern]) -> dict[Segment, float]:

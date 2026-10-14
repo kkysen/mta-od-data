@@ -1,0 +1,693 @@
+"""Average weekday ridership by station complex, station, platform, route, or line,
+from `mta-od-data raptor assign-range`'s paths.
+
+Each measure is a sum of paths' riders, so it's taken over
+`average_path_riders`' average of each path over the manifest's dates,
+once per way of counting riders (a column each):
+scaled by each `--od-factors` file, and with fare evaders unless `--no-fare-evasion`.
+
+- A place (complex, station, platform) counts each ride's boarding and alighting there,
+  and which of those are transfers (not the journey's first boarding or last alighting).
+  With `--route` but not `--by route`, consecutive rides on `--route`'s routes
+  changing at the same stop are one ride: an N to R change at 59 St is neither.
+- A route counts each journey riding it once, however many of its rides are on it.
+  Routes with express variants (5X 6X 7X FX) count as the route, `5`,
+  and again as their local, `5L`, or express, `5X`, alone.
+- A line counts each journey with a ride on its track once:
+  between two consecutive stops both on it (`lines.json5`), as `raptor` paths
+  list every stop a ride passes.
+"""
+
+from collections import defaultdict
+from collections.abc import Iterable, Sequence
+from csv import DictReader
+from dataclasses import dataclass, field
+from datetime import date
+from enum import StrEnum
+from pathlib import Path
+from typing import Annotated, Any
+
+import json5
+from typer import BadParameter, Context, Option, Typer
+
+from mta_od_data import DATA
+from mta_od_data.analyze.common import connection
+from mta_od_data.analyze.line_ridership import (
+    Pattern,
+    load_feed,
+    route_length,
+    segment_lengths,
+)
+from mta_od_data.analyze.markdown import table_row, table_rule
+from mta_od_data.analyze.path_riders import (
+    AveragePaths,
+    average_path_riders,
+    counting,
+    read_manifest,
+)
+from mta_od_data.gtfs import DEFAULT_GTFS_DIR
+from mta_od_data.invocation import produced_by
+
+app = Typer()
+
+HERE = Path(__file__).parent
+DEFAULT_MANIFEST = DATA / "raptor" / "manifest.csv"
+# Each scaled to its year's counted entries (`scale-od --to-counts`):
+# the current year's, to level the OD data with them, and 2019's, before the pandemic.
+DEFAULT_OD_FACTORS = [
+    DATA / "mta_od_2025_counted.factors.parquet",
+    DATA / "mta_od_2019_counted.factors.parquet",
+]
+DEFAULT_LINES = HERE / "lines.json5"
+DEFAULT_STATIONS = DATA / "stations.csv"
+DEFAULT_COMPLEXES = DATA / "complexes.csv"
+
+
+class By(StrEnum):
+    COMPLEX = "complex"
+    STATION = "station"
+    PLATFORM = "platform"
+    ROUTE = "route"
+    LINE = "line"
+
+
+PLACES = frozenset({By.COMPLEX, By.STATION, By.PLATFORM})
+
+# Express variants the feed lists as routes of their own, and their routes.
+VARIANTS = {"5X": "5", "6X": "6", "7X": "7", "FX": "F"}
+
+# Routes in the feed but not the OD data, which is subway only.
+NOT_IN_OD = frozenset({"SI"})
+
+
+def route_groups(route: str, routes: Iterable[str]) -> list[str]:
+    """The `--by route` rows a GTFS route's rides count towards,
+    of all `routes`' (a route has a local row only beside its express variant's)."""
+    if route in NOT_IN_OD:
+        return []
+    if (base := VARIANTS.get(route)) is not None:
+        return [base, route]
+    if any(VARIANTS.get(r) == route for r in routes):
+        return [route, f"{route}L"]
+    return [route]
+
+
+def base_route(group: str) -> str:
+    """The route a `--by route` row is a variant of, or itself."""
+    if group.endswith("L") and group[:-1] in VARIANTS.values():
+        return group[:-1]
+    return VARIANTS.get(group, group)
+
+
+@dataclass(frozen=True, slots=True)
+class Column:
+    """One way of counting riders, and each path's average under it."""
+
+    label: str
+    average: AveragePaths
+
+
+def columns(
+    manifest: Path, od_factors: Sequence[Path], fare_evasion: bool, unscaled: bool
+) -> list[Column]:
+    # One at a time: `counting` loads its factors into the tables
+    # `average_path_riders` reads, so each is averaged before the next loads.
+    cols: list[Column] = []
+    if unscaled:
+        c = counting(None, fare_evasion)
+        cols.append(Column("OD data", average_path_riders(manifest, c)))
+    for factors in od_factors:
+        c = counting(factors, fare_evasion)
+        assert c.scale is not None, "counting with factors scales"
+        label = f"scaled to {c.scale.year}"
+        cols.append(Column(label, average_path_riders(manifest, c)))
+    days = {col.average.days for col in cols}
+    assert len(days) == 1, f"one manifest, one number of days: {days}"
+    return cols
+
+
+# What each temp table was last built from, so a process running several reports
+# (the snapshot tests) builds each once: `legs` takes ~3 s, `events` ~5 s,
+# and `directions` reads every feed, ~8 s.
+built: dict[str, object] = {}
+
+
+def load_legs(cols: Sequence[Column]) -> list[str]:
+    """Each path's legs as a temp table `legs`,
+    with each column's riders as `r0`, `r1`, and so on; returns those names.
+
+    `route` is the leg's route, or `walk`, and `stops` its parent stops in order.
+    """
+    db = connection()
+    names = [f"r{k}" for k in range(len(cols))]
+    files = [str(col.average.file) for col in cols]
+    if built.get("legs") == files:
+        return names
+    built.pop("events", None)
+    union = " UNION ".join(f"SELECT path FROM read_parquet('{f}')" for f in files)
+    joins = " ".join(
+        f"LEFT JOIN read_parquet('{f}') c{k} USING (path)" for k, f in enumerate(files)
+    )
+    riders = ", ".join(f"coalesce(c{k}.riders, 0) AS {n}" for k, n in enumerate(names))
+    db.execute(
+        f"""
+        CREATE OR REPLACE TEMP TABLE legs AS
+        SELECT
+            path, {", ".join(names)}, i,
+            split_part(leg, ' ', 1) AS route,
+            string_split(split_part(leg, ' ', 2), '>') AS stops
+        FROM (
+            SELECT
+                path, {", ".join(names)},
+                unnest(string_split(path, ' | ')) AS leg,
+                unnest(range(1, len(string_split(path, ' | ')) + 1)) AS i
+            FROM (SELECT p.path, {riders} FROM ({union}) p {joins})
+        )
+        """
+    )
+    built["legs"] = files
+    return names
+
+
+def ride_routes(routes: Sequence[str]) -> tuple[list[str], dict[str, list[str]]]:
+    """The GTFS routes of `legs`' rides that `--route` keeps (all, if none),
+    and each one's `--by route` rows."""
+    every = [
+        r
+        for (r,) in connection()
+        .execute("SELECT DISTINCT route FROM legs WHERE route != 'walk'")
+        .fetchall()
+    ]
+    groups = {r: gs for r in every if (gs := route_groups(r, every))}
+    if routes:
+        known = set().union(*groups.values())
+        if unknown := sorted(set(routes) - known):
+            raise BadParameter(
+                f"no rides on {', '.join(unknown)}", param_hint="--route"
+            )
+        groups = {r: gs for r, gs in groups.items() if set(gs) & set(routes)}
+    return sorted(groups), groups
+
+
+def route_groups_table(groups: dict[str, list[str]]) -> None:
+    connection().execute(
+        "CREATE OR REPLACE TEMP TABLE route_groups AS "
+        "SELECT unnest($routes) AS route, unnest($groups) AS grp",
+        {
+            "routes": [r for r, gs in groups.items() for _ in gs],
+            "groups": [g for gs in groups.values() for g in gs],
+        },
+    )
+
+
+def directions_table(manifest: Path) -> None:
+    """Each route's consecutive stops' platform directions, from every date's feed."""
+    if built.get("directions") == manifest:
+        return
+    directions: dict[tuple[str, str, str], tuple[str, str]] = {}
+    for row in read_manifest(manifest):
+        directions |= load_feed(DEFAULT_GTFS_DIR / Path(row["feed"]).name).directions
+    keys = list(directions)
+    connection().execute(
+        "CREATE OR REPLACE TEMP TABLE directions AS SELECT "
+        "unnest($route) AS route, unnest($a) AS a, unnest($b) AS b, "
+        "unnest($da) AS da, unnest($db) AS db",
+        {
+            "route": [k[0] for k in keys],
+            "a": [k[1] for k in keys],
+            "b": [k[2] for k in keys],
+            "da": [directions[k][0] for k in keys],
+            "db": [directions[k][1] for k in keys],
+        },
+    )
+    built["directions"] = manifest
+
+
+@dataclass(frozen=True, slots=True)
+class Names:
+    """Stations' and complexes' names, and stations' complexes and directions."""
+
+    station: dict[str, str]
+    complex_of: dict[str, str]
+    complex: dict[str, str]
+    direction: dict[tuple[str, str], str] = field(default_factory=dict)
+
+
+def load_names(stations: Path, complexes: Path) -> Names:
+    with stations.open() as f:
+        rows = list(DictReader(f))
+    with complexes.open() as f:
+        complex_names = {r["complex_id"]: r["display_name"] for r in DictReader(f)}
+    return Names(
+        station={
+            r["gtfs_stop_id"]: f"{r['stop_name']} ({r['daytime_routes']})" for r in rows
+        },
+        complex_of={r["gtfs_stop_id"]: r["complex_id"] for r in rows},
+        complex=complex_names,
+        direction={
+            (r["gtfs_stop_id"], d): r[f"{label}_direction_label"]
+            for r in rows
+            for d, label in [("N", "north"), ("S", "south")]
+        },
+    )
+
+
+def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
+    """Each ride's boarding and alighting on `routes` as a temp table `events`:
+    its stop, platform direction, route, riders per column,
+    and whether it's a boarding and a transfer.
+    With `merge`, consecutive rides on `routes` changing at a stop are one ride."""
+    key = (built.get("legs"), tuple(routes), merge)
+    if built.get("events") == key:
+        return
+    connection().execute(
+        f"""
+        CREATE OR REPLACE TEMP TABLE events AS
+        WITH l AS (
+            SELECT *, route IN $routes AS f FROM legs
+        ),
+        w AS (
+            SELECT *,
+                $merge AND f AND coalesce(lag(f) OVER p, false)
+                    AND lag(stops[-1]) OVER p = stops[1] AS cont_in,
+                $merge AND f AND coalesce(lead(f) OVER p, false)
+                    AND lead(stops[1]) OVER p = stops[-1] AS cont_out,
+                min(if(route != 'walk', i, NULL)) OVER (PARTITION BY path)
+                    AS first_ride,
+                max(if(route != 'walk', i, NULL)) OVER (PARTITION BY path)
+                    AS last_ride
+            FROM l
+            WINDOW p AS (PARTITION BY path ORDER BY i)
+        )
+        SELECT stops[1] AS stop, coalesce(d.da, '') AS dir, w.route,
+            {", ".join(names)}, true AS boarding, i > first_ride AS transfer
+        FROM w
+        LEFT JOIN directions d
+            ON d.route = w.route AND d.a = stops[1] AND d.b = stops[2]
+        WHERE f AND NOT cont_in
+        UNION ALL
+        SELECT stops[-1], coalesce(d.db, ''), w.route,
+            {", ".join(names)}, false, i < last_ride
+        FROM w
+        LEFT JOIN directions d
+            ON d.route = w.route AND d.a = stops[-2] AND d.b = stops[-1]
+        WHERE f AND NOT cont_out
+        """,
+        {"routes": list(routes), "merge": merge},
+    )
+    built["events"] = key
+
+
+def place_rows(with_route: bool, names: list[str]) -> list[tuple[Any, ...]]:
+    """`events` by platform (and route): riders on and off per column,
+    then the first column's boardings, alightings, and transfers on and off."""
+    grp = ", grp" if with_route else ""
+    join_route = "JOIN route_groups USING (route)" if with_route else ""
+    first = names[0]
+    sums = ", ".join(f"sum({n})::DOUBLE" for n in names)
+    return (
+        connection()
+        .execute(
+            f"""
+            SELECT stop, dir{grp}, {sums},
+                coalesce(sum({first}) FILTER (WHERE boarding), 0)::DOUBLE,
+                coalesce(sum({first}) FILTER (WHERE NOT boarding), 0)::DOUBLE,
+                coalesce(sum({first}) FILTER (WHERE transfer), 0)::DOUBLE
+            FROM events {join_route}
+            GROUP BY ALL
+            """
+        )
+        .fetchall()
+    )
+
+
+@dataclass(slots=True)
+class RouteService:
+    """A `--by route` row's average route km, trips, and train-km."""
+
+    route_km: float = 0.0
+    trips: float = 0.0
+    train_km: float = 0.0
+
+
+def route_service(
+    manifest: Path, groups: dict[str, list[str]]
+) -> dict[str, RouteService]:
+    """Each `--by route` row's route km, trips, and train-km,
+    from each date's feed, averaged as its riders are."""
+    totals: defaultdict[str, RouteService] = defaultdict(RouteService)
+    total_days = 0
+    for row in read_manifest(manifest):
+        feed = load_feed(DEFAULT_GTFS_DIR / Path(row["feed"]).name)
+        days = int(row["days"])
+        total_days += days
+        patterns = feed.patterns_on(date.fromisoformat(row["date"]))
+        lengths = segment_lengths(patterns)
+        by_group: defaultdict[str, dict[Pattern, int]] = defaultdict(dict)
+        for p, n in patterns.items():
+            for g in groups.get(p.route, []):
+                by_group[g][p] = n
+        for g, ps in by_group.items():
+            t = totals[g]
+            t.route_km += route_length(ps, lengths) / 1000 * days
+            t.trips += sum(ps.values()) * days
+            t.train_km += sum(n * sum(p.lengths) for p, n in ps.items()) / 1000 * days
+    return {
+        g: RouteService(
+            t.route_km / total_days, t.trips / total_days, t.train_km / total_days
+        )
+        for g, t in totals.items()
+    }
+
+
+def route_rows(names: list[str], with_line: bool) -> list[tuple[Any, ...]]:
+    line = ", name" if with_line else ""
+    on_line = "JOIN on_line USING (path, route, i)" if with_line else ""
+    sums = ", ".join(f"sum({n})::DOUBLE" for n in names)
+    return (
+        connection()
+        .execute(
+            f"""
+            WITH {ON_LINE if with_line else "x AS (SELECT 1)"},
+            journeys AS (
+                SELECT DISTINCT path, grp{line}, {", ".join(names)}
+                FROM legs JOIN route_groups USING (route) {on_line}
+            )
+            SELECT grp{line}, {sums} FROM journeys GROUP BY ALL
+            """,
+            {"lines": lines_param()} if with_line else {},
+        )
+        .fetchall()
+    )
+
+
+# Each ride on each line's track, by the leg it's in.
+ON_LINE = """
+    on_line AS (
+        SELECT path, route, i, l.name
+        FROM legs, (SELECT unnest($lines) AS l)
+        WHERE route IN (SELECT route FROM route_groups)
+        AND len(list_filter(
+            range(1, len(stops)),
+            j -> list_contains(l.stops, stops[j])
+                AND list_contains(l.stops, stops[j + 1])
+        )) > 0
+    )
+"""
+
+LINES: dict[str, list[str]] = {}
+
+
+def lines_param() -> list[dict[str, object]]:
+    return [{"name": n, "stops": s} for n, s in LINES.items()]
+
+
+def load_lines(path: Path) -> dict[str, list[str]]:
+    lines = json5.loads(path.read_text(), allow_duplicate_keys=False)
+    return {name: list(line["stops"]) for name, line in lines.items()}
+
+
+def line_rows(names: list[str]) -> list[tuple[Any, ...]]:
+    sums = ", ".join(f"sum({n})::DOUBLE" for n in names)
+    return (
+        connection()
+        .execute(
+            f"""
+            WITH {ON_LINE},
+            journeys AS (
+                SELECT DISTINCT path, name, {", ".join(names)}
+                FROM legs JOIN on_line USING (path, route, i)
+            )
+            SELECT name, {sums} FROM journeys GROUP BY ALL
+            """,
+            {"lines": lines_param()},
+        )
+        .fetchall()
+    )
+
+
+def as_text(row: tuple[Any, ...]) -> tuple[str, ...]:
+    return tuple(map(str, row))
+
+
+def by_riders(row: tuple[Any, ...]) -> tuple[int, str]:
+    """A `(name, riders, ...)` row's order: busiest first, as shown."""
+    return (-round(row[1]), row[0])
+
+
+def by_line_then_riders(row: tuple[Any, ...]) -> tuple[str, int, str]:
+    """A `(route, line, riders, ...)` row's order."""
+    return (row[1], -round(row[2]), row[0])
+
+
+def fmt(x: float | None, digits: int = 0) -> str:
+    return f"{x or 0:,.{digits}f}"
+
+
+def place_table(
+    by: By,
+    with_route: bool,
+    rows: list[tuple[Any, ...]],
+    cols: list[Column],
+    names_: Names,
+) -> list[str]:
+    def label(stop: str, d: str) -> tuple[str, str]:
+        match by:
+            case By.COMPLEX:
+                c = names_.complex_of.get(stop, "")
+                return c, names_.complex.get(c, "")
+            case By.STATION:
+                return stop, names_.station.get(stop, "")
+            case By.PLATFORM:
+                where = names_.direction.get((stop, d), "")
+                name = names_.station.get(stop, "")
+                return f"{stop}{d}", f"{name}, {where}" if where else name
+        raise AssertionError(by)
+
+    # Complexes sum their stations' rows.
+    k = len(cols)
+    merged: defaultdict[tuple[str, ...], list[float]] = defaultdict(
+        lambda: [0.0] * (k + 3)
+    )
+    # In a set order, so a complex's floating-point sum of its stations is too.
+    for row in sorted(rows, key=as_text):
+        stop, d, *rest = row
+        grp = (rest.pop(0),) if with_route else ()
+        key = (*label(stop, d), *grp)
+        for j, v in enumerate(rest):
+            merged[key][j] += v or 0.0
+    head = [by.value, "name", *(["route"] if with_route else [])]
+    lines = [
+        table_row(
+            *head,
+            *(f"on + off, {c.label}" for c in cols),
+            f"on, {cols[0].label}",
+            f"off, {cols[0].label}",
+            f"transfers on + off, {cols[0].label}",
+        ),
+        table_rule("l" * len(head) + "r" * (k + 3)),
+    ]
+
+    # By the riders as shown, so rows that show the same come out in a set order.
+    def busiest(
+        item: tuple[tuple[str, ...], list[float]],
+    ) -> tuple[int, tuple[str, ...]]:
+        key, vs = item
+        return (-round(vs[0]), key)
+
+    for key, vs in sorted(merged.items(), key=busiest):
+        lines.append(table_row(*key, *(fmt(v) for v in vs)))
+    return lines
+
+
+def route_order(riders: dict[str, float]) -> list[str]:
+    """Busiest first, each route's variants right after it."""
+
+    def order(g: str) -> tuple[int, str, bool, str]:
+        base = base_route(g)
+        return (-round(riders.get(base, 0.0)), base, g != base, g)
+
+    return sorted(riders, key=order)
+
+
+@app.command()
+def ridership(
+    ctx: Context,
+    by: Annotated[
+        list[By],
+        Option(
+            help=(
+                "What to total riders by; repeat to cross one of "
+                "complex, station, platform, or line with route"
+            )
+        ),
+    ],
+    route: Annotated[
+        list[str] | None,
+        Option(
+            help=(
+                "Only rides on these `--by route` rows (repeatable), "
+                "e.g. --route 1, or --route N --route R --route W as one group"
+            )
+        ),
+    ] = None,
+    manifest: Annotated[
+        Path, Option(help="`mta-od-data raptor assign-range`'s manifest")
+    ] = DEFAULT_MANIFEST,
+    od_factors: Annotated[
+        list[Path] | None,
+        Option(
+            help=(
+                "Count riders as if routed with OD data scaled by these factors "
+                "(repeatable, a column each), from `mta-od-data scale-od`; "
+                "by default the current year's and 2019's counted entries"
+            )
+        ),
+    ] = None,
+    unscaled: Annotated[
+        bool, Option(help="Also count riders as in the OD data, unscaled, first")
+    ] = False,
+    fare_evasion: Annotated[
+        bool,
+        Option(
+            help=(
+                "Count fare evaders too: riders over 1 less the evasion rate "
+                "in each date's quarter, or in the year scaled to"
+            )
+        ),
+    ] = True,
+    lines: Annotated[Path, Option(help="Named lines for --by line")] = DEFAULT_LINES,
+    markdown_out: Annotated[
+        Path | None, Option(help="Write the report here, not to stdout")
+    ] = None,
+) -> None:
+    """Average weekday ridership by station complex, station, platform, route, or line,
+    over `mta-od-data raptor assign-range`'s dates.
+    """
+    route = route or []
+    if od_factors is None:
+        od_factors = DEFAULT_OD_FACTORS
+    dims = set(by)
+    places = dims & PLACES
+    if (
+        len(dims) != len(by)
+        or len(places) > 1
+        or (places and By.LINE in dims)
+        or (len(dims) > 1 and By.ROUTE not in dims)
+    ):
+        raise BadParameter(
+            "one of complex, station, platform, route, or line, "
+            "optionally crossed with route",
+            param_hint="--by",
+        )
+    cols = columns(manifest, od_factors, fare_evasion, unscaled)
+    names = load_legs(cols)
+    kept, groups = ride_routes(route)
+    route_groups_table(groups)
+    with_route = By.ROUTE in dims and len(dims) > 1
+
+    if places:
+        (place,) = places
+        directions_table(manifest)
+        build_events(kept, names, merge=bool(route) and not with_route)
+        rows = place_rows(with_route, names)
+        table = place_table(
+            place,
+            with_route,
+            rows,
+            cols,
+            load_names(DEFAULT_STATIONS, DEFAULT_COMPLEXES),
+        )
+    elif By.LINE in dims:
+        LINES.clear()
+        LINES.update(load_lines(lines))
+        if with_route:
+            got = route_rows(names, with_line=True)
+            table = [
+                table_row("line", "route", *(c.label for c in cols)),
+                table_rule("ll" + "r" * len(cols)),
+            ]
+            for grp, name, *vs in sorted(got, key=by_line_then_riders):
+                if not route or grp in route:
+                    table.append(table_row(name, grp, *(fmt(v) for v in vs)))
+        else:
+            got = line_rows(names)
+            table = [
+                table_row("line", *(c.label for c in cols)),
+                table_rule("l" + "r" * len(cols)),
+            ]
+            for name, *vs in sorted(got, key=by_riders):
+                table.append(table_row(name, *(fmt(v) for v in vs)))
+    else:
+        got = {grp: vs for grp, *vs in route_rows(names, with_line=False)}
+        if route:
+            got = {g: vs for g, vs in got.items() if g in route}
+        service = route_service(manifest, groups)
+        first = cols[0].label
+        table = [
+            table_row(
+                "route",
+                *(c.label for c in cols),
+                "route km",
+                f"per route km, {first}",
+                "trips",
+                "train-km",
+                f"per train-km, {first}",
+            ),
+            table_rule("l" + "r" * (len(cols) + 5)),
+        ]
+        for grp in route_order({g: vs[0] for g, vs in got.items()}):
+            s = service.get(grp, RouteService())
+            vs = got[grp]
+            table.append(
+                table_row(
+                    grp,
+                    *(fmt(v) for v in vs),
+                    fmt(s.route_km, 1),
+                    fmt(vs[0] / s.route_km if s.route_km else None),
+                    fmt(s.trips),
+                    fmt(s.train_km),
+                    fmt(vs[0] / s.train_km if s.train_km else None, 1),
+                )
+            )
+
+    report = render(ctx, by, route, manifest, cols, fare_evasion, table)
+    if markdown_out is None:
+        print(report, end="")
+    else:
+        markdown_out.write_text(report)
+        print(f"Wrote {markdown_out}")
+
+
+def render(
+    ctx: Context,
+    by: Iterable[By],
+    route: Sequence[str],
+    manifest: Path,
+    cols: Sequence[Column],
+    fare_evasion: bool,
+    table: list[str],
+) -> str:
+    dates = sorted(row["date"] for row in read_manifest(manifest))
+    scope = f" on {', '.join(route)}" if route else ""
+    evaders = " with fare evaders" if fare_evasion else ""
+    lines = [
+        f"# Ridership by {' and '.join(b.value for b in by)}{scope}",
+        "",
+        f"Average weekday riders{evaders}, "
+        f"over {cols[0].average.days} weekdays from {dates[0]} to {dates[-1]} "
+        f"(`{manifest}`).",
+        *(
+            [
+                "Each scaled column scales the OD data "
+                "to a year's counted station entries."
+            ]
+            if any(c.label.startswith("scaled") for c in cols)
+            else []
+        ),
+        "",
+        f"Produced by `{produced_by(ctx)}`.",
+        "",
+        *table,
+    ]
+    return "\n".join(lines) + "\n"
