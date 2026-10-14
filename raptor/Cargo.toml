@@ -22,6 +22,10 @@ rustc-hash = "2.1.3"
 serde = { version = "1.0.229", features = ["derive"] }
 zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
 
+[profile.release]
+# 4% fewer cycles than the default 16 units, for slower builds.
+codegen-units = 1
+
 [features]
 # Heap profiling: `dhat`'s allocator in place of `mimalloc`,
 # writing `dhat-heap.json` for each date assigned (see `scripts/profile-heap.sh`).
