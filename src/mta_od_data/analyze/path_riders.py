@@ -14,13 +14,14 @@ each path's riders over 1 less the evasion rate counts them too.
 from csv import DictReader
 from dataclasses import dataclass
 from datetime import date, timedelta
+from hashlib import sha256
 from pathlib import Path
 from typing import Annotated
 
 from typer import Option
 
 from mta_od_data import DATA
-from mta_od_data.analyze.common import connection
+from mta_od_data.analyze.common import SCRATCH, connection
 from mta_od_data.prepare import fetch_csv
 
 
@@ -55,8 +56,9 @@ def slice_of(d: date) -> Slice:
 @dataclass(frozen=True, slots=True)
 class OdScale:
     """`mta-od-data scale-od`'s factors, as `load_factors` loaded them:
-    the year scaled to, and the slices scaled (weekdays only)."""
+    their file, the year scaled to, and the slices scaled (weekdays only)."""
 
+    path: Path
     year: int
     slices: frozenset[Slice]
 
@@ -194,7 +196,11 @@ def load_factors(path: Path) -> OdScale:
     years = {y for y, _, _ in rows}
     if len(years) != 1:
         raise ValueError(f"{path}: not scaled to one year: {sorted(years)}")
-    return OdScale(year=years.pop(), slices=frozenset((m, dow) for _, m, dow in rows))
+    return OdScale(
+        path=path,
+        year=years.pop(),
+        slices=frozenset((m, dow) for _, m, dow in rows),
+    )
 
 
 _UNSCALED = """
@@ -235,3 +241,107 @@ def paths_params(d: DatePaths, c: Counting) -> dict[str, object]:
             "next_dow": after[1],
         }
     return params
+
+
+# Bumped by hand whenever `average_path_riders`' output changes for the same inputs,
+# so caches written before don't pass for it.
+AVERAGE_VERSION = 2
+
+
+def _stat(path: Path) -> tuple[str, int, int]:
+    st = path.stat()
+    return (str(path), st.st_size, st.st_mtime_ns)
+
+
+def _average_key(manifest: Path, rows: list[DatePaths], c: Counting) -> str:
+    """What `average_path_riders`' output depends on, hashed:
+    a cache is only ever read back for the same inputs."""
+    parts: list[object] = [AVERAGE_VERSION, manifest.read_text()]
+    parts += [(_stat(d.paths), _stat(d.texts)) for d in rows]
+    if c.scale is not None:
+        parts.append(_stat(c.scale.path))
+    if c.evasion is not None:
+        parts += [sorted(c.evasion.rates.items()), c.evasion.year]
+    return sha256(repr(parts).encode()).hexdigest()[:16]
+
+
+# Riders summed exactly, not as `DOUBLE`s: DuckDB sums in parallel, in no set order,
+# so floating-point sums differ in their last bits run to run,
+# reordering tied rows of a report and, rarely, rounding a total differently.
+# Each term is first rounded to 1e-10 of a rider, far below any reported digit.
+EXACT = "DECIMAL(38, 10)"
+
+
+@dataclass(frozen=True, slots=True)
+class AveragePaths:
+    """Each path's riders, averaged over a manifest's dates:
+    a Parquet of `path` (its text) and `riders` (`EXACT`), and the days it averages."""
+
+    file: Path
+    days: int
+
+
+def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths:
+    """Each path's average riders over `manifest`'s dates, each weighted by its `days`.
+
+    Every ridership measure is a sum of paths' riders,
+    so averaging per path first gives each measure's average,
+    with one read of the dates' paths for any number of measures.
+    Paths are by text, not id: ids are per routing, and texts say what a path is.
+
+    Cached under `SCRATCH`, keyed by everything it depends on:
+    the dates' files are ~25 s to read, and the reports, snapshot tests included,
+    read the same average over and over.
+    """
+    manifest_rows = read_manifest(manifest)
+    dates = [date_paths(manifest, row) for row in manifest_rows]
+    days = sum(int(row["days"]) for row in manifest_rows)
+    out = SCRATCH / f"path-riders-{_average_key(manifest, dates, c)}.parquet"
+    if out.exists():
+        return AveragePaths(file=out, days=days)
+
+    db = connection()
+    db.execute(f"CREATE TYPE IF NOT EXISTS EXACT AS {EXACT}")
+    # By id first, per routing's texts: summing a few million integers per date
+    # is far cheaper than grouping by text, which then happens once per routing.
+    db.execute(
+        """
+        CREATE OR REPLACE TEMP TABLE by_id
+            (texts VARCHAR, path_id UINTEGER, riders EXACT)
+        """
+    )
+    for row, d in zip(manifest_rows, dates, strict=True):
+        db.execute(
+            f"""
+            INSERT INTO by_id
+            SELECT $texts, path_id, sum(riders::EXACT) * $days
+            FROM ({paths_query(c)})
+            GROUP BY path_id
+            """,
+            paths_params(d, c) | {"texts": str(d.texts), "days": int(row["days"])},
+        )
+    db.execute("CREATE OR REPLACE TEMP TABLE by_text (path VARCHAR, riders EXACT)")
+    for texts in sorted({str(d.texts) for d in dates}):
+        db.execute(
+            """
+            INSERT INTO by_text
+            SELECT t.path, sum(b.riders)
+            FROM by_id b JOIN read_parquet($texts) t USING (path_id)
+            WHERE b.texts = $texts
+            GROUP BY t.path
+            """,
+            {"texts": texts},
+        )
+    # To a temporary name, then renamed: an interrupted write leaves no cache behind.
+    partial = out.with_suffix(".partial")
+    db.execute(
+        f"""
+        COPY (
+            SELECT path, (sum(riders) / {days})::EXACT AS riders
+            FROM by_text GROUP BY path ORDER BY path
+        ) TO '{partial}' (FORMAT parquet, COMPRESSION zstd)
+        """
+    )
+    db.execute("DROP TABLE by_id; DROP TABLE by_text")
+    partial.rename(out)
+    return AveragePaths(file=out, days=days)
