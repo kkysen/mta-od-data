@@ -77,6 +77,9 @@ DEFAULT_MANIFEST = DATA / "raptor" / "manifest.csv"
 DEFAULT_OD_FACTORS = [DATA / "mta_od_2019_counted.factors.parquet"]
 DEFAULT_LINES = HERE / "lines.json5"
 TRAIN_LENGTHS = HERE / "train_lengths.json5"
+# Loads per this much train: a B Division car's length, most cars',
+# so a load per car compares across trains of different cars.
+CAR_FT = 60
 # Each route's stops' physical platforms, from OpenStreetMap (`platforms.py`).
 PLATFORMS = HERE / "platforms.csv"
 
@@ -443,12 +446,12 @@ def place_rows(with_route: bool, names: list[str]) -> list[tuple[Any, ...]]:
 @dataclass(slots=True)
 class RouteService:
     """A `--by route` row's average route km, trips, and train-km,
-    and train-km times its trains' lengths in 100s of feet."""
+    and train-km times its trains' lengths in 60-ft cars' worth."""
 
     route_km: float = 0.0
     trips: float = 0.0
     train_km: float = 0.0
-    train_100ft_km: float = 0.0
+    train_60ft_km: float = 0.0
 
 
 def route_service(
@@ -474,9 +477,9 @@ def route_service(
             t.route_km += route_length(ps, lengths) / 1000 * days
             t.trips += sum(ps.values()) * days
             t.train_km += sum(n * sum(p.lengths) for p, n in ps.items()) / 1000 * days
-            t.train_100ft_km += (
+            t.train_60ft_km += (
                 sum(
-                    n * sum(p.lengths) * train_lengths.get(p.route, 0) / 100
+                    n * sum(p.lengths) * train_lengths.get(p.route, 0) / CAR_FT
                     for p, n in ps.items()
                 )
                 / 1000
@@ -487,7 +490,7 @@ def route_service(
             t.route_km / total_days,
             t.trips / total_days,
             t.train_km / total_days,
-            t.train_100ft_km / total_days,
+            t.train_60ft_km / total_days,
         )
         for g, t in totals.items()
     }
@@ -883,7 +886,7 @@ def ridership(
                 "Trips",
                 "Train-km",
                 f"Per Train-km, {first}",
-                f"Per 100 ft of Train-km, {first}",
+                f"Per {CAR_FT} ft of Train-km, {first}",
                 *peak_heads(cols),
             ),
             table_rule("l" + "r" * (len(cols) + 6) + "lr"),
@@ -900,7 +903,7 @@ def ridership(
                     fmt(s.trips),
                     fmt(s.train_km),
                     fmt(vs[0] / s.train_km if s.train_km else None, 1),
-                    fmt(vs[0] / s.train_100ft_km if s.train_100ft_km else None, 2),
+                    fmt(vs[0] / s.train_60ft_km if s.train_60ft_km else None, 2),
                     *peak_cells(peaks, (grp,)),
                 )
             )
@@ -946,7 +949,7 @@ def trip_table(trains: list[Train], names: Names, label: str) -> list[str]:
             "Train",
             f"Peak Load, {label}",
             "Train Length (ft)",
-            "Peak per 100 ft",
+            f"Peak per {CAR_FT} ft",
             "Peak Between",
             "Leaving At",
             "Weekdays Run",
@@ -961,7 +964,7 @@ def trip_table(trains: list[Train], names: Names, label: str) -> list[str]:
                 f" to {stop(t.last_stop)}",
                 fmt(t.peak),
                 fmt(lengths.get(t.route)),
-                fmt(t.peak / lengths[t.route] * 100 if t.route in lengths else None),
+                fmt(t.peak / lengths[t.route] * CAR_FT if t.route in lengths else None),
                 f"{stop(t.peak_stop)} to {stop(t.peak_next)}",
                 clock_time(t.peak_departure),
                 str(t.days),
