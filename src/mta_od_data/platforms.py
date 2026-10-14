@@ -16,6 +16,10 @@ Where a feed's route and OSM's relations disagree on its stops
 a stop's platform falls back to its route's at that stop in that direction,
 then to the stop's in that direction if one platform serves it.
 
+Each platform's area is its OSM outline's, for how crowded it is (`platform_areas.csv`):
+every platform a route relation lists is mapped as a closed way
+but one, Elmhurst Av's northbound, a multipolygon relation, left without.
+
 Read from Geofabrik's New York extract, not the Overpass API,
 whose public servers were too busy to answer.
 """
@@ -24,6 +28,7 @@ import csv
 import math
 from collections import Counter, defaultdict
 from dataclasses import dataclass
+from itertools import pairwise
 from pathlib import Path
 from typing import Annotated
 from urllib.request import urlretrieve
@@ -42,6 +47,7 @@ app = Typer()
 EXTRACT_URL = "https://download.geofabrik.de/north-america/us/new-york-latest.osm.pbf"
 DEFAULT_EXTRACT = DATA / "osm" / "new-york-latest.osm.pbf"
 DEFAULT_OUT = Path(__file__).parent / "ridership" / "platforms.csv"
+DEFAULT_AREAS_OUT = Path(__file__).parent / "ridership" / "platform_areas.csv"
 
 # A relation's stop more than this far from every GTFS stop of its route
 # is one the feed doesn't have (or a mapping error), and is skipped.
@@ -83,12 +89,14 @@ class Relations(osmium.SimpleHandler):
 
 
 class Locations(osmium.SimpleHandler):
-    """Each wanted node's location, and each wanted way's centroid."""
+    """Each wanted node's location, and each wanted way's centroid,
+    and its area if it's closed."""
 
     def __init__(self, nodes: set[int], ways: set[int]) -> None:
         super().__init__()
         self.wanted_nodes, self.wanted_ways = nodes, ways
         self.at: dict[str, tuple[float, float]] = {}
+        self.areas: dict[str, float] = {}
 
     def node(self, n: Node) -> None:
         if n.id in self.wanted_nodes:
@@ -102,11 +110,21 @@ class Locations(osmium.SimpleHandler):
                     sum(p[0] for p in points) / len(points),
                     sum(p[1] for p in points) / len(points),
                 )
+            if w.is_closed() and len(points) == len(w.nodes) > 3:
+                self.areas[f"w{w.id}"] = square_metres(points)
 
 
 def metres(a: tuple[float, float], b: tuple[float, float]) -> float:
     """Roughly, at New York's latitude: plenty to tell stations apart."""
     return math.hypot((a[0] - b[0]) * 111_000, (a[1] - b[1]) * 84_000)
+
+
+def square_metres(ring: list[tuple[float, float]]) -> float:
+    """A closed ring's area, by the shoelace formula,
+    on a plane through its first point: exact enough across a platform."""
+    lat0 = math.radians(ring[0][0])
+    xy = [(lon * 111_320 * math.cos(lat0), lat * 111_320) for lat, lon in ring]
+    return abs(sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in pairwise(xy))) / 2
 
 
 def stop_coords(feed_zip: Path) -> dict[str, tuple[float, float]]:
@@ -132,6 +150,9 @@ def fetch_platforms(
     out: Annotated[
         Path, Option(help="The platform of each route's stops")
     ] = DEFAULT_OUT,
+    areas_out: Annotated[
+        Path, Option(help="Each of those platforms' area")
+    ] = DEFAULT_AREAS_OUT,
 ) -> None:
     """Map each route's consecutive stops, in every feed version,
     to the OSM platforms its trains stop at there."""
@@ -223,4 +244,16 @@ def fetch_platforms(
     print(
         f"wrote {out}: {len(rows)} pairs of stops, {direct} from a relation directly, "
         f"{unknown} with a platform unknown"
+    )
+    platforms = sorted({p for r in rows for p in (r[4], r[5]) if p})
+    with areas_out.open("w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["platform", "area_m2"])
+        writer.writerows(
+            (p, f"{locations.areas[p]:.1f}") for p in platforms if p in locations.areas
+        )
+    missing = [p for p in platforms if p not in locations.areas]
+    print(
+        f"wrote {areas_out}: {len(platforms) - len(missing)} platforms' areas, "
+        f"{len(missing)} not closed ways: {', '.join(missing)}"
     )
