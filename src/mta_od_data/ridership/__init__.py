@@ -8,7 +8,8 @@ as in the OD data, and scaled by each `--od-factors` file,
 all with fare evaders unless `--no-fare-evasion`.
 
 - A place (complex, station, platform) counts each ride's boarding and alighting there,
-  and which of those are transfers (not the journey's first boarding or last alighting).
+  which of those are transfers (not the journey's first boarding or last alighting),
+  and riders staying on a train stopping there.
   With `--route` but not `--by route`, consecutive rides on `--route`'s routes
   changing at the same stop are one ride: an N to R change at 59 St is neither.
 - A route counts each journey riding it once, however many of its rides are on it.
@@ -281,17 +282,26 @@ def load_names(stations: Path, complexes: Path) -> Names:
 def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
     """Each ride's boarding and alighting on `routes` as a temp table `events`:
     its stop, platform direction, route, riders per column,
-    and whether it's a boarding and a transfer.
-    With `merge`, consecutive rides on `routes` changing at a stop are one ride."""
+    and whether it's a boarding and a transfer;
+    and the first column's riders staying on at each stop between, as `staying`,
+    by stop, platform direction, and route.
+    With `merge`, consecutive rides on `routes` changing at a stop are one ride,
+    staying on there.
+
+    A ride lists only the stops its train stops at (an express skips the locals),
+    so riders staying on are those on a train stopping there."""
     key = (built.get("legs"), tuple(routes), merge)
     if built.get("events") == key:
         return
-    connection().execute(
-        f"""
-        CREATE OR REPLACE TEMP TABLE events AS
+    db = connection()
+    db.execute(
+        """
+        CREATE OR REPLACE TEMP TABLE rides AS
         WITH l AS (
             SELECT *, route IN $routes AS f FROM legs
         ),
+        -- Over every leg, then only `routes`' rides kept:
+        -- a journey's first and last rides, and the legs beside one, may be off them.
         w AS (
             SELECT *,
                 $merge AND f AND coalesce(lag(f) OVER p, false)
@@ -305,42 +315,86 @@ def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
             FROM l
             WINDOW p AS (PARTITION BY path ORDER BY i)
         )
-        SELECT stops[1] AS stop, coalesce(d.da, '') AS dir, w.route,
-            {", ".join(names)}, true AS boarding, i > first_ride AS transfer
-        FROM w
-        LEFT JOIN directions d
-            ON d.route = w.route AND d.a = stops[1] AND d.b = stops[2]
-        WHERE f AND NOT cont_in
-        UNION ALL
-        SELECT stops[-1], coalesce(d.db, ''), w.route,
-            {", ".join(names)}, false, i < last_ride
-        FROM w
-        LEFT JOIN directions d
-            ON d.route = w.route AND d.a = stops[-2] AND d.b = stops[-1]
-        WHERE f AND NOT cont_out
+        SELECT * FROM w WHERE f
         """,
         {"routes": list(routes), "merge": merge},
     )
+    db.execute(
+        f"""
+        CREATE OR REPLACE TEMP TABLE events AS
+        SELECT stops[1] AS stop, coalesce(d.da, '') AS dir, w.route,
+            {", ".join(names)}, true AS boarding, i > first_ride AS transfer
+        FROM rides w
+        LEFT JOIN directions d
+            ON d.route = w.route AND d.a = stops[1] AND d.b = stops[2]
+        WHERE NOT cont_in
+        UNION ALL
+        SELECT stops[-1], coalesce(d.db, ''), w.route,
+            {", ".join(names)}, false, i < last_ride
+        FROM rides w
+        LEFT JOIN directions d
+            ON d.route = w.route AND d.a = stops[-2] AND d.b = stops[-1]
+        WHERE NOT cont_out
+        """
+    )
+    first = names[0]
+    db.execute(
+        f"""
+        CREATE OR REPLACE TEMP TABLE staying AS
+        WITH between AS (
+            SELECT route, stops, {first}, unnest(range(2, len(stops))) AS j
+            FROM rides
+        )
+        SELECT stops[j] AS stop, coalesce(d.da, '') AS dir, b.route,
+            sum({first}) AS riders
+        FROM between b
+        LEFT JOIN directions d
+            ON d.route = b.route AND d.a = stops[j] AND d.b = stops[j + 1]
+        GROUP BY ALL
+        UNION ALL
+        SELECT stops[-1], coalesce(d.db, ''), w.route, sum({first})
+        FROM rides w
+        LEFT JOIN directions d
+            ON d.route = w.route AND d.a = stops[-2] AND d.b = stops[-1]
+        WHERE cont_out
+        GROUP BY ALL
+        """
+    )
+    db.execute("DROP TABLE rides")
     built["events"] = key
 
 
 def place_rows(with_route: bool, names: list[str]) -> list[tuple[Any, ...]]:
     """`events` by platform (and route): riders on and off per column,
-    then the first column's boardings, alightings, and transfers on and off."""
+    then the first column's boardings, alightings, transfers on and off,
+    and riders staying on."""
     grp = ", grp" if with_route else ""
     join_route = "JOIN route_groups USING (route)" if with_route else ""
     first = names[0]
-    sums = ", ".join(f"sum({n})::DOUBLE" for n in names)
+    sums = ", ".join(f"sum({n})::DOUBLE AS {n}" for n in names)
+    values = ", ".join(
+        f"coalesce({v}, 0)" for v in [*names, "boarded", "alighted", "transfers"]
+    )
     return (
         connection()
         .execute(
             f"""
-            SELECT stop, dir{grp}, {sums},
-                coalesce(sum({first}) FILTER (WHERE boarding), 0)::DOUBLE,
-                coalesce(sum({first}) FILTER (WHERE NOT boarding), 0)::DOUBLE,
-                coalesce(sum({first}) FILTER (WHERE transfer), 0)::DOUBLE
-            FROM events {join_route}
-            GROUP BY ALL
+            WITH e AS (
+                SELECT stop, dir{grp}, {sums},
+                    sum({first}) FILTER (WHERE boarding)::DOUBLE AS boarded,
+                    sum({first}) FILTER (WHERE NOT boarding)::DOUBLE AS alighted,
+                    sum({first}) FILTER (WHERE transfer)::DOUBLE AS transfers
+                FROM events {join_route}
+                GROUP BY ALL
+            ),
+            s AS (
+                SELECT stop, dir{grp}, sum(riders)::DOUBLE AS staying
+                FROM staying {join_route}
+                GROUP BY ALL
+            )
+            -- Full, for stops riders only stay on at.
+            SELECT stop, dir{grp}, {values}, coalesce(staying, 0)
+            FROM e FULL JOIN s USING (stop, dir{grp})
             """
         )
         .fetchall()
@@ -493,7 +547,7 @@ def place_table(
     # Complexes sum their stations' rows.
     k = len(cols)
     merged: defaultdict[tuple[str, ...], list[float]] = defaultdict(
-        lambda: [0.0] * (k + 3)
+        lambda: [0.0] * (k + 4)
     )
     # In a set order, so a complex's floating-point sum of its stations is too.
     for row in sorted(rows, key=as_text):
@@ -510,8 +564,9 @@ def place_table(
             f"On, {cols[0].label}",
             f"Off, {cols[0].label}",
             f"Transfers On + Off, {cols[0].label}",
+            f"Staying On, {cols[0].label}",
         ),
-        table_rule("l" * len(head) + "r" * (k + 3)),
+        table_rule("l" * len(head) + "r" * (k + 4)),
     ]
 
     # By the riders as shown, so rows that show the same come out in a set order.

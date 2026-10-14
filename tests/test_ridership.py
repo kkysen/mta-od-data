@@ -61,7 +61,7 @@ def paths(tmp_path: Path) -> list[str]:
 
 
 def by_stop(rows: list[tuple[Any, ...]]) -> dict[tuple[Any, ...], tuple[Any, ...]]:
-    return {tuple(r[:-4]): tuple(r[-4:]) for r in rows}
+    return {tuple(r[:-5]): tuple(r[-5:]) for r in rows}
 
 
 def test_place_counts_boardings_alightings_and_transfers(paths: list[str]) -> None:
@@ -69,12 +69,14 @@ def test_place_counts_boardings_alightings_and_transfers(paths: list[str]) -> No
     route_groups_table(groups)
     build_events(kept, paths, merge=False)
     got = by_stop(place_rows(False, paths))
-    # (riders on + off, on, off, transfers on + off)
-    assert got[("R11", "S")] == (2.0, 1.0, 1.0, 2.0)
-    assert got[("R01", "S")] == (1.0, 1.0, 0.0, 0.0)
+    # (riders on + off, on, off, transfers on + off, staying on)
+    assert got[("R11", "S")] == (2.0, 1.0, 1.0, 2.0, 0.0)
+    assert got[("R01", "S")] == (1.0, 1.0, 0.0, 0.0, 0.0)
     # No direction known for the walk's stations.
-    assert got[("127", "")] == (2.0, 0.0, 2.0, 2.0)
-    assert got[("R16", "")] == (10.0, 2.0, 8.0, 2.0)
+    assert got[("127", "")] == (2.0, 0.0, 2.0, 2.0, 0.0)
+    assert got[("R16", "")] == (10.0, 2.0, 8.0, 2.0, 0.0)
+    # The Q stays on past 72 St and the rest, and only stops there.
+    assert got[("Q03", "")] == (0.0, 0.0, 0.0, 0.0, 8.0)
 
 
 def test_route_filter_merges_same_stop_changes(paths: list[str]) -> None:
@@ -82,11 +84,11 @@ def test_route_filter_merges_same_stop_changes(paths: list[str]) -> None:
     route_groups_table(groups)
     build_events(kept, paths, merge=True)
     got = by_stop(place_rows(False, paths))
-    # The N to R change at R11 is one ride: neither off nor on there.
-    assert ("R11", "S") not in got
-    assert got[("R01", "S")] == (1.0, 1.0, 0.0, 0.0)
+    # The N to R change at R11 is one ride: neither off nor on there, but staying on.
+    assert got[("R11", "S")] == (0.0, 0.0, 0.0, 0.0, 1.0)
+    assert got[("R01", "S")] == (1.0, 1.0, 0.0, 0.0, 0.0)
     # The W after a walk is still a transfer on.
-    assert got[("R16", "")] == (2.0, 2.0, 0.0, 2.0)
+    assert got[("R16", "")] == (2.0, 2.0, 0.0, 2.0, 0.0)
 
 
 def test_routes_count_each_journey_once_per_row(paths: list[str]) -> None:
