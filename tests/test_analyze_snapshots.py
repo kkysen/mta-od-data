@@ -124,13 +124,13 @@ SNAPSHOTS = [
         Snapshot(
             name=f"ridership-by-{'-and-'.join(by)}",
             cmd=["mta-od-data", "ridership", *(a for b in by for a in ("--by", b))],
-            path=RIDERSHIP_DIR / f"by_{'_and_'.join(by)}.md",
+            path=RIDERSHIP_DIR / f"by_{'_and_'.join(by).replace('-', '_')}.md",
             needs=RIDERSHIP_DATA,
         )
         for by in [
             ["complex"],
             ["station"],
-            ["platform"],
+            ["station-direction"],
             ["route"],
             ["line"],
             ["line", "route"],

@@ -1,4 +1,5 @@
-"""Average weekday ridership by station complex, station, platform, route, or line,
+"""Average weekday ridership by station complex, station, station direction, route,
+or line,
 from `mta-od-data raptor assign-range`'s paths.
 
 Each measure is a sum of paths' riders, so it's taken over
@@ -7,7 +8,8 @@ once per way of counting riders (a column each):
 as in the OD data, and scaled by each `--od-factors` file,
 all with fare evaders unless `--no-fare-evasion`.
 
-- A place (complex, station, platform) counts each ride's boarding and alighting there,
+- A place (complex, station, station direction)
+  counts each ride's boarding and alighting there,
   which of those are transfers (not the journey's first boarding or last alighting),
   and riders staying on a train stopping there.
   With `--route` but not `--by route`, consecutive rides on `--route`'s routes
@@ -72,12 +74,12 @@ DEFAULT_COMPLEXES = DATA / "complexes.csv"
 class By(StrEnum):
     COMPLEX = "complex"
     STATION = "station"
-    PLATFORM = "platform"
+    STATION_DIRECTION = "station-direction"
     ROUTE = "route"
     LINE = "line"
 
 
-PLACES = frozenset({By.COMPLEX, By.STATION, By.PLATFORM})
+PLACES = frozenset({By.COMPLEX, By.STATION, By.STATION_DIRECTION})
 
 # Express variants the feed lists as routes of their own, and their routes.
 VARIANTS = {"5X": "5", "6X": "6", "7X": "7", "FX": "F"}
@@ -538,7 +540,7 @@ def place_table(
                 return c, names_.complex.get(c, "")
             case By.STATION:
                 return stop, names_.station.get(stop, "")
-            case By.PLATFORM:
+            case By.STATION_DIRECTION:
                 where = names_.direction.get((stop, d), "")
                 name = names_.station.get(stop, "")
                 return f"{stop}{d}", f"{name}, {where}" if where else name
@@ -556,7 +558,11 @@ def place_table(
         key = (*label(stop, d), *grp)
         for j, v in enumerate(rest):
             merged[key][j] += v or 0.0
-    head = [by.value.capitalize(), "Name", *(["Route"] if with_route else [])]
+    head = [
+        by.value.replace("-", " ").title(),
+        "Name",
+        *(["Route"] if with_route else []),
+    ]
     lines = [
         table_row(
             *head,
@@ -599,7 +605,7 @@ def ridership(
         Option(
             help=(
                 "What to total riders by; repeat to cross one of "
-                "complex, station, platform, or line with route"
+                "complex, station, station-direction, or line with route"
             )
         ),
     ],
@@ -642,7 +648,8 @@ def ridership(
         Path | None, Option(help="Write the report here, not to stdout")
     ] = None,
 ) -> None:
-    """Average weekday ridership by station complex, station, platform, route, or line,
+    """Average weekday ridership by station complex, station, station direction,
+    route, or line,
     over `mta-od-data raptor assign-range`'s dates.
     """
     route = route or []
@@ -657,7 +664,7 @@ def ridership(
         or (len(dims) > 1 and By.ROUTE not in dims)
     ):
         raise BadParameter(
-            "one of complex, station, platform, route, or line, "
+            "one of complex, station, station-direction, route, or line, "
             "optionally crossed with route",
             param_hint="--by",
         )
@@ -753,7 +760,7 @@ def render(
     scope = f" on {', '.join(route)}" if route else ""
     evaders = " with fare evaders" if fare_evasion else ""
     lines = [
-        f"# Ridership by {' and '.join(b.value for b in by)}{scope}",
+        f"# Ridership by {' and '.join(b.value.replace('-', ' ') for b in by)}{scope}",
         "",
         f"Average weekday riders{evaders}, "
         f"over {cols[0].average.days} weekdays from {dates[0]} to {dates[-1]} "
