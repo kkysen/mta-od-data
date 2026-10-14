@@ -469,8 +469,10 @@ The calls release the GIL, so `rayon` gets every core.
 Python drives it: the `mta-od-data raptor` commands,
 and `assign-range`'s picking of dates and its manifest.
 `assign_dates` takes all of a range's dates at once, to group them by timetable;
-it loads the next timetable's OD rows while routing this one's,
-and writes several dates' paths while splitting the next's.
+it routes every pair of complexes, not just the OD rows' pairs (~98% of them),
+so routing needs no OD rows, which load while it runs,
+and the next timetable's while this one's split;
+it writes several dates' paths while splitting the next's.
 
 Layout: a Cargo crate at `raptor/`,
 with GTFS loading, timetable building, transfers, rRAPTOR,

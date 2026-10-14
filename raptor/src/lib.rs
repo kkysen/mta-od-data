@@ -141,7 +141,8 @@ pub fn assign_dates(
     let mut summaries: Vec<Option<AssignSummary>> = jobs.iter().map(|_| None).collect();
     let dates = |group: &Group| -> Vec<Date> { group.jobs.iter().map(|&i| jobs[i].date).collect() };
     // Loading and writing each take one core, routing and splitting every core:
-    // the next timetable's dates load while this one's route,
+    // a timetable's dates load while it routes, which doesn't need them,
+    // and the next's while its dates split and write,
     // and up to `WRITERS` dates write while the next split.
     std::thread::scope(|scope| -> Result<()> {
         let load = |group: &Group| {
@@ -155,16 +156,11 @@ pub fn assign_dates(
         let mut loading = groups.first().map(load);
         let mut writing = VecDeque::new();
         for (g, group) in groups.iter().enumerate() {
+            let start = Instant::now();
+            let routes = route(&group.tt, &group.complexes, &config);
+            let routed = start.elapsed();
             let (slices, loaded) = join(loading.take().expect("loading this group"))?;
             loading = groups.get(g + 1).map(load);
-            let start = Instant::now();
-            let routes = route(
-                &group.tt,
-                &group.complexes,
-                slices.iter().flatten(),
-                &config,
-            );
-            let routed = start.elapsed();
             let dates = dates(group);
             eprintln!(
                 "routed timetable {} of {} in {routed:.1?}, for {}",

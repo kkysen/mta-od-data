@@ -120,7 +120,7 @@ pub fn assign(
     rows: &[OdRow],
     config: &Config,
 ) -> (Vec<PathRow>, PathTexts, Unassigned) {
-    let routes = route(tt, complexes, rows, config);
+    let routes = route(tt, complexes, config);
     let (paths, unassigned) = split(&routes, complexes, rows);
     let texts = PathTexts(routes.texts().map(Box::from).collect());
     (paths, texts, unassigned)
@@ -146,26 +146,16 @@ pub struct OriginRoutes {
     offset: u32,
 }
 
-/// Routes every OD pair in `rows` (of any number of dates) on `tt`.
-pub fn route<'a>(
-    tt: &Timetable,
-    complexes: &Complexes,
-    rows: impl IntoIterator<Item = &'a OdRow>,
-    config: &Config,
-) -> Routes {
+/// Routes every pair of `complexes` on `tt`,
+/// so any OD data on its dates splits over the same routes.
+/// That's barely more than the OD data's own pairs, ~98% of them.
+pub fn route(tt: &Timetable, complexes: &Complexes, config: &Config) -> Routes {
     let router = Router::new(tt);
-    let mut pairs: BTreeMap<ComplexId, Vec<ComplexId>> = BTreeMap::new();
-    for row in rows {
-        pairs.entry(row.origin).or_default().push(row.destination);
-    }
-    for destinations in pairs.values_mut() {
-        destinations.sort_unstable();
-        destinations.dedup();
-    }
-    let mut routes: BTreeMap<_, _> = pairs
+    let ids: Vec<ComplexId> = complexes.stops.keys().copied().collect();
+    let mut routes: BTreeMap<_, _> = ids
         .par_iter()
-        .map(|(&origin, destinations)| {
-            let routes = route_origin(tt, &router, complexes, origin, destinations, config);
+        .map(|&origin| {
+            let routes = route_origin(tt, &router, complexes, origin, &ids, config);
             (origin, routes)
         })
         .collect();
@@ -190,7 +180,17 @@ pub fn split(routes: &Routes, complexes: &Complexes, rows: &[OdRow]) -> (Vec<Pat
     }
     let results: Vec<_> = by_origin
         .par_iter()
-        .map(|(&origin, rows)| split_origin(&routes.0[&origin], complexes, origin, rows))
+        .map(|(&origin, rows)| match routes.0.get(&origin) {
+            Some(r) => split_origin(r, complexes, origin, rows),
+            // Not a complex in the station data, so it has no stops.
+            None => (
+                Vec::new(),
+                Unassigned {
+                    no_stops: rows.iter().map(|r| r.riders.to_f64()).sum(),
+                    ..Unassigned::default()
+                },
+            ),
+        })
         .collect();
 
     // `collect` keeps `by_origin`'s order, and each origin's rows come sorted,
