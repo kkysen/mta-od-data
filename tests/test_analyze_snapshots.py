@@ -134,6 +134,7 @@ SNAPSHOTS = [
             ["route"],
             ["line"],
             ["line", "route"],
+            ["trip"],
         ]
     ),
 ]

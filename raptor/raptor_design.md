@@ -432,6 +432,11 @@ Complexity is added only once the simple version works end to end.
    with a ride between two consecutive stops both on it,
    e.g. Second Av Subway Phase 1's R14, B08, Q03, Q04, and Q05.
    Its reports for each `--by` are committed beside it.
+   `--by trip` reads the trips files instead:
+   each route's most crowded trains by their average load at their busiest,
+   a train the same across dates with the same route, direction,
+   first departure, and stops.
+   Every report's busiest hour is by when its riders' trains are there.
    It takes `--od-factors`
    (from `mta-od-data scale-od`, by default `data/mta_od_2019_counted.factors.parquet`)
    to count riders as if routed with the scaled OD data, without routing:

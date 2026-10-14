@@ -253,14 +253,10 @@ def _stat(path: Path) -> tuple[str, int, int]:
     return (str(path), st.st_size, st.st_mtime_ns)
 
 
-def _average_key(
-    manifest: Path, rows: list[DatePaths], c: Counting, by_hour: bool
-) -> str:
+def _average_key(manifest: Path, rows: list[DatePaths], c: Counting) -> str:
     """What `average_path_riders`' output depends on, hashed:
     a cache is only ever read back for the same inputs."""
     parts: list[object] = [AVERAGE_VERSION, manifest.read_text()]
-    if by_hour:
-        parts.append("by hour")
     parts += [(_stat(d.paths), _stat(d.texts)) for d in rows]
     if c.scale is not None:
         parts.append(_stat(c.scale.path))
@@ -285,12 +281,8 @@ class AveragePaths:
     days: int
 
 
-def average_path_riders(
-    manifest: Path, c: Counting = AS_ROUTED, by_hour: bool = False
-) -> AveragePaths:
-    """Each path's average riders over `manifest`'s dates, each weighted by its `days`,
-    and with `by_hour`, in each hour its riders enter (an `hour` column,
-    from the service day's start, 4, to 27, the next date's 3 a.m.).
+def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths:
+    """Each path's average riders over `manifest`'s dates, each weighted by its `days`.
 
     Every ridership measure is a sum of paths' riders,
     so averaging per path first gives each measure's average,
@@ -304,9 +296,7 @@ def average_path_riders(
     manifest_rows = read_manifest(manifest)
     dates = [date_paths(manifest, row) for row in manifest_rows]
     days = sum(int(row["days"]) for row in manifest_rows)
-    key = _average_key(manifest, dates, c, by_hour)
-    out = SCRATCH / f"path-riders-{key}.parquet"
-    hour = ", hour" if by_hour else ""
+    out = SCRATCH / f"path-riders-{_average_key(manifest, dates, c)}.parquet"
     if out.exists():
         return AveragePaths(file=out, days=days)
 
@@ -317,31 +307,28 @@ def average_path_riders(
     db.execute(
         """
         CREATE OR REPLACE TEMP TABLE by_id
-            (texts VARCHAR, path_id UINTEGER, hour UTINYINT, riders EXACT)
+            (texts VARCHAR, path_id UINTEGER, riders EXACT)
         """
     )
     for row, d in zip(manifest_rows, dates, strict=True):
         db.execute(
             f"""
             INSERT INTO by_id BY NAME
-            SELECT $texts AS texts, path_id{hour}, sum(riders::EXACT) * $days AS riders
+            SELECT $texts AS texts, path_id, sum(riders::EXACT) * $days AS riders
             FROM ({paths_query(c)})
-            GROUP BY path_id{hour}
+            GROUP BY path_id
             """,
             paths_params(d, c) | {"texts": str(d.texts), "days": int(row["days"])},
         )
-    db.execute(
-        "CREATE OR REPLACE TEMP TABLE by_text "
-        "(path VARCHAR, hour UTINYINT, riders EXACT)"
-    )
+    db.execute("CREATE OR REPLACE TEMP TABLE by_text (path VARCHAR, riders EXACT)")
     for texts in sorted({str(d.texts) for d in dates}):
         db.execute(
-            f"""
+            """
             INSERT INTO by_text BY NAME
-            SELECT t.path{hour}, sum(b.riders) AS riders
+            SELECT t.path, sum(b.riders) AS riders
             FROM by_id b JOIN read_parquet($texts) t USING (path_id)
             WHERE b.texts = $texts
-            GROUP BY t.path{hour}
+            GROUP BY t.path
             """,
             {"texts": texts},
         )
@@ -350,8 +337,8 @@ def average_path_riders(
     db.execute(
         f"""
         COPY (
-            SELECT path{hour}, (sum(riders) / {days})::EXACT AS riders
-            FROM by_text GROUP BY path{hour} ORDER BY path{hour}
+            SELECT path, (sum(riders) / {days})::EXACT AS riders
+            FROM by_text GROUP BY path ORDER BY path
         ) TO '{partial}' (FORMAT parquet, COMPRESSION zstd)
         """
     )

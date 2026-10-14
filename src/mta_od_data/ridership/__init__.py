@@ -45,9 +45,9 @@ from mta_od_data.analyze.common import (
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import (
     AveragePaths,
-    Counting,
     average_path_riders,
     counting,
+    load_fare_evasion,
     read_manifest,
 )
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR
@@ -57,6 +57,14 @@ from mta_od_data.ridership.service import (
     load_feed,
     route_length,
     segment_lengths,
+)
+from mta_od_data.ridership.trips import (
+    Train,
+    crowded_trains,
+    line_hours,
+    load_trip_stops,
+    place_hours,
+    route_hours,
 )
 
 app = Typer()
@@ -78,6 +86,7 @@ class By(StrEnum):
     STATION_DIRECTION = "station-direction"
     ROUTE = "route"
     LINE = "line"
+    TRIP = "trip"
 
 
 PLACES = frozenset({By.COMPLEX, By.STATION, By.STATION_DIRECTION})
@@ -116,8 +125,6 @@ class Column:
     average: AveragePaths
     # The year its OD data is scaled to the counted entries of, if scaled.
     scaled_to: int | None = None
-    # Each path's average riders by the hour they enter, for the first column.
-    hourly: AveragePaths | None = None
 
 
 def period(manifest: Path) -> str:
@@ -137,20 +144,14 @@ def columns(
     # One at a time: `counting` loads its factors into the tables
     # `average_path_riders` reads, so each is averaged before the next loads.
     cols: list[Column] = []
-
-    def averages(c: Counting) -> tuple[AveragePaths, AveragePaths | None]:
-        hourly = None if cols else average_path_riders(manifest, c, by_hour=True)
-        return average_path_riders(manifest, c), hourly
-
     if unscaled:
-        average, hourly = averages(counting(None, fare_evasion))
-        cols.append(Column(period(manifest), average, hourly=hourly))
+        c = counting(None, fare_evasion)
+        cols.append(Column(period(manifest), average_path_riders(manifest, c)))
     for factors in od_factors:
         c = counting(factors, fare_evasion)
         assert c.scale is not None, "counting with factors scales"
         year = c.scale.year
-        average, hourly = averages(c)
-        cols.append(Column(str(year), average, year, hourly))
+        cols.append(Column(str(year), average_path_riders(manifest, c), year))
     days = {col.average.days for col in cols}
     assert len(days) == 1, f"one manifest, one number of days: {days}"
     return cols
@@ -261,6 +262,8 @@ class Names:
     complex_of: dict[str, str]
     complex: dict[str, str]
     direction: dict[tuple[str, str], str] = field(default_factory=dict)
+    # Each station's name alone, without its routes.
+    stop: dict[str, str] = field(default_factory=dict)
 
 
 def load_names(stations: Path, complexes: Path) -> Names:
@@ -281,6 +284,7 @@ def load_names(stations: Path, complexes: Path) -> Names:
             for r in rows
         },
         complex_of={r["gtfs_stop_id"]: r["complex_id"] for r in rows},
+        stop={r["gtfs_stop_id"]: abbreviate_name(r["stop_name"]) for r in rows},
         complex=complex_names,
         direction={
             (r["gtfs_stop_id"], d): r[f"{label}_direction_label"]
@@ -290,22 +294,18 @@ def load_names(stations: Path, complexes: Path) -> Names:
     )
 
 
-def build_events(
-    routes: Sequence[str], names: list[str], merge: bool, hourly: AveragePaths
-) -> None:
+def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
     """Each ride's boarding and alighting on `routes` as a temp table `events`:
     its stop, platform direction, route, riders per column,
     and whether it's a boarding and a transfer;
     and the first column's riders staying on at each stop between, as `staying`,
-    by stop, platform direction, and route;
-    and `hourly`'s riders on and off by stop, direction, route, and hour,
-    as `event_hours`, for the busiest hour.
+    by stop, platform direction, and route.
     With `merge`, consecutive rides on `routes` changing at a stop are one ride,
     staying on there.
 
     A ride lists only the stops its train stops at (an express skips the locals),
     so riders staying on are those on a train stopping there."""
-    key = (built.get("legs"), tuple(routes), merge, hourly.file)
+    key = (built.get("legs"), tuple(routes), merge)
     if built.get("events") == key:
         return
     db = connection()
@@ -376,14 +376,6 @@ def build_events(
         """
     )
     db.execute("DROP TABLE rides")
-    db.execute(
-        f"""
-        CREATE OR REPLACE TEMP TABLE event_hours AS
-        SELECT stop, dir, route, h.hour, sum(h.riders) AS riders
-        FROM events JOIN read_parquet('{hourly.file}') h USING (path)
-        GROUP BY ALL
-        """
-    )
     built["events"] = key
 
 
@@ -524,25 +516,6 @@ def line_rows(names: list[str]) -> list[tuple[Any, ...]]:
             SELECT name, {sums} FROM journeys GROUP BY ALL
             """,
             {"lines": lines_param()},
-        )
-        .fetchall()
-    )
-
-
-def hourly_rows(
-    hourly: AveragePaths, journeys: str, keys: str
-) -> list[tuple[Any, ...]]:
-    """Riders by `keys` and the hour they enter, from `journeys`,
-    a query of `path` and `keys`, a row for each time a path counts."""
-    return (
-        connection()
-        .execute(
-            f"""
-            SELECT {keys}, h.hour, sum(h.riders)::DOUBLE
-            FROM ({journeys}) j JOIN read_parquet('{hourly.file}') h USING (path)
-            GROUP BY ALL
-            """,
-            {"lines": lines_param()} if "$lines" in journeys else {},
         )
         .fetchall()
     )
@@ -728,6 +701,9 @@ def ridership(
         ),
     ] = True,
     lines: Annotated[Path, Option(help="Named lines for --by line")] = DEFAULT_LINES,
+    top: Annotated[
+        int, Option(help="--by trip: each route's this many most crowded trains")
+    ] = 1,
     markdown_out: Annotated[
         Path | None, Option(help="Write the report here, not to stdout")
     ] = None,
@@ -740,6 +716,19 @@ def ridership(
     if od_factors is None:
         od_factors = DEFAULT_OD_FACTORS
     dims = set(by)
+    evasion = load_fare_evasion(None) if fare_evasion else None
+    if By.TRIP in dims:
+        if len(dims) > 1:
+            raise BadParameter("trip goes alone", param_hint="--by")
+        days = load_trip_stops(manifest, evasion).days
+        table = trip_table(
+            crowded_trains(trip_routes(route), top),
+            load_names(DEFAULT_STATIONS, DEFAULT_COMPLEXES),
+            period(manifest),
+        )
+        report = render(ctx, by, route, manifest, days, [], fare_evasion, table)
+        write(report, markdown_out)
+        return
     places = dims & PLACES
     if (
         len(dims) != len(by)
@@ -757,29 +746,18 @@ def ridership(
     kept, groups = ride_routes(route)
     route_groups_table(groups)
     with_route = By.ROUTE in dims and len(dims) > 1
-    hourly = cols[0].hourly
-    assert hourly is not None, "the first column is averaged by hour too"
-    grp = ", grp" if with_route else ""
+    days = load_trip_stops(manifest, evasion).days
 
     if places:
         (place,) = places
         directions_table(manifest)
-        build_events(kept, names, merge=bool(route) and not with_route, hourly=hourly)
+        build_events(kept, names, merge=bool(route) and not with_route)
         rows = place_rows(with_route, names)
-        join_route = "JOIN route_groups USING (route)" if with_route else ""
-        hours = (
-            connection()
-            .execute(
-                f"SELECT stop, dir{grp}, hour, sum(riders)::DOUBLE "
-                f"FROM event_hours {join_route} GROUP BY ALL"
-            )
-            .fetchall()
-        )
         table = place_table(
             place,
             with_route,
             rows,
-            hours,
+            place_hours(with_route, days),
             cols,
             load_names(DEFAULT_STATIONS, DEFAULT_COMPLEXES),
         )
@@ -788,14 +766,7 @@ def ridership(
         LINES.update(load_lines(lines))
         if with_route:
             got = route_rows(names, with_line=True)
-            peaks = busiest(
-                hourly_rows(
-                    hourly,
-                    f"WITH {ON_LINE} SELECT DISTINCT path, grp, name "
-                    "FROM on_line JOIN route_groups USING (route)",
-                    "grp, name",
-                )
-            )
+            peaks = busiest(line_hours(lines_param(), True, days))
             table = [
                 table_row("Line", "Route", *(c.label for c in cols), *peak_heads(cols)),
                 table_rule("ll" + "r" * len(cols) + "lr"),
@@ -807,18 +778,12 @@ def ridership(
                             name,
                             g,
                             *(fmt(v) for v in vs),
-                            *peak_cells(peaks, (g, name)),
+                            *peak_cells(peaks, (name, g)),
                         )
                     )
         else:
             got = line_rows(names)
-            peaks = busiest(
-                hourly_rows(
-                    hourly,
-                    f"WITH {ON_LINE} SELECT DISTINCT path, name FROM on_line",
-                    "name",
-                )
-            )
+            peaks = busiest(line_hours(lines_param(), False, days))
             table = [
                 table_row("Line", *(c.label for c in cols), *peak_heads(cols)),
                 table_rule("l" + "r" * len(cols) + "lr"),
@@ -832,13 +797,7 @@ def ridership(
         if route:
             got = {g: vs for g, vs in got.items() if g in route}
         service = route_service(manifest, groups)
-        peaks = busiest(
-            hourly_rows(
-                hourly,
-                "SELECT DISTINCT path, grp FROM legs JOIN route_groups USING (route)",
-                "grp",
-            )
-        )
+        peaks = busiest(route_hours(days))
         first = cols[0].label
         table = [
             table_row(
@@ -869,7 +828,11 @@ def ridership(
                 )
             )
 
-    report = render(ctx, by, route, manifest, cols, fare_evasion, table)
+    report = render(ctx, by, route, manifest, days, cols, fare_evasion, table)
+    write(report, markdown_out)
+
+
+def write(report: str, markdown_out: Path | None) -> None:
     if markdown_out is None:
         print(report, end="")
     else:
@@ -877,11 +840,59 @@ def ridership(
         print(f"Wrote {markdown_out}")
 
 
+def trip_routes(route: Sequence[str]) -> list[str]:
+    """The GTFS routes of `trip_stops`' trains that `--route` keeps (all, if none)."""
+    every = [
+        r
+        for (r,) in connection()
+        .execute("SELECT DISTINCT route_id FROM trip_stops")
+        .fetchall()
+    ]
+    groups = {r: gs for r in every if (gs := route_groups(r, every))}
+    return sorted(r for r, gs in groups.items() if not route or set(gs) & set(route))
+
+
+def clock_time(secs: int) -> str:
+    """Seconds on the service day's clock as a time of day, `HH:MM`."""
+    return f"{secs // 3600 % 24:02}:{secs % 3600 // 60:02}"
+
+
+def trip_table(trains: list[Train], names: Names, label: str) -> list[str]:
+    def stop(s: str) -> str:
+        return names.stop.get(s, s)
+
+    lines = [
+        table_row(
+            "Route",
+            "Train",
+            f"Peak Load, {label}",
+            "Peak Between",
+            "Leaving At",
+            "Weekdays Run",
+        ),
+        table_rule("ll" + "r" + "ll" + "r"),
+    ]
+    for t in trains:
+        lines.append(
+            table_row(
+                t.route,
+                f"{clock_time(t.first_departure)} {stop(t.first_stop)}"
+                f" to {stop(t.last_stop)}",
+                fmt(t.peak),
+                f"{stop(t.peak_stop)} to {stop(t.peak_next)}",
+                clock_time(t.peak_departure),
+                str(t.days),
+            )
+        )
+    return lines
+
+
 def render(
     ctx: Context,
     by: Iterable[By],
     route: Sequence[str],
     manifest: Path,
+    days: int,
     cols: Sequence[Column],
     fare_evasion: bool,
     table: list[str],
@@ -893,7 +904,7 @@ def render(
         f"# Ridership by {' and '.join(b.value.replace('-', ' ') for b in by)}{scope}",
         "",
         f"Average weekday riders{evaders}, "
-        f"over {cols[0].average.days} weekdays from {dates[0]} to {dates[-1]} "
+        f"over {days} weekdays from {dates[0]} to {dates[-1]} "
         f"(`{manifest}`).",
         *(
             f"The {c.label} column scales the OD data on these dates "
@@ -901,9 +912,22 @@ def render(
             for c in cols
             if c.scaled_to is not None
         ),
-        "The busiest hour is the hour, by when they start, "
-        "in which the most riders who use it enter the subway "
-        "(the OD data says when riders enter, not when they pass a place).",
+        *(
+            [
+                "The busiest hour is the hour, by when it starts, "
+                f"with the most riders in the {cols[0].label} column "
+                "on its trains there "
+                "(getting on or off at a place, boarding a route, or joining a line), "
+                "and those riders."
+            ]
+            if cols
+            else [
+                "A train's load is its riders on board between two stops, "
+                "averaged over the weekdays it runs: "
+                "a train is the same on any date with the same route, direction, "
+                "first stop, and departure from it."
+            ]
+        ),
         "",
         f"Produced by `{produced_by(ctx)}`.",
         "",
