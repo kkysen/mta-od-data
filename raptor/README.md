@@ -116,6 +116,17 @@ The columns:
   not the journey's first boarding or last alighting.
 - **Staying On**: riders on trains that stop there and who stay on.
 
+For platforms only, how busy each is for its size:
+
+- **Area (m²)**: its OpenStreetMap outline's area
+  ([`platform_areas.csv`](../src/mta_od_data/ridership/platform_areas.csv)).
+  A few outlines look mapped only in part, like Newkirk Plaza's 51 m²,
+  so their rows overstate crowding.
+- **On + Off per m²**, **On + Off in Peak Hour per m²**:
+  riders getting on or off over the day, or the peak hour, per m² of platform.
+  That's throughput for its size, not how many stand on it at once,
+  which would also need how long riders wait there.
+
 ### By route: [`by_route.md`](../src/mta_od_data/ridership/by_route.md)
 
 Each route's journeys, counting a journey once however many of its rides are on the route.

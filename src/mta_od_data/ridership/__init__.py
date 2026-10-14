@@ -65,6 +65,8 @@ DEFAULT_MANIFEST = DATA / "raptor" / "manifest.csv"
 DEFAULT_OD_FACTORS = [DATA / "mta_od_2019_counted.factors.parquet"]
 DEFAULT_LINES = HERE / "lines.json5"
 DIRECTION_LABELS = HERE / "direction_labels.json5"
+# Each platform's area, from OpenStreetMap (`mta-od-data fetch-platforms`).
+PLATFORM_AREAS = HERE / "platform_areas.csv"
 DEFAULT_STATIONS = DATA / "stations.csv"
 DEFAULT_COMPLEXES = DATA / "complexes.csv"
 
@@ -267,8 +269,10 @@ def place_table(
     names_: Names,
 ) -> list[str]:
     """`place_rows`' rows as a table, with each place's busiest hour
-    from `hours`, `(stop, dir, platform, [route,] hour, riders on + off)` rows."""
+    from `hours`, `(stop, dir, platform, [route,] hour, riders on + off)` rows,
+    and for a platform, its area and its riders on and off per m² of it."""
     platform_names = platform_labels(names_, platforms) if by is By.PLATFORM else {}
+    areas: dict[str, float] = load_platform_areas() if by is By.PLATFORM else {}
 
     def label(stop: str, d: str, platform: str) -> tuple[str, ...]:
         match by:
@@ -338,8 +342,17 @@ def place_table(
             f"Staying On, {cols[0].label}",
             "Peak Hour",
             f"On + Off in Peak Hour, {cols[0].label}",
+            *(
+                [
+                    "Area (m²)",
+                    f"On + Off per m², {cols[0].label}",
+                    f"On + Off in Peak Hour per m², {cols[0].label}",
+                ]
+                if areas
+                else []
+            ),
         ),
-        table_rule("l" * len(head) + "r" * (k + 4) + "lr"),
+        table_rule("l" * len(head) + "r" * (k + 4) + "lr" + "rrr" * bool(areas)),
     ]
 
     # By the riders as shown, so rows that show the same come out in a set order.
@@ -352,8 +365,22 @@ def place_table(
     for key, vs in sorted(merged.items(), key=by_riders_shown):
         hour, riders = peaks.get(key, (None, 0.0))
         peak = (clock(hour), fmt(riders)) if hour is not None else ("", "")
-        lines.append(table_row(*key, *(fmt(v) for v in vs), *peak))
+        crowding: list[str] = []
+        if areas:
+            area = areas.get(named[key][0])
+            crowding = (
+                [fmt(area), fmt(vs[0] / area, 1), fmt(riders / area, 2)]
+                if area
+                else ["", "", ""]
+            )
+        lines.append(table_row(*key, *(fmt(v) for v in vs), *peak, *crowding))
     return lines
+
+
+def load_platform_areas() -> dict[str, float]:
+    """Each platform's area in m², by its OSM element, e.g. `w426103243`."""
+    with PLATFORM_AREAS.open() as f:
+        return {r["platform"]: float(r["area_m2"]) for r in DictReader(f)}
 
 
 def route_order(riders: dict[str, float]) -> list[str]:
@@ -631,7 +658,11 @@ def render(
             [
                 "Platforms are from OpenStreetMap's subway routes "
                 "(© OpenStreetMap contributors, ODbL), "
-                "by `mta-od-data fetch-platforms`."
+                "by `mta-od-data fetch-platforms`.",
+                "A platform's area is its OpenStreetMap outline's, "
+                "and its On + Off per m² is its riders getting on or off "
+                "over the day, or the peak hour, per m² of it: "
+                "how busy it is for its size, not how many stand on it at once.",
             ]
             if By.PLATFORM in by
             else []
