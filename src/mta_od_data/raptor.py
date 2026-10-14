@@ -41,6 +41,7 @@ MANIFEST_FIELDS = [
     "feed",
     "paths",
     "path_texts",
+    "trips",
     "riders_in",
     "riders_assigned",
     "unassigned_no_stops",
@@ -229,6 +230,8 @@ def assign_range(
                     "feed": version.path,
                     "paths": out,
                     "path_texts": s.path_texts,
+                    # Beside its paths, as `assign_dates` writes it (`trips_out`).
+                    "trips": out.with_name(f"trips-{day}.parquet"),
                     "riders_in": s.riders_in,
                     "riders_assigned": s.riders_assigned,
                     "unassigned_no_stops": s.unassigned_no_stops,

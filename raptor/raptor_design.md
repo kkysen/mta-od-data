@@ -357,7 +357,12 @@ Complexity is added only once the simple version works end to end.
    are found from consecutive stops on it,
    whatever their origin and destination,
    not inferred from where they board or alight.
-   Trip-level output (which train) is a later flag.
+   Each date's `trips-<date>.parquet` has every train's riders at each of its stops:
+   boarding, alighting, and on board as it leaves (its trip ID the date's own),
+   from each ride's train, kept with its choice through `split`.
+   Riders add up as integer billionths, the same in any order,
+   so each train's load ends at exactly 0, as writing it checks.
+   A train's riders at a stop match the paths' rides starting and ending there.
    - One profile per origin complex over the service day
      (through `DEPARTURES_UNTIL`, for riders entering late),
      to every destination complex at once.

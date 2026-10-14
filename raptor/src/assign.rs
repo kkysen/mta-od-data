@@ -11,6 +11,7 @@
 use std::collections::BTreeMap;
 use std::ops::Index;
 use std::path::Path;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 use anyhow::{Context, Result};
 use parquet::basic::{Compression, Encoding, ZstdLevel};
@@ -121,7 +122,7 @@ pub fn assign(
     config: &Config,
 ) -> (Vec<PathRow>, PathTexts, Unassigned) {
     let routes = route(tt, complexes);
-    let (paths, unassigned) = split(&routes, complexes, rows, config);
+    let (paths, unassigned) = split(&routes, complexes, rows, config, &TripLoads::new(tt));
     let texts = PathTexts(routes.texts().map(Box::from).collect());
     (paths, texts, unassigned)
 }
@@ -172,6 +173,76 @@ impl AllLegs {
     fn path(&self, id: LegsId) -> PathId {
         self.ends[id.0 as usize].0
     }
+
+    /// `id`'s rides' patterns and board and alight positions, in order.
+    fn rides(&self, id: LegsId) -> impl Iterator<Item = (u32, u16, u16)> {
+        let i = id.0 as usize;
+        let start = i.checked_sub(1).map_or(0, |i| self.ends[i].1) as usize;
+        self.legs[start..self.ends[i].1 as usize]
+            .iter()
+            .filter_map(|leg| match *leg {
+                LegKey::Ride {
+                    pattern,
+                    board_pos,
+                    alight_pos,
+                } => Some((pattern, board_pos, alight_pos)),
+                LegKey::Walk { .. } => None,
+            })
+    }
+}
+
+/// Riders boarding and alighting each train at each of its stops, over a date's rows,
+/// in billionths of a rider.
+/// Integers, added atomically from every origin's thread at once:
+/// integer sums are the same in any order, as floating-point ones aren't.
+pub struct TripLoads {
+    /// Each pattern's first slot and stop count: a trip's stops are consecutive slots.
+    patterns: Vec<(usize, usize)>,
+    on: Vec<AtomicU64>,
+    off: Vec<AtomicU64>,
+}
+
+/// Billionths of a rider: an OD row's share on a choice is often well under 1e-4,
+/// the riders' precision elsewhere, and rounding each to that would lose them.
+pub const NANO: f64 = 1e9;
+
+impl TripLoads {
+    pub fn new(tt: &Timetable) -> Self {
+        let mut patterns = Vec::with_capacity(tt.patterns.len());
+        let mut slots = 0;
+        for p in &tt.patterns {
+            patterns.push((slots, p.stops.len()));
+            slots += p.trips.len() * p.stops.len();
+        }
+        let zeros = || (0..slots).map(|_| AtomicU64::new(0)).collect();
+        Self {
+            patterns,
+            on: zeros(),
+            off: zeros(),
+        }
+    }
+
+    fn slot(&self, pattern: usize, trip: usize, pos: usize) -> usize {
+        let (first, stops) = self.patterns[pattern];
+        first + trip * stops + pos
+    }
+
+    fn add(&self, (pattern, board, alight): (u32, u16, u16), train: Train, nano: u64) {
+        let (pattern, train) = (pattern as usize, usize::from(train));
+        let on = self.slot(pattern, train, board.into());
+        let off = self.slot(pattern, train, alight.into());
+        self.on[on].fetch_add(nano, Ordering::Relaxed);
+        self.off[off].fetch_add(nano, Ordering::Relaxed);
+    }
+
+    /// Riders boarding and alighting `pattern`'s `trip` at `pos`, in billionths.
+    pub fn at(&self, pattern: usize, trip: usize, pos: usize) -> (u64, u64) {
+        let slot = self.slot(pattern, trip, pos);
+        (
+            self.on[slot].load(Ordering::Relaxed),
+            self.off[slot].load(Ordering::Relaxed),
+        )
+    }
 }
 
 /// An origin's choice's legs, in its `OriginRoutes::legs`.
@@ -205,11 +276,13 @@ pub fn route(tt: &Timetable, complexes: &Complexes) -> Routes {
 /// Splits `rows`' riders over their journeys in `routes`,
 /// by `config`'s weights.
 /// Paths are `routes`' ids, so their texts are `Routes::texts`.
+/// Each ride's riders are added to its train's boardings and alightings in `loads`.
 pub fn split(
     routes: &Routes,
     complexes: &Complexes,
     rows: &[OdRow],
     config: &Config,
+    loads: &TripLoads,
 ) -> (Vec<PathRow>, Unassigned) {
     let mut by_origin: BTreeMap<ComplexId, Vec<&OdRow>> = BTreeMap::new();
     for row in rows {
@@ -218,7 +291,7 @@ pub fn split(
     let results: Vec<_> = by_origin
         .par_iter()
         .map(|(&origin, rows)| match routes.0.get(&origin) {
-            Some(r) => split_origin(r, complexes, origin, rows, config),
+            Some(r) => split_origin(r, complexes, origin, rows, config, loads),
             // Not a complex in the station data, so it has no stops.
             None => (
                 Vec::new(),
@@ -306,6 +379,7 @@ fn split_origin(
     origin: ComplexId,
     rows: &[&OdRow],
     config: &Config,
+    loads: &TripLoads,
 ) -> (Vec<PathRow>, Unassigned) {
     let mut unassigned = Unassigned::default();
     let origin_stops = stops_of(complexes, origin);
@@ -321,7 +395,8 @@ fn split_origin(
             unassigned.unreachable += row.riders.to_f64();
             continue;
         }
-        let (row_paths, assigned) = assign_row(row, intervals, &routes.legs, config, &mut shares);
+        let (row_paths, assigned) =
+            assign_row(row, intervals, &routes.legs, config, &mut shares, loads);
         unassigned.no_departure += row.riders.to_f64() * (1.0 - assigned);
         paths.extend(row_paths);
     }
@@ -602,6 +677,7 @@ fn assign_row(
     legs: &AllLegs,
     config: &Config,
     shares: &mut Vec<f64>,
+    loads: &TripLoads,
 ) -> (Vec<PathRow>, f64) {
     let (start, end) = (Secs::from(row.hour) * HOUR, Secs::from(row.hour + 1) * HOUR);
     #[derive(Default)]
@@ -614,7 +690,7 @@ fn assign_row(
     }
     let mut accs: BTreeMap<PathId, Acc> = BTreeMap::new();
     let mut assigned = 0.0;
-    for (after, until, choices, _) in intervals.iter() {
+    for (after, until, choices, trains) in intervals.iter() {
         let (lo, hi) = (after.max(start), until.min(end));
         if lo >= hi {
             continue;
@@ -625,8 +701,15 @@ fn assign_row(
         // A rider entering in `(after, until]` chooses as one entering at `until`,
         // the departure that ends the interval.
         shares_into(choices, until, config, shares);
+        let mut trains = trains.iter();
         for (o, &s) in choices.iter().zip(shares.iter()) {
             let share = weight * s;
+            let nano = (share * row.riders.to_f64() * NANO).round() as u64;
+            for (ride, &train) in legs.rides(o.legs).zip(trains.by_ref().take(o.rides.into())) {
+                if nano > 0 {
+                    loads.add(ride, train, nano);
+                }
+            }
             let acc = accs.entry(legs.path(o.legs)).or_default();
             acc.rides = o.rides;
             acc.share += share;
@@ -808,6 +891,110 @@ pub fn write_path_texts(
         id += n;
         writer.write(&batch)?;
     }
+    writer.close()?;
+    Ok(())
+}
+
+/// Writes each train's riders at each of its stops as zstd Parquet:
+/// its trip (`trip_ids`, by pattern, the date's own),
+/// route, direction, the service date it runs on relative to the timetable's,
+/// each stop's position and GTFS parent stop ID (`127`: `direction_id` says which way),
+/// scheduled arrival and departure (seconds from the timetable's date's noon less 12h),
+/// riders boarding and alighting there, and riders on board as it leaves.
+/// Riders are in billionths summed exactly, so each trip's load ends at exactly 0,
+/// which this checks.
+pub fn write_trips(
+    out: &Path,
+    tt: &Timetable,
+    trip_ids: &[Vec<String>],
+    loads: &TripLoads,
+    metadata: Vec<(String, String)>,
+    zstd_level: i32,
+) -> Result<()> {
+    use std::sync::Arc;
+
+    use arrow_array::builder::{
+        Float64Builder, Int8Builder, Int32Builder, StringBuilder, UInt8Builder, UInt16Builder,
+    };
+    use arrow_array::{ArrayRef, RecordBatch};
+    use arrow_schema::{DataType, Field, Schema};
+    use parquet::arrow::ArrowWriter;
+
+    let schema = Arc::new(Schema::new(vec![
+        Field::new("trip_id", DataType::Utf8, false),
+        Field::new("route_id", DataType::Utf8, false),
+        Field::new("direction_id", DataType::UInt8, true),
+        Field::new("day", DataType::Int8, false),
+        Field::new("stop_sequence", DataType::UInt16, false),
+        Field::new("stop_id", DataType::Utf8, false),
+        Field::new("arrival", DataType::Int32, false),
+        Field::new("departure", DataType::Int32, false),
+        Field::new("boardings", DataType::Float64, false),
+        Field::new("alightings", DataType::Float64, false),
+        Field::new("load", DataType::Float64, false),
+    ]));
+    let (mut trip, mut route, mut direction, mut day) = (
+        StringBuilder::new(),
+        StringBuilder::new(),
+        UInt8Builder::new(),
+        Int8Builder::new(),
+    );
+    let (mut seq, mut stop, mut arrival, mut departure) = (
+        UInt16Builder::new(),
+        StringBuilder::new(),
+        Int32Builder::new(),
+        Int32Builder::new(),
+    );
+    let (mut on, mut off, mut load) = (
+        Float64Builder::new(),
+        Float64Builder::new(),
+        Float64Builder::new(),
+    );
+    for (p, (pattern, ids)) in tt.patterns.iter().zip(trip_ids).enumerate() {
+        anyhow::ensure!(ids.len() == pattern.trips.len(), "a trip ID per trip");
+        for (t, (times, id)) in pattern.trips.iter().zip(ids).enumerate() {
+            let mut aboard: i128 = 0;
+            for (k, (&s, &(arrive, depart))) in pattern.stops.iter().zip(&times.times).enumerate() {
+                let (boarded, alighted) = loads.at(p, t, k);
+                aboard += i128::from(boarded) - i128::from(alighted);
+                anyhow::ensure!(aboard >= 0, "{id}: fewer riders than alight at {k}");
+                trip.append_value(id);
+                route.append_value(&pattern.route_id);
+                direction.append_option(pattern.direction_id);
+                day.append_value(times.day);
+                seq.append_value(u16::try_from(k)?);
+                stop.append_value(&tt.stops[s as usize].id);
+                arrival.append_value(arrive);
+                departure.append_value(depart);
+                on.append_value(boarded as f64 / NANO);
+                off.append_value(alighted as f64 / NANO);
+                load.append_value(aboard as f64 / NANO);
+            }
+            anyhow::ensure!(
+                aboard == 0,
+                "{id}: {aboard} billionths still aboard at its end"
+            );
+        }
+    }
+    let batch = RecordBatch::try_new(
+        Arc::clone(&schema),
+        vec![
+            Arc::new(trip.finish()) as ArrayRef,
+            Arc::new(route.finish()),
+            Arc::new(direction.finish()),
+            Arc::new(day.finish()),
+            Arc::new(seq.finish()),
+            Arc::new(stop.finish()),
+            Arc::new(arrival.finish()),
+            Arc::new(departure.finish()),
+            Arc::new(on.finish()),
+            Arc::new(off.finish()),
+            Arc::new(load.finish()),
+        ],
+    )?;
+    let props = properties(metadata, zstd_level)?.build();
+    let mut writer = ArrowWriter::try_new(create(out)?, schema, Some(props))?;
+    writer.write(&batch)?;
     writer.close()?;
     Ok(())
 }

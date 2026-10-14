@@ -21,7 +21,10 @@ use pyo3::types::{PyModule, PyModuleMethods};
 use pyo3::{Bound, PyResult, Python, pyclass, pyfunction, pymethods, pymodule, wrap_pyfunction};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
-use crate::assign::{Config, Transfers, Unassigned, route, split, write_path_texts, write_paths};
+use crate::assign::{
+    Config, Transfers, TripLoads, Unassigned, route, split, write_path_texts, write_paths,
+    write_trips,
+};
 use crate::batch::{Version, load_versions, pick_dates};
 use crate::gtfs::{Feed, Secs, parse_time};
 use crate::od::{Complexes, load_service_day, load_service_days};
@@ -92,6 +95,15 @@ struct Group {
     jobs: Vec<usize>,
 }
 
+/// Each pattern's trips' IDs: a date's own, which a group's timetable,
+/// its first date's, doesn't have for the rest (`routes_like` ignores them).
+fn trip_ids(tt: &Timetable) -> Vec<Vec<String>> {
+    tt.patterns
+        .iter()
+        .map(|p| p.trips.iter().map(|t| t.trip_id.clone()).collect())
+        .collect()
+}
+
 /// Assigns each job's date as `assign_date` does,
 /// but routes each distinct timetable once, for every date with it:
 /// a feed version's Mondays to Thursdays mostly share one.
@@ -121,7 +133,9 @@ pub fn assign_dates(
         })
         .collect::<Result<_>>()?;
     let mut groups: Vec<Group> = Vec::new();
+    let mut job_trip_ids = Vec::with_capacity(jobs.len());
     for (i, (tt, complexes)) in timetables.into_iter().enumerate() {
+        job_trip_ids.push(trip_ids(&tt));
         match groups.iter_mut().find(|g| g.tt.routes_like(&tt)) {
             Some(group) => group.jobs.push(i),
             None => groups.push(Group {
@@ -204,7 +218,8 @@ pub fn assign_dates(
             for (&i, rows) in group.jobs.iter().zip(&slices) {
                 let job = &jobs[i];
                 let start = Instant::now();
-                let (paths, unassigned) = split(&routes, &group.complexes, rows, &config);
+                let loads = TripLoads::new(&group.tt);
+                let (paths, unassigned) = split(&routes, &group.complexes, rows, &config, &loads);
                 let timings = Timings {
                     loaded,
                     routed,
@@ -235,10 +250,17 @@ pub fn assign_dates(
                 while writing.len() >= WRITERS {
                     join(writing.pop_front().expect("WRITERS > 0"))?;
                 }
+                let tt = &group.tt;
+                let ids = &job_trip_ids[i];
+                let trips = trips_out(&job.out, job.date);
+                let trips_metadata = metadata.clone();
                 writing.push_back(scope.spawn(move || -> Result<()> {
                     let start = Instant::now();
                     write_paths(&job.out, &paths, job.date, metadata, zstd_level)?;
                     eprintln!("wrote {} in {:.1?}", job.out.display(), start.elapsed());
+                    let start = Instant::now();
+                    write_trips(&trips, tt, ids, &loads, trips_metadata, zstd_level)?;
+                    eprintln!("wrote {} in {:.1?}", trips.display(), start.elapsed());
                     Ok(())
                 }));
             }
@@ -252,6 +274,11 @@ pub fn assign_dates(
         .into_iter()
         .map(|s| s.expect("every job is in a group"))
         .collect())
+}
+
+/// Where a date's trips go: beside its paths, `out`.
+pub fn trips_out(out: &Path, date: Date) -> PathBuf {
+    out.with_file_name(format!("trips-{date}.parquet"))
 }
 
 /// Where a group's path texts go: beside its first date's paths, `out`.
