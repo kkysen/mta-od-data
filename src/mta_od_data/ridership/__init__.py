@@ -33,12 +33,6 @@ from typer import BadParameter, Context, Option, Typer
 
 from mta_od_data import DATA
 from mta_od_data.analyze.common import connection
-from mta_od_data.analyze.line_ridership import (
-    Pattern,
-    load_feed,
-    route_length,
-    segment_lengths,
-)
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import (
     AveragePaths,
@@ -48,6 +42,12 @@ from mta_od_data.analyze.path_riders import (
 )
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR
 from mta_od_data.invocation import produced_by
+from mta_od_data.ridership.service import (
+    Pattern,
+    load_feed,
+    route_length,
+    segment_lengths,
+)
 
 app = Typer()
 

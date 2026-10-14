@@ -419,13 +419,16 @@ Complexity is added only once the simple version works end to end.
    This is the representative-date rule.
    The OD data averages each (month, day of week) over all its dates, holidays included,
    while the timetable is that of an ordinary one.
-   `mta-od-data analyze track-ridership --stop <id> ...` reads the manifest
-   and averages, weighted by `days`, the riders on paths
-   with a ride between two consecutive stops both in the given set,
-   e.g. `--stop R14 --stop B08 --stop Q03 --stop Q04 --stop Q05`
-   for Second Av Subway Phase 1.
-   It and `line-ridership` take `--od-factors`
-   (from `mta-od-data scale-od`, e.g. `data/mta_od_scaled_to_2019.factors.parquet`)
+   `mta-od-data ridership --by complex|station|platform|route|line` reads the manifest
+   and averages each path's riders over its dates, weighted by `days`,
+   then totals them by what `--by` names:
+   a place's riders on and off, a route's journeys,
+   or a named line's (`src/mta_od_data/ridership/lines.json5`) journeys
+   with a ride between two consecutive stops both on it,
+   e.g. Second Av Subway Phase 1's R14, B08, Q03, Q04, and Q05.
+   Its reports for each `--by` are committed beside it.
+   It takes `--od-factors`
+   (from `mta-od-data scale-od`, by default `data/mta_od_2019_counted.factors.parquet`)
    to count riders as if routed with the scaled OD data, without routing:
    with no crowding, riders' choices don't depend on how many ride,
    and `scale-od` scales each OD row by its origin's and destination's factors
@@ -435,7 +438,7 @@ Complexity is added only once the simple version works end to end.
    Saturday isn't scaled, so they scale as Friday does
    rather than dropping, as routing the scaled OD data drops them.
    Once crowding is modeled, scaled OD data will need its own routing.
-   `--fare-evasion` likewise counts fare evaders, absent from the OD data:
+   It likewise counts fare evaders, absent from the OD data, unless `--no-fare-evasion`:
    each path's riders over 1 less the evasion rate in its date's quarter
    (data.ny.gov's `6kj3-ijvb`, fetched to `data/fare_evasion.csv`),
    or with `--od-factors`, that quarter's in the year scaled to,
