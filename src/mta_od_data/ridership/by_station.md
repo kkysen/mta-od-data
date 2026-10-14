@@ -2,11 +2,11 @@
 
 Average weekday riders with fare evaders, over 103 weekdays from 2025-08-19 to 2025-12-22 (`data/raptor/manifest.csv`).
 The 2019 column scales the OD data on these dates to 2019's counted station entries.
-The busiest hour is the hour, by when it starts, with the most riders in the Aug-Dec 2025 column on its trains there (getting on or off at a place, boarding a route, or joining a line), and those riders.
+The peak hour is the hour, by when it starts, with the most riders in the Aug-Dec 2025 column on its trains there (getting on or off at a place, boarding a route, or joining a line), and those riders.
 
 Produced by `mta-od-data ridership --by station --markdown-out src/mta_od_data/ridership/by_station.md`.
 
-| Station | On + Off, Aug-Dec 2025 | On + Off, 2019 | On, Aug-Dec 2025 | Off, Aug-Dec 2025 | Transfers On + Off, Aug-Dec 2025 | Staying On, Aug-Dec 2025 | Busiest Hour | On + Off in It, Aug-Dec 2025 |
+| Station | On + Off, Aug-Dec 2025 | On + Off, 2019 | On, Aug-Dec 2025 | Off, Aug-Dec 2025 | Transfers On + Off, Aug-Dec 2025 | Staying On, Aug-Dec 2025 | Peak Hour | On + Off in Peak Hour, Aug-Dec 2025 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
 | Grand Central-42 St (4,5,6) | 348,175 | 459,717 | 171,820 | 176,355 | 183,224 | 262,934 | 8:00 AM | 36,292 |
 | Times Sq-42 St (1,2,3) | 313,615 | 419,142 | 157,531 | 156,084 | 227,688 | 187,945 | 5:00 PM | 30,599 |

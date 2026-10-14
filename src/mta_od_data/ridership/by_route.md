@@ -2,11 +2,11 @@
 
 Average weekday riders with fare evaders, over 103 weekdays from 2025-08-19 to 2025-12-22 (`data/raptor/manifest.csv`).
 The 2019 column scales the OD data on these dates to 2019's counted station entries.
-The busiest hour is the hour, by when it starts, with the most riders in the Aug-Dec 2025 column on its trains there (getting on or off at a place, boarding a route, or joining a line), and those riders.
+The peak hour is the hour, by when it starts, with the most riders in the Aug-Dec 2025 column on its trains there (getting on or off at a place, boarding a route, or joining a line), and those riders.
 
 Produced by `mta-od-data ridership --by route --markdown-out src/mta_od_data/ridership/by_route.md`.
 
-| Route | Aug-Dec 2025 | 2019 | Route-km | Per Route-km, Aug-Dec 2025 | Trips | Train-km | Per Train-km, Aug-Dec 2025 | Per 60 ft of Train-km, Aug-Dec 2025 | Busiest Hour | Riders in It, Aug-Dec 2025 |
+| Route | Aug-Dec 2025 | 2019 | Route-km | Per Route-km, Aug-Dec 2025 | Trips | Train-km | Per Train-km, Aug-Dec 2025 | Per 60 ft of Train-km, Aug-Dec 2025 | Peak Hour | Riders in Peak Hour, Aug-Dec 2025 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
 | 6 | 560,123 | 745,403 | 24.1 | 23,245 | 552 | 12,495 | 44.8 | 5.27 | 5:00 PM | 53,437 |
 | 6L | 425,011 | 562,254 | 24.1 | 17,638 | 439 | 9,772 | 43.5 | 5.12 | 5:00 PM | 36,492 |

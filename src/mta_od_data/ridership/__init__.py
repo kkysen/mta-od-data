@@ -582,7 +582,7 @@ def busiest(
 
 
 def peak_heads(cols: Sequence[Column]) -> list[str]:
-    return ["Busiest Hour", f"Riders in It, {cols[0].label}"]
+    return ["Peak Hour", f"Riders in Peak Hour, {cols[0].label}"]
 
 
 def peak_cells(
@@ -831,8 +831,8 @@ def place_table(
             f"Off, {cols[0].label}",
             f"Transfers On + Off, {cols[0].label}",
             f"Staying On, {cols[0].label}",
-            "Busiest Hour",
-            f"On + Off in It, {cols[0].label}",
+            "Peak Hour",
+            f"On + Off in Peak Hour, {cols[0].label}",
         ),
         table_rule("l" * len(head) + "r" * (k + 4) + "lr"),
     ]
@@ -1130,7 +1130,7 @@ def render(
         ),
         *(
             [
-                "The busiest hour is the hour, by when it starts, "
+                "The peak hour is the hour, by when it starts, "
                 f"with the most riders in the {cols[0].label} column "
                 "on its trains there "
                 "(getting on or off at a place, boarding a route, or joining a line), "
