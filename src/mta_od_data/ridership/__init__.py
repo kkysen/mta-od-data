@@ -656,24 +656,23 @@ def place_table(
     from `hours`, `(stop, dir, platform, [route,] hour, riders on + off)` rows."""
     platform_names = platform_labels(names_) if by is By.PLATFORM else {}
 
-    def label(stop: str, d: str, platform: str) -> tuple[str, str]:
+    def label(stop: str, d: str, platform: str) -> tuple[str, ...]:
         match by:
             case By.COMPLEX:
                 c = names_.complex_of.get(stop, "")
-                return c, names_.complex.get(c, "")
+                return (names_.complex.get(c, c),)
             case By.STATION:
-                return stop, names_.station.get(stop, "")
+                return (names_.station.get(stop, stop),)
             case By.STATION_DIRECTION:
-                where = names_.direction.get((stop, d), "")
-                name = names_.station.get(stop, "")
-                return f"{stop}{d}", f"{name}, {where}" if where else name
+                where = names_.direction.get((stop, d), d)
+                return names_.station.get(stop, stop), where
             case By.PLATFORM:
                 if platform:
-                    return platform, platform_names.get(platform, "")
+                    return (platform_names.get(platform, platform),)
                 # A stop OSM's routes don't say the platform of: its direction.
-                where = names_.direction.get((stop, d), "")
-                name = names_.station.get(stop, "")
-                return f"{stop}{d}?", f"{name}, {where}, platform unknown"
+                where = names_.direction.get((stop, d), d)
+                name = names_.station.get(stop, stop)
+                return (f"{name}, {where}, platform unknown",)
         raise AssertionError(by)
 
     # Complexes sum their stations' rows.
@@ -681,17 +680,38 @@ def place_table(
     merged: defaultdict[tuple[str, ...], list[float]] = defaultdict(
         lambda: [0.0] * (k + 4)
     )
+
+    def identity(stop: str, d: str, platform: str) -> tuple[str, ...]:
+        """The place a row is at, which its name must be unique to."""
+        match by:
+            case By.COMPLEX:
+                return (names_.complex_of.get(stop, ""),)
+            case By.STATION:
+                return (stop,)
+            case By.STATION_DIRECTION:
+                return (stop, d)
+            case By.PLATFORM:
+                return (platform,) if platform else (stop, d)
+        raise AssertionError(by)
+
+    named: dict[tuple[str, ...], tuple[str, ...]] = {}
     # In a set order, so a complex's floating-point sum of its stations is too.
     for row in sorted(rows, key=as_text):
         stop, d, platform, *rest = row
         grp = (rest.pop(0),) if with_route else ()
         key = (*label(stop, d, platform), *grp)
+        place = identity(stop, d, platform)
+        if named.setdefault(key, place) != place:
+            raise ValueError(f"{named[key]} and {place} are both named {key}")
         for j, v in enumerate(rest):
             merged[key][j] += v or 0.0
     peaks = busiest((*label(stop, d, p), *rest) for stop, d, p, *rest in hours)
     head = [
-        by.value.replace("-", " ").title(),
-        "Name",
+        *(
+            ["Station", "Direction"]
+            if by is By.STATION_DIRECTION
+            else [by.value.title()]
+        ),
         *(["Route"] if with_route else []),
     ]
     lines = [
@@ -1018,8 +1038,7 @@ def render(
             [
                 "Platforms are from OpenStreetMap's subway routes "
                 "(© OpenStreetMap contributors, ODbL), "
-                "by `mta-od-data fetch-platforms`; "
-                "a platform's ID is its OSM way's."
+                "by `mta-od-data fetch-platforms`."
             ]
             if By.PLATFORM in by
             else []
