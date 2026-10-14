@@ -7,31 +7,31 @@ Produced by `mta-od-data ridership --by trip --markdown-out src/mta_od_data/ride
 
 | Route | Train | Peak Load, Aug-Dec 2025 | Train Length (ft) | Peak per 60 ft | Peak Between | Leaving At | Weekdays Run |
 | --- | --- | ---: | ---: | ---: | --- | --- | ---: |
-| F | 08:43 Jamaica-179 St to Coney Island-Stillwell Av | 1,360 | 600 | 136 | Court Sq-23 St to Lexington Av/53 St | 09:09 | 23 |
-| 7 | 15:56 34 St-Hudson Yards to Flushing-Main St | 1,211 | 561 | 130 | 74 St-Broadway to 82 St-Jackson Hts | 16:22 | 103 |
-| A | 07:29 Inwood-207 St to Far Rockaway-Mott Av | 1,185 | 600 | 118 | 125 St to 59 St-Columbus Circle | 07:47 | 60 |
-| L | 17:51 8 Av to Canarsie-Rockaway Pkwy | 1,179 | 480 | 147 | 14 St-Union Sq to 3 Av | 17:54 | 60 |
-| E | 08:32 Jamaica Center-Parsons/Archer to World Trade Center | 1,166 | 600 | 117 | Court Sq-23 St to Lexington Av/53 St | 08:57 | 103 |
-| 5 | 08:00 Flatbush Av-Brooklyn College to Eastchester-Dyre Av | 1,065 | 510 | 125 | 14 St-Union Sq to Grand Central-42 St | 08:39 | 103 |
-| 4 | 17:17 Woodlawn to Crown Hts-Utica Av | 1,022 | 510 | 120 | Grand Central-42 St to 14 St-Union Sq | 17:54 | 103 |
-| W | 08:50 Astoria-Ditmars Blvd to Whitehall St-South Ferry | 1,021 | 600 | 102 | Queensboro Plaza to Lexington Av/59 St | 09:01 | 103 |
-| N | 08:17 Coney Island-Stillwell Av to 96 St | 978 | 600 | 98 | Atlantic Av to Canal St | 08:51 | 103 |
-| Q | 16:58 96 St to Coney Island-Stillwell Av | 945 | 600 | 95 | Canal St to DeKalb Av | 17:19 | 103 |
-| 6 | 08:20 Parkchester to Brooklyn Bridge-City Hall | 929 | 510 | 109 | 51 St to Grand Central-42 St | 08:54 | 60 |
-| FX | 16:58 Jamaica-179 St to Coney Island-Stillwell Av | 928 | 600 | 93 | Broadway-Lafayette St to 2 Av | 17:45 | 80 |
-| D | 15:57 Norwood-205 St to Coney Island-Stillwell Av | 916 | 600 | 92 | Broadway-Lafayette St to Grand St | 16:43 | 43 |
-| B | 08:41 Brighton Beach to Bedford Park Blvd | 915 | 600 | 91 | 7 Av to Atlantic Av | 09:00 | 103 |
-| 2 | 16:19 Flatbush Av-Brooklyn College to Wakefield-241 St | 908 | 510 | 107 | Times Sq-42 St to 72 St | 17:05 | 103 |
-| C | 17:31 Euclid Av to 168 St | 884 | 600 | 88 | 14 St to 23 St | 18:08 | 60 |
-| 6X | 08:46 Pelham Bay Park to Brooklyn Bridge-City Hall | 881 | 510 | 104 | 3 Av-138 St to 125 St | 09:11 | 103 |
-| 1 | 07:19 South Ferry to Van Cortlandt Park-242 St | 872 | 510 | 103 | Times Sq-42 St to 50 St | 07:36 | 103 |
-| 3 | 17:23 New Lots Av to Harlem-148 St | 868 | 510 | 102 | 14 St to 34 St-Penn Station | 18:10 | 103 |
-| M | 15:52 Middle Village-Metropolitan Av to Forest Hills-71 Av | 852 | 480 | 107 | Lexington Av/63 St to Roosevelt Island | 16:40 | 23 |
-| 7X | 16:56 34 St-Hudson Yards to Flushing-Main St | 801 | 561 | 86 | 74 St-Broadway to Junction Blvd | 17:23 | 103 |
-| R | 06:58 Bay Ridge-95 St to 96 St | 750 | 600 | 75 | Lexington Av/63 St to 72 St | 07:57 | 103 |
-| J | 08:22 Jamaica Center-Parsons/Archer to Broad St | 737 | 480 | 92 | Marcy Av to Delancey St-Essex St | 08:59 | 80 |
-| G | 08:06 Church Av to Court Sq | 558 | 300 | 112 | Greenpoint Av to 21 St | 08:38 | 103 |
-| Z | 07:52 Jamaica Center-Parsons/Archer to Broad St | 533 | 480 | 67 | Marcy Av to Delancey St-Essex St | 08:24 | 80 |
-| GS | 16:59 Grand Central-42 St to Times Sq-42 St | 333 | 306 | 65 | Grand Central-42 St to Times Sq-42 St | 16:59 | 103 |
-| FS | 16:41 Franklin Av to Prospect Park | 100 | 150 | 40 | Park Pl to Botanic Garden | 16:43 | 103 |
-| H | 06:21 Rockaway Park-Beach 116 St to Broad Channel | 54 | 300 | 11 | Beach 90 St to Broad Channel | 06:26 | 60 |
+| F | 8:43 AM Jamaica-179 St to Coney Island-Stillwell Av | 1,360 | 600 | 136 | Court Sq-23 St to Lexington Av/53 St | 9:09 AM | 23 |
+| 7 | 3:56 PM 34 St-Hudson Yards to Flushing-Main St | 1,211 | 561 | 130 | 74 St-Broadway to 82 St-Jackson Hts | 4:22 PM | 103 |
+| A | 7:29 AM Inwood-207 St to Far Rockaway-Mott Av | 1,185 | 600 | 118 | 125 St to 59 St-Columbus Circle | 7:47 AM | 60 |
+| L | 5:51 PM 8 Av to Canarsie-Rockaway Pkwy | 1,179 | 480 | 147 | 14 St-Union Sq to 3 Av | 5:54 PM | 60 |
+| E | 8:32 AM Jamaica Center-Parsons/Archer to World Trade Center | 1,166 | 600 | 117 | Court Sq-23 St to Lexington Av/53 St | 8:57 AM | 103 |
+| 5 | 8:00 AM Flatbush Av-Brooklyn College to Eastchester-Dyre Av | 1,065 | 510 | 125 | 14 St-Union Sq to Grand Central-42 St | 8:39 AM | 103 |
+| 4 | 5:17 PM Woodlawn to Crown Hts-Utica Av | 1,022 | 510 | 120 | Grand Central-42 St to 14 St-Union Sq | 5:54 PM | 103 |
+| W | 8:50 AM Astoria-Ditmars Blvd to Whitehall St-South Ferry | 1,021 | 600 | 102 | Queensboro Plaza to Lexington Av/59 St | 9:01 AM | 103 |
+| N | 8:17 AM Coney Island-Stillwell Av to 96 St | 978 | 600 | 98 | Atlantic Av to Canal St | 8:51 AM | 103 |
+| Q | 4:58 PM 96 St to Coney Island-Stillwell Av | 945 | 600 | 95 | Canal St to DeKalb Av | 5:19 PM | 103 |
+| 6 | 8:20 AM Parkchester to Brooklyn Bridge-City Hall | 929 | 510 | 109 | 51 St to Grand Central-42 St | 8:54 AM | 60 |
+| FX | 4:58 PM Jamaica-179 St to Coney Island-Stillwell Av | 928 | 600 | 93 | Broadway-Lafayette St to 2 Av | 5:45 PM | 80 |
+| D | 3:57 PM Norwood-205 St to Coney Island-Stillwell Av | 916 | 600 | 92 | Broadway-Lafayette St to Grand St | 4:43 PM | 43 |
+| B | 8:41 AM Brighton Beach to Bedford Park Blvd | 915 | 600 | 91 | 7 Av to Atlantic Av | 9:00 AM | 103 |
+| 2 | 4:19 PM Flatbush Av-Brooklyn College to Wakefield-241 St | 908 | 510 | 107 | Times Sq-42 St to 72 St | 5:05 PM | 103 |
+| C | 5:31 PM Euclid Av to 168 St | 884 | 600 | 88 | 14 St to 23 St | 6:08 PM | 60 |
+| 6X | 8:46 AM Pelham Bay Park to Brooklyn Bridge-City Hall | 881 | 510 | 104 | 3 Av-138 St to 125 St | 9:11 AM | 103 |
+| 1 | 7:19 AM South Ferry to Van Cortlandt Park-242 St | 872 | 510 | 103 | Times Sq-42 St to 50 St | 7:36 AM | 103 |
+| 3 | 5:23 PM New Lots Av to Harlem-148 St | 868 | 510 | 102 | 14 St to 34 St-Penn Station | 6:10 PM | 103 |
+| M | 3:52 PM Middle Village-Metropolitan Av to Forest Hills-71 Av | 852 | 480 | 107 | Lexington Av/63 St to Roosevelt Island | 4:40 PM | 23 |
+| 7X | 4:56 PM 34 St-Hudson Yards to Flushing-Main St | 801 | 561 | 86 | 74 St-Broadway to Junction Blvd | 5:23 PM | 103 |
+| R | 6:58 AM Bay Ridge-95 St to 96 St | 750 | 600 | 75 | Lexington Av/63 St to 72 St | 7:57 AM | 103 |
+| J | 8:22 AM Jamaica Center-Parsons/Archer to Broad St | 737 | 480 | 92 | Marcy Av to Delancey St-Essex St | 8:59 AM | 80 |
+| G | 8:06 AM Church Av to Court Sq | 558 | 300 | 112 | Greenpoint Av to 21 St | 8:38 AM | 103 |
+| Z | 7:52 AM Jamaica Center-Parsons/Archer to Broad St | 533 | 480 | 67 | Marcy Av to Delancey St-Essex St | 8:24 AM | 80 |
+| GS | 4:59 PM Grand Central-42 St to Times Sq-42 St | 333 | 306 | 65 | Grand Central-42 St to Times Sq-42 St | 4:59 PM | 103 |
+| FS | 4:41 PM Franklin Av to Prospect Park | 100 | 150 | 40 | Park Pl to Botanic Garden | 4:43 PM | 103 |
+| H | 6:21 AM Rockaway Park-Beach 116 St to Broad Channel | 54 | 300 | 11 | Beach 90 St to Broad Channel | 6:26 AM | 60 |

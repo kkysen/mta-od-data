@@ -594,7 +594,7 @@ def peak_cells(
 
 def clock(hour: int) -> str:
     """A service day's hour, from 4 to 27, as the hour of the day it starts."""
-    return f"{hour % 24:02}:00"
+    return clock_time(hour * 3600)
 
 
 def as_text(row: tuple[Any, ...]) -> tuple[str, ...]:
@@ -953,8 +953,9 @@ def trip_routes(route: Sequence[str]) -> list[str]:
 
 
 def clock_time(secs: int) -> str:
-    """Seconds on the service day's clock as a time of day, `HH:MM`."""
-    return f"{secs // 3600 % 24:02}:{secs % 3600 // 60:02}"
+    """Seconds on the service day's clock as a time of day, `H:MM AM`."""
+    hour = secs // 3600 % 24
+    return f"{(hour - 1) % 12 + 1}:{secs % 3600 // 60:02} {'AM' if hour < 12 else 'PM'}"
 
 
 def trip_table(trains: list[Train], names: Names, label: str) -> list[str]:

@@ -8,6 +8,6 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 
 | Line | Route | Aug-Dec 2025 | 2019 | Busiest Hour | Riders in It, Aug-Dec 2025 |
 | --- | --- | ---: | ---: | --- | ---: |
-| SAS Phase 1 | Q | 135,111 | 176,349 | 08:00 | 13,264 |
-| SAS Phase 1 | N | 5,259 | 6,863 | 16:00 | 2,513 |
-| SAS Phase 1 | R | 800 | 1,024 | 07:00 | 800 |
+| SAS Phase 1 | Q | 135,111 | 176,349 | 8:00 AM | 13,264 |
+| SAS Phase 1 | N | 5,259 | 6,863 | 4:00 PM | 2,513 |
+| SAS Phase 1 | R | 800 | 1,024 | 7:00 AM | 800 |
