@@ -49,6 +49,11 @@ def paths(tmp_path: Path) -> list[str]:
         f"COPY (SELECT * FROM (VALUES {values}) t(path, riders)) "
         f"TO '{file}' (FORMAT parquet)"
     )
+    # All in one hour.
+    connection().execute(
+        f"COPY (SELECT path, 8 AS hour, riders FROM '{file}') "
+        f"TO '{tmp_path / 'hourly.parquet'}' (FORMAT parquet)"
+    )
     built.clear()
     names = load_legs([Column("test", AveragePaths(file=file, days=1))])
     connection().execute(
@@ -60,14 +65,21 @@ def paths(tmp_path: Path) -> list[str]:
     return names
 
 
+def hourly(tmp_path: Path) -> AveragePaths:
+    """The `paths` fixture's averages by hour, in the test's `tmp_path`."""
+    return AveragePaths(file=tmp_path / "hourly.parquet", days=1)
+
+
 def by_stop(rows: list[tuple[Any, ...]]) -> dict[tuple[Any, ...], tuple[Any, ...]]:
     return {tuple(r[:-5]): tuple(r[-5:]) for r in rows}
 
 
-def test_place_counts_boardings_alightings_and_transfers(paths: list[str]) -> None:
+def test_place_counts_boardings_alightings_and_transfers(
+    paths: list[str], tmp_path: Path
+) -> None:
     kept, groups = ride_routes([])
     route_groups_table(groups)
-    build_events(kept, paths, merge=False)
+    build_events(kept, paths, merge=False, hourly=hourly(tmp_path))
     got = by_stop(place_rows(False, paths))
     # (riders on + off, on, off, transfers on + off, staying on)
     assert got[("R11", "S")] == (2.0, 1.0, 1.0, 2.0, 0.0)
@@ -79,10 +91,12 @@ def test_place_counts_boardings_alightings_and_transfers(paths: list[str]) -> No
     assert got[("Q03", "")] == (0.0, 0.0, 0.0, 0.0, 8.0)
 
 
-def test_route_filter_merges_same_stop_changes(paths: list[str]) -> None:
+def test_route_filter_merges_same_stop_changes(
+    paths: list[str], tmp_path: Path
+) -> None:
     kept, groups = ride_routes(["N", "R", "W"])
     route_groups_table(groups)
-    build_events(kept, paths, merge=True)
+    build_events(kept, paths, merge=True, hourly=hourly(tmp_path))
     got = by_stop(place_rows(False, paths))
     # The N to R change at R11 is one ride: neither off nor on there, but staying on.
     assert got[("R11", "S")] == (0.0, 0.0, 0.0, 0.0, 1.0)

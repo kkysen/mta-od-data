@@ -45,6 +45,7 @@ from mta_od_data.analyze.common import (
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import (
     AveragePaths,
+    Counting,
     average_path_riders,
     counting,
     read_manifest,
@@ -115,6 +116,8 @@ class Column:
     average: AveragePaths
     # The year its OD data is scaled to the counted entries of, if scaled.
     scaled_to: int | None = None
+    # Each path's average riders by the hour they enter, for the first column.
+    hourly: AveragePaths | None = None
 
 
 def period(manifest: Path) -> str:
@@ -134,14 +137,20 @@ def columns(
     # One at a time: `counting` loads its factors into the tables
     # `average_path_riders` reads, so each is averaged before the next loads.
     cols: list[Column] = []
+
+    def averages(c: Counting) -> tuple[AveragePaths, AveragePaths | None]:
+        hourly = None if cols else average_path_riders(manifest, c, by_hour=True)
+        return average_path_riders(manifest, c), hourly
+
     if unscaled:
-        c = counting(None, fare_evasion)
-        cols.append(Column(period(manifest), average_path_riders(manifest, c)))
+        average, hourly = averages(counting(None, fare_evasion))
+        cols.append(Column(period(manifest), average, hourly=hourly))
     for factors in od_factors:
         c = counting(factors, fare_evasion)
         assert c.scale is not None, "counting with factors scales"
         year = c.scale.year
-        cols.append(Column(str(year), average_path_riders(manifest, c), year))
+        average, hourly = averages(c)
+        cols.append(Column(str(year), average, year, hourly))
     days = {col.average.days for col in cols}
     assert len(days) == 1, f"one manifest, one number of days: {days}"
     return cols
@@ -281,18 +290,22 @@ def load_names(stations: Path, complexes: Path) -> Names:
     )
 
 
-def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
+def build_events(
+    routes: Sequence[str], names: list[str], merge: bool, hourly: AveragePaths
+) -> None:
     """Each ride's boarding and alighting on `routes` as a temp table `events`:
     its stop, platform direction, route, riders per column,
     and whether it's a boarding and a transfer;
     and the first column's riders staying on at each stop between, as `staying`,
-    by stop, platform direction, and route.
+    by stop, platform direction, and route;
+    and `hourly`'s riders on and off by stop, direction, route, and hour,
+    as `event_hours`, for the busiest hour.
     With `merge`, consecutive rides on `routes` changing at a stop are one ride,
     staying on there.
 
     A ride lists only the stops its train stops at (an express skips the locals),
     so riders staying on are those on a train stopping there."""
-    key = (built.get("legs"), tuple(routes), merge)
+    key = (built.get("legs"), tuple(routes), merge, hourly.file)
     if built.get("events") == key:
         return
     db = connection()
@@ -324,14 +337,14 @@ def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
     db.execute(
         f"""
         CREATE OR REPLACE TEMP TABLE events AS
-        SELECT stops[1] AS stop, coalesce(d.da, '') AS dir, w.route,
+        SELECT w.path, stops[1] AS stop, coalesce(d.da, '') AS dir, w.route,
             {", ".join(names)}, true AS boarding, i > first_ride AS transfer
         FROM rides w
         LEFT JOIN directions d
             ON d.route = w.route AND d.a = stops[1] AND d.b = stops[2]
         WHERE NOT cont_in
         UNION ALL
-        SELECT stops[-1], coalesce(d.db, ''), w.route,
+        SELECT w.path, stops[-1], coalesce(d.db, ''), w.route,
             {", ".join(names)}, false, i < last_ride
         FROM rides w
         LEFT JOIN directions d
@@ -363,6 +376,14 @@ def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
         """
     )
     db.execute("DROP TABLE rides")
+    db.execute(
+        f"""
+        CREATE OR REPLACE TEMP TABLE event_hours AS
+        SELECT stop, dir, route, h.hour, sum(h.riders) AS riders
+        FROM events JOIN read_parquet('{hourly.file}') h USING (path)
+        GROUP BY ALL
+        """
+    )
     built["events"] = key
 
 
@@ -508,6 +529,60 @@ def line_rows(names: list[str]) -> list[tuple[Any, ...]]:
     )
 
 
+def hourly_rows(
+    hourly: AveragePaths, journeys: str, keys: str
+) -> list[tuple[Any, ...]]:
+    """Riders by `keys` and the hour they enter, from `journeys`,
+    a query of `path` and `keys`, a row for each time a path counts."""
+    return (
+        connection()
+        .execute(
+            f"""
+            SELECT {keys}, h.hour, sum(h.riders)::DOUBLE
+            FROM ({journeys}) j JOIN read_parquet('{hourly.file}') h USING (path)
+            GROUP BY ALL
+            """,
+            {"lines": lines_param()} if "$lines" in journeys else {},
+        )
+        .fetchall()
+    )
+
+
+def busiest(
+    rows: Iterable[tuple[Any, ...]],
+) -> dict[tuple[Any, ...], tuple[int, float]]:
+    """Each key's busiest hour and its riders, from `(*key, hour, riders)` rows:
+    the earliest of any tied."""
+    by_key: defaultdict[tuple[Any, ...], dict[int, float]] = defaultdict(dict)
+    for *key, hour, riders in sorted(rows, key=as_text):
+        hours = by_key[tuple(key)]
+        hours[hour] = hours.get(hour, 0.0) + riders
+
+    def most(hour_riders: tuple[int, float]) -> tuple[int, int]:
+        hour, riders = hour_riders
+        return (round(riders), -hour)
+
+    return {k: max(hours.items(), key=most) for k, hours in by_key.items()}
+
+
+def peak_heads(cols: Sequence[Column]) -> list[str]:
+    return ["Busiest Hour", f"Riders in It, {cols[0].label}"]
+
+
+def peak_cells(
+    peaks: dict[tuple[Any, ...], tuple[int, float]], key: tuple[Any, ...]
+) -> list[str]:
+    if key not in peaks:
+        return ["", ""]
+    hour, riders = peaks[key]
+    return [clock(hour), fmt(riders)]
+
+
+def clock(hour: int) -> str:
+    """A service day's hour, from 4 to 27, as the hour of the day it starts."""
+    return f"{hour % 24:02}:00"
+
+
 def as_text(row: tuple[Any, ...]) -> tuple[str, ...]:
     return tuple(map(str, row))
 
@@ -530,9 +605,13 @@ def place_table(
     by: By,
     with_route: bool,
     rows: list[tuple[Any, ...]],
+    hours: list[tuple[Any, ...]],
     cols: list[Column],
     names_: Names,
 ) -> list[str]:
+    """`place_rows`' rows as a table, with each place's busiest hour
+    from `hours`, `(stop, dir, [route,] hour, riders on + off)` rows."""
+
     def label(stop: str, d: str) -> tuple[str, str]:
         match by:
             case By.COMPLEX:
@@ -558,6 +637,7 @@ def place_table(
         key = (*label(stop, d), *grp)
         for j, v in enumerate(rest):
             merged[key][j] += v or 0.0
+    peaks = busiest((*label(stop, d), *rest) for stop, d, *rest in hours)
     head = [
         by.value.replace("-", " ").title(),
         "Name",
@@ -571,19 +651,23 @@ def place_table(
             f"Off, {cols[0].label}",
             f"Transfers On + Off, {cols[0].label}",
             f"Staying On, {cols[0].label}",
+            "Busiest Hour",
+            f"On + Off in It, {cols[0].label}",
         ),
-        table_rule("l" * len(head) + "r" * (k + 4)),
+        table_rule("l" * len(head) + "r" * (k + 4) + "lr"),
     ]
 
     # By the riders as shown, so rows that show the same come out in a set order.
-    def busiest(
+    def by_riders_shown(
         item: tuple[tuple[str, ...], list[float]],
     ) -> tuple[int, tuple[str, ...]]:
         key, vs = item
         return (-round(vs[0]), key)
 
-    for key, vs in sorted(merged.items(), key=busiest):
-        lines.append(table_row(*key, *(fmt(v) for v in vs)))
+    for key, vs in sorted(merged.items(), key=by_riders_shown):
+        hour, riders = peaks.get(key, (None, 0.0))
+        peak = (clock(hour), fmt(riders)) if hour is not None else ("", "")
+        lines.append(table_row(*key, *(fmt(v) for v in vs), *peak))
     return lines
 
 
@@ -673,16 +757,29 @@ def ridership(
     kept, groups = ride_routes(route)
     route_groups_table(groups)
     with_route = By.ROUTE in dims and len(dims) > 1
+    hourly = cols[0].hourly
+    assert hourly is not None, "the first column is averaged by hour too"
+    grp = ", grp" if with_route else ""
 
     if places:
         (place,) = places
         directions_table(manifest)
-        build_events(kept, names, merge=bool(route) and not with_route)
+        build_events(kept, names, merge=bool(route) and not with_route, hourly=hourly)
         rows = place_rows(with_route, names)
+        join_route = "JOIN route_groups USING (route)" if with_route else ""
+        hours = (
+            connection()
+            .execute(
+                f"SELECT stop, dir{grp}, hour, sum(riders)::DOUBLE "
+                f"FROM event_hours {join_route} GROUP BY ALL"
+            )
+            .fetchall()
+        )
         table = place_table(
             place,
             with_route,
             rows,
+            hours,
             cols,
             load_names(DEFAULT_STATIONS, DEFAULT_COMPLEXES),
         )
@@ -691,26 +788,57 @@ def ridership(
         LINES.update(load_lines(lines))
         if with_route:
             got = route_rows(names, with_line=True)
+            peaks = busiest(
+                hourly_rows(
+                    hourly,
+                    f"WITH {ON_LINE} SELECT DISTINCT path, grp, name "
+                    "FROM on_line JOIN route_groups USING (route)",
+                    "grp, name",
+                )
+            )
             table = [
-                table_row("Line", "Route", *(c.label for c in cols)),
-                table_rule("ll" + "r" * len(cols)),
+                table_row("Line", "Route", *(c.label for c in cols), *peak_heads(cols)),
+                table_rule("ll" + "r" * len(cols) + "lr"),
             ]
-            for grp, name, *vs in sorted(got, key=by_line_then_riders):
-                if not route or grp in route:
-                    table.append(table_row(name, grp, *(fmt(v) for v in vs)))
+            for g, name, *vs in sorted(got, key=by_line_then_riders):
+                if not route or g in route:
+                    table.append(
+                        table_row(
+                            name,
+                            g,
+                            *(fmt(v) for v in vs),
+                            *peak_cells(peaks, (g, name)),
+                        )
+                    )
         else:
             got = line_rows(names)
+            peaks = busiest(
+                hourly_rows(
+                    hourly,
+                    f"WITH {ON_LINE} SELECT DISTINCT path, name FROM on_line",
+                    "name",
+                )
+            )
             table = [
-                table_row("Line", *(c.label for c in cols)),
-                table_rule("l" + "r" * len(cols)),
+                table_row("Line", *(c.label for c in cols), *peak_heads(cols)),
+                table_rule("l" + "r" * len(cols) + "lr"),
             ]
             for name, *vs in sorted(got, key=by_riders):
-                table.append(table_row(name, *(fmt(v) for v in vs)))
+                table.append(
+                    table_row(name, *(fmt(v) for v in vs), *peak_cells(peaks, (name,)))
+                )
     else:
         got = {grp: vs for grp, *vs in route_rows(names, with_line=False)}
         if route:
             got = {g: vs for g, vs in got.items() if g in route}
         service = route_service(manifest, groups)
+        peaks = busiest(
+            hourly_rows(
+                hourly,
+                "SELECT DISTINCT path, grp FROM legs JOIN route_groups USING (route)",
+                "grp",
+            )
+        )
         first = cols[0].label
         table = [
             table_row(
@@ -721,8 +849,9 @@ def ridership(
                 "Trips",
                 "Train-km",
                 f"Per Train-km, {first}",
+                *peak_heads(cols),
             ),
-            table_rule("l" + "r" * (len(cols) + 5)),
+            table_rule("l" + "r" * (len(cols) + 5) + "lr"),
         ]
         for grp in route_order({g: vs[0] for g, vs in got.items()}):
             s = service.get(grp, RouteService())
@@ -736,6 +865,7 @@ def ridership(
                     fmt(s.trips),
                     fmt(s.train_km),
                     fmt(vs[0] / s.train_km if s.train_km else None, 1),
+                    *peak_cells(peaks, (grp,)),
                 )
             )
 
@@ -771,6 +901,9 @@ def render(
             for c in cols
             if c.scaled_to is not None
         ),
+        "The busiest hour is the hour, by when they start, "
+        "in which the most riders who use it enter the subway "
+        "(the OD data says when riders enter, not when they pass a place).",
         "",
         f"Produced by `{produced_by(ctx)}`.",
         "",
