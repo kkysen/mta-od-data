@@ -21,10 +21,11 @@ from hashlib import sha256
 from pathlib import Path
 
 from mta_od_data import DATA, ROOT
-from mta_od_data.analyze.common import SCRATCH
+from mta_od_data.analyze.common import CACHE
 from mta_od_data.ridership.compute import By, Computed, compute
 
-CACHE = SCRATCH / "ridership"
+# Each report's rows, by `key`.
+ROWS = CACHE / "ridership"
 PACKAGE = Path(__file__).parent.parent
 HERE = Path(__file__).parent
 # Read only to lay out rows, by `__init__.py`.
@@ -37,7 +38,7 @@ def files(root: Path) -> list[Path]:
     for parent, dirs, names in os.walk(root):
         dirs[:] = sorted(d for d in dirs if d != "__pycache__")
         found += (Path(parent) / n for n in sorted(names))
-    return [f for f in found if CACHE not in f.parents]
+    return [f for f in found if ROWS not in f.parents]
 
 
 def stat(path: Path) -> tuple[str, int, int]:
@@ -75,12 +76,12 @@ def cached_compute(
     args = (by, route, manifest, od_factors, unscaled, fare_evasion, lines, top)
     # The manifest's own directory too, for its dates' files, wherever it is.
     paths = [*files(manifest.parent), manifest, *od_factors, lines]
-    file = CACHE / f"{key(args, paths)}.pickle"
+    file = ROWS / f"{key(args, paths)}.pickle"
     if file.exists():
         with file.open("rb") as f:
             return pickle.load(f)
     rows = compute(*args)
-    CACHE.mkdir(parents=True, exist_ok=True)
+    ROWS.mkdir(parents=True, exist_ok=True)
     # To a temporary name, then renamed: an interrupted write leaves no cache behind.
     tmp = file.with_suffix(f".{os.getpid()}.tmp")
     with tmp.open("wb") as f:

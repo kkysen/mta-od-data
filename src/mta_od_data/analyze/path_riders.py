@@ -21,7 +21,7 @@ from typing import Annotated
 from typer import Option
 
 from mta_od_data import DATA
-from mta_od_data.analyze.common import SCRATCH, connection
+from mta_od_data.analyze.common import CACHE, connection
 from mta_od_data.prepare import fetch_csv
 
 
@@ -289,14 +289,14 @@ def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths
     with one read of the dates' paths for any number of measures.
     Paths are by text, not id: ids are per routing, and texts say what a path is.
 
-    Cached under `SCRATCH`, keyed by everything it depends on:
+    Cached under `CACHE`, keyed by everything it depends on:
     the dates' files are ~25 s to read, and the reports, snapshot tests included,
     read the same average over and over.
     """
     manifest_rows = read_manifest(manifest)
     dates = [date_paths(manifest, row) for row in manifest_rows]
     days = sum(int(row["days"]) for row in manifest_rows)
-    out = SCRATCH / f"path-riders-{_average_key(manifest, dates, c)}.parquet"
+    out = CACHE / "path-riders" / f"{_average_key(manifest, dates, c)}.parquet"
     if out.exists():
         return AveragePaths(file=out, days=days)
 
@@ -333,6 +333,7 @@ def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths
             {"texts": texts},
         )
     # To a temporary name, then renamed: an interrupted write leaves no cache behind.
+    out.parent.mkdir(parents=True, exist_ok=True)
     partial = out.with_suffix(".partial")
     db.execute(
         f"""

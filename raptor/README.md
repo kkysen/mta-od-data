@@ -84,7 +84,7 @@ Most reports have two columns of riders:
 The **Peak Hour** is the hour, by when it starts, with the most riders in the first column,
 counted when their trains are there, and **Riders in Peak Hour** (or On + Off) is how many.
 
-Computed rows are cached in `~/.cache/mta-od-scratch/ridership/`,
+Computed rows are cached in `~/.cache/mta-od-data/ridership/`,
 so changing a report's wording or names re-renders it in under a second
 (see `ridership/cache.py`).
 
