@@ -42,6 +42,7 @@ from mta_od_data.analyze.common import (
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import read_manifest
 from mta_od_data.invocation import produced_by
+from mta_od_data.ridership.cache import cached_compute
 from mta_od_data.ridership.compute import (
     CAR_FT,
     PLACES,
@@ -49,7 +50,6 @@ from mta_od_data.ridership.compute import (
     Column,
     RouteService,
     base_route,
-    compute,
     load_train_lengths,
     period,
 )
@@ -442,7 +442,9 @@ def ridership(
             "optionally crossed with route",
             param_hint="--by",
         )
-    got = compute(by, route, manifest, od_factors, unscaled, fare_evasion, lines, top)
+    got = cached_compute(
+        by, route, manifest, od_factors, unscaled, fare_evasion, lines, top
+    )
     days, cols = got.days, got.cols
     if By.TRIP in dims:
         table = trip_table(
