@@ -5,8 +5,8 @@ Each scaled column scales the OD data to a year's counted station entries.
 
 Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_od_data/ridership/by_line_and_route.md`.
 
-| line | route | scaled to 2025 | scaled to 2019 |
+| line | route | OD data | scaled to 2019 |
 | --- | --- | ---: | ---: |
-| SAS Phase 1 | Q | 137,460 | 176,349 |
-| SAS Phase 1 | N | 5,354 | 6,863 |
-| SAS Phase 1 | R | 813 | 1,024 |
+| SAS Phase 1 | Q | 135,111 | 176,349 |
+| SAS Phase 1 | N | 5,259 | 6,863 |
+| SAS Phase 1 | R | 800 | 1,024 |

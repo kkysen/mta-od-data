@@ -4,7 +4,8 @@ from `mta-od-data raptor assign-range`'s paths.
 Each measure is a sum of paths' riders, so it's taken over
 `average_path_riders`' average of each path over the manifest's dates,
 once per way of counting riders (a column each):
-scaled by each `--od-factors` file, and with fare evaders unless `--no-fare-evasion`.
+as in the OD data, and scaled by each `--od-factors` file,
+all with fare evaders unless `--no-fare-evasion`.
 
 - A place (complex, station, platform) counts each ride's boarding and alighting there,
   and which of those are transfers (not the journey's first boarding or last alighting).
@@ -52,12 +53,10 @@ app = Typer()
 
 HERE = Path(__file__).parent
 DEFAULT_MANIFEST = DATA / "raptor" / "manifest.csv"
-# Each scaled to its year's counted entries (`scale-od --to-counts`):
-# the current year's, to level the OD data with them, and 2019's, before the pandemic.
-DEFAULT_OD_FACTORS = [
-    DATA / "mta_od_2025_counted.factors.parquet",
-    DATA / "mta_od_2019_counted.factors.parquet",
-]
+# Scaled to 2019's counted entries (`scale-od --to-counts`), before the pandemic.
+# Not also to the OD data's own year's: its trips are within ~1% of 2025's counts
+# systemwide, and 2% at 80% of stations, so that column barely differed.
+DEFAULT_OD_FACTORS = [DATA / "mta_od_2019_counted.factors.parquet"]
 DEFAULT_LINES = HERE / "lines.json5"
 DEFAULT_STATIONS = DATA / "stations.csv"
 DEFAULT_COMPLEXES = DATA / "complexes.csv"
@@ -540,13 +539,13 @@ def ridership(
             help=(
                 "Count riders as if routed with OD data scaled by these factors "
                 "(repeatable, a column each), from `mta-od-data scale-od`; "
-                "by default the current year's and 2019's counted entries"
+                "by default 2019's counted entries"
             )
         ),
     ] = None,
     unscaled: Annotated[
-        bool, Option(help="Also count riders as in the OD data, unscaled, first")
-    ] = False,
+        bool, Option(help="Count riders as in the OD data, unscaled, first")
+    ] = True,
     fare_evasion: Annotated[
         bool,
         Option(
