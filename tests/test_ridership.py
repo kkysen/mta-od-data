@@ -53,15 +53,16 @@ def paths(tmp_path: Path) -> list[str]:
     names = load_legs([Column("test", AveragePaths(file=file, days=1))])
     connection().execute(
         "CREATE OR REPLACE TEMP TABLE directions AS "
-        "SELECT * FROM (VALUES ('N', 'R01', 'R11', 'S', 'S'), "
-        "('R', 'R11', 'R13', 'S', 'S')) t(route, a, b, da, db)"
+        "SELECT * FROM (VALUES ('N', 'R01', 'R11', 'S', 'S', 'p1', 'p2'), "
+        "('R', 'R11', 'R13', 'S', 'S', 'p2', 'p3')) t(route, a, b, da, db, pa, pb)"
     )
     built["directions"] = "test"
     return names
 
 
 def by_stop(rows: list[tuple[Any, ...]]) -> dict[tuple[Any, ...], tuple[Any, ...]]:
-    return {tuple(r[:-5]): tuple(r[-5:]) for r in rows}
+    """`place_rows`' rows by (stop, direction), each one platform here."""
+    return {tuple(r[:2]): tuple(r[-5:]) for r in rows}
 
 
 def test_place_counts_boardings_alightings_and_transfers(paths: list[str]) -> None:
@@ -71,6 +72,8 @@ def test_place_counts_boardings_alightings_and_transfers(paths: list[str]) -> No
     got = by_stop(place_rows(False, paths))
     # (riders on + off, on, off, transfers on + off, staying on)
     assert got[("R11", "S")] == (2.0, 1.0, 1.0, 2.0, 0.0)
+    # The N alights and the R boards at R11 on one platform.
+    assert {r[2] for r in place_rows(False, paths) if r[0] == "R11"} == {"p2"}
     assert got[("R01", "S")] == (1.0, 1.0, 0.0, 0.0, 0.0)
     # No direction known for the walk's stations.
     assert got[("127", "")] == (2.0, 0.0, 2.0, 2.0, 0.0)

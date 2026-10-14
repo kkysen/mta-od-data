@@ -131,6 +131,7 @@ SNAPSHOTS = [
             ["complex"],
             ["station"],
             ["station-direction"],
+            ["platform"],
             ["route"],
             ["line"],
             ["line", "route"],

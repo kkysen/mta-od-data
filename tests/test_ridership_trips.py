@@ -45,6 +45,11 @@ def test_trains_average_over_the_weekdays_they_run(tmp_path: Path) -> None:
     days = load_trip_stops(manifest, None).days
     assert days == 4
     route_groups_table({"Q": ["Q"]})
+    # 63 St's platform leaving for 57 St.
+    connection().execute(
+        "CREATE OR REPLACE TEMP TABLE directions AS SELECT * FROM (VALUES "
+        "('Q', 'B08', 'R14', 'S', 'S', 'p63', 'p57')) t(route, a, b, da, db, pa, pb)"
+    )
     # Joining SAS: 10 + 5 on one date, 2 + 5 on the other, averaged over 4 weekdays.
     assert line_hours([SAS], False, days) == [("SAS", 8, (15 * 3 + 7 * 1) / 4)]
     (train,) = crowded_trains(["Q"], 1)
@@ -55,5 +60,7 @@ def test_trains_average_over_the_weekdays_they_run(tmp_path: Path) -> None:
         4,
     )
     # On and off at 63 St, at 08:00.
-    hours = {(s, h): r for s, _, h, r in place_hours(False, days)}
-    assert hours["B08", 8] == 5.0
+    hours = {(s, p, h): r for s, _, p, h, r in place_hours(False, days)}
+    assert hours["B08", "p63", 8] == 5.0
+    # 57 St's platform, by the segment arriving there.
+    assert hours["R14", "p57", 8] == (15 * 3 + 7 * 1) / 4

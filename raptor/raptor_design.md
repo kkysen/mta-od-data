@@ -424,10 +424,12 @@ Complexity is added only once the simple version works end to end.
    This is the representative-date rule.
    The OD data averages each (month, day of week) over all its dates, holidays included,
    while the timetable is that of an ordinary one.
-   `mta-od-data ridership --by complex|station|platform|route|line` reads the manifest
+   `mta-od-data ridership --by complex|station|station-direction|platform|route|line`
+   reads the manifest
    and averages each path's riders over its dates, weighted by `days`,
    then totals them by what `--by` names:
-   a place's riders on and off, a route's journeys,
+   a place's riders on and off (a platform's from OSM, `mta-od-data fetch-platforms`),
+   a route's journeys,
    or a named line's (`src/mta_od_data/ridership/lines.json5`) journeys
    with a ride between two consecutive stops both on it,
    e.g. Second Av Subway Phase 1's R14, B08, Q03, Q04, and Q05.

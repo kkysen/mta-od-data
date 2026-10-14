@@ -77,6 +77,8 @@ DEFAULT_MANIFEST = DATA / "raptor" / "manifest.csv"
 DEFAULT_OD_FACTORS = [DATA / "mta_od_2019_counted.factors.parquet"]
 DEFAULT_LINES = HERE / "lines.json5"
 TRAIN_LENGTHS = HERE / "train_lengths.json5"
+# Each route's stops' physical platforms, from OpenStreetMap (`platforms.py`).
+PLATFORMS = HERE / "platforms.csv"
 
 
 def load_train_lengths(path: Path = TRAIN_LENGTHS) -> dict[str, int]:
@@ -93,12 +95,13 @@ class By(StrEnum):
     COMPLEX = "complex"
     STATION = "station"
     STATION_DIRECTION = "station-direction"
+    PLATFORM = "platform"
     ROUTE = "route"
     LINE = "line"
     TRIP = "trip"
 
 
-PLACES = frozenset({By.COMPLEX, By.STATION, By.STATION_DIRECTION})
+PLACES = frozenset({By.COMPLEX, By.STATION, By.STATION_DIRECTION, By.PLATFORM})
 
 # Express variants the feed lists as routes of their own, and their routes.
 VARIANTS = {"5X": "5", "6X": "6", "7X": "7", "FX": "F"}
@@ -241,7 +244,9 @@ def route_groups_table(groups: dict[str, list[str]]) -> None:
 
 
 def directions_table(manifest: Path) -> None:
-    """Each route's consecutive stops' platform directions, from every date's feed."""
+    """Each route's consecutive stops' platform directions, from every date's feed,
+    and their physical platforms (`platforms.csv`, `mta-od-data fetch-platforms`'s),
+    as a temp table `directions`: `route`, `a`, `b`, `da`, `db`, `pa`, `pb`."""
     if built.get("directions") == manifest:
         return
     directions: dict[tuple[str, str, str], tuple[str, str]] = {}
@@ -249,9 +254,17 @@ def directions_table(manifest: Path) -> None:
         directions |= load_feed(DEFAULT_GTFS_DIR / Path(row["feed"]).name).directions
     keys = list(directions)
     connection().execute(
-        "CREATE OR REPLACE TEMP TABLE directions AS SELECT "
-        "unnest($route) AS route, unnest($a) AS a, unnest($b) AS b, "
-        "unnest($da) AS da, unnest($db) AS db",
+        f"""
+        CREATE OR REPLACE TEMP TABLE directions AS
+        SELECT d.*,
+            coalesce(p.stop_platform, '') AS pa, coalesce(p.next_platform, '') AS pb
+        FROM (
+            SELECT unnest($route) AS route, unnest($a) AS a, unnest($b) AS b,
+                unnest($da) AS da, unnest($db) AS db
+        ) d
+        LEFT JOIN read_csv('{PLATFORMS}', all_varchar = true) p
+            ON p.route = d.route AND p.stop = d.a AND p.next_stop = d.b
+        """,
         {
             "route": [k[0] for k in keys],
             "a": [k[1] for k in keys],
@@ -346,14 +359,15 @@ def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
     db.execute(
         f"""
         CREATE OR REPLACE TEMP TABLE events AS
-        SELECT w.path, stops[1] AS stop, coalesce(d.da, '') AS dir, w.route,
+        SELECT w.path, stops[1] AS stop, coalesce(d.da, '') AS dir,
+            coalesce(d.pa, '') AS platform, w.route,
             {", ".join(names)}, true AS boarding, i > first_ride AS transfer
         FROM rides w
         LEFT JOIN directions d
             ON d.route = w.route AND d.a = stops[1] AND d.b = stops[2]
         WHERE NOT cont_in
         UNION ALL
-        SELECT w.path, stops[-1], coalesce(d.db, ''), w.route,
+        SELECT w.path, stops[-1], coalesce(d.db, ''), coalesce(d.pb, ''), w.route,
             {", ".join(names)}, false, i < last_ride
         FROM rides w
         LEFT JOIN directions d
@@ -369,14 +383,15 @@ def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
             SELECT route, stops, {first}, unnest(range(2, len(stops))) AS j
             FROM rides
         )
-        SELECT stops[j] AS stop, coalesce(d.da, '') AS dir, b.route,
-            sum({first}) AS riders
+        SELECT stops[j] AS stop, coalesce(d.da, '') AS dir,
+            coalesce(d.pa, '') AS platform, b.route, sum({first}) AS riders
         FROM between b
         LEFT JOIN directions d
             ON d.route = b.route AND d.a = stops[j] AND d.b = stops[j + 1]
         GROUP BY ALL
         UNION ALL
-        SELECT stops[-1], coalesce(d.db, ''), w.route, sum({first})
+        SELECT stops[-1], coalesce(d.db, ''), coalesce(d.pb, ''), w.route,
+            sum({first})
         FROM rides w
         LEFT JOIN directions d
             ON d.route = w.route AND d.a = stops[-2] AND d.b = stops[-1]
@@ -389,7 +404,7 @@ def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
 
 
 def place_rows(with_route: bool, names: list[str]) -> list[tuple[Any, ...]]:
-    """`events` by platform (and route): riders on and off per column,
+    """`events` by stop, direction, platform (and route): riders on and off per column,
     then the first column's boardings, alightings, transfers on and off,
     and riders staying on."""
     grp = ", grp" if with_route else ""
@@ -404,7 +419,7 @@ def place_rows(with_route: bool, names: list[str]) -> list[tuple[Any, ...]]:
         .execute(
             f"""
             WITH e AS (
-                SELECT stop, dir{grp}, {sums},
+                SELECT stop, dir, platform{grp}, {sums},
                     sum({first}) FILTER (WHERE boarding)::DOUBLE AS boarded,
                     sum({first}) FILTER (WHERE NOT boarding)::DOUBLE AS alighted,
                     sum({first}) FILTER (WHERE transfer)::DOUBLE AS transfers
@@ -412,13 +427,13 @@ def place_rows(with_route: bool, names: list[str]) -> list[tuple[Any, ...]]:
                 GROUP BY ALL
             ),
             s AS (
-                SELECT stop, dir{grp}, sum(riders)::DOUBLE AS staying
+                SELECT stop, dir, platform{grp}, sum(riders)::DOUBLE AS staying
                 FROM staying {join_route}
                 GROUP BY ALL
             )
             -- Full, for stops riders only stay on at.
-            SELECT stop, dir{grp}, {values}, coalesce(staying, 0)
-            FROM e FULL JOIN s USING (stop, dir{grp})
+            SELECT stop, dir, platform{grp}, {values}, coalesce(staying, 0)
+            FROM e FULL JOIN s USING (stop, dir, platform{grp})
             """
         )
         .fetchall()
@@ -597,6 +612,35 @@ def fmt(x: float | None, digits: int = 0) -> str:
     return f"{x or 0:,.{digits}f}"
 
 
+def platform_labels(names: Names) -> dict[str, str]:
+    """Each platform's station and what it serves, from `directions`:
+    e.g. `96 St (1,2,3), Uptown 1 2 3`, or both directions for an island."""
+    rows = (
+        connection()
+        .execute(
+            """
+            SELECT platform, stop, dir, list(DISTINCT route ORDER BY route)
+            FROM (
+                SELECT pa AS platform, a AS stop, da AS dir, route FROM directions
+                UNION ALL
+                SELECT pb, b, db, route FROM directions
+            )
+            WHERE platform != ''
+            GROUP BY ALL
+            ORDER BY ALL
+            """
+        )
+        .fetchall()
+    )
+    served: defaultdict[str, list[str]] = defaultdict(list)
+    station: dict[str, str] = {}
+    for platform, stop, d, routes in rows:
+        station.setdefault(platform, names.station.get(stop, stop))
+        where = names.direction.get((stop, d), d)
+        served[platform].append(f"{where} {' '.join(routes)}")
+    return {p: f"{station[p]}, {' & '.join(s)}" for p, s in served.items()}
+
+
 def place_table(
     by: By,
     with_route: bool,
@@ -606,9 +650,10 @@ def place_table(
     names_: Names,
 ) -> list[str]:
     """`place_rows`' rows as a table, with each place's busiest hour
-    from `hours`, `(stop, dir, [route,] hour, riders on + off)` rows."""
+    from `hours`, `(stop, dir, platform, [route,] hour, riders on + off)` rows."""
+    platform_names = platform_labels(names_) if by is By.PLATFORM else {}
 
-    def label(stop: str, d: str) -> tuple[str, str]:
+    def label(stop: str, d: str, platform: str) -> tuple[str, str]:
         match by:
             case By.COMPLEX:
                 c = names_.complex_of.get(stop, "")
@@ -619,6 +664,13 @@ def place_table(
                 where = names_.direction.get((stop, d), "")
                 name = names_.station.get(stop, "")
                 return f"{stop}{d}", f"{name}, {where}" if where else name
+            case By.PLATFORM:
+                if platform:
+                    return platform, platform_names.get(platform, "")
+                # A stop OSM's routes don't say the platform of: its direction.
+                where = names_.direction.get((stop, d), "")
+                name = names_.station.get(stop, "")
+                return f"{stop}{d}?", f"{name}, {where}, platform unknown"
         raise AssertionError(by)
 
     # Complexes sum their stations' rows.
@@ -628,12 +680,12 @@ def place_table(
     )
     # In a set order, so a complex's floating-point sum of its stations is too.
     for row in sorted(rows, key=as_text):
-        stop, d, *rest = row
+        stop, d, platform, *rest = row
         grp = (rest.pop(0),) if with_route else ()
-        key = (*label(stop, d), *grp)
+        key = (*label(stop, d, platform), *grp)
         for j, v in enumerate(rest):
             merged[key][j] += v or 0.0
-    peaks = busiest((*label(stop, d), *rest) for stop, d, *rest in hours)
+    peaks = busiest((*label(stop, d, p), *rest) for stop, d, p, *rest in hours)
     head = [
         by.value.replace("-", " ").title(),
         "Name",
@@ -958,6 +1010,16 @@ def render(
                 "a train is the same on any date with the same route, direction, "
                 "first stop, and departure from it."
             ]
+        ),
+        *(
+            [
+                "Platforms are from OpenStreetMap's subway routes "
+                "(© OpenStreetMap contributors, ODbL), "
+                "by `mta-od-data fetch-platforms`; "
+                "a platform's ID is its OSM way's."
+            ]
+            if By.PLATFORM in by
+            else []
         ),
         "",
         f"Produced by `{produced_by(ctx)}`.",

@@ -93,25 +93,25 @@ def load_trip_stops(manifest: Path, evasion: FareEvasion | None) -> TripStops:
 
 def place_hours(with_route: bool, days: int) -> list[tuple[Any, ...]]:
     """Riders on and off each stop's trains (each of `route_groups`' routes'),
-    by stop, direction, (route,) and the hour the train is there:
-    `(stop, dir, [route,] hour, riders)` rows, an average weekday's."""
+    by stop, direction, platform (from `directions`), (route,)
+    and the hour the train is there:
+    `(stop, dir, platform, [route,] hour, riders)` rows, an average weekday's."""
     grp = ", grp" if with_route else ""
+    join_route = "JOIN route_groups g ON g.route = t.route_id" if with_route else ""
     return (
         connection()
         .execute(
             f"""
-            SELECT stop_id, dir{grp}, departure // 3600 AS hour,
-                sum((boardings + alightings) * w) / {days}
-            FROM trip_stops JOIN route_groups ON route = route_id
-            WHERE route_id IN (SELECT route FROM route_groups)
-            GROUP BY ALL
-            """
-            if with_route
-            else f"""
-            SELECT stop_id, dir, departure // 3600 AS hour,
-                sum((boardings + alightings) * w) / {days}
-            FROM trip_stops
-            WHERE route_id IN (SELECT route FROM route_groups)
+            SELECT stop_id, dir, coalesce(leaving.pa, arriving.pb, '') AS platform{grp},
+                departure // 3600 AS hour, sum((boardings + alightings) * w) / {days}
+            FROM trip_stops t {join_route}
+            LEFT JOIN directions leaving
+                ON leaving.route = t.route_id AND leaving.a = t.stop_id
+                AND leaving.b = t.next_stop
+            LEFT JOIN directions arriving
+                ON arriving.route = t.route_id AND arriving.a = t.prev_stop
+                AND arriving.b = t.stop_id
+            WHERE t.route_id IN (SELECT route FROM route_groups)
             GROUP BY ALL
             """
         )
