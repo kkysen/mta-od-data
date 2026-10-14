@@ -76,6 +76,15 @@ DEFAULT_MANIFEST = DATA / "raptor" / "manifest.csv"
 # systemwide, and 2% at 80% of stations, so that column barely differed.
 DEFAULT_OD_FACTORS = [DATA / "mta_od_2019_counted.factors.parquet"]
 DEFAULT_LINES = HERE / "lines.json5"
+TRAIN_LENGTHS = HERE / "train_lengths.json5"
+
+
+def load_train_lengths(path: Path = TRAIN_LENGTHS) -> dict[str, int]:
+    """Each GTFS route's train length, in feet."""
+    lengths = json5.loads(path.read_text(), allow_duplicate_keys=False)
+    return {route: int(feet) for route, feet in lengths.items()}
+
+
 DEFAULT_STATIONS = DATA / "stations.csv"
 DEFAULT_COMPLEXES = DATA / "complexes.csv"
 
@@ -418,11 +427,13 @@ def place_rows(with_route: bool, names: list[str]) -> list[tuple[Any, ...]]:
 
 @dataclass(slots=True)
 class RouteService:
-    """A `--by route` row's average route km, trips, and train-km."""
+    """A `--by route` row's average route km, trips, and train-km,
+    and train-km times its trains' lengths in 100s of feet."""
 
     route_km: float = 0.0
     trips: float = 0.0
     train_km: float = 0.0
+    train_100ft_km: float = 0.0
 
 
 def route_service(
@@ -432,6 +443,7 @@ def route_service(
     from each date's feed, averaged as its riders are."""
     totals: defaultdict[str, RouteService] = defaultdict(RouteService)
     total_days = 0
+    train_lengths = load_train_lengths()
     for row in read_manifest(manifest):
         feed = load_feed(DEFAULT_GTFS_DIR / Path(row["feed"]).name)
         days = int(row["days"])
@@ -447,9 +459,20 @@ def route_service(
             t.route_km += route_length(ps, lengths) / 1000 * days
             t.trips += sum(ps.values()) * days
             t.train_km += sum(n * sum(p.lengths) for p, n in ps.items()) / 1000 * days
+            t.train_100ft_km += (
+                sum(
+                    n * sum(p.lengths) * train_lengths.get(p.route, 0) / 100
+                    for p, n in ps.items()
+                )
+                / 1000
+                * days
+            )
     return {
         g: RouteService(
-            t.route_km / total_days, t.trips / total_days, t.train_km / total_days
+            t.route_km / total_days,
+            t.trips / total_days,
+            t.train_km / total_days,
+            t.train_100ft_km / total_days,
         )
         for g, t in totals.items()
     }
@@ -808,9 +831,10 @@ def ridership(
                 "Trips",
                 "Train-km",
                 f"Per Train-km, {first}",
+                f"Per 100 ft of Train-km, {first}",
                 *peak_heads(cols),
             ),
-            table_rule("l" + "r" * (len(cols) + 5) + "lr"),
+            table_rule("l" + "r" * (len(cols) + 6) + "lr"),
         ]
         for grp in route_order({g: vs[0] for g, vs in got.items()}):
             s = service.get(grp, RouteService())
@@ -824,6 +848,7 @@ def ridership(
                     fmt(s.trips),
                     fmt(s.train_km),
                     fmt(vs[0] / s.train_km if s.train_km else None, 1),
+                    fmt(vs[0] / s.train_100ft_km if s.train_100ft_km else None, 2),
                     *peak_cells(peaks, (grp,)),
                 )
             )
@@ -861,16 +886,20 @@ def trip_table(trains: list[Train], names: Names, label: str) -> list[str]:
     def stop(s: str) -> str:
         return names.stop.get(s, s)
 
+    lengths = load_train_lengths()
+
     lines = [
         table_row(
             "Route",
             "Train",
             f"Peak Load, {label}",
+            "Train Length (ft)",
+            "Peak per 100 ft",
             "Peak Between",
             "Leaving At",
             "Weekdays Run",
         ),
-        table_rule("ll" + "r" + "ll" + "r"),
+        table_rule("llrrrllr"),
     ]
     for t in trains:
         lines.append(
@@ -879,6 +908,8 @@ def trip_table(trains: list[Train], names: Names, label: str) -> list[str]:
                 f"{clock_time(t.first_departure)} {stop(t.first_stop)}"
                 f" to {stop(t.last_stop)}",
                 fmt(t.peak),
+                fmt(lengths.get(t.route)),
+                fmt(t.peak / lengths[t.route] * 100 if t.route in lengths else None),
                 f"{stop(t.peak_stop)} to {stop(t.peak_next)}",
                 clock_time(t.peak_departure),
                 str(t.days),
