@@ -104,6 +104,19 @@ class Column:
 
     label: str
     average: AveragePaths
+    # The year its OD data is scaled to the counted entries of, if scaled.
+    scaled_to: int | None = None
+
+
+def period(manifest: Path) -> str:
+    """The manifest's dates as a column name, e.g. "Aug-Dec 2025"."""
+    days = sorted(date.fromisoformat(row["date"]) for row in read_manifest(manifest))
+    first, last = days[0], days[-1]
+    if first.year != last.year:
+        return f"{first:%b %Y}-{last:%b %Y}"
+    if first.month != last.month:
+        return f"{first:%b}-{last:%b %Y}"
+    return f"{first:%b %Y}"
 
 
 def columns(
@@ -114,12 +127,12 @@ def columns(
     cols: list[Column] = []
     if unscaled:
         c = counting(None, fare_evasion)
-        cols.append(Column("OD data", average_path_riders(manifest, c)))
+        cols.append(Column(period(manifest), average_path_riders(manifest, c)))
     for factors in od_factors:
         c = counting(factors, fare_evasion)
         assert c.scale is not None, "counting with factors scales"
-        label = f"scaled to {c.scale.year}"
-        cols.append(Column(label, average_path_riders(manifest, c)))
+        year = c.scale.year
+        cols.append(Column(str(year), average_path_riders(manifest, c), year))
     days = {col.average.days for col in cols}
     assert len(days) == 1, f"one manifest, one number of days: {days}"
     return cols
@@ -475,14 +488,14 @@ def place_table(
         key = (*label(stop, d), *grp)
         for j, v in enumerate(rest):
             merged[key][j] += v or 0.0
-    head = [by.value, "name", *(["route"] if with_route else [])]
+    head = [by.value.capitalize(), "Name", *(["Route"] if with_route else [])]
     lines = [
         table_row(
             *head,
-            *(f"on + off, {c.label}" for c in cols),
-            f"on, {cols[0].label}",
-            f"off, {cols[0].label}",
-            f"transfers on + off, {cols[0].label}",
+            *(f"On + Off, {c.label}" for c in cols),
+            f"On, {cols[0].label}",
+            f"Off, {cols[0].label}",
+            f"Transfers On + Off, {cols[0].label}",
         ),
         table_rule("l" * len(head) + "r" * (k + 3)),
     ]
@@ -603,7 +616,7 @@ def ridership(
         if with_route:
             got = route_rows(names, with_line=True)
             table = [
-                table_row("line", "route", *(c.label for c in cols)),
+                table_row("Line", "Route", *(c.label for c in cols)),
                 table_rule("ll" + "r" * len(cols)),
             ]
             for grp, name, *vs in sorted(got, key=by_line_then_riders):
@@ -612,7 +625,7 @@ def ridership(
         else:
             got = line_rows(names)
             table = [
-                table_row("line", *(c.label for c in cols)),
+                table_row("Line", *(c.label for c in cols)),
                 table_rule("l" + "r" * len(cols)),
             ]
             for name, *vs in sorted(got, key=by_riders):
@@ -625,13 +638,13 @@ def ridership(
         first = cols[0].label
         table = [
             table_row(
-                "route",
+                "Route",
                 *(c.label for c in cols),
-                "route km",
-                f"per route km, {first}",
-                "trips",
-                "train-km",
-                f"per train-km, {first}",
+                "Route-km",
+                f"Per Route-km, {first}",
+                "Trips",
+                "Train-km",
+                f"Per Train-km, {first}",
             ),
             table_rule("l" + "r" * (len(cols) + 5)),
         ]
@@ -677,12 +690,10 @@ def render(
         f"over {cols[0].average.days} weekdays from {dates[0]} to {dates[-1]} "
         f"(`{manifest}`).",
         *(
-            [
-                "Each scaled column scales the OD data "
-                "to a year's counted station entries."
-            ]
-            if any(c.label.startswith("scaled") for c in cols)
-            else []
+            f"The {c.label} column scales the OD data on these dates "
+            f"to {c.scaled_to}'s counted station entries."
+            for c in cols
+            if c.scaled_to is not None
         ),
         "",
         f"Produced by `{produced_by(ctx)}`.",

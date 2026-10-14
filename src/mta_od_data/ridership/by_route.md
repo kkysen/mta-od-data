@@ -1,11 +1,11 @@
 # Ridership by route
 
 Average weekday riders with fare evaders, over 103 weekdays from 2025-08-19 to 2025-12-22 (`data/raptor/manifest.csv`).
-Each scaled column scales the OD data to a year's counted station entries.
+The 2019 column scales the OD data on these dates to 2019's counted station entries.
 
 Produced by `mta-od-data ridership --by route --markdown-out src/mta_od_data/ridership/by_route.md`.
 
-| route | OD data | scaled to 2019 | route km | per route km, OD data | trips | train-km | per train-km, OD data |
+| Route | Aug-Dec 2025 | 2019 | Route-km | Per Route-km, Aug-Dec 2025 | Trips | Train-km | Per Train-km, Aug-Dec 2025 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | 6 | 560,123 | 745,403 | 24.1 | 23,245 | 552 | 12,495 | 44.8 |
 | 6L | 425,011 | 562,254 | 24.1 | 17,638 | 439 | 9,772 | 43.5 |

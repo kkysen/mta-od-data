@@ -1,11 +1,11 @@
 # Ridership by platform
 
 Average weekday riders with fare evaders, over 103 weekdays from 2025-08-19 to 2025-12-22 (`data/raptor/manifest.csv`).
-Each scaled column scales the OD data to a year's counted station entries.
+The 2019 column scales the OD data on these dates to 2019's counted station entries.
 
 Produced by `mta-od-data ridership --by platform --markdown-out src/mta_od_data/ridership/by_platform.md`.
 
-| platform | name | on + off, OD data | on + off, scaled to 2019 | on, OD data | off, OD data | transfers on + off, OD data |
+| Platform | Name | On + Off, Aug-Dec 2025 | On + Off, 2019 | On, Aug-Dec 2025 | Off, Aug-Dec 2025 | Transfers On + Off, Aug-Dec 2025 |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | 631N | Grand Central-42 St (4 5 6), Uptown | 178,315 | 235,680 | 81,187 | 97,129 | 96,310 |
 | 631S | Grand Central-42 St (4 5 6), Downtown | 169,860 | 224,037 | 90,634 | 79,226 | 86,915 |

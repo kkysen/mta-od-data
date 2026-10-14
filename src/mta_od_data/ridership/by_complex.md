@@ -1,11 +1,11 @@
 # Ridership by complex
 
 Average weekday riders with fare evaders, over 103 weekdays from 2025-08-19 to 2025-12-22 (`data/raptor/manifest.csv`).
-Each scaled column scales the OD data to a year's counted station entries.
+The 2019 column scales the OD data on these dates to 2019's counted station entries.
 
 Produced by `mta-od-data ridership --by complex --markdown-out src/mta_od_data/ridership/by_complex.md`.
 
-| complex | name | on + off, OD data | on + off, scaled to 2019 | on, OD data | off, OD data | transfers on + off, OD data |
+| Complex | Name | On + Off, Aug-Dec 2025 | On + Off, 2019 | On, Aug-Dec 2025 | Off, Aug-Dec 2025 | Transfers On + Off, Aug-Dec 2025 |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | 611 | Times Sq-42 St/Port Authority Bus Terminal (1,2,3,7,A,C,E,N,Q,R,W,S) | 936,114 | 1,222,617 | 469,687 | 466,426 | 613,941 |
 | 602 | 14 St-Union Sq (4,5,6,L,N,Q,R,W) | 594,868 | 752,362 | 294,421 | 300,447 | 420,669 |
