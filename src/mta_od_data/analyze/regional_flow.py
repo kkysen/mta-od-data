@@ -195,7 +195,7 @@ def write_csv(path: Path, rows: list[FlowRow]) -> None:
 @app.command(name="regional-flow")
 def regional_flow(
     ctx: Context,
-    parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
+    parquet: Annotated[Path, Option()] = DATA / "mta_od_2025.parquet",
     complexes_path: Annotated[Path, Option("--complexes")] = (DATA / "complexes.csv"),
     day_type: Annotated[DayType, Option()] = DayType.WEEKDAY,
     days: Annotated[

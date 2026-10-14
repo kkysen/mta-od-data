@@ -38,7 +38,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release download "$OD_RELEASE_TAG" \
-            --pattern mta_od.parquet --dir data --clobber \
+            --pattern mta_od_2025.parquet --dir data --clobber \
           || echo "no $OD_RELEASE_TAG release asset; analyze tests will skip"
 
       - name: pytest

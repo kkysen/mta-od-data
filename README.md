@@ -58,7 +58,7 @@ into the project's `.venv`.
 ### `mta-od-data prepare`
 
 Fetches the station reference CSVs
-and converts the OD CSV(s) into Parquet (`data/mta_od.parquet`)
+and converts the OD CSV(s) into Parquet (`data/mta_od_2025.parquet`)
 for fast repeated querying.
 Re-runnable as new OD extracts are released:
 point `--csv` at the new file(s) (globs work) and/or `--out` at a new
@@ -87,7 +87,7 @@ The Parquet comes out considerably smaller than the extract it's built from
 
 ### Publishing the Parquet as a release asset
 
-`data/mta_od.parquet` is too big to commit (358MB for the 2025 extract),
+`data/mta_od_2025.parquet` is too big to commit (358MB for the 2025 extract),
 but small enough to download in seconds, so it lives as an asset on the `od-data` release.
 CI fetches it before `pytest`, which is what lets
 the `analyze` tests run there instead of skipping.
@@ -99,13 +99,13 @@ Publish (or replace) it from a machine that has run `prepare`:
 gh release create od-data --title 'OD dataset' \
     --notes 'Parquet built by `mta-od-data prepare` from the 2025 extract.'
 
-gh release upload od-data data/mta_od.parquet --clobber
+gh release upload od-data data/mta_od_2025.parquet --clobber
 ```
 
 Anyone (including a fresh clone) can then get it without rebuilding from the 27GB CSV:
 
 ```sh
-gh release download od-data --pattern mta_od.parquet --dir data
+gh release download od-data --pattern mta_od_2025.parquet --dir data
 ```
 
 ### `mta-od-data analyze one-seat-rides`
@@ -267,6 +267,6 @@ and diffs it against its committed `.md` snapshot.
 Check-only, like every other hook here:
 it fails with a diff and the regen command
 rather than rewriting the snapshot itself.
-Skipped, not failed, without `data/mta_od.parquet`,
+Skipped, not failed, without `data/mta_od_2025.parquet`,
 which is gitignored, so a fresh clone that hasn't downloaded the release asset
 still gets a passing suite.
