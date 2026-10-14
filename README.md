@@ -190,6 +190,22 @@ Same `--csv-out`/`--markdown-out` options as `one-seat-rides`;
 see [`src/mta_od_data/analyze/regional_flow.md`](src/mta_od_data/analyze/regional_flow.md)
 for example output.
 
+### `mta-od-data fetch-platforms`
+
+Maps each route's consecutive stops, in every feed in `data/gtfs/`,
+to the physical platforms its trains stop at,
+from OpenStreetMap's NYC Subway route relations
+(© OpenStreetMap contributors, under the [ODbL](https://www.openstreetmap.org/copyright)),
+read from [Geofabrik's New York extract](https://download.geofabrik.de/north-america/us/new-york.html)
+(fetched to `data/osm/` if missing, ~500MB).
+It writes the checked-in [`src/mta_od_data/ridership/platforms.csv`](src/mta_od_data/ridership/platforms.csv),
+which `mta-od-data ridership --by platform` reads,
+so it only needs rerunning when the feeds or OSM change.
+
+```sh
+uv run mta-od-data fetch-platforms
+```
+
 ## How the classification works
 
 - **Origin set**: stations served by at least one route in `--routes`,
