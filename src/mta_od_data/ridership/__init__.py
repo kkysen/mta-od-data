@@ -32,7 +32,13 @@ import json5
 from typer import BadParameter, Context, Option, Typer
 
 from mta_od_data import DATA
-from mta_od_data.analyze.common import connection
+from mta_od_data.analyze.common import (
+    Complex,
+    MissingComplex,
+    abbreviate_name,
+    connection,
+    display_station,
+)
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import (
     AveragePaths,
@@ -246,13 +252,21 @@ class Names:
 
 
 def load_names(stations: Path, complexes: Path) -> Names:
+    """Names as the `analyze` reports write them: `abbreviate_name`d,
+    with their routes as `display_station` lists them, `DeKalb Av (B,Q,R)`."""
     with stations.open() as f:
         rows = list(DictReader(f))
-    with complexes.open() as f:
-        complex_names = {r["complex_id"]: r["display_name"] for r in DictReader(f)}
+    complex_names = {
+        str(c.complex_id): c.display()
+        for c in Complex.load_all(complexes)
+        if not isinstance(c, MissingComplex)
+    }
     return Names(
         station={
-            r["gtfs_stop_id"]: f"{r['stop_name']} ({r['daytime_routes']})" for r in rows
+            r["gtfs_stop_id"]: display_station(
+                abbreviate_name(r["stop_name"]), frozenset(r["daytime_routes"].split())
+            )
+            for r in rows
         },
         complex_of={r["gtfs_stop_id"]: r["complex_id"] for r in rows},
         complex=complex_names,
