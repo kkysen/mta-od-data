@@ -15,7 +15,7 @@ set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-od="$root/data/mta_od.parquet"
+od="$root/data/mta_od_2025.parquet"
 date=2025-10-15
 feed="$root/data/gtfs/mdb-516-202510180014.zip"
 while (($#)); do

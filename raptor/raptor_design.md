@@ -18,7 +18,7 @@ but nothing here depends on scenarios.
   GTFS-RT is out of scope for now;
   the timetable layer should not assume static-only,
   so RT can replace it later.
-- The OD Parquet produced by `prepare.py` (`data/mta_od.parquet`,
+- The OD Parquet produced by `prepare.py` (`data/mta_od_2025.parquet`,
   currently all of 2025):
   (year, month, day of week, hour, origin complex, destination complex, ridership).
   The OD data is an average per (month, day of week, hour),

@@ -18,7 +18,7 @@ cd "$root"
 # A date the feed covers, and its OD rows.
 date=2025-09-16
 feed=data/gtfs/mdb-516-202510180014.zip
-od=data/mta_od.parquet
+od=data/mta_od_2025.parquet
 
 # `$RUSTFLAGS` replaces `.cargo/config.toml`'s flags rather than adding to them.
 native="-C target-cpu=native"
