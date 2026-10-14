@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from mta_od_data.analyze.common import connection
-from mta_od_data.ridership import route_groups_table
+from mta_od_data.ridership.compute import route_groups_table
 from mta_od_data.ridership.trips import (
     crowded_trains,
     line_hours,

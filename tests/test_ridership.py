@@ -5,7 +5,7 @@ import pytest
 
 from mta_od_data.analyze.common import connection
 from mta_od_data.analyze.path_riders import AveragePaths
-from mta_od_data.ridership import (
+from mta_od_data.ridership.compute import (
     LINES,
     Column,
     base_route,
