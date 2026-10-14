@@ -1,0 +1,20 @@
+// Platform direction labels for `mta-od-data ridership --by platform`
+// where a station's own (`north_direction_label`, `south_direction_label`) don't fit,
+// by GTFS parent stop ID: a direction's label, or a route's own labels.
+// A route's label that isn't one of the station's is shown with the route.
+{
+  // Hoyt-Schermerhorn Sts: the A and C north are towards Manhattan, not "Westbound",
+  // and the G crosses the A's line here, so the A's labels don't fit it.
+  A42: {
+    N: "Manhattan",
+    G: {N: "NB", S: "SB"},
+  },
+  // Broadway (Brooklyn) to Delancey St: the M runs north towards Manhattan,
+  // where the J and Z, which the stations' labels are for, run south.
+  M11: {M: {N: "Manhattan", S: "Outbound"}},
+  M12: {M: {N: "Manhattan", S: "Outbound"}},
+  M13: {M: {N: "Manhattan", S: "Outbound"}},
+  M14: {M: {N: "Manhattan", S: "Outbound"}},
+  M16: {M: {N: "Manhattan", S: "Outbound"}},
+  M18: {M: {N: "Inbound", S: "Brooklyn"}},
+}

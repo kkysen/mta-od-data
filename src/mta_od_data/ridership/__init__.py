@@ -59,6 +59,7 @@ from mta_od_data.ridership.service import (
     segment_lengths,
 )
 from mta_od_data.ridership.trips import (
+    DAY,
     Train,
     crowded_trains,
     line_hours,
@@ -76,6 +77,7 @@ DEFAULT_MANIFEST = DATA / "raptor" / "manifest.csv"
 # systemwide, and 2% at 80% of stations, so that column barely differed.
 DEFAULT_OD_FACTORS = [DATA / "mta_od_2019_counted.factors.parquet"]
 DEFAULT_LINES = HERE / "lines.json5"
+DIRECTION_LABELS = HERE / "direction_labels.json5"
 TRAIN_LENGTHS = HERE / "train_lengths.json5"
 # Loads per this much train: a B Division car's length, most cars',
 # so a load per car compares across trains of different cars.
@@ -615,19 +617,56 @@ def fmt(x: float | None, digits: int = 0) -> str:
     return f"{x or 0:,.{digits}f}"
 
 
+# Station directions' labels, as short as `Uptown` or `Manhattan`.
+COMPASS = {
+    "Northbound": "NB",
+    "Southbound": "SB",
+    "Eastbound": "EB",
+    "Westbound": "WB",
+}
+
+
 def platform_labels(names: Names) -> dict[str, str]:
-    """Each platform's station and what it serves, from `directions`:
-    e.g. `96 St (1,2,3), Uptown 1 2 3`, or both directions for an island."""
+    """Each platform's station, from `trip_stops`, and only as much more as tells it
+    from the station's other platforms: the directions it serves,
+    e.g. `96 St (1,2,3), Uptown`, or its routes, e.g. `Jamaica Center (E,J,Z), E`,
+    then its routes each way, e.g. `Uptown 2,3`,
+    then their express variants, e.g. `Uptown 7X`.
+    A platform's routes are those with a tenth of their trains at the station
+    by day, from 6 AM to 9 PM, there, not one there only overnight,
+    unless none are there by day."""
     rows = (
         connection()
         .execute(
-            """
-            SELECT platform, stop, dir, list(DISTINCT route ORDER BY route)
-            FROM (
-                SELECT pa AS platform, a AS stop, da AS dir, route FROM directions
-                UNION ALL
-                SELECT pb, b, db, route FROM directions
+            f"""
+            WITH s AS (
+                SELECT coalesce(leaving.pa, arriving.pb, '') AS platform,
+                    stop_id AS stop, coalesce(leaving.da, arriving.db) AS dir,
+                    route_id AS route,
+                    count(*) FILTER (
+                        departure % {DAY} BETWEEN 6 * 3600 AND 21 * 3600
+                    ) AS by_day
+                FROM trip_stops t
+                LEFT JOIN directions leaving
+                    ON leaving.route = t.route_id AND leaving.a = t.stop_id
+                    AND leaving.b = t.next_stop
+                LEFT JOIN directions arriving
+                    ON arriving.route = t.route_id AND arriving.a = t.prev_stop
+                    AND arriving.b = t.stop_id
+                GROUP BY ALL
+            ),
+            -- A route is by day at a platform with a tenth of its trains there.
+            r AS (
+                SELECT *,
+                    by_day > 0
+                    AND by_day >= 0.1 * sum(by_day) OVER (PARTITION BY stop, route)
+                        AS kept
+                FROM s
             )
+            SELECT platform, stop, dir,
+                if(bool_or(kept), list(route ORDER BY route) FILTER (kept),
+                    list(route ORDER BY route))
+            FROM r
             WHERE platform != ''
             GROUP BY ALL
             ORDER BY ALL
@@ -635,13 +674,83 @@ def platform_labels(names: Names) -> dict[str, str]:
         )
         .fetchall()
     )
-    served: defaultdict[str, list[str]] = defaultdict(list)
+    overrides = json5.loads(DIRECTION_LABELS.read_text(), allow_duplicate_keys=False)
+
     station: dict[str, str] = {}
-    for platform, stop, d, routes in rows:
+    # Each way a platform serves, by its label: its routes that way.
+    ways: defaultdict[str, defaultdict[str, list[str]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    # Each station's own labels, which a route's own label is shown without.
+    own_labels: defaultdict[str, set[str]] = defaultdict(set)
+    for platform, stop, d, rs in rows:
         station.setdefault(platform, names.station.get(stop, stop))
-        where = names.direction.get((stop, d), d)
-        served[platform].append(f"{where} {' '.join(routes)}")
-    return {p: f"{station[p]}, {' & '.join(s)}" for p, s in served.items()}
+        override = overrides.get(stop, {})
+        where = override.get(d, names.direction.get((stop, d), d))
+        own_labels[platform].add(where)
+        for r in rs:
+            ways[platform][override[r][d] if r in override else where].append(r)
+    # Each direction a platform serves: its label, its routes that way,
+    # and whether the label is the routes' own, not the station's.
+    served = {
+        p: [
+            (COMPASS.get(where, where), sorted(set(rs)), where not in own_labels[p])
+            for where, rs in w.items()
+        ]
+        for p, w in ways.items()
+    }
+
+    def way(where: str, routes: Iterable[str]) -> str:
+        return f"{where} {','.join(routes)}"
+
+    def with_directions(p: str) -> str:
+        # A train's last stop doesn't tell its platform: it's where it's going.
+        wheres = dict.fromkeys(
+            way(where, rs) if ours else where
+            for where, rs, ours in served[p]
+            if where != "Last Stop"
+        )
+        return f"{station[p]}, {' & '.join(wheres)}" if wheres else station[p]
+
+    def routes_alone(p: str) -> str:
+        routes = sorted({base_route(r) for _, rs, _ in served[p] for r in rs})
+        return f"{station[p]}, {','.join(routes)}"
+
+    def variants_alone(p: str) -> str:
+        routes = sorted({r for _, rs, _ in served[p] for r in rs})
+        return f"{station[p]}, {','.join(routes)}"
+
+    def with_routes(p: str) -> str:
+        ways = (
+            way(where, sorted({base_route(r) for r in rs}))
+            for where, rs, _ in served[p]
+        )
+        return f"{station[p]}, {' & '.join(ways)}"
+
+    def with_variants(p: str) -> str:
+        ways = (way(where, rs) for where, rs, _ in served[p])
+        return f"{station[p]}, {' & '.join(ways)}"
+
+    # Each station's platforms by the first of these that tells them all apart.
+    platforms: defaultdict[str, list[str]] = defaultdict(list)
+    for p, name in station.items():
+        platforms[name].append(p)
+    labels: dict[str, str] = {}
+    for ps in platforms.values():
+        for more in [
+            station.__getitem__,
+            with_directions,
+            routes_alone,
+            variants_alone,
+            with_routes,
+        ]:
+            tried = {p: more(p) for p in ps}
+            if len(set(tried.values())) == len(ps):
+                break
+        else:
+            tried = {p: with_variants(p) for p in ps}
+        labels |= tried
+    return labels
 
 
 def place_table(
