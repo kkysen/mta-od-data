@@ -157,7 +157,7 @@ pub fn assign_dates(
         let mut writing = VecDeque::new();
         for (g, group) in groups.iter().enumerate() {
             let start = Instant::now();
-            let routes = route(&group.tt, &group.complexes, &config);
+            let routes = route(&group.tt, &group.complexes);
             let routed = start.elapsed();
             let (slices, loaded) = join(loading.take().expect("loading this group"))?;
             loading = groups.get(g + 1).map(load);
@@ -204,7 +204,7 @@ pub fn assign_dates(
             for (&i, rows) in group.jobs.iter().zip(&slices) {
                 let job = &jobs[i];
                 let start = Instant::now();
-                let (paths, unassigned) = split(&routes, &group.complexes, rows);
+                let (paths, unassigned) = split(&routes, &group.complexes, rows, &config);
                 let timings = Timings {
                     loaded,
                     routed,

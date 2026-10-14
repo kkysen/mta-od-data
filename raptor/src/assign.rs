@@ -120,15 +120,16 @@ pub fn assign(
     rows: &[OdRow],
     config: &Config,
 ) -> (Vec<PathRow>, PathTexts, Unassigned) {
-    let routes = route(tt, complexes, config);
-    let (paths, unassigned) = split(&routes, complexes, rows);
+    let routes = route(tt, complexes);
+    let (paths, unassigned) = split(&routes, complexes, rows, config);
     let texts = PathTexts(routes.texts().map(Box::from).collect());
     (paths, texts, unassigned)
 }
 
 /// Every origin's choice intervals to each of its destinations on one timetable.
-/// Riders' choices depend only on the timetable and config,
-/// so dates whose timetables route alike share these.
+/// They depend only on the timetable, not the config,
+/// whose weights `split` applies, so any config splits over the same routes,
+/// and dates whose timetables route alike share them.
 pub struct Routes(BTreeMap<ComplexId, OriginRoutes>);
 
 impl Routes {
@@ -149,13 +150,13 @@ pub struct OriginRoutes {
 /// Routes every pair of `complexes` on `tt`,
 /// so any OD data on its dates splits over the same routes.
 /// That's barely more than the OD data's own pairs, ~98% of them.
-pub fn route(tt: &Timetable, complexes: &Complexes, config: &Config) -> Routes {
+pub fn route(tt: &Timetable, complexes: &Complexes) -> Routes {
     let router = Router::new(tt);
     let ids: Vec<ComplexId> = complexes.stops.keys().copied().collect();
     let mut routes: BTreeMap<_, _> = ids
         .par_iter()
         .map(|&origin| {
-            let routes = route_origin(tt, &router, complexes, origin, &ids, config);
+            let routes = route_origin(tt, &router, complexes, origin, &ids);
             (origin, routes)
         })
         .collect();
@@ -171,9 +172,14 @@ pub fn route(tt: &Timetable, complexes: &Complexes, config: &Config) -> Routes {
 }
 
 /// Splits `rows`' riders over their journeys in `routes`,
-/// which must have routed every OD pair in `rows`.
+/// by `config`'s weights.
 /// Paths are `routes`' ids, so their texts are `Routes::texts`.
-pub fn split(routes: &Routes, complexes: &Complexes, rows: &[OdRow]) -> (Vec<PathRow>, Unassigned) {
+pub fn split(
+    routes: &Routes,
+    complexes: &Complexes,
+    rows: &[OdRow],
+    config: &Config,
+) -> (Vec<PathRow>, Unassigned) {
     let mut by_origin: BTreeMap<ComplexId, Vec<&OdRow>> = BTreeMap::new();
     for row in rows {
         by_origin.entry(row.origin).or_default().push(row);
@@ -181,7 +187,7 @@ pub fn split(routes: &Routes, complexes: &Complexes, rows: &[OdRow]) -> (Vec<Pat
     let results: Vec<_> = by_origin
         .par_iter()
         .map(|(&origin, rows)| match routes.0.get(&origin) {
-            Some(r) => split_origin(r, complexes, origin, rows),
+            Some(r) => split_origin(r, complexes, origin, rows, config),
             // Not a complex in the station data, so it has no stops.
             None => (
                 Vec::new(),
@@ -231,7 +237,6 @@ fn route_origin(
     complexes: &Complexes,
     origin: ComplexId,
     destinations: &[ComplexId],
-    config: &Config,
 ) -> OriginRoutes {
     let origin_stops = stops_of(complexes, origin);
     let targets: Vec<&[u32]> = destinations
@@ -251,7 +256,7 @@ fn route_origin(
     let intervals = destinations
         .iter()
         .zip(profiles)
-        .map(|(&d, journeys)| (d, intervals(tt, &mut paths, &legs, &journeys, config)))
+        .map(|(&d, journeys)| (d, intervals(tt, &mut paths, &legs, &journeys)))
         .collect();
     drop(legs);
     // Drops the interner's maps now, not when the routes are.
@@ -268,10 +273,12 @@ fn split_origin(
     complexes: &Complexes,
     origin: ComplexId,
     rows: &[&OdRow],
+    config: &Config,
 ) -> (Vec<PathRow>, Unassigned) {
     let mut unassigned = Unassigned::default();
     let origin_stops = stops_of(complexes, origin);
     let mut paths = Vec::new();
+    let mut shares = Vec::new();
     for row in rows {
         if origin_stops.is_empty() || stops_of(complexes, row.destination).is_empty() {
             unassigned.no_stops += row.riders.to_f64();
@@ -282,7 +289,7 @@ fn split_origin(
             unassigned.unreachable += row.riders.to_f64();
             continue;
         }
-        let (row_paths, assigned) = assign_row(row, intervals);
+        let (row_paths, assigned) = assign_row(row, intervals, config, &mut shares);
         unassigned.no_departure += row.riders.to_f64() * (1.0 - assigned);
         paths.extend(row_paths);
     }
@@ -329,20 +336,13 @@ impl Intervals {
 struct Choice {
     path: PathId,
     rides: u8,
-    share: f64,
     arrive: Secs,
     in_vehicle: Secs,
     walk: Secs,
 }
 
 /// The choice intervals of one OD pair's profile (latest departure first).
-fn intervals(
-    tt: &Timetable,
-    paths: &mut Paths,
-    legs: &Legs,
-    journeys: &[Journey],
-    config: &Config,
-) -> Intervals {
+fn intervals(tt: &Timetable, paths: &mut Paths, legs: &Legs, journeys: &[Journey]) -> Intervals {
     // Built latest first, then reversed.
     let mut latest_first = Intervals::default();
     // The latest journey seen per ride count:
@@ -367,7 +367,7 @@ fn intervals(
             }
         }
         let choices = &mut latest_first.choices;
-        choices_into(tt, paths, legs, &candidates, depart, config, choices);
+        choices_into(tt, paths, legs, &candidates, choices);
         let end = u32::try_from(choices.len()).expect("under 2^32 choices");
         latest_first.ends.push((depart, end));
     }
@@ -384,30 +384,29 @@ fn intervals(
     intervals
 }
 
-/// Appends each candidate's choice to `choices`,
-/// its share by logit over generalized cost for a rider entering at `t`.
+/// Appends each candidate's choice to `choices`.
 fn choices_into(
     tt: &Timetable,
     paths: &mut Paths,
     legs: &Legs,
     candidates: &[&Journey],
-    t: Secs,
-    config: &Config,
     choices: &mut Vec<Choice>,
 ) {
-    let start = choices.len();
     choices.extend(candidates.iter().map(|j| {
         let (in_vehicle, walk) = in_vehicle_and_walk(tt, legs.of(j));
         Choice {
             path: paths.get(tt, legs.of(j)),
             rides: j.rides() as u8,
-            share: 0.0,
             arrive: j.arrive,
             in_vehicle,
             walk,
         }
     }));
-    let choices = &mut choices[start..];
+}
+
+/// Sets `shares` to each of `choices`' shares,
+/// by logit over generalized cost for a rider entering at `t`.
+fn shares_into(choices: &[Choice], t: Secs, config: &Config, shares: &mut Vec<f64>) {
     let cost = |o: &Choice| {
         let wait = (o.arrive - t - o.in_vehicle - o.walk) as f64;
         (o.in_vehicle as f64 + config.wait_weight * wait + config.walk_weight * o.walk as f64)
@@ -415,19 +414,15 @@ fn choices_into(
             + config.transfer_penalty_min * f64::from(o.rides - 1)
     };
     // Each share holds its cost, then its weight, then its share.
-    for c in choices.iter_mut() {
-        c.share = cost(c);
+    shares.clear();
+    shares.extend(choices.iter().map(cost));
+    let min = shares.iter().copied().fold(f64::INFINITY, f64::min);
+    for s in shares.iter_mut() {
+        *s = (-config.logit_scale_per_min * (*s - min)).exp();
     }
-    let min = choices
-        .iter()
-        .map(|c| c.share)
-        .fold(f64::INFINITY, f64::min);
-    for c in choices.iter_mut() {
-        c.share = (-config.logit_scale_per_min * (c.share - min)).exp();
-    }
-    let sum: f64 = choices.iter().map(|c| c.share).sum();
-    for c in choices.iter_mut() {
-        c.share /= sum;
+    let sum: f64 = shares.iter().sum();
+    for s in shares.iter_mut() {
+        *s /= sum;
     }
 }
 
@@ -534,7 +529,12 @@ fn path(tt: &Timetable, legs: &[Leg]) -> String {
 
 /// One row's paths, and the share of its riders assigned:
 /// short of 1 by those entering after the last departure.
-fn assign_row(row: &OdRow, intervals: &Intervals) -> (Vec<PathRow>, f64) {
+fn assign_row(
+    row: &OdRow,
+    intervals: &Intervals,
+    config: &Config,
+    shares: &mut Vec<f64>,
+) -> (Vec<PathRow>, f64) {
     let (start, end) = (Secs::from(row.hour) * HOUR, Secs::from(row.hour + 1) * HOUR);
     #[derive(Default)]
     struct Acc {
@@ -554,8 +554,11 @@ fn assign_row(row: &OdRow, intervals: &Intervals) -> (Vec<PathRow>, f64) {
         let weight = f64::from(hi - lo) / f64::from(HOUR);
         let mid = f64::from(lo + hi) / 2.0;
         assigned += weight;
-        for o in choices {
-            let share = weight * o.share;
+        // A rider entering in `(after, until]` chooses as one entering at `until`,
+        // the departure that ends the interval.
+        shares_into(choices, until, config, shares);
+        for (o, &s) in choices.iter().zip(shares.iter()) {
+            let share = weight * s;
             let acc = accs.entry(o.path).or_default();
             acc.rides = o.rides;
             acc.share += share;

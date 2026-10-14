@@ -400,8 +400,10 @@ Complexity is added only once the simple version works end to end.
    (date, feed, the paths and their texts' files, how many of the month's dates in the range share its weekday,
    and the run's rider totals),
    so an average over the range weights each date by its `days`.
-   Riders' choices depend only on the timetable and config,
-   so dates whose timetables route alike
+   Routing depends only on the timetable, not the config:
+   it finds each interval's journeys, and splitting weighs them by the config,
+   so one routing serves any cost weights.
+   Dates whose timetables route alike
    (the same stops, patterns, trip times, and transfers,
    whatever the trip IDs or feed version)
    share one routing, and only split their own OD rows over it:
