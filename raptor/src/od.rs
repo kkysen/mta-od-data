@@ -14,7 +14,11 @@ use arrow_schema::DataType;
 use jiff::ToSpan;
 use jiff::civil::{Date, Weekday};
 use parquet::arrow::ProjectionMask;
-use parquet::arrow::arrow_reader::ParquetRecordBatchReaderBuilder;
+use parquet::arrow::arrow_reader::{
+    ArrowReaderMetadata, ArrowReaderOptions, ParquetRecordBatchReaderBuilder,
+};
+use rayon::iter::ParallelIterator;
+use rayon::slice::ParallelSlice;
 use serde::Deserialize;
 
 use crate::timetable::{SERVICE_DAY_START, StopIdx, Timetable};
@@ -82,11 +86,13 @@ pub fn load_service_day(path: &Path, date: Date) -> Result<Vec<OdRow>> {
     Ok(days.pop().unwrap_or_default())
 }
 
-/// `load_service_day` for each of `dates`, in one read of the file.
+/// `load_service_day` for each of `dates`, in one read of the file,
+/// its row groups decoded in parallel: on one core,
+/// it took longer than routing, which it runs beside.
 pub fn load_service_days(path: &Path, dates: &[Date]) -> Result<Vec<Vec<OdRow>>> {
-    let file = File::open(path).with_context(|| format!("opening {}", path.display()))?;
-    let builder = ParquetRecordBatchReaderBuilder::try_new(file)?;
-    let schema = builder.parquet_schema();
+    let open = || File::open(path).with_context(|| format!("opening {}", path.display()));
+    let metadata = ArrowReaderMetadata::load(&open()?, ArrowReaderOptions::default())?;
+    let schema = metadata.parquet_schema();
     let columns = [
         YEAR,
         MONTH,
@@ -107,7 +113,6 @@ pub fn load_service_days(path: &Path, dates: &[Date]) -> Result<Vec<Vec<OdRow>>>
         })
         .collect::<Result<Vec<_>>>()?;
     let mask = ProjectionMask::leaves(schema, indices);
-    let reader = builder.with_projection(mask).build()?;
 
     let start = i64::from(SERVICE_DAY_START / (60 * 60));
     let mut slices = Vec::new();
@@ -115,9 +120,35 @@ pub fn load_service_days(path: &Path, dates: &[Date]) -> Result<Vec<Vec<OdRow>>>
         slices.push(Slice::new(date, start..24, 0, k));
         slices.push(Slice::new(date.checked_add(1.day())?, 0..start, 24, k));
     }
-    let mut rows = vec![Vec::new(); dates.len()];
-    for batch in reader {
-        read_batch(&batch?, &slices, &mut rows)?;
+    // A few chunks per thread, so threads that finish early take more.
+    let row_groups: Vec<usize> = (0..metadata.metadata().num_row_groups()).collect();
+    let chunk = row_groups
+        .len()
+        .div_ceil(4 * rayon::current_num_threads())
+        .max(1);
+    let chunks: Vec<Vec<Vec<OdRow>>> = row_groups
+        .par_chunks(chunk)
+        .map(|row_groups| -> Result<_> {
+            let reader =
+                ParquetRecordBatchReaderBuilder::new_with_metadata(open()?, metadata.clone())
+                    .with_projection(mask.clone())
+                    .with_row_groups(row_groups.to_vec())
+                    .build()?;
+            let mut rows = vec![Vec::new(); dates.len()];
+            for batch in reader {
+                read_batch(&batch?, &slices, &mut rows)?;
+            }
+            Ok(rows)
+        })
+        .collect::<Result<_>>()?;
+    // In the file's order, as one reader would have read them.
+    let mut rows: Vec<Vec<OdRow>> = (0..dates.len())
+        .map(|k| Vec::with_capacity(chunks.iter().map(|c| c[k].len()).sum()))
+        .collect();
+    for chunk in chunks {
+        for (rows, chunk) in rows.iter_mut().zip(chunk) {
+            rows.extend(chunk);
+        }
     }
     Ok(rows)
 }
