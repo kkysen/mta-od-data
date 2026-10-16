@@ -11,6 +11,8 @@
 // is on the express tracks on `express_routes`' trains and on the local tracks on others'.
 // `tracks` are a trunk's other stops in order, with no express tracks,
 // counted only as the trunk.
+// A list in `tracks` can be `{routes, stops}`: track only `routes`' trains ride,
+// where another line's stations, on another level, share its stop IDs.
 {
   "SAS Phase 1": {
     // 57 St-7 Av, Lexington Av/63 St, 72 St, 86 St, 96 St:

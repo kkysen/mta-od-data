@@ -7,6 +7,7 @@ from mta_od_data.analyze.common import connection
 from mta_od_data.analyze.path_riders import AveragePaths
 from mta_od_data.ridership.compute import (
     Column,
+    Hop,
     base_route,
     build_events,
     built,
@@ -113,3 +114,20 @@ def test_lines_count_rides_between_consecutive_stops_on_them(
     stops = ["R14", "B08", "Q03", "Q04", "Q05"]
     line_hops_table(trunk_hops("SAS Phase 1", {"tracks": [stops]}))
     assert dict(line_rows(paths)) == {"SAS Phase 1": 8.0}
+
+
+def test_trunks_tell_their_tracks_apart() -> None:
+    trunk = {
+        "tracks": [{"routes": ["E"], "stops": ["G05", "G06"]}],
+        "local": [["A27", "A28", "A30"]],
+        "express": [["A27", "A28"]],
+        "express_routes": ["A"],
+    }
+    assert trunk_hops("8 Av", trunk) == [
+        Hop("8 Av", "G05", "G06", ("E",)),
+        Hop("8 Av", "A27", "A28"),
+        Hop("8 Av", "A28", "A30"),
+        Hop("8 Av local", "A27", "A28", not_routes=("A",)),
+        Hop("8 Av local", "A28", "A30"),
+        Hop("8 Av express", "A27", "A28", routes=("A",)),
+    ]

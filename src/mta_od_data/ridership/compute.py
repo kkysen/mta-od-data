@@ -475,14 +475,24 @@ def pairs(seqs: Iterable[Sequence[str]]) -> list[tuple[str, str]]:
     return [(s[k], s[k + 1]) for s in seqs for k in range(len(s) - 1)]
 
 
+def track_hops(name: str, tracks: Iterable[Any]) -> list[Hop]:
+    """A trunk's `tracks`: each a list of stops, or `{routes, stops}`
+    for track only `routes`' trains ride, where another line's stops share its IDs."""
+    hops: list[Hop] = []
+    for t in tracks:
+        stops, routes = (t["stops"], tuple(t["routes"])) if "stops" in t else (t, ())
+        hops += [Hop(name, a, b, routes) for a, b in pairs([stops])]
+    return hops
+
+
 def trunk_hops(name: str, trunk: dict[str, Any]) -> list[Hop]:
     """A `lines.json5` trunk's hops, as the trunk and,
     if it has `express` stops, its local and express tracks."""
-    other = pairs(trunk.get("tracks", []))
     local = pairs(trunk.get("local", []))
     express = pairs(trunk.get("express", []))
     routes = tuple(trunk.get("express_routes", []))
-    hops = [Hop(name, a, b) for a, b in dict.fromkeys(other + local + express)]
+    hops = track_hops(name, trunk.get("tracks", []))
+    hops += [Hop(name, a, b) for a, b in dict.fromkeys(local + express)]
     if not express:
         return hops
     both = {frozenset(h) for h in local} & {frozenset(h) for h in express}
@@ -499,7 +509,13 @@ def trunk_hops(name: str, trunk: dict[str, Any]) -> list[Hop]:
 
 def load_lines(path: Path) -> list[Hop]:
     lines = json5.loads(path.read_text(), allow_duplicate_keys=False)
-    return [h for name, trunk in lines.items() for h in trunk_hops(name, trunk)]
+    hops = [h for name, trunk in lines.items() for h in trunk_hops(name, trunk)]
+    seen = set()
+    for h in hops:
+        if (key := (h.line, frozenset((h.a, h.b)))) in seen:
+            raise ValueError(f"{path}: {h.line} lists {h.a} to {h.b} twice")
+        seen.add(key)
+    return hops
 
 
 def line_hops_table(hops: list[Hop]) -> None:
