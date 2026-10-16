@@ -185,6 +185,28 @@
     local: [["F01", "F02", "F03", "F04", "F05", "F06", "F07", "G08", "G09", "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G18", "G19", "G20", "G21"]],
     express: [["F01", "F03", "F06", "G08", "G14", "G21"]],
   },
+  // Queens Blvd's stretches, each only its own hops.
+  "Hillside Av": {
+    // Jamaica-179 St to Briarwood, and the E's rush-hour express past Briarwood.
+    tracks: [
+      ["F01", "F02", "F03", "F04", "F05"],
+      ["F01", "F03", "F06"],
+    ],
+  },
+  "Queens Blvd east": {
+    // Briarwood to Forest Hills-71 Av.
+    tracks: [
+      ["F05", "F06", "F07", "G08"],
+      ["F06", "G08"],
+    ],
+  },
+  "Queens Blvd west": {
+    // Forest Hills-71 Av to Queens Plaza.
+    tracks: [
+      ["G08", "G09", "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G18", "G19", "G20", "G21"],
+      ["G08", "G14", "G21"],
+    ],
+  },
   "Crosstown": {
     tracks: [["G22", "G24", "G26", "G28", "G29", "G30", "G31", "G32", "G33", "G34", "G35", "G36", "A42"]],
   },
@@ -200,6 +222,10 @@
     express: [["A42", "A46", "A48", "A51", "A55"]],
     express_routes: ["A"],
   },
+  "Lefferts branch": {
+    // Rockaway Blvd to Ozone Park-Lefferts Blvd.
+    tracks: [["A61", "A63", "A64", "A65"]],
+  },
   "Rockaway": {
     tracks: [
       // Rockaway Blvd to Far Rockaway-Mott Av, and Rockaway Park-Beach 116 St.
@@ -208,6 +234,13 @@
       ["A61", "H02"],
       ["H04", "H12", "H13", "H14", "H15"],
     ],
+  },
+  // The Rockaway line's branches past Broad Channel.
+  "Far Rockaway branch": {
+    tracks: [["H04", "H06", "H07", "H08", "H09", "H10", "H11"]],
+  },
+  "Rockaway Park branch": {
+    tracks: [["H04", "H12", "H13", "H14", "H15"]],
   },
   "Culver": {
     tracks: [
@@ -220,6 +253,21 @@
     // Jay St-MetroTech to Church Av.
     local: [["A41", "F20", "F21", "F22", "F23", "F24", "F25", "F26", "F27"]],
     express: [["A41", "F24", "F27"]],
+  },
+  // Culver's stretches either side of Church Av.
+  "Upper Culver": {
+    // Jay St-MetroTech to Church Av.
+    tracks: [
+      ["A41", "F20", "F21", "F22", "F23", "F24", "F25", "F26", "F27"],
+      ["A41", "F24", "F27"],
+    ],
+  },
+  "Lower Culver": {
+    // Church Av to Coney Island-Stillwell Av.
+    tracks: [
+      ["F27", "F29", "F30", "F31", "F32", "F33", "F34", "F35", "F36", "F38", "F39", "D42"],
+      {routes: ["F", "FX"], stops: ["D42", "D43"]},
+    ],
   },
 
   // BMT

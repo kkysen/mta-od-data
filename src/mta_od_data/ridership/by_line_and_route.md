@@ -105,6 +105,7 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | Eastern Pkwy local | 2 | 67,478 | 87,732 | 8:00 AM | 6,337 |
 | Eastern Pkwy local | 4 | 8,109 | 11,136 | 5:00 AM | 1,925 |
 | Eastern Pkwy local | 5 | 162 | 228 | 5:00 AM | 147 |
+| Far Rockaway branch | A | 16,535 | 34,093 | 7:00 AM | 1,568 |
 | Flushing | 7 | 500,053 | 576,654 | 5:00 PM | 54,801 |
 | Flushing | 7L | 408,252 | 471,188 | 5:00 PM | 37,349 |
 | Flushing | 7X | 94,012 | 108,009 | 5:00 PM | 17,452 |
@@ -118,6 +119,10 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | Fulton St express | A | 136,847 | 194,726 | 5:00 PM | 13,635 |
 | Fulton St local | C | 76,945 | 101,511 | 5:00 PM | 6,873 |
 | Fulton St local | A | 14,293 | 19,809 | 11:00 PM | 3,862 |
+| Hillside Av | F | 55,526 | 77,171 | 5:00 PM | 4,784 |
+| Hillside Av | FL | 55,165 | 76,686 | 5:00 PM | 4,714 |
+| Hillside Av | E | 2,203 | 3,169 | 7:00 AM | 857 |
+| Hillside Av | FX | 361 | 484 | 8:00 AM | 149 |
 | Jamaica | J | 129,591 | 175,299 | 4:00 PM | 10,617 |
 | Jamaica | M | 57,794 | 77,270 | 8:00 AM | 5,820 |
 | Jamaica | Z | 8,994 | 12,171 | 5:00 PM | 3,529 |
@@ -127,6 +132,7 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | Jamaica local | M | 50,343 | 66,766 | 8:00 AM | 5,106 |
 | Jamaica local | Z | 4,415 | 6,046 | 8:00 AM | 1,614 |
 | Jerome Av | 4 | 160,095 | 228,370 | 3:00 PM | 13,160 |
+| Lefferts branch | A | 16,087 | 24,484 | 7:00 AM | 1,672 |
 | Lenox Av | 2 | 96,166 | 141,703 | 8:00 AM | 8,247 |
 | Lenox Av | 3 | 32,653 | 48,096 | 5:00 PM | 2,931 |
 | Lexington Av | 6 | 508,660 | 667,137 | 5:00 PM | 48,514 |
@@ -140,6 +146,9 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | Lexington Av local | 6L | 383,383 | 500,250 | 5:00 PM | 33,146 |
 | Lexington Av local | 6X | 125,471 | 167,136 | 5:00 PM | 15,367 |
 | Lexington Av local | 4 | 7,051 | 9,418 | 5:00 AM | 1,536 |
+| Lower Culver | F | 39,795 | 54,095 | 7:00 AM | 4,111 |
+| Lower Culver | FL | 38,180 | 51,910 | 8:00 AM | 3,952 |
+| Lower Culver | FX | 1,615 | 2,185 | 7:00 AM | 995 |
 | Manhattan Bridge | Q | 92,786 | 122,126 | 8:00 AM | 8,728 |
 | Manhattan Bridge | N | 71,629 | 84,732 | 5:00 PM | 7,682 |
 | Manhattan Bridge | D | 63,827 | 81,707 | 5:00 PM | 5,788 |
@@ -163,6 +172,10 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | Queens Blvd | R | 85,561 | 114,226 | 5:00 PM | 8,538 |
 | Queens Blvd | M | 81,327 | 108,957 | 8:00 AM | 8,324 |
 | Queens Blvd | FX | 970 | 1,247 | 8:00 AM | 400 |
+| Queens Blvd east | E | 104,050 | 131,597 | 7:00 AM | 9,055 |
+| Queens Blvd east | F | 83,596 | 115,348 | 8:00 AM | 7,769 |
+| Queens Blvd east | FL | 83,032 | 114,591 | 8:00 AM | 7,534 |
+| Queens Blvd east | FX | 564 | 757 | 8:00 AM | 235 |
 | Queens Blvd express | E | 187,388 | 231,809 | 5:00 PM | 19,222 |
 | Queens Blvd express | F | 97,917 | 130,563 | 5:00 PM | 9,651 |
 | Queens Blvd express | FL | 97,320 | 129,791 | 5:00 PM | 9,463 |
@@ -173,13 +186,25 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | Queens Blvd local | M | 80,881 | 108,277 | 8:00 AM | 8,265 |
 | Queens Blvd local | E | 33,266 | 41,618 | 10:00 PM | 4,918 |
 | Queens Blvd local | FX | 586 | 786 | 8:00 AM | 248 |
+| Queens Blvd west | E | 190,614 | 235,124 | 5:00 PM | 17,725 |
+| Queens Blvd west | F | 112,005 | 148,757 | 5:00 PM | 9,651 |
+| Queens Blvd west | FL | 111,408 | 147,986 | 5:00 PM | 9,463 |
+| Queens Blvd west | R | 85,561 | 114,226 | 5:00 PM | 8,538 |
+| Queens Blvd west | M | 80,881 | 108,277 | 8:00 AM | 8,265 |
+| Queens Blvd west | FX | 597 | 772 | 8:00 AM | 253 |
 | Rockaway | A | 27,390 | 48,997 | 7:00 AM | 2,435 |
 | Rockaway | H | 2,769 | 5,415 | 4:00 PM | 242 |
+| Rockaway Park branch | H | 2,769 | 5,415 | 4:00 PM | 242 |
+| Rockaway Park branch | A | 433 | 850 | 7:00 AM | 150 |
 | SAS Phase 1 | Q | 135,111 | 176,349 | 8:00 AM | 13,264 |
 | SAS Phase 1 | N | 5,259 | 6,863 | 4:00 PM | 2,513 |
 | SAS Phase 1 | R | 800 | 1,024 | 7:00 AM | 800 |
 | Sea Beach | N | 78,733 | 86,557 | 5:00 PM | 7,307 |
 | Sea Beach | W | 520 | 560 | 7:00 AM | 293 |
+| Upper Culver | F | 104,856 | 134,584 | 8:00 AM | 10,745 |
+| Upper Culver | FL | 102,667 | 131,645 | 8:00 AM | 10,745 |
+| Upper Culver | G | 39,778 | 47,023 | 8:00 AM | 3,603 |
+| Upper Culver | FX | 2,423 | 3,247 | 7:00 AM | 1,385 |
 | West End | D | 81,966 | 107,088 | 7:00 AM | 7,860 |
 | West End | W | 56 | 72 | 10:00 AM | 34 |
 | West End | R | 30 | 38 | 9:00 AM | 30 |

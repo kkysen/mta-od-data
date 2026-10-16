@@ -151,6 +151,10 @@ including riders passing through without stopping.
 
 The lines are every named trunk (Lexington Av, Queens Blvd, Brighton, ...),
 plus the 53 St and 63 St tunnels, the Manhattan Bridge, and SAS Phase 1 (57 St-7 Av to 96 St).
+Some trunks are also split into their stretches, each counting only its own hops:
+Hillside Av and Queens Blvd east and west of Forest Hills-71 Av,
+Culver north and south of Church Av,
+and the A's Lefferts, Far Rockaway, and Rockaway Park branches.
 A trunk with express tracks is also two lines, `<trunk> local` and `<trunk> express`,
 for riders on each track over the stretch where it has both:
 a ride skipping a station is on the express tracks,

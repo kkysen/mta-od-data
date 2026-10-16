@@ -18,6 +18,7 @@ Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ride
 | Queens Blvd | 496,608 | 634,621 | 5:00 PM | 52,043 |
 | Lexington Av express | 470,464 | 633,571 | 5:00 PM | 46,233 |
 | 8 Av local | 452,244 | 585,921 | 5:00 PM | 42,979 |
+| Queens Blvd west | 438,643 | 564,910 | 5:00 PM | 42,983 |
 | Broadway-7 Av local | 436,143 | 577,878 | 5:00 PM | 42,609 |
 | Broadway local | 394,137 | 519,126 | 5:00 PM | 38,431 |
 | Canarsie | 376,101 | 424,267 | 5:00 PM | 35,446 |
@@ -37,12 +38,14 @@ Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ride
 | Flushing local | 220,818 | 246,171 | 4:00 PM | 16,394 |
 | Brighton | 220,096 | 294,891 | 8:00 AM | 22,253 |
 | Jamaica | 188,244 | 253,355 | 8:00 AM | 17,983 |
+| Queens Blvd east | 183,575 | 241,366 | 5:00 PM | 16,315 |
 | White Plains Rd | 163,009 | 243,559 | 7:00 AM | 16,690 |
 | Jerome Av | 160,095 | 228,370 | 3:00 PM | 13,160 |
 | Culver | 157,320 | 198,128 | 8:00 AM | 15,661 |
 | 4 Av express | 149,153 | 180,453 | 8:00 AM | 14,653 |
 | Eastern Pkwy express | 149,053 | 199,937 | 8:00 AM | 14,283 |
 | Eastern Pkwy local | 146,802 | 196,216 | 8:00 AM | 13,259 |
+| Upper Culver | 143,085 | 179,763 | 8:00 AM | 14,348 |
 | SAS Phase 1 | 141,144 | 184,197 | 8:00 AM | 14,196 |
 | Culver local | 140,999 | 176,955 | 8:00 AM | 14,348 |
 | Fulton St express | 136,847 | 194,726 | 5:00 PM | 13,635 |
@@ -64,13 +67,18 @@ Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ride
 | Brighton express | 66,569 | 92,414 | 8:00 AM | 7,213 |
 | Nassau St | 64,644 | 89,861 | 5:00 PM | 6,220 |
 | 42 St Shuttle | 63,151 | 84,848 | 5:00 PM | 7,500 |
+| Hillside Av | 57,653 | 80,236 | 7:00 AM | 5,465 |
 | Myrtle Av | 48,984 | 61,545 | 8:00 AM | 4,305 |
+| Lower Culver | 39,795 | 54,095 | 7:00 AM | 4,111 |
 | Pelham express | 36,803 | 55,247 | 7:00 AM | 5,390 |
 | Flushing express | 35,176 | 40,390 | 5:00 PM | 5,743 |
 | Jamaica express | 28,431 | 39,024 | 8:00 AM | 4,336 |
 | Rockaway | 27,467 | 49,200 | 7:00 AM | 2,580 |
 | Dyre Av | 25,099 | 37,996 | 7:00 AM | 2,766 |
 | White Plains Rd express | 18,341 | 27,079 | 7:00 AM | 4,307 |
+| Far Rockaway branch | 16,535 | 34,093 | 7:00 AM | 1,568 |
+| Lefferts branch | 16,087 | 24,484 | 7:00 AM | 1,672 |
 | Concourse express | 15,013 | 25,176 | 7:00 AM | 3,231 |
 | Franklin Av Shuttle | 12,854 | 17,160 | 8:00 AM | 1,099 |
+| Rockaway Park branch | 3,201 | 6,265 | 7:00 AM | 295 |
 | Culver express | 2,423 | 3,247 | 7:00 AM | 1,385 |
