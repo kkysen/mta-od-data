@@ -192,6 +192,15 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | Queens Blvd west | R | 85,561 | 114,226 | 5:00 PM | 8,538 |
 | Queens Blvd west | M | 80,881 | 108,277 | 8:00 AM | 8,265 |
 | Queens Blvd west | FX | 597 | 772 | 8:00 AM | 253 |
+| Queens Blvd west express | E | 175,330 | 216,039 | 5:00 PM | 17,725 |
+| Queens Blvd west express | F | 97,917 | 130,563 | 5:00 PM | 9,651 |
+| Queens Blvd west express | FL | 97,320 | 129,791 | 5:00 PM | 9,463 |
+| Queens Blvd west express | FX | 597 | 772 | 8:00 AM | 253 |
+| Queens Blvd west local | R | 85,561 | 114,226 | 5:00 PM | 8,538 |
+| Queens Blvd west local | M | 80,881 | 108,277 | 8:00 AM | 8,265 |
+| Queens Blvd west local | E | 15,387 | 19,229 | 10:00 PM | 3,900 |
+| Queens Blvd west local | F | 14,129 | 18,252 | 10:00 PM | 4,271 |
+| Queens Blvd west local | FL | 14,129 | 18,252 | 10:00 PM | 4,271 |
 | Rockaway | A | 27,390 | 48,997 | 7:00 AM | 2,435 |
 | Rockaway | H | 2,769 | 5,415 | 4:00 PM | 242 |
 | Rockaway Park branch | H | 2,769 | 5,415 | 4:00 PM | 242 |
@@ -205,6 +214,11 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | Upper Culver | FL | 102,667 | 131,645 | 8:00 AM | 10,745 |
 | Upper Culver | G | 39,778 | 47,023 | 8:00 AM | 3,603 |
 | Upper Culver | FX | 2,423 | 3,247 | 7:00 AM | 1,385 |
+| Upper Culver express | F | 2,423 | 3,247 | 7:00 AM | 1,385 |
+| Upper Culver express | FX | 2,423 | 3,247 | 7:00 AM | 1,385 |
+| Upper Culver local | F | 102,667 | 131,645 | 8:00 AM | 10,745 |
+| Upper Culver local | FL | 102,667 | 131,645 | 8:00 AM | 10,745 |
+| Upper Culver local | G | 39,778 | 47,023 | 8:00 AM | 3,603 |
 | West End | D | 81,966 | 107,088 | 7:00 AM | 7,860 |
 | West End | W | 56 | 72 | 10:00 AM | 34 |
 | West End | R | 30 | 38 | 9:00 AM | 30 |

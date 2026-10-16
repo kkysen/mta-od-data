@@ -32,11 +32,13 @@ Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ride
 | Manhattan Bridge | 283,829 | 362,696 | 5:00 PM | 27,946 |
 | Queens Blvd express | 283,136 | 359,556 | 5:00 PM | 28,873 |
 | 4 Av | 281,435 | 343,069 | 8:00 AM | 29,199 |
+| Queens Blvd west express | 272,835 | 346,047 | 5:00 PM | 27,375 |
 | 63 St | 266,217 | 345,028 | 5:00 PM | 25,886 |
 | 6 Av express | 246,953 | 332,032 | 5:00 PM | 25,163 |
 | Fulton St | 246,192 | 338,057 | 5:00 PM | 23,437 |
 | Flushing local | 220,818 | 246,171 | 4:00 PM | 16,394 |
 | Brighton | 220,096 | 294,891 | 8:00 AM | 22,253 |
+| Queens Blvd west local | 195,744 | 259,701 | 8:00 AM | 15,719 |
 | Jamaica | 188,244 | 253,355 | 8:00 AM | 17,983 |
 | Queens Blvd east | 183,575 | 241,366 | 5:00 PM | 16,315 |
 | White Plains Rd | 163,009 | 243,559 | 7:00 AM | 16,690 |
@@ -48,6 +50,7 @@ Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ride
 | Upper Culver | 143,085 | 179,763 | 8:00 AM | 14,348 |
 | SAS Phase 1 | 141,144 | 184,197 | 8:00 AM | 14,196 |
 | Culver local | 140,999 | 176,955 | 8:00 AM | 14,348 |
+| Upper Culver local | 140,999 | 176,955 | 8:00 AM | 14,348 |
 | Fulton St express | 136,847 | 194,726 | 5:00 PM | 13,635 |
 | 4 Av local | 135,512 | 166,330 | 5:00 PM | 11,326 |
 | Crosstown | 132,849 | 153,941 | 5:00 PM | 12,254 |
@@ -82,3 +85,4 @@ Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ride
 | Franklin Av Shuttle | 12,854 | 17,160 | 8:00 AM | 1,099 |
 | Rockaway Park branch | 3,201 | 6,265 | 7:00 AM | 295 |
 | Culver express | 2,423 | 3,247 | 7:00 AM | 1,385 |
+| Upper Culver express | 2,423 | 3,247 | 7:00 AM | 1,385 |

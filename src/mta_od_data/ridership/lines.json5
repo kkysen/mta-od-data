@@ -202,10 +202,8 @@
   },
   "Queens Blvd west": {
     // Forest Hills-71 Av to Queens Plaza.
-    tracks: [
-      ["G08", "G09", "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G18", "G19", "G20", "G21"],
-      ["G08", "G14", "G21"],
-    ],
+    local: [["G08", "G09", "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G18", "G19", "G20", "G21"]],
+    express: [["G08", "G14", "G21"]],
   },
   "Crosstown": {
     tracks: [["G22", "G24", "G26", "G28", "G29", "G30", "G31", "G32", "G33", "G34", "G35", "G36", "A42"]],
@@ -257,10 +255,8 @@
   // Culver's stretches either side of Church Av.
   "Upper Culver": {
     // Jay St-MetroTech to Church Av.
-    tracks: [
-      ["A41", "F20", "F21", "F22", "F23", "F24", "F25", "F26", "F27"],
-      ["A41", "F24", "F27"],
-    ],
+    local: [["A41", "F20", "F21", "F22", "F23", "F24", "F25", "F26", "F27"]],
+    express: [["A41", "F24", "F27"]],
   },
   "Lower Culver": {
     // Church Av to Coney Island-Stillwell Av.
