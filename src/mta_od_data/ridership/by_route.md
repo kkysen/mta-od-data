@@ -6,7 +6,7 @@ The peak hour is the hour, by when it starts, with the most riders in the Aug-De
 
 Produced by `mta-od-data ridership --by route --markdown-out src/mta_od_data/ridership/by_route.md`.
 
-| Route | Aug-Dec 2025 | 2019 | Route-km | Per Route-km, Aug-Dec 2025 | Trips | Train-km | Per Train-km, Aug-Dec 2025 | Per 60 ft of Train-km, Aug-Dec 2025 | Peak Hour | Riders in Peak Hour, Aug-Dec 2025 |
+| Route | Aug-Dec 2025 | 2019 | Route-km | Per Route-km, Aug-Dec 2025 | Trips | Train-km | Per Train-km, Aug-Dec 2025 | Per Car\*-km, Aug-Dec 2025 | Peak Hour | Riders in Peak Hour, Aug-Dec 2025 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
 | 6 | 560,123 | 745,403 | 24.1 | 23,245 | 552 | 12,495 | 44.8 | 5.27 | 5:00 PM | 53,437 |
 | 6L | 425,011 | 562,254 | 24.1 | 17,638 | 439 | 9,772 | 43.5 | 5.12 | 5:00 PM | 36,492 |
@@ -39,3 +39,5 @@ Produced by `mta-od-data ridership --by route --markdown-out src/mta_od_data/rid
 | FS | 12,854 | 17,160 | 2.2 | 5,884 | 238 | 520 | 24.7 | 9.89 | 8:00 AM | 1,099 |
 | Z | 10,116 | 13,720 | 21.4 | 473 | 12 | 257 | 39.4 | 4.92 | 5:00 PM | 3,969 |
 | H | 2,769 | 5,415 | 4.5 | 610 | 168 | 763 | 3.6 | 0.73 | 4:00 PM | 242 |
+
+\* A car is 60 ft of train, about one B Division car's length, so routes with different train lengths compare (`train_lengths.json5`).

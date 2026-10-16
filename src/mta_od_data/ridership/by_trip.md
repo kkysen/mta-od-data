@@ -5,7 +5,7 @@ A train's load is its riders on board between two stops, averaged over the weekd
 
 Produced by `mta-od-data ridership --by trip --markdown-out src/mta_od_data/ridership/by_trip.md`.
 
-| Route | Train | Peak Load, Aug-Dec 2025 | Train Length (ft) | Peak per 60 ft | Peak Between | Leaving At | Weekdays Run |
+| Route | Train | Peak Load, Aug-Dec 2025 | Train Length (ft) | Peak per Car\* | Peak Between | Leaving At | Weekdays Run |
 | --- | --- | ---: | ---: | ---: | --- | --- | ---: |
 | F | 8:43 AM Jamaica-179 St to Coney Island-Stillwell Av | 1,360 | 600 | 136 | Court Sq-23 St to Lexington Av/53 St | 9:09 AM | 23 |
 | 7 | 3:56 PM 34 St-Hudson Yards to Flushing-Main St | 1,211 | 561 | 130 | 74 St-Broadway to 82 St-Jackson Hts | 4:22 PM | 103 |
@@ -35,3 +35,5 @@ Produced by `mta-od-data ridership --by trip --markdown-out src/mta_od_data/ride
 | GS | 4:59 PM Grand Central-42 St to Times Sq-42 St | 333 | 306 | 65 | Grand Central-42 St to Times Sq-42 St | 4:59 PM | 103 |
 | FS | 4:41 PM Franklin Av to Prospect Park | 100 | 150 | 40 | Park Pl to Botanic Garden | 4:43 PM | 103 |
 | H | 6:21 AM Rockaway Park-Beach 116 St to Broad Channel | 54 | 300 | 11 | Beach 90 St to Broad Channel | 6:26 AM | 60 |
+
+\* A car is 60 ft of train, about one B Division car's length, so routes with different train lengths compare (`train_lengths.json5`).

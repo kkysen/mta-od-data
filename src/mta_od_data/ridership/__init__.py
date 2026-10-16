@@ -69,6 +69,11 @@ DIRECTION_LABELS = HERE / "direction_labels.json5"
 PLATFORM_AREAS = HERE / "platform_areas.csv"
 DEFAULT_STATIONS = DATA / "stations.csv"
 DEFAULT_COMPLEXES = DATA / "complexes.csv"
+# A car is a length of train, so routes with different train lengths compare.
+CAR_NOTE = (
+    f"\\* A car is {CAR_FT} ft of train, about one B Division car's length, "
+    "so routes with different train lengths compare (`train_lengths.json5`)."
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -478,7 +483,7 @@ def ridership(
             got.trains,
             load_names(DEFAULT_STATIONS, DEFAULT_COMPLEXES),
             period(manifest),
-        )
+        ) + ["", CAR_NOTE]
         report = render(ctx, by, route, manifest, days, [], fare_evasion, table)
         write(report, markdown_out)
         return
@@ -537,7 +542,7 @@ def ridership(
                 "Trips",
                 "Train-km",
                 f"Per Train-km, {first}",
-                f"Per {CAR_FT} ft of Train-km, {first}",
+                f"Per Car\\*-km, {first}",
                 *peak_heads(cols),
             ),
             table_rule("l" + "r" * (len(cols) + 6) + "lr"),
@@ -554,10 +559,12 @@ def ridership(
                     fmt(s.trips),
                     fmt(s.train_km),
                     fmt(vs[0] / s.train_km if s.train_km else None, 1),
-                    fmt(vs[0] / s.train_60ft_km if s.train_60ft_km else None, 2),
+                    fmt(vs[0] / s.car_km if s.car_km else None, 2),
                     *peak_cells(peaks, (grp,)),
                 )
             )
+
+        table += ["", CAR_NOTE]
 
     report = render(ctx, by, route, manifest, days, cols, fare_evasion, table)
     write(report, markdown_out)
@@ -589,7 +596,7 @@ def trip_table(trains: list[Train], names: Names, label: str) -> list[str]:
             "Train",
             f"Peak Load, {label}",
             "Train Length (ft)",
-            f"Peak per {CAR_FT} ft",
+            "Peak per Car\\*",
             "Peak Between",
             "Leaving At",
             "Weekdays Run",

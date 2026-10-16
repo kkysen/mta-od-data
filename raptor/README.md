@@ -138,7 +138,7 @@ then as their local (`6L`) and express (`6X`) separately.
 - **Trips**: trains a weekday.
 - **Train-km**: km run by all its trains.
 - **Per Train-km**: riders per train-km, how full its trains run on average.
-- **Per 60 ft of Train-km**: that per 60 ft of train, about one B Division car,
+- **Per Car\*-km**: that per car-km, where a car is 60 ft of train, about one B Division car,
   so routes with different train lengths compare
   ([`train_lengths.json5`](../src/mta_od_data/ridership/train_lengths.json5)).
 
@@ -169,7 +169,7 @@ A train is the same across dates if it has the same route, direction, first depa
 
 - **Train**: its first departure and its terminals.
 - **Peak Load**: riders on board at its fullest, averaged over the weekdays it runs.
-- **Train Length (ft)**, **Peak per 60 ft**: its length, and that load per 60 ft of it.
+- **Train Length (ft)**, **Peak per Car\***: its length, and that load per 60 ft car of it.
 - **Peak Between**, **Leaving At**: where and when it's that full.
 - **Weekdays Run**: how many of the range's weekdays it ran on.
 

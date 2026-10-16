@@ -371,12 +371,12 @@ def place_rows(with_route: bool, names: list[str]) -> list[tuple[Any, ...]]:
 @dataclass(slots=True)
 class RouteService:
     """A `--by route` row's average route km, trips, and train-km,
-    and train-km times its trains' lengths in 60-ft cars' worth."""
+    and car-km: train-km times its trains' lengths in 60-ft cars' worth."""
 
     route_km: float = 0.0
     trips: float = 0.0
     train_km: float = 0.0
-    train_60ft_km: float = 0.0
+    car_km: float = 0.0
 
 
 def route_service(
@@ -402,7 +402,7 @@ def route_service(
             t.route_km += route_length(ps, lengths) / 1000 * days
             t.trips += sum(ps.values()) * days
             t.train_km += sum(n * sum(p.lengths) for p, n in ps.items()) / 1000 * days
-            t.train_60ft_km += (
+            t.car_km += (
                 sum(
                     n * sum(p.lengths) * train_lengths.get(p.route, 0) / CAR_FT
                     for p, n in ps.items()
@@ -415,7 +415,7 @@ def route_service(
             t.route_km / total_days,
             t.trips / total_days,
             t.train_km / total_days,
-            t.train_60ft_km / total_days,
+            t.car_km / total_days,
         )
         for g, t in totals.items()
     }
