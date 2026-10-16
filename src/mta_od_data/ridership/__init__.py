@@ -18,8 +18,8 @@ all with fare evaders unless `--no-fare-evasion`.
   Routes with express variants (5X 6X 7X FX) count as the route, `5`,
   and again as their local, `5L`, or express, `5X`, alone.
 - A line counts each journey with a ride on its track once:
-  between two consecutive stops both on it (`lines.json5`), as `raptor` paths
-  list every stop a ride passes.
+  between two stops one after the other on it (`lines.json5`),
+  as `raptor` paths list every stop a ride stops at.
 """
 
 from collections import defaultdict

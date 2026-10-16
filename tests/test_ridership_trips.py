@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from mta_od_data.analyze.common import connection
-from mta_od_data.ridership.compute import route_groups_table
+from mta_od_data.ridership.compute import Hop, line_hops_table, route_groups_table
 from mta_od_data.ridership.trips import (
     crowded_trains,
     line_hours,
@@ -9,7 +9,7 @@ from mta_od_data.ridership.trips import (
     place_hours,
 )
 
-SAS: dict[str, object] = {"name": "SAS", "stops": ["R14", "B08", "Q03"]}
+SAS = [Hop("SAS", "R14", "B08"), Hop("SAS", "B08", "Q03")]
 
 
 def write_dates(tmp_path: Path, dates: list[tuple[str, int, str]]) -> Path:
@@ -51,7 +51,8 @@ def test_trains_average_over_the_weekdays_they_run(tmp_path: Path) -> None:
         "('Q', 'B08', 'R14', 'S', 'S', 'p63', 'p57')) t(route, a, b, da, db, pa, pb)"
     )
     # Joining SAS: 10 + 5 on one date, 2 + 5 on the other, averaged over 4 weekdays.
-    assert line_hours([SAS], False, days) == [("SAS", 8, (15 * 3 + 7 * 1) / 4)]
+    line_hops_table(SAS)
+    assert line_hours(False, days) == [("SAS", 8, (15 * 3 + 7 * 1) / 4)]
     (train,) = crowded_trains(["Q"], 1)
     assert (train.peak, train.peak_stop, train.peak_next, train.days) == (
         (15 * 3 + 7 * 1) / 4,

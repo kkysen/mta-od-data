@@ -36,6 +36,7 @@ from mta_od_data.ridership.trips import (
     DAY,
     Train,
     crowded_trains,
+    hop_on,
     line_hours,
     load_trip_stops,
     place_hours,
@@ -435,36 +436,85 @@ def route_rows(names: list[str], with_line: bool) -> list[tuple[Any, ...]]:
             )
             SELECT grp{line}, {sums} FROM journeys GROUP BY ALL
             """,
-            {"lines": lines_param()} if with_line else {},
         )
         .fetchall()
     )
 
 
 # Each ride on each line's track, by the leg it's in.
-ON_LINE = """
+ON_LINE = f"""
     on_line AS (
-        SELECT path, route, i, l.name
-        FROM legs, (SELECT unnest($lines) AS l)
-        WHERE route IN (SELECT route FROM route_groups)
-        AND len(list_filter(
-            range(1, len(stops)),
-            j -> list_contains(l.stops, stops[j])
-                AND list_contains(l.stops, stops[j + 1])
-        )) > 0
+        SELECT DISTINCT path, route, i, name
+        FROM (
+            SELECT path, route, i, unnest(stops[:-2]) AS a, unnest(stops[2:]) AS b
+            FROM legs
+            WHERE route IN (SELECT route FROM route_groups)
+        ) h
+        JOIN line_hops USING (a, b)
+        WHERE {hop_on("line_hops", "route")}
     )
 """
 
-LINES: dict[str, list[str]] = {}
+
+@dataclass(frozen=True, slots=True)
+class Hop:
+    """A line's track between two stops a train stops at one after the other,
+    either way: on only `routes`' trains, if any, and never on `not_routes`'."""
+
+    line: str
+    a: str
+    b: str
+    routes: tuple[str, ...] = ()
+    not_routes: tuple[str, ...] = ()
 
 
-def lines_param() -> list[dict[str, object]]:
-    return [{"name": n, "stops": s} for n, s in LINES.items()]
+def pairs(seqs: Iterable[Sequence[str]]) -> list[tuple[str, str]]:
+    return [(s[k], s[k + 1]) for s in seqs for k in range(len(s) - 1)]
 
 
-def load_lines(path: Path) -> dict[str, list[str]]:
+def trunk_hops(name: str, trunk: dict[str, Any]) -> list[Hop]:
+    """A `lines.json5` trunk's hops, as the trunk and,
+    if it has `express` stops, its local and express tracks."""
+    other = pairs(trunk.get("tracks", []))
+    local = pairs(trunk.get("local", []))
+    express = pairs(trunk.get("express", []))
+    routes = tuple(trunk.get("express_routes", []))
+    hops = [Hop(name, a, b) for a, b in dict.fromkeys(other + local + express)]
+    if not express:
+        return hops
+    both = {frozenset(h) for h in local} & {frozenset(h) for h in express}
+    if both and not routes:
+        raise ValueError(f"{name}: no `express_routes` to tell {sorted(both)} apart")
+    for a, b in dict.fromkeys(local):
+        shared = frozenset((a, b)) in both
+        hops.append(Hop(f"{name} local", a, b, not_routes=routes if shared else ()))
+    for a, b in dict.fromkeys(express):
+        shared = frozenset((a, b)) in both
+        hops.append(Hop(f"{name} express", a, b, routes=routes if shared else ()))
+    return hops
+
+
+def load_lines(path: Path) -> list[Hop]:
     lines = json5.loads(path.read_text(), allow_duplicate_keys=False)
-    return {name: list(line["stops"]) for name, line in lines.items()}
+    return [h for name, trunk in lines.items() for h in trunk_hops(name, trunk)]
+
+
+def line_hops_table(hops: list[Hop]) -> None:
+    """`hops` as a temp table `line_hops`, each both ways."""
+    both = [*hops, *(Hop(h.line, h.b, h.a, h.routes, h.not_routes) for h in hops)]
+    connection().execute(
+        "CREATE OR REPLACE TEMP TABLE line_hops AS "
+        "SELECT unnest($names) AS name, unnest($a) AS a, unnest($b) AS b, "
+        "unnest($routes)::VARCHAR[] AS routes, "
+        "unnest($not_routes)::VARCHAR[] AS not_routes",
+        {
+            "names": [h.line for h in both],
+            "a": [h.a for h in both],
+            "b": [h.b for h in both],
+            "routes": [list(h.routes) for h in both],
+            "not_routes": [list(h.not_routes) for h in both],
+        },
+    )
 
 
 def line_rows(names: list[str]) -> list[tuple[Any, ...]]:
@@ -479,8 +529,7 @@ def line_rows(names: list[str]) -> list[tuple[Any, ...]]:
                 FROM legs JOIN on_line USING (path, route, i)
             )
             SELECT name, {sums} FROM journeys GROUP BY ALL
-            """,
-            {"lines": lines_param()},
+            """
         )
         .fetchall()
     )
@@ -597,18 +646,15 @@ def compute(
             platform_routes() if place is By.PLATFORM else [],
         )
     if By.LINE in dims:
-        LINES.clear()
-        LINES.update(load_lines(lines))
+        line_hops_table(load_lines(lines))
         if with_route:
             return Computed(
                 days,
                 cols,
                 route_rows(names, with_line=True),
-                line_hours(lines_param(), True, days),
+                line_hours(True, days),
             )
-        return Computed(
-            days, cols, line_rows(names), line_hours(lines_param(), False, days)
-        )
+        return Computed(days, cols, line_rows(names), line_hours(False, days))
     return Computed(
         days,
         cols,

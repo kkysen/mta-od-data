@@ -135,35 +135,42 @@ def route_hours(days: int) -> list[tuple[Any, ...]]:
     )
 
 
-def line_hours(
-    lines: list[dict[str, object]], with_route: bool, days: int
-) -> list[tuple[Any, ...]]:
-    """Riders joining each line's track on its trains, by the hour they join:
-    `(line, [route,] hour, riders)` rows.
+def hop_on(hop: str, route: str) -> str:
+    """SQL for whether `line_hops` row `hop` is track that `route`'s trains ride."""
+    return (
+        f"(len({hop}.routes) = 0 OR list_contains({hop}.routes, {route})) "
+        f"AND NOT list_contains({hop}.not_routes, {route})"
+    )
 
-    At a stop whose next segment is on the line, riders join it by boarding there,
-    and if the segment before isn't on the line, so do all those staying on."""
+
+def line_hours(with_route: bool, days: int) -> list[tuple[Any, ...]]:
+    """Riders joining each line's track (`line_hops`) on its trains,
+    by the hour they join: `(line, [route,] hour, riders)` rows.
+
+    At a stop whose next hop is on the line, riders join it by boarding there,
+    and if the hop before isn't on the line, so do all those staying on."""
     grp = ", grp" if with_route else ""
     return (
         connection()
         .execute(
             f"""
             WITH s AS (
-                SELECT l.name, route_id, departure, w, boardings, load,
-                    list_contains(l.stops, stop_id)
-                        AND list_contains(l.stops, next_stop) AS on_out,
-                    list_contains(l.stops, stop_id)
-                        AND coalesce(list_contains(l.stops, prev_stop), false) AS on_in
-                FROM trip_stops, (SELECT unnest($lines) AS l)
+                SELECT o.name, route_id, departure, w, boardings, load,
+                    i.name IS NOT NULL AS on_in
+                FROM trip_stops t
+                JOIN line_hops o
+                    ON o.a = t.stop_id AND o.b = t.next_stop
+                    AND {hop_on("o", "t.route_id")}
+                LEFT JOIN line_hops i
+                    ON i.name = o.name AND i.a = t.prev_stop AND i.b = t.stop_id
+                    AND {hop_on("i", "t.route_id")}
                 WHERE route_id IN (SELECT route FROM route_groups)
             )
             SELECT name{grp}, departure // 3600 AS hour,
                 sum(if(on_in, boardings, load) * w) / {days}
             FROM s {"JOIN route_groups ON route = route_id" if with_route else ""}
-            WHERE on_out
             GROUP BY ALL
-            """,
-            {"lines": lines},
+            """
         )
         .fetchall()
     )

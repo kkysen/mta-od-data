@@ -1,10 +1,20 @@
 // Named lines for `mta-od-data ridership --by line`:
-// a path rides a line if one of its rides passes between two consecutive stops
-// both in the line's `stops` (GTFS parent stop IDs), whatever its route.
+// a path rides a line if one of its rides goes between two stops
+// one after the other in one of the line's lists (GTFS parent stop IDs), either way,
+// whatever its route.
+//
+// A trunk with express tracks lists its stops in order on each:
+// `local` (every station the local tracks pass),
+// and `express` (the stations express trains stop at),
+// and is three lines: the trunk, `<trunk> local`, and `<trunk> express`.
+// A hop in both, between express stations with no station between,
+// is on the express tracks on `express_routes`' trains and on the local tracks on others'.
+// `tracks` are a trunk's other stops in order, with no express tracks,
+// counted only as the trunk.
 {
   "SAS Phase 1": {
     // 57 St-7 Av, Lexington Av/63 St, 72 St, 86 St, 96 St:
     // the 63 St connector and the Second Av Subway's first phase.
-    stops: ["R14", "B08", "Q03", "Q04", "Q05"],
+    tracks: [["R14", "B08", "Q03", "Q04", "Q05"]],
   },
 }

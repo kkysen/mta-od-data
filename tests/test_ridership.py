@@ -6,11 +6,11 @@ import pytest
 from mta_od_data.analyze.common import connection
 from mta_od_data.analyze.path_riders import AveragePaths
 from mta_od_data.ridership.compute import (
-    LINES,
     Column,
     base_route,
     build_events,
     built,
+    line_hops_table,
     line_rows,
     load_legs,
     place_rows,
@@ -18,6 +18,7 @@ from mta_od_data.ridership.compute import (
     route_groups,
     route_groups_table,
     route_rows,
+    trunk_hops,
 )
 
 
@@ -109,6 +110,6 @@ def test_lines_count_rides_between_consecutive_stops_on_them(
 ) -> None:
     kept, groups = ride_routes([])
     route_groups_table(groups)
-    LINES.clear()
-    LINES["SAS Phase 1"] = ["R14", "B08", "Q03", "Q04", "Q05"]
+    stops = ["R14", "B08", "Q03", "Q04", "Q05"]
+    line_hops_table(trunk_hops("SAS Phase 1", {"tracks": [stops]}))
     assert dict(line_rows(paths)) == {"SAS Phase 1": 8.0}
