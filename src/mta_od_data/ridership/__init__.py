@@ -499,6 +499,7 @@ def ridership(
                     [f"Peak Load, {label}"],
                     ["Peak load"],
                     label=peak_label,
+                    align="rmlr",
                 ),
                 Chart(
                     "peak-per-car",
@@ -507,6 +508,7 @@ def ridership(
                     ["Peak per car"],
                     CAR_CHART_NOTE,
                     peak_label,
+                    "rmlr",
                 ),
             ],
         )
@@ -652,9 +654,11 @@ def ridership(
     write(report, markdown_out)
 
 
-def peak_label(row: Mapping[str, str]) -> str:
-    """A `trip_table` row's route, and where and when its train is fullest."""
-    return f"{row['Route']}: {row['Peak Between']}, {row['Leaving At']}"
+def peak_label(row: Mapping[str, str]) -> list[str]:
+    """Where and when a `trip_table` row's train is fullest,
+    its route between the two stations: `Court Sq-23 St`, `F`, ...."""
+    a, b = row["Peak Between"].split(" to ")
+    return [a, row["Route"], b, row["Leaving At"]]
 
 
 def riders_chart(title: str, cols: Sequence[Column]) -> Chart:

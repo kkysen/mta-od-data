@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="876" height="664" viewBox="0 0 876 664" role="img" aria-label="Each route&#x27;s most crowded train, per car*">
+<svg xmlns="http://www.w3.org/2000/svg" width="906" height="664" viewBox="0 0 906 664" role="img" aria-label="Each route&#x27;s most crowded train, per car*">
 <style>
 svg { --bg:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --grid:#e4e3df; --s0:#2a78d6;--s1:#eb6834; }
 @media (prefers-color-scheme: dark) {
@@ -18,96 +18,180 @@ text {
 <rect width="100%" height="100%" fill="var(--bg)"/>
 <text x="16.0" y="31.0" class="title">Each route&#x27;s most crowded train, per car*</text>
 <text x="16.0" y="51.0">Average weekday with fare evaders, 2025-08-19 to 2025-12-22; *a car is 60 ft of train</text>
-<line class="grid" x1="354.0" x2="354.0" y1="60" y2="624"/>
-<text x="354.0" y="640.0" text-anchor="middle">0</text>
-<line class="grid" x1="514.0" x2="514.0" y1="60" y2="624"/>
-<text x="514.0" y="640.0" text-anchor="middle">50</text>
-<line class="grid" x1="674.0" x2="674.0" y1="60" y2="624"/>
-<text x="674.0" y="640.0" text-anchor="middle">100</text>
-<line class="grid" x1="834.0" x2="834.0" y1="60" y2="624"/>
-<text x="834.0" y="640.0" text-anchor="middle">150</text>
-<text x="346.0" y="78.0" class="label" text-anchor="end">L: 14 St-Union Sq to 3 Av, 5:54 PM</text>
-<path class="s0" d="M354.0,68.0h466.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-466.4z"><title>L: 14 St-Union Sq to 3 Av, 5:54 PM, Peak per car: 147</title></path>
-<text x="828.4" y="78.0">147</text>
-<text x="346.0" y="98.0" class="label" text-anchor="end">F: Court Sq-23 St to Lexington Av/53 St, 9:09 AM</text>
-<path class="s0" d="M354.0,88.0h431.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-431.2z"><title>F: Court Sq-23 St to Lexington Av/53 St, 9:09 AM, Peak per car: 136</title></path>
-<text x="793.2" y="98.0">136</text>
-<text x="346.0" y="118.0" class="label" text-anchor="end">7: 74 St-Broadway to 82 St-Jackson Hts, 4:22 PM</text>
-<path class="s0" d="M354.0,108.0h412.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-412.0z"><title>7: 74 St-Broadway to 82 St-Jackson Hts, 4:22 PM, Peak per car: 130</title></path>
-<text x="774.0" y="118.0">130</text>
-<text x="346.0" y="138.0" class="label" text-anchor="end">5: 14 St-Union Sq to Grand Central-42 St, 8:39 AM</text>
-<path class="s0" d="M354.0,128.0h396.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-396.0z"><title>5: 14 St-Union Sq to Grand Central-42 St, 8:39 AM, Peak per car: 125</title></path>
-<text x="758.0" y="138.0">125</text>
-<text x="346.0" y="158.0" class="label" text-anchor="end">4: Grand Central-42 St to 14 St-Union Sq, 5:54 PM</text>
-<path class="s0" d="M354.0,148.0h380.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-380.0z"><title>4: Grand Central-42 St to 14 St-Union Sq, 5:54 PM, Peak per car: 120</title></path>
-<text x="742.0" y="158.0">120</text>
-<text x="346.0" y="178.0" class="label" text-anchor="end">A: 125 St to 59 St-Columbus Circle, 7:47 AM</text>
-<path class="s0" d="M354.0,168.0h373.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-373.6z"><title>A: 125 St to 59 St-Columbus Circle, 7:47 AM, Peak per car: 118</title></path>
-<text x="735.6" y="178.0">118</text>
-<text x="346.0" y="198.0" class="label" text-anchor="end">E: Court Sq-23 St to Lexington Av/53 St, 8:57 AM</text>
-<path class="s0" d="M354.0,188.0h370.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-370.4z"><title>E: Court Sq-23 St to Lexington Av/53 St, 8:57 AM, Peak per car: 117</title></path>
-<text x="732.4" y="198.0">117</text>
-<text x="346.0" y="218.0" class="label" text-anchor="end">G: Greenpoint Av to 21 St, 8:38 AM</text>
-<path class="s0" d="M354.0,208.0h354.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-354.4z"><title>G: Greenpoint Av to 21 St, 8:38 AM, Peak per car: 112</title></path>
-<text x="716.4" y="218.0">112</text>
-<text x="346.0" y="238.0" class="label" text-anchor="end">6: 51 St to Grand Central-42 St, 8:54 AM</text>
-<path class="s0" d="M354.0,228.0h344.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-344.8z"><title>6: 51 St to Grand Central-42 St, 8:54 AM, Peak per car: 109</title></path>
-<text x="706.8" y="238.0">109</text>
-<text x="346.0" y="258.0" class="label" text-anchor="end">2: Times Sq-42 St to 72 St, 5:05 PM</text>
-<path class="s0" d="M354.0,248.0h338.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-338.4z"><title>2: Times Sq-42 St to 72 St, 5:05 PM, Peak per car: 107</title></path>
-<text x="700.4" y="258.0">107</text>
-<text x="346.0" y="278.0" class="label" text-anchor="end">M: Lexington Av/63 St to Roosevelt Island, 4:40 PM</text>
-<path class="s0" d="M354.0,268.0h338.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-338.4z"><title>M: Lexington Av/63 St to Roosevelt Island, 4:40 PM, Peak per car: 107</title></path>
-<text x="700.4" y="278.0">107</text>
-<text x="346.0" y="298.0" class="label" text-anchor="end">6X: 3 Av-138 St to 125 St, 9:11 AM</text>
-<path class="s0" d="M354.0,288.0h328.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-328.8z"><title>6X: 3 Av-138 St to 125 St, 9:11 AM, Peak per car: 104</title></path>
-<text x="690.8" y="298.0">104</text>
-<text x="346.0" y="318.0" class="label" text-anchor="end">1: Times Sq-42 St to 50 St, 7:36 AM</text>
-<path class="s0" d="M354.0,308.0h325.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-325.6z"><title>1: Times Sq-42 St to 50 St, 7:36 AM, Peak per car: 103</title></path>
-<text x="687.6" y="318.0">103</text>
-<text x="346.0" y="338.0" class="label" text-anchor="end">W: Queensboro Plaza to Lexington Av/59 St, 9:01 AM</text>
-<path class="s0" d="M354.0,328.0h322.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-322.4z"><title>W: Queensboro Plaza to Lexington Av/59 St, 9:01 AM, Peak per car: 102</title></path>
-<text x="684.4" y="338.0">102</text>
-<text x="346.0" y="358.0" class="label" text-anchor="end">3: 14 St to 34 St-Penn Station, 6:10 PM</text>
-<path class="s0" d="M354.0,348.0h322.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-322.4z"><title>3: 14 St to 34 St-Penn Station, 6:10 PM, Peak per car: 102</title></path>
-<text x="684.4" y="358.0">102</text>
-<text x="346.0" y="378.0" class="label" text-anchor="end">N: Atlantic Av to Canal St, 8:51 AM</text>
-<path class="s0" d="M354.0,368.0h309.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-309.6z"><title>N: Atlantic Av to Canal St, 8:51 AM, Peak per car: 98</title></path>
-<text x="671.6" y="378.0">98</text>
-<text x="346.0" y="398.0" class="label" text-anchor="end">Q: Canal St to DeKalb Av, 5:19 PM</text>
-<path class="s0" d="M354.0,388.0h300.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-300.0z"><title>Q: Canal St to DeKalb Av, 5:19 PM, Peak per car: 95</title></path>
-<text x="662.0" y="398.0">95</text>
-<text x="346.0" y="418.0" class="label" text-anchor="end">FX: Broadway-Lafayette St to 2 Av, 5:45 PM</text>
-<path class="s0" d="M354.0,408.0h293.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-293.6z"><title>FX: Broadway-Lafayette St to 2 Av, 5:45 PM, Peak per car: 93</title></path>
-<text x="655.6" y="418.0">93</text>
-<text x="346.0" y="438.0" class="label" text-anchor="end">D: Broadway-Lafayette St to Grand St, 4:43 PM</text>
-<path class="s0" d="M354.0,428.0h290.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-290.4z"><title>D: Broadway-Lafayette St to Grand St, 4:43 PM, Peak per car: 92</title></path>
-<text x="652.4" y="438.0">92</text>
-<text x="346.0" y="458.0" class="label" text-anchor="end">J: Marcy Av to Delancey St-Essex St, 8:59 AM</text>
-<path class="s0" d="M354.0,448.0h290.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-290.4z"><title>J: Marcy Av to Delancey St-Essex St, 8:59 AM, Peak per car: 92</title></path>
-<text x="652.4" y="458.0">92</text>
-<text x="346.0" y="478.0" class="label" text-anchor="end">B: 7 Av to Atlantic Av, 9:00 AM</text>
-<path class="s0" d="M354.0,468.0h287.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-287.2z"><title>B: 7 Av to Atlantic Av, 9:00 AM, Peak per car: 91</title></path>
-<text x="649.2" y="478.0">91</text>
-<text x="346.0" y="498.0" class="label" text-anchor="end">C: 14 St to 23 St, 6:08 PM</text>
-<path class="s0" d="M354.0,488.0h277.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-277.6z"><title>C: 14 St to 23 St, 6:08 PM, Peak per car: 88</title></path>
-<text x="639.6" y="498.0">88</text>
-<text x="346.0" y="518.0" class="label" text-anchor="end">7X: 74 St-Broadway to Junction Blvd, 5:23 PM</text>
-<path class="s0" d="M354.0,508.0h271.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-271.2z"><title>7X: 74 St-Broadway to Junction Blvd, 5:23 PM, Peak per car: 86</title></path>
-<text x="633.2" y="518.0">86</text>
-<text x="346.0" y="538.0" class="label" text-anchor="end">R: Lexington Av/63 St to 72 St, 7:57 AM</text>
-<path class="s0" d="M354.0,528.0h236.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-236.0z"><title>R: Lexington Av/63 St to 72 St, 7:57 AM, Peak per car: 75</title></path>
-<text x="598.0" y="538.0">75</text>
-<text x="346.0" y="558.0" class="label" text-anchor="end">Z: Marcy Av to Delancey St-Essex St, 8:24 AM</text>
-<path class="s0" d="M354.0,548.0h210.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-210.4z"><title>Z: Marcy Av to Delancey St-Essex St, 8:24 AM, Peak per car: 67</title></path>
-<text x="572.4" y="558.0">67</text>
-<text x="346.0" y="578.0" class="label" text-anchor="end">GS: Grand Central-42 St to Times Sq-42 St, 4:59 PM</text>
-<path class="s0" d="M354.0,568.0h204.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-204.0z"><title>GS: Grand Central-42 St to Times Sq-42 St, 4:59 PM, Peak per car: 65</title></path>
-<text x="566.0" y="578.0">65</text>
-<text x="346.0" y="598.0" class="label" text-anchor="end">FS: Park Pl to Botanic Garden, 4:43 PM</text>
-<path class="s0" d="M354.0,588.0h124.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-124.0z"><title>FS: Park Pl to Botanic Garden, 4:43 PM, Peak per car: 40</title></path>
-<text x="486.0" y="598.0">40</text>
-<text x="346.0" y="618.0" class="label" text-anchor="end">H: Beach 90 St to Broad Channel, 6:26 AM</text>
-<path class="s0" d="M354.0,608.0h31.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-31.2z"><title>H: Beach 90 St to Broad Channel, 6:26 AM, Peak per car: 11</title></path>
-<text x="393.2" y="618.0">11</text>
+<line class="grid" x1="384.6" x2="384.6" y1="60" y2="624"/>
+<text x="384.6" y="640.0" text-anchor="middle">0</text>
+<line class="grid" x1="544.6" x2="544.6" y1="60" y2="624"/>
+<text x="544.6" y="640.0" text-anchor="middle">50</text>
+<line class="grid" x1="704.6" x2="704.6" y1="60" y2="624"/>
+<text x="704.6" y="640.0" text-anchor="middle">100</text>
+<line class="grid" x1="864.6" x2="864.6" y1="60" y2="624"/>
+<text x="864.6" y="640.0" text-anchor="middle">150</text>
+<text x="154.6" y="78.0" class="label" text-anchor="end">14 St-Union Sq</text>
+<text x="169.2" y="78.0" class="label" text-anchor="middle">L</text>
+<text x="183.8" y="78.0" class="label" text-anchor="start">3 Av</text>
+<text x="376.6" y="78.0" class="label" text-anchor="end">5:54 PM</text>
+<path class="s0" d="M384.6,68.0h466.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-466.4z"><title>14 St-Union Sq L 3 Av 5:54 PM, Peak per car: 147</title></path>
+<text x="859.0" y="78.0">147</text>
+<text x="154.6" y="98.0" class="label" text-anchor="end">Court Sq-23 St</text>
+<text x="169.2" y="98.0" class="label" text-anchor="middle">F</text>
+<text x="183.8" y="98.0" class="label" text-anchor="start">Lexington Av/53 St</text>
+<text x="376.6" y="98.0" class="label" text-anchor="end">9:09 AM</text>
+<path class="s0" d="M384.6,88.0h431.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-431.2z"><title>Court Sq-23 St F Lexington Av/53 St 9:09 AM, Peak per car: 136</title></path>
+<text x="823.8" y="98.0">136</text>
+<text x="154.6" y="118.0" class="label" text-anchor="end">74 St-Broadway</text>
+<text x="169.2" y="118.0" class="label" text-anchor="middle">7</text>
+<text x="183.8" y="118.0" class="label" text-anchor="start">82 St-Jackson Hts</text>
+<text x="376.6" y="118.0" class="label" text-anchor="end">4:22 PM</text>
+<path class="s0" d="M384.6,108.0h412.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-412.0z"><title>74 St-Broadway 7 82 St-Jackson Hts 4:22 PM, Peak per car: 130</title></path>
+<text x="804.6" y="118.0">130</text>
+<text x="154.6" y="138.0" class="label" text-anchor="end">14 St-Union Sq</text>
+<text x="169.2" y="138.0" class="label" text-anchor="middle">5</text>
+<text x="183.8" y="138.0" class="label" text-anchor="start">Grand Central-42 St</text>
+<text x="376.6" y="138.0" class="label" text-anchor="end">8:39 AM</text>
+<path class="s0" d="M384.6,128.0h396.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-396.0z"><title>14 St-Union Sq 5 Grand Central-42 St 8:39 AM, Peak per car: 125</title></path>
+<text x="788.6" y="138.0">125</text>
+<text x="154.6" y="158.0" class="label" text-anchor="end">Grand Central-42 St</text>
+<text x="169.2" y="158.0" class="label" text-anchor="middle">4</text>
+<text x="183.8" y="158.0" class="label" text-anchor="start">14 St-Union Sq</text>
+<text x="376.6" y="158.0" class="label" text-anchor="end">5:54 PM</text>
+<path class="s0" d="M384.6,148.0h380.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-380.0z"><title>Grand Central-42 St 4 14 St-Union Sq 5:54 PM, Peak per car: 120</title></path>
+<text x="772.6" y="158.0">120</text>
+<text x="154.6" y="178.0" class="label" text-anchor="end">125 St</text>
+<text x="169.2" y="178.0" class="label" text-anchor="middle">A</text>
+<text x="183.8" y="178.0" class="label" text-anchor="start">59 St-Columbus Circle</text>
+<text x="376.6" y="178.0" class="label" text-anchor="end">7:47 AM</text>
+<path class="s0" d="M384.6,168.0h373.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-373.6z"><title>125 St A 59 St-Columbus Circle 7:47 AM, Peak per car: 118</title></path>
+<text x="766.2" y="178.0">118</text>
+<text x="154.6" y="198.0" class="label" text-anchor="end">Court Sq-23 St</text>
+<text x="169.2" y="198.0" class="label" text-anchor="middle">E</text>
+<text x="183.8" y="198.0" class="label" text-anchor="start">Lexington Av/53 St</text>
+<text x="376.6" y="198.0" class="label" text-anchor="end">8:57 AM</text>
+<path class="s0" d="M384.6,188.0h370.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-370.4z"><title>Court Sq-23 St E Lexington Av/53 St 8:57 AM, Peak per car: 117</title></path>
+<text x="763.0" y="198.0">117</text>
+<text x="154.6" y="218.0" class="label" text-anchor="end">Greenpoint Av</text>
+<text x="169.2" y="218.0" class="label" text-anchor="middle">G</text>
+<text x="183.8" y="218.0" class="label" text-anchor="start">21 St</text>
+<text x="376.6" y="218.0" class="label" text-anchor="end">8:38 AM</text>
+<path class="s0" d="M384.6,208.0h354.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-354.4z"><title>Greenpoint Av G 21 St 8:38 AM, Peak per car: 112</title></path>
+<text x="747.0" y="218.0">112</text>
+<text x="154.6" y="238.0" class="label" text-anchor="end">51 St</text>
+<text x="169.2" y="238.0" class="label" text-anchor="middle">6</text>
+<text x="183.8" y="238.0" class="label" text-anchor="start">Grand Central-42 St</text>
+<text x="376.6" y="238.0" class="label" text-anchor="end">8:54 AM</text>
+<path class="s0" d="M384.6,228.0h344.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-344.8z"><title>51 St 6 Grand Central-42 St 8:54 AM, Peak per car: 109</title></path>
+<text x="737.4" y="238.0">109</text>
+<text x="154.6" y="258.0" class="label" text-anchor="end">Times Sq-42 St</text>
+<text x="169.2" y="258.0" class="label" text-anchor="middle">2</text>
+<text x="183.8" y="258.0" class="label" text-anchor="start">72 St</text>
+<text x="376.6" y="258.0" class="label" text-anchor="end">5:05 PM</text>
+<path class="s0" d="M384.6,248.0h338.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-338.4z"><title>Times Sq-42 St 2 72 St 5:05 PM, Peak per car: 107</title></path>
+<text x="731.0" y="258.0">107</text>
+<text x="154.6" y="278.0" class="label" text-anchor="end">Lexington Av/63 St</text>
+<text x="169.2" y="278.0" class="label" text-anchor="middle">M</text>
+<text x="183.8" y="278.0" class="label" text-anchor="start">Roosevelt Island</text>
+<text x="376.6" y="278.0" class="label" text-anchor="end">4:40 PM</text>
+<path class="s0" d="M384.6,268.0h338.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-338.4z"><title>Lexington Av/63 St M Roosevelt Island 4:40 PM, Peak per car: 107</title></path>
+<text x="731.0" y="278.0">107</text>
+<text x="154.6" y="298.0" class="label" text-anchor="end">3 Av-138 St</text>
+<text x="169.2" y="298.0" class="label" text-anchor="middle">6X</text>
+<text x="183.8" y="298.0" class="label" text-anchor="start">125 St</text>
+<text x="376.6" y="298.0" class="label" text-anchor="end">9:11 AM</text>
+<path class="s0" d="M384.6,288.0h328.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-328.8z"><title>3 Av-138 St 6X 125 St 9:11 AM, Peak per car: 104</title></path>
+<text x="721.4" y="298.0">104</text>
+<text x="154.6" y="318.0" class="label" text-anchor="end">Times Sq-42 St</text>
+<text x="169.2" y="318.0" class="label" text-anchor="middle">1</text>
+<text x="183.8" y="318.0" class="label" text-anchor="start">50 St</text>
+<text x="376.6" y="318.0" class="label" text-anchor="end">7:36 AM</text>
+<path class="s0" d="M384.6,308.0h325.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-325.6z"><title>Times Sq-42 St 1 50 St 7:36 AM, Peak per car: 103</title></path>
+<text x="718.2" y="318.0">103</text>
+<text x="154.6" y="338.0" class="label" text-anchor="end">Queensboro Plaza</text>
+<text x="169.2" y="338.0" class="label" text-anchor="middle">W</text>
+<text x="183.8" y="338.0" class="label" text-anchor="start">Lexington Av/59 St</text>
+<text x="376.6" y="338.0" class="label" text-anchor="end">9:01 AM</text>
+<path class="s0" d="M384.6,328.0h322.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-322.4z"><title>Queensboro Plaza W Lexington Av/59 St 9:01 AM, Peak per car: 102</title></path>
+<text x="715.0" y="338.0">102</text>
+<text x="154.6" y="358.0" class="label" text-anchor="end">14 St</text>
+<text x="169.2" y="358.0" class="label" text-anchor="middle">3</text>
+<text x="183.8" y="358.0" class="label" text-anchor="start">34 St-Penn Station</text>
+<text x="376.6" y="358.0" class="label" text-anchor="end">6:10 PM</text>
+<path class="s0" d="M384.6,348.0h322.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-322.4z"><title>14 St 3 34 St-Penn Station 6:10 PM, Peak per car: 102</title></path>
+<text x="715.0" y="358.0">102</text>
+<text x="154.6" y="378.0" class="label" text-anchor="end">Atlantic Av</text>
+<text x="169.2" y="378.0" class="label" text-anchor="middle">N</text>
+<text x="183.8" y="378.0" class="label" text-anchor="start">Canal St</text>
+<text x="376.6" y="378.0" class="label" text-anchor="end">8:51 AM</text>
+<path class="s0" d="M384.6,368.0h309.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-309.6z"><title>Atlantic Av N Canal St 8:51 AM, Peak per car: 98</title></path>
+<text x="702.2" y="378.0">98</text>
+<text x="154.6" y="398.0" class="label" text-anchor="end">Canal St</text>
+<text x="169.2" y="398.0" class="label" text-anchor="middle">Q</text>
+<text x="183.8" y="398.0" class="label" text-anchor="start">DeKalb Av</text>
+<text x="376.6" y="398.0" class="label" text-anchor="end">5:19 PM</text>
+<path class="s0" d="M384.6,388.0h300.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-300.0z"><title>Canal St Q DeKalb Av 5:19 PM, Peak per car: 95</title></path>
+<text x="692.6" y="398.0">95</text>
+<text x="154.6" y="418.0" class="label" text-anchor="end">Broadway-Lafayette St</text>
+<text x="169.2" y="418.0" class="label" text-anchor="middle">FX</text>
+<text x="183.8" y="418.0" class="label" text-anchor="start">2 Av</text>
+<text x="376.6" y="418.0" class="label" text-anchor="end">5:45 PM</text>
+<path class="s0" d="M384.6,408.0h293.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-293.6z"><title>Broadway-Lafayette St FX 2 Av 5:45 PM, Peak per car: 93</title></path>
+<text x="686.2" y="418.0">93</text>
+<text x="154.6" y="438.0" class="label" text-anchor="end">Broadway-Lafayette St</text>
+<text x="169.2" y="438.0" class="label" text-anchor="middle">D</text>
+<text x="183.8" y="438.0" class="label" text-anchor="start">Grand St</text>
+<text x="376.6" y="438.0" class="label" text-anchor="end">4:43 PM</text>
+<path class="s0" d="M384.6,428.0h290.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-290.4z"><title>Broadway-Lafayette St D Grand St 4:43 PM, Peak per car: 92</title></path>
+<text x="683.0" y="438.0">92</text>
+<text x="154.6" y="458.0" class="label" text-anchor="end">Marcy Av</text>
+<text x="169.2" y="458.0" class="label" text-anchor="middle">J</text>
+<text x="183.8" y="458.0" class="label" text-anchor="start">Delancey St-Essex St</text>
+<text x="376.6" y="458.0" class="label" text-anchor="end">8:59 AM</text>
+<path class="s0" d="M384.6,448.0h290.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-290.4z"><title>Marcy Av J Delancey St-Essex St 8:59 AM, Peak per car: 92</title></path>
+<text x="683.0" y="458.0">92</text>
+<text x="154.6" y="478.0" class="label" text-anchor="end">7 Av</text>
+<text x="169.2" y="478.0" class="label" text-anchor="middle">B</text>
+<text x="183.8" y="478.0" class="label" text-anchor="start">Atlantic Av</text>
+<text x="376.6" y="478.0" class="label" text-anchor="end">9:00 AM</text>
+<path class="s0" d="M384.6,468.0h287.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-287.2z"><title>7 Av B Atlantic Av 9:00 AM, Peak per car: 91</title></path>
+<text x="679.8" y="478.0">91</text>
+<text x="154.6" y="498.0" class="label" text-anchor="end">14 St</text>
+<text x="169.2" y="498.0" class="label" text-anchor="middle">C</text>
+<text x="183.8" y="498.0" class="label" text-anchor="start">23 St</text>
+<text x="376.6" y="498.0" class="label" text-anchor="end">6:08 PM</text>
+<path class="s0" d="M384.6,488.0h277.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-277.6z"><title>14 St C 23 St 6:08 PM, Peak per car: 88</title></path>
+<text x="670.2" y="498.0">88</text>
+<text x="154.6" y="518.0" class="label" text-anchor="end">74 St-Broadway</text>
+<text x="169.2" y="518.0" class="label" text-anchor="middle">7X</text>
+<text x="183.8" y="518.0" class="label" text-anchor="start">Junction Blvd</text>
+<text x="376.6" y="518.0" class="label" text-anchor="end">5:23 PM</text>
+<path class="s0" d="M384.6,508.0h271.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-271.2z"><title>74 St-Broadway 7X Junction Blvd 5:23 PM, Peak per car: 86</title></path>
+<text x="663.8" y="518.0">86</text>
+<text x="154.6" y="538.0" class="label" text-anchor="end">Lexington Av/63 St</text>
+<text x="169.2" y="538.0" class="label" text-anchor="middle">R</text>
+<text x="183.8" y="538.0" class="label" text-anchor="start">72 St</text>
+<text x="376.6" y="538.0" class="label" text-anchor="end">7:57 AM</text>
+<path class="s0" d="M384.6,528.0h236.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-236.0z"><title>Lexington Av/63 St R 72 St 7:57 AM, Peak per car: 75</title></path>
+<text x="628.6" y="538.0">75</text>
+<text x="154.6" y="558.0" class="label" text-anchor="end">Marcy Av</text>
+<text x="169.2" y="558.0" class="label" text-anchor="middle">Z</text>
+<text x="183.8" y="558.0" class="label" text-anchor="start">Delancey St-Essex St</text>
+<text x="376.6" y="558.0" class="label" text-anchor="end">8:24 AM</text>
+<path class="s0" d="M384.6,548.0h210.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-210.4z"><title>Marcy Av Z Delancey St-Essex St 8:24 AM, Peak per car: 67</title></path>
+<text x="603.0" y="558.0">67</text>
+<text x="154.6" y="578.0" class="label" text-anchor="end">Grand Central-42 St</text>
+<text x="169.2" y="578.0" class="label" text-anchor="middle">GS</text>
+<text x="183.8" y="578.0" class="label" text-anchor="start">Times Sq-42 St</text>
+<text x="376.6" y="578.0" class="label" text-anchor="end">4:59 PM</text>
+<path class="s0" d="M384.6,568.0h204.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-204.0z"><title>Grand Central-42 St GS Times Sq-42 St 4:59 PM, Peak per car: 65</title></path>
+<text x="596.6" y="578.0">65</text>
+<text x="154.6" y="598.0" class="label" text-anchor="end">Park Pl</text>
+<text x="169.2" y="598.0" class="label" text-anchor="middle">FS</text>
+<text x="183.8" y="598.0" class="label" text-anchor="start">Botanic Garden</text>
+<text x="376.6" y="598.0" class="label" text-anchor="end">4:43 PM</text>
+<path class="s0" d="M384.6,588.0h124.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-124.0z"><title>Park Pl FS Botanic Garden 4:43 PM, Peak per car: 40</title></path>
+<text x="516.6" y="598.0">40</text>
+<text x="154.6" y="618.0" class="label" text-anchor="end">Beach 90 St</text>
+<text x="169.2" y="618.0" class="label" text-anchor="middle">H</text>
+<text x="183.8" y="618.0" class="label" text-anchor="start">Broad Channel</text>
+<text x="376.6" y="618.0" class="label" text-anchor="end">6:26 AM</text>
+<path class="s0" d="M384.6,608.0h31.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-31.2z"><title>Beach 90 St H Broad Channel 6:26 AM, Peak per car: 11</title></path>
+<text x="423.8" y="618.0">11</text>
 </svg>

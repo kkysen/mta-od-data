@@ -51,7 +51,8 @@ text {
 class Bar:
     """A row's bars: each series' value, and its text as the table shows it."""
 
-    label: str
+    # Its label's columns, laid out aligned with the other rows'.
+    label: Sequence[str]
     values: Sequence[float | None]
     texts: Sequence[str]
 
@@ -66,9 +67,11 @@ class Chart:
     columns: Sequence[str]
     series: Sequence[str]
     note: str = ""
-    # A row's label from its cells by their column's heading,
-    # if not its first `keys` cells.
-    label: Callable[[Mapping[str, str]], str] | None = None
+    # A row's label's columns from its cells by their column's heading,
+    # if not its first `keys` cells, joined;
+    # and each column's alignment: `l`eft, `m`iddle, or `r`ight.
+    label: Callable[[Mapping[str, str]], Sequence[str]] | None = None
+    align: str = "r"
 
 
 def cells(row: str) -> list[str]:
@@ -98,7 +101,7 @@ def table_charts(
             Bar(
                 c.label(dict(zip(head, r, strict=True)))
                 if c.label
-                else ": ".join(r[:keys]),
+                else [": ".join(r[:keys])],
                 [number(r[i]) for i in idx],
                 [r[i] for i in idx],
             )
@@ -107,7 +110,7 @@ def table_charts(
         ]
         bars.sort(key=first_value, reverse=True)
         sub = f"{subtitle}; {c.note}" if c.note else subtitle
-        out[c.slug] = bar_chart(c.title, sub, c.series, bars)
+        out[c.slug] = bar_chart(c.title, sub, c.series, bars, c.align)
     return out
 
 
@@ -144,12 +147,25 @@ def text(x: float, y: float, s: str, attrs: str = "") -> str:
 
 
 def bar_chart(
-    title: str, subtitle: str, series: Sequence[str], bars: Sequence[Bar]
+    title: str,
+    subtitle: str,
+    series: Sequence[str],
+    bars: Sequence[Bar],
+    align: str = "r",
 ) -> str:
     """Horizontal bars, one row per `bars`, in its order, one bar per `series`,
     each labelled with its text."""
     n = len(series)
-    label_w = max(len(b.label) for b in bars) * CHAR_W + 8
+    # Each label column's width, and where its text is anchored.
+    col_ws = [max(len(b.label[j]) for b in bars) * CHAR_W for j in range(len(align))]
+    anchors = []
+    x = PAD
+    for a, w in zip(align, col_ws, strict=True):
+        anchors.append(
+            {"l": (x, "start"), "m": (x + w / 2, "middle")}.get(a, (x + w, "end"))
+        )
+        x += w + 8
+    label_w = x - PAD
     value_w = max(len(t) for b in bars for t in b.texts) * CHAR_W
     plot_x = PAD + label_w
     width = max(WIDTH, plot_x + MIN_PLOT_W + value_w + 6 + PAD)
@@ -188,20 +204,21 @@ def bar_chart(
         out.append(text(x, bottom + 16, f"{t:,g}", ' text-anchor="middle"'))
     for r, b in enumerate(bars):
         y0 = top + r * (row_h + ROW_GAP) + ROW_GAP / 2
-        out.append(
-            text(
-                plot_x - 8,
-                y0 + row_h / 2 + 4,
-                b.label,
-                ' class="label" text-anchor="end"',
+        for (ax, anchor), part in zip(anchors, b.label, strict=True):
+            out.append(
+                text(
+                    ax,
+                    y0 + row_h / 2 + 4,
+                    part,
+                    f' class="label" text-anchor="{anchor}"',
+                )
             )
-        )
         for i, v in enumerate(b.values):
             if v is None:
                 continue
             y = y0 + i * (BAR_H + BAR_GAP)
             w = max(v * scale, 1)
-            tip = escape(f"{b.label}, {series[i]}: {b.texts[i]}")
+            tip = escape(f"{' '.join(b.label)}, {series[i]}: {b.texts[i]}")
             out.append(
                 f'<path class="s{i}" d="{bar_path(plot_x, y, w, BAR_H)}">'
                 f"<title>{tip}</title></path>"
