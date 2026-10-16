@@ -154,17 +154,29 @@ def line_hours(with_route: bool, days: int) -> list[tuple[Any, ...]]:
         connection()
         .execute(
             f"""
-            WITH s AS (
-                SELECT o.name, route_id, departure, w, boardings, load,
+            WITH stops AS (
+                SELECT DISTINCT route_id, coalesce(prev_stop, '') AS prev,
+                    stop_id, next_stop
+                FROM trip_stops
+                WHERE route_id IN (SELECT route FROM route_groups)
+            ),
+            -- Each stop's lines, matched once for every train stopping alike there.
+            stop_lines AS (
+                SELECT route_id, prev, stop_id, next_stop, o.name,
                     i.name IS NOT NULL AS on_in
-                FROM trip_stops t
+                FROM stops t
                 JOIN line_hops o
                     ON o.a = t.stop_id AND o.b = t.next_stop
                     AND {hop_on("o", "t.route_id")}
                 LEFT JOIN line_hops i
-                    ON i.name = o.name AND i.a = t.prev_stop AND i.b = t.stop_id
+                    ON i.name = o.name AND i.a = t.prev AND i.b = t.stop_id
                     AND {hop_on("i", "t.route_id")}
-                WHERE route_id IN (SELECT route FROM route_groups)
+            ),
+            s AS (
+                SELECT name, route_id, departure, w, boardings, load, on_in
+                FROM (
+                    SELECT *, coalesce(prev_stop, '') AS prev FROM trip_stops
+                ) JOIN stop_lines USING (route_id, prev, stop_id, next_stop)
             )
             SELECT name{grp}, departure // 3600 AS hour,
                 sum(if(on_in, boardings, load) * w) / {days}

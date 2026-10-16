@@ -423,13 +423,13 @@ def route_service(
 
 def route_rows(names: list[str], with_line: bool) -> list[tuple[Any, ...]]:
     line = ", name" if with_line else ""
-    on_line = "JOIN on_line USING (path, route, i)" if with_line else ""
+    on_line = "JOIN leg_lines USING (route, stops)" if with_line else ""
     sums = ", ".join(f"sum({n})::DOUBLE" for n in names)
     return (
         connection()
         .execute(
             f"""
-            WITH {ON_LINE if with_line else "x AS (SELECT 1)"},
+            WITH {LEG_LINES if with_line else "x AS (SELECT 1)"},
             journeys AS (
                 SELECT DISTINCT path, grp{line}, {", ".join(names)}
                 FROM legs JOIN route_groups USING (route) {on_line}
@@ -441,14 +441,17 @@ def route_rows(names: list[str], with_line: bool) -> list[tuple[Any, ...]]:
     )
 
 
-# Each ride on each line's track, by the leg it's in.
-ON_LINE = f"""
-    on_line AS (
-        SELECT DISTINCT path, route, i, name
+# The lines each ride rides, by its route and stops:
+# matched once for each different ride, however many paths take it.
+LEG_LINES = f"""
+    leg_lines AS (
+        SELECT DISTINCT route, stops, name
         FROM (
-            SELECT path, route, i, unnest(stops[:-2]) AS a, unnest(stops[2:]) AS b
-            FROM legs
-            WHERE route IN (SELECT route FROM route_groups)
+            SELECT route, stops, unnest(stops[:-2]) AS a, unnest(stops[2:]) AS b
+            FROM (
+                SELECT DISTINCT route, stops FROM legs
+                WHERE route IN (SELECT route FROM route_groups)
+            )
         ) h
         JOIN line_hops USING (a, b)
         WHERE {hop_on("line_hops", "route")}
@@ -523,10 +526,10 @@ def line_rows(names: list[str]) -> list[tuple[Any, ...]]:
         connection()
         .execute(
             f"""
-            WITH {ON_LINE},
+            WITH {LEG_LINES},
             journeys AS (
                 SELECT DISTINCT path, name, {", ".join(names)}
-                FROM legs JOIN on_line USING (path, route, i)
+                FROM legs JOIN leg_lines USING (route, stops)
             )
             SELECT name, {sums} FROM journeys GROUP BY ALL
             """
