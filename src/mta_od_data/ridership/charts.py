@@ -7,7 +7,7 @@ and is a standalone SVG with its own light and dark colors,
 so it reads the same embedded in a Markdown report on GitHub or opened alone.
 """
 
-from collections.abc import Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from html import escape
 from math import ceil, floor, log10
@@ -66,6 +66,9 @@ class Chart:
     columns: Sequence[str]
     series: Sequence[str]
     note: str = ""
+    # A row's label from its cells by their column's heading,
+    # if not its first `keys` cells.
+    label: Callable[[Mapping[str, str]], str] | None = None
 
 
 def cells(row: str) -> list[str]:
@@ -92,7 +95,13 @@ def table_charts(
     for c in charts:
         idx = [head.index(col) for col in c.columns]
         bars: list[Bar] = [
-            Bar(": ".join(r[:keys]), [number(r[i]) for i in idx], [r[i] for i in idx])
+            Bar(
+                c.label(dict(zip(head, r, strict=True)))
+                if c.label
+                else ": ".join(r[:keys]),
+                [number(r[i]) for i in idx],
+                [r[i] for i in idx],
+            )
             for r in rows
             if r[idx[0]]
         ]

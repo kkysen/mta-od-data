@@ -23,7 +23,7 @@ all with fare evaders unless `--no-fare-evasion`.
 """
 
 from collections import defaultdict
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from csv import DictReader
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -498,6 +498,7 @@ def ridership(
                     "Each route's most crowded train",
                     [f"Peak Load, {label}"],
                     ["Peak load"],
+                    label=peak_label,
                 ),
                 Chart(
                     "peak-per-car",
@@ -505,6 +506,7 @@ def ridership(
                     ["Peak per Car\\*"],
                     ["Peak per car"],
                     CAR_CHART_NOTE,
+                    peak_label,
                 ),
             ],
         )
@@ -648,6 +650,11 @@ def ridership(
     )
     report = render(ctx, by, route, manifest, days, cols, fare_evasion, table, charts)
     write(report, markdown_out)
+
+
+def peak_label(row: Mapping[str, str]) -> str:
+    """A `trip_table` row's route, and where and when its train is fullest."""
+    return f"{row['Route']}: {row['Peak Between']}, {row['Leaving At']}"
 
 
 def riders_chart(title: str, cols: Sequence[Column]) -> Chart:
