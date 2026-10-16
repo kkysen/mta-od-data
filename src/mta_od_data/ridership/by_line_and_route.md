@@ -91,9 +91,10 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | Culver | FX | 2,684 | 3,589 | 7:00 AM | 1,576 |
 | Culver express | F | 2,423 | 3,247 | 7:00 AM | 1,385 |
 | Culver express | FX | 2,423 | 3,247 | 7:00 AM | 1,385 |
-| Culver local | F | 102,667 | 131,645 | 8:00 AM | 10,745 |
-| Culver local | FL | 102,667 | 131,645 | 8:00 AM | 10,745 |
+| Culver local | F | 111,598 | 143,914 | 8:00 AM | 11,408 |
+| Culver local | FL | 110,050 | 141,814 | 8:00 AM | 11,408 |
 | Culver local | G | 39,778 | 47,023 | 8:00 AM | 3,603 |
+| Culver local | FX | 1,563 | 2,119 | 7:00 AM | 965 |
 | Dyre Av | 5 | 25,099 | 37,996 | 7:00 AM | 2,766 |
 | Eastern Pkwy | 3 | 95,927 | 131,962 | 8:00 AM | 9,392 |
 | Eastern Pkwy | 2 | 88,842 | 116,214 | 8:00 AM | 9,104 |
@@ -123,6 +124,11 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | Hillside Av | FL | 55,165 | 76,686 | 5:00 PM | 4,714 |
 | Hillside Av | E | 2,203 | 3,169 | 7:00 AM | 857 |
 | Hillside Av | FX | 361 | 484 | 8:00 AM | 149 |
+| Hillside Av express | E | 2,060 | 2,970 | 7:00 AM | 857 |
+| Hillside Av local | F | 55,526 | 77,171 | 5:00 PM | 4,784 |
+| Hillside Av local | FL | 55,165 | 76,686 | 5:00 PM | 4,714 |
+| Hillside Av local | FX | 361 | 484 | 8:00 AM | 149 |
+| Hillside Av local | E | 143 | 199 | 8:00 PM | 143 |
 | Jamaica | J | 129,591 | 175,299 | 4:00 PM | 10,617 |
 | Jamaica | M | 57,794 | 77,270 | 8:00 AM | 5,820 |
 | Jamaica | Z | 8,994 | 12,171 | 5:00 PM | 3,529 |
@@ -149,6 +155,9 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | Lower Culver | F | 39,795 | 54,095 | 7:00 AM | 4,111 |
 | Lower Culver | FL | 38,180 | 51,910 | 8:00 AM | 3,952 |
 | Lower Culver | FX | 1,615 | 2,185 | 7:00 AM | 995 |
+| Lower Culver local | F | 37,107 | 50,612 | 7:00 AM | 3,873 |
+| Lower Culver local | FL | 35,544 | 48,493 | 8:00 AM | 3,701 |
+| Lower Culver local | FX | 1,563 | 2,119 | 7:00 AM | 965 |
 | Manhattan Bridge | Q | 92,786 | 122,126 | 8:00 AM | 8,728 |
 | Manhattan Bridge | N | 71,629 | 84,732 | 5:00 PM | 7,682 |
 | Manhattan Bridge | D | 63,827 | 81,707 | 5:00 PM | 5,788 |

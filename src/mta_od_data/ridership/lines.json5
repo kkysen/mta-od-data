@@ -188,10 +188,8 @@
   // Queens Blvd's stretches, each only its own hops.
   "Hillside Av": {
     // Jamaica-179 St to Briarwood, and the E's rush-hour express past Briarwood.
-    tracks: [
-      ["F01", "F02", "F03", "F04", "F05"],
-      ["F01", "F03", "F06"],
-    ],
+    local: [["F01", "F02", "F03", "F04", "F05"]],
+    express: [["F01", "F03", "F06"]],
   },
   "Queens Blvd east": {
     // Briarwood to Forest Hills-71 Av.
@@ -242,15 +240,16 @@
   },
   "Culver": {
     tracks: [
-      // Church Av to Coney Island-Stillwell Av, and the G from Crosstown.
+      // Kings Hwy to Coney Island-Stillwell Av, and the G from Crosstown.
       // W 8 St-NY Aquarium's IDs are also Brighton's, a level below.
-      ["F27", "F29", "F30", "F31", "F32", "F33", "F34", "F35", "F36", "F38", "F39", "D42"],
+      ["F35", "F36", "F38", "F39", "D42"],
       {routes: ["F", "FX"], stops: ["D42", "D43"]},
       ["A42", "F20"],
     ],
-    // Jay St-MetroTech to Church Av.
-    local: [["A41", "F20", "F21", "F22", "F23", "F24", "F25", "F26", "F27"]],
-    express: [["A41", "F24", "F27"]],
+    // Jay St-MetroTech to Kings Hwy.
+    // No trains run express south of Church Av for now.
+    local: [["A41", "F20", "F21", "F22", "F23", "F24", "F25", "F26", "F27", "F29", "F30", "F31", "F32", "F33", "F34", "F35"]],
+    express: [["A41", "F24", "F27", "F35"]],
   },
   // Culver's stretches either side of Church Av.
   "Upper Culver": {
@@ -259,11 +258,14 @@
     express: [["A41", "F24", "F27"]],
   },
   "Lower Culver": {
-    // Church Av to Coney Island-Stillwell Av.
+    // Church Av to Coney Island-Stillwell Av,
+    // with express tracks to Kings Hwy.
     tracks: [
-      ["F27", "F29", "F30", "F31", "F32", "F33", "F34", "F35", "F36", "F38", "F39", "D42"],
+      ["F35", "F36", "F38", "F39", "D42"],
       {routes: ["F", "FX"], stops: ["D42", "D43"]},
     ],
+    local: [["F27", "F29", "F30", "F31", "F32", "F33", "F34", "F35"]],
+    express: [["F27", "F35"]],
   },
 
   // BMT

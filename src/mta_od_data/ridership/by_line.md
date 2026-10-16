@@ -46,10 +46,10 @@ Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ride
 | Culver | 157,320 | 198,128 | 8:00 AM | 15,661 |
 | 4 Av express | 149,153 | 180,453 | 8:00 AM | 14,653 |
 | Eastern Pkwy express | 149,053 | 199,937 | 8:00 AM | 14,283 |
+| Culver local | 148,595 | 187,613 | 8:00 AM | 15,011 |
 | Eastern Pkwy local | 146,802 | 196,216 | 8:00 AM | 13,259 |
 | Upper Culver | 143,085 | 179,763 | 8:00 AM | 14,348 |
 | SAS Phase 1 | 141,144 | 184,197 | 8:00 AM | 14,196 |
-| Culver local | 140,999 | 176,955 | 8:00 AM | 14,348 |
 | Upper Culver local | 140,999 | 176,955 | 8:00 AM | 14,348 |
 | Fulton St express | 136,847 | 194,726 | 5:00 PM | 13,635 |
 | 4 Av local | 135,512 | 166,330 | 5:00 PM | 11,326 |
@@ -71,8 +71,10 @@ Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ride
 | Nassau St | 64,644 | 89,861 | 5:00 PM | 6,220 |
 | 42 St Shuttle | 63,151 | 84,848 | 5:00 PM | 7,500 |
 | Hillside Av | 57,653 | 80,236 | 7:00 AM | 5,465 |
+| Hillside Av local | 55,669 | 77,369 | 5:00 PM | 4,784 |
 | Myrtle Av | 48,984 | 61,545 | 8:00 AM | 4,305 |
 | Lower Culver | 39,795 | 54,095 | 7:00 AM | 4,111 |
+| Lower Culver local | 37,107 | 50,612 | 7:00 AM | 3,873 |
 | Pelham express | 36,803 | 55,247 | 7:00 AM | 5,390 |
 | Flushing express | 35,176 | 40,390 | 5:00 PM | 5,743 |
 | Jamaica express | 28,431 | 39,024 | 8:00 AM | 4,336 |
@@ -86,3 +88,4 @@ Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ride
 | Rockaway Park branch | 3,201 | 6,265 | 7:00 AM | 295 |
 | Culver express | 2,423 | 3,247 | 7:00 AM | 1,385 |
 | Upper Culver express | 2,423 | 3,247 | 7:00 AM | 1,385 |
+| Hillside Av express | 2,060 | 2,970 | 7:00 AM | 857 |
