@@ -74,18 +74,18 @@ text {
 <text x="376.6" y="218.0" class="label" text-anchor="end">9:01 AM</text>
 <path class="s0" d="M384.6,208.0h322.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-322.7z"><title>Queensboro Plaza W Lexington Av/59 St 9:01 AM, Peak load: 1,021</title></path>
 <text x="715.3" y="218.0">1,021</text>
-<text x="154.6" y="238.0" class="label" text-anchor="end">Atlantic Av</text>
-<text x="169.2" y="238.0" class="label" text-anchor="middle">N</text>
-<text x="183.8" y="238.0" class="label" text-anchor="start">Canal St</text>
-<text x="376.6" y="238.0" class="label" text-anchor="end">8:51 AM</text>
-<path class="s0" d="M384.6,228.0h309.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-309.0z"><title>Atlantic Av N Canal St 8:51 AM, Peak load: 978</title></path>
-<text x="701.6" y="238.0">978</text>
-<text x="154.6" y="258.0" class="label" text-anchor="end">Canal St</text>
-<text x="169.2" y="258.0" class="label" text-anchor="middle">Q</text>
-<text x="183.8" y="258.0" class="label" text-anchor="start">DeKalb Av</text>
-<text x="376.6" y="258.0" class="label" text-anchor="end">5:19 PM</text>
-<path class="s0" d="M384.6,248.0h298.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-298.4z"><title>Canal St Q DeKalb Av 5:19 PM, Peak load: 945</title></path>
-<text x="691.0" y="258.0">945</text>
+<text x="154.6" y="238.0" class="label" text-anchor="end">Canal St</text>
+<text x="169.2" y="238.0" class="label" text-anchor="middle">Q</text>
+<text x="183.8" y="238.0" class="label" text-anchor="start">DeKalb Av</text>
+<text x="376.6" y="238.0" class="label" text-anchor="end">5:19 PM</text>
+<path class="s0" d="M384.6,228.0h298.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-298.4z"><title>Canal St Q DeKalb Av 5:19 PM, Peak load: 945</title></path>
+<text x="691.0" y="238.0">945</text>
+<text x="154.6" y="258.0" class="label" text-anchor="end">Queensboro Plaza</text>
+<text x="169.2" y="258.0" class="label" text-anchor="middle">N</text>
+<text x="183.8" y="258.0" class="label" text-anchor="start">Lexington Av/59 St</text>
+<text x="376.6" y="258.0" class="label" text-anchor="end">8:10 AM</text>
+<path class="s0" d="M384.6,248.0h295.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-295.5z"><title>Queensboro Plaza N Lexington Av/59 St 8:10 AM, Peak load: 936</title></path>
+<text x="688.1" y="258.0">936</text>
 <text x="154.6" y="278.0" class="label" text-anchor="end">51 St</text>
 <text x="169.2" y="278.0" class="label" text-anchor="middle">6</text>
 <text x="183.8" y="278.0" class="label" text-anchor="start">Grand Central-42 St</text>
@@ -152,18 +152,18 @@ text {
 <text x="376.6" y="478.0" class="label" text-anchor="end">5:23 PM</text>
 <path class="s0" d="M384.6,468.0h252.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-252.3z"><title>74 St-Broadway 7X Junction Blvd 5:23 PM, Peak load: 801</title></path>
 <text x="644.9" y="478.0">801</text>
-<text x="154.6" y="498.0" class="label" text-anchor="end">Lexington Av/63 St</text>
-<text x="169.2" y="498.0" class="label" text-anchor="middle">R</text>
-<text x="183.8" y="498.0" class="label" text-anchor="start">72 St</text>
-<text x="376.6" y="498.0" class="label" text-anchor="end">7:57 AM</text>
-<path class="s0" d="M384.6,488.0h236.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-236.0z"><title>Lexington Av/63 St R 72 St 7:57 AM, Peak load: 750</title></path>
-<text x="628.6" y="498.0">750</text>
-<text x="154.6" y="518.0" class="label" text-anchor="end">Marcy Av</text>
-<text x="169.2" y="518.0" class="label" text-anchor="middle">J</text>
-<text x="183.8" y="518.0" class="label" text-anchor="start">Delancey St-Essex St</text>
-<text x="376.6" y="518.0" class="label" text-anchor="end">8:59 AM</text>
-<path class="s0" d="M384.6,508.0h231.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-231.8z"><title>Marcy Av J Delancey St-Essex St 8:59 AM, Peak load: 737</title></path>
-<text x="624.4" y="518.0">737</text>
+<text x="154.6" y="498.0" class="label" text-anchor="end">Marcy Av</text>
+<text x="169.2" y="498.0" class="label" text-anchor="middle">J</text>
+<text x="183.8" y="498.0" class="label" text-anchor="start">Delancey St-Essex St</text>
+<text x="376.6" y="498.0" class="label" text-anchor="end">8:59 AM</text>
+<path class="s0" d="M384.6,488.0h231.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-231.8z"><title>Marcy Av J Delancey St-Essex St 8:59 AM, Peak load: 737</title></path>
+<text x="624.4" y="498.0">737</text>
+<text x="154.6" y="518.0" class="label" text-anchor="end">DeKalb Av</text>
+<text x="169.2" y="518.0" class="label" text-anchor="middle">R</text>
+<text x="183.8" y="518.0" class="label" text-anchor="start">Jay St-MetroTech</text>
+<text x="376.6" y="518.0" class="label" text-anchor="end">9:08 AM</text>
+<path class="s0" d="M384.6,508.0h221.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-221.0z"><title>DeKalb Av R Jay St-MetroTech 9:08 AM, Peak load: 703</title></path>
+<text x="613.6" y="518.0">703</text>
 <text x="154.6" y="538.0" class="label" text-anchor="end">Greenpoint Av</text>
 <text x="169.2" y="538.0" class="label" text-anchor="middle">G</text>
 <text x="183.8" y="538.0" class="label" text-anchor="start">21 St</text>

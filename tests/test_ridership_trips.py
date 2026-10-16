@@ -65,3 +65,17 @@ def test_trains_average_over_the_weekdays_they_run(tmp_path: Path) -> None:
     assert hours["B08", "p63", 8] == 5.0
     # 57 St's platform, by the segment arriving there.
     assert hours["R14", "p57", 8] == (15 * 3 + 7 * 1) / 4
+
+
+def test_crowded_trains_run_their_routes_usual_line(tmp_path: Path) -> None:
+    # Ten Rs from 59 St to 57 St, and one fuller R on to 63 St,
+    # which too few Rs stop at to be on the R's usual line.
+    usual = ";".join(
+        f"r{i},R,R11,{28800 + 600 * i},10,0,10;r{i},R,R14,{28860 + 600 * i},0,10,0"
+        for i in range(10)
+    )
+    off = "x,R,R11,36000,50,0,50;x,R,R14,36060,0,0,50;x,R,B08,36120,0,50,0"
+    manifest = write_dates(tmp_path, [("2025-09-17", 1, f"{usual};{off}")])
+    load_trip_stops(manifest, None)
+    (train,) = crowded_trains(["R"], 1)
+    assert (train.peak, train.peak_stop) == (10, "R11")

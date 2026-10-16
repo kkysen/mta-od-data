@@ -205,17 +205,34 @@ class Train:
 
 
 def crowded_trains(routes: Sequence[str], top: int) -> list[Train]:
-    """Each of `routes`' `top` trains by their average peak load, busiest first."""
+    """Each of `routes`' `top` trains by their average peak load, busiest first,
+    of those running its usual line:
+    stopping only at stations a tenth of its trains stop at,
+    so not an R to 96 St via Second Av, or an E to Jamaica-179 St."""
     rows = (
         connection()
         .execute(
             """
-            WITH trains AS (
+            WITH route_trains AS (
+                SELECT route_id, sum(days) AS n
+                FROM (SELECT DISTINCT route_id, d, trip_id, day, days FROM trip_stops)
+                GROUP BY ALL
+            ),
+            unusual AS (
+                SELECT route_id, stop_id
+                FROM (SELECT DISTINCT route_id, d, trip_id, day, days, stop_id
+                    FROM trip_stops)
+                JOIN route_trains USING (route_id)
+                GROUP BY route_id, stop_id
+                HAVING sum(days) < any_value(n) / 10
+            ),
+            trains AS (
                 -- Its stop and next are its key's `stops`'; departures, the earliest.
                 SELECT route_id, direction_id, first_stop, first_departure, stops,
                     stop_sequence, stop_id, next_stop, min(departure) AS departure,
-                    sum(load * w) / sum(days) AS load, sum(days) AS days
-                FROM trip_stops
+                    sum(load * w) / sum(days) AS load, sum(days) AS days,
+                    u.stop_id IS NOT NULL AS unusual
+                FROM trip_stops LEFT JOIN unusual u USING (route_id, stop_id)
                 WHERE route_id IN (SELECT unnest($routes))
                 GROUP BY ALL
             ),
@@ -231,8 +248,10 @@ def crowded_trains(routes: Sequence[str], top: int) -> list[Train]:
                     PARTITION BY
                         route_id, direction_id, first_stop, first_departure, stops
                 )
-                -- Where it peaks: its first stop with its greatest load.
+                -- Where it peaks: its first stop with its greatest load,
+                -- if all its stops are usual.
                 QUALIFY row_number() OVER (k ORDER BY load DESC, stop_sequence) = 1
+                    AND NOT bool_or(unusual) OVER k
             )
             SELECT route_id, first_stop, first_departure, last_stop, peak,
                 stop_id, coalesce(next_stop, ''), departure, days

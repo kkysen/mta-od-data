@@ -169,6 +169,9 @@ The J and Z's skip-stop is on the local tracks.
 
 Each route's most crowded train, from the trips files.
 A train is the same across dates if it has the same route, direction, first departure, and stops.
+Only trains on their route's usual line count:
+stopping only at stations at least a tenth of the route's trains stop at,
+so not the few rush-hour Rs to 96 St via Second Av, or Es to Jamaica-179 St.
 
 - **Train**: its first departure and its terminals.
 - **Peak Load**: riders on board at its fullest, averaged over the weekdays it runs.
