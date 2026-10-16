@@ -145,10 +145,18 @@ then as their local (`6L`) and express (`6X`) separately.
 ### By line: [`by_line.md`](../src/mta_od_data/ridership/by_line.md), [`by_line_and_route.md`](../src/mta_od_data/ridership/by_line_and_route.md)
 
 Journeys riding a named stretch of track at all, defined in [`lines.json5`](../src/mta_od_data/ridership/lines.json5):
-a journey counts if a ride passes between two consecutive stops both on the line,
+a journey counts if a ride goes between two stops one after the other on the line,
 including riders passing through without stopping.
 `by_line_and_route.md` splits each line's riders by the route they ride on it.
-For now the only line is SAS Phase 1 (57 St-7 Av to 96 St).
+
+The lines are every named trunk (Lexington Av, Queens Blvd, Brighton, ...),
+plus the 53 St and 63 St tunnels, the Manhattan Bridge, and SAS Phase 1 (57 St-7 Av to 96 St).
+A trunk with express tracks is also two lines, `<trunk> local` and `<trunk> express`,
+for riders on each track over the stretch where it has both:
+a ride skipping a station is on the express tracks,
+and one between express stations with nothing between them is on whichever its route runs on by day,
+the A's express tracks or the C's local ones between Canal St and Chambers St.
+The J and Z's skip-stop is on the local tracks.
 
 ### By train: [`by_trip.md`](../src/mta_od_data/ridership/by_trip.md)
 
@@ -170,5 +178,7 @@ A train is the same across dates if it has the same route, direction, first depa
   There's no crowding, delays, or planned work.
 - Routing starts at the platform:
   there's no time from fare gate to platform, and riders enter evenly through their hour.
+- An express route running local at night is still counted on the express tracks
+  between express stations with no station between, like the A from 42 St to 34 St.
 - Only August to December 2025 is routed,
   since earlier GTFS versions haven't been fetched.
