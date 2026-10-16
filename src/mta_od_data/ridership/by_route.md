@@ -41,3 +41,11 @@ Produced by `mta-od-data ridership --by route --markdown-out src/mta_od_data/rid
 | H | 2,769 | 5,415 | 4.5 | 610 | 168 | 763 | 3.6 | 0.73 | 4:00 PM | 242 |
 
 \* A car is 60 ft of train, about one B Division car's length, so routes with different train lengths compare (`train_lengths.json5`).
+
+![Riders by route](by_route-riders.svg)
+
+![Riders per route-km](by_route-per-route-km.svg)
+
+![Riders per train-km](by_route-per-train-km.svg)
+
+![Riders per car\*-km](by_route-per-car-km.svg)

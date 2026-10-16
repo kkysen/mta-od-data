@@ -43,6 +43,7 @@ from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import read_manifest
 from mta_od_data.invocation import produced_by
 from mta_od_data.ridership.cache import cached_compute
+from mta_od_data.ridership.charts import Chart, table_charts
 from mta_od_data.ridership.compute import (
     CAR_FT,
     PLACES,
@@ -70,6 +71,7 @@ PLATFORM_AREAS = HERE / "platform_areas.csv"
 DEFAULT_STATIONS = DATA / "stations.csv"
 DEFAULT_COMPLEXES = DATA / "complexes.csv"
 # A car is a length of train, so routes with different train lengths compare.
+CAR_CHART_NOTE = f"*a car is {CAR_FT} ft of train"
 CAR_NOTE = (
     f"\\* A car is {CAR_FT} ft of train, about one B Division car's length, "
     "so routes with different train lengths compare (`train_lengths.json5`)."
@@ -484,7 +486,29 @@ def ridership(
             load_names(DEFAULT_STATIONS, DEFAULT_COMPLEXES),
             period(manifest),
         ) + ["", CAR_NOTE]
-        report = render(ctx, by, route, manifest, days, [], fare_evasion, table)
+        label = period(manifest)
+        charts = save_charts(
+            markdown_out,
+            table,
+            2,
+            chart_subtitle(manifest, fare_evasion),
+            [
+                Chart(
+                    "peak-load",
+                    "Each route's most crowded train",
+                    [f"Peak Load, {label}"],
+                    ["Peak load"],
+                ),
+                Chart(
+                    "peak-per-car",
+                    "Each route's most crowded train, per car*",
+                    ["Peak per Car\\*"],
+                    ["Peak per car"],
+                    CAR_CHART_NOTE,
+                ),
+            ],
+        )
+        report = render(ctx, by, route, manifest, days, [], fare_evasion, table, charts)
         write(report, markdown_out)
         return
     with_route = By.ROUTE in dims and len(dims) > 1
@@ -500,6 +524,32 @@ def ridership(
             cols,
             load_names(DEFAULT_STATIONS, DEFAULT_COMPLEXES),
         )
+        keys = (2 if place is By.STATION_DIRECTION else 1) + with_route
+        what = place.value.replace("-", " ")
+        first = cols[0].label
+        specs = [
+            Chart(
+                "riders",
+                f"Riders on and off by {what}",
+                [f"On + Off, {c.label}" for c in cols],
+                [c.label for c in cols],
+            )
+        ]
+        if place is By.PLATFORM and not with_route:
+            specs += [
+                Chart(
+                    "per-m2",
+                    "Riders on and off per m² of platform",
+                    [f"On + Off per m², {first}"],
+                    [first],
+                ),
+                Chart(
+                    "peak-per-m2",
+                    "Riders on and off in the peak hour per m² of platform",
+                    [f"On + Off in Peak Hour per m², {first}"],
+                    [first],
+                ),
+            ]
     elif By.LINE in dims:
         if with_route:
             peaks = busiest(got.hours)
@@ -517,6 +567,8 @@ def ridership(
                             *peak_cells(peaks, (name, g)),
                         )
                     )
+            keys = 2
+            specs = [riders_chart("Riders by line and route", cols)]
         else:
             peaks = busiest(got.hours)
             table = [
@@ -527,6 +579,8 @@ def ridership(
                 table.append(
                     table_row(name, *(fmt(v) for v in vs), *peak_cells(peaks, (name,)))
                 )
+            keys = 1
+            specs = [riders_chart("Riders by line", cols)]
     else:
         riders = {grp: vs for grp, *vs in got.rows}
         if route:
@@ -565,9 +619,66 @@ def ridership(
             )
 
         table += ["", CAR_NOTE]
+        keys = 1
+        specs = [
+            riders_chart("Riders by route", cols),
+            Chart(
+                "per-route-km",
+                "Riders per route-km",
+                [f"Per Route-km, {first}"],
+                [first],
+            ),
+            Chart(
+                "per-train-km",
+                "Riders per train-km",
+                [f"Per Train-km, {first}"],
+                [first],
+            ),
+            Chart(
+                "per-car-km",
+                "Riders per car*-km",
+                [f"Per Car\\*-km, {first}"],
+                [first],
+                CAR_CHART_NOTE,
+            ),
+        ]
 
-    report = render(ctx, by, route, manifest, days, cols, fare_evasion, table)
+    charts = save_charts(
+        markdown_out, table, keys, chart_subtitle(manifest, fare_evasion), specs
+    )
+    report = render(ctx, by, route, manifest, days, cols, fare_evasion, table, charts)
     write(report, markdown_out)
+
+
+def riders_chart(title: str, cols: Sequence[Column]) -> Chart:
+    return Chart("riders", title, [c.label for c in cols], [c.label for c in cols])
+
+
+def chart_subtitle(manifest: Path, fare_evasion: bool) -> str:
+    dates = sorted(row["date"] for row in read_manifest(manifest))
+    evaders = " with fare evaders" if fare_evasion else ""
+    return f"Average weekday{evaders}, {dates[0]} to {dates[-1]}"
+
+
+def save_charts(
+    markdown_out: Path | None,
+    table: list[str],
+    keys: int,
+    subtitle: str,
+    specs: Sequence[Chart],
+) -> list[tuple[str, str]]:
+    """`specs`' charts of `table`, beside `markdown_out` as `<its name>-<slug>.svg`:
+    each one's title and file name, for the report to show them."""
+    if markdown_out is None:
+        return []
+    shown = []
+    for spec, svg in zip(
+        specs, table_charts(table, keys, subtitle, specs).values(), strict=True
+    ):
+        file = markdown_out.with_name(f"{markdown_out.stem}-{spec.slug}.svg")
+        file.write_text(svg)
+        shown.append((spec.title, file.name))
+    return shown
 
 
 def write(report: str, markdown_out: Path | None) -> None:
@@ -629,6 +740,7 @@ def render(
     cols: Sequence[Column],
     fare_evasion: bool,
     table: list[str],
+    charts: Sequence[tuple[str, str]] = (),
 ) -> str:
     dates = sorted(row["date"] for row in read_manifest(manifest))
     scope = f" on {', '.join(route)}" if route else ""
@@ -678,5 +790,10 @@ def render(
         f"Produced by `{produced_by(ctx)}`.",
         "",
         *table,
+        *(
+            line
+            for title, file in charts
+            for line in ("", f"![{title.replace('*', r'\*')}]({file})")
+        ),
     ]
     return "\n".join(lines) + "\n"

@@ -187,3 +187,15 @@ def test_snapshot_matches_fresh_run(
         f"  {rerun}\n"
         "and commit the result."
     )
+
+    # And its charts, `<its name>-<chart>.svg` beside it, the same way.
+    charts = f"{snapshot.path.stem}-*.svg"
+    fresh_charts = {p.name: p.read_text() for p in tmp_path.glob(charts)}
+    committed_charts = {
+        p.name: p.read_text() for p in snapshot.path.parent.glob(charts)
+    }
+    assert fresh_charts == committed_charts, (
+        f"{rel_path}'s charts are out of date. Regenerate them with:\n"
+        f"  {rerun}\n"
+        "and commit the result."
+    )

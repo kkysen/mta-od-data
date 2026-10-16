@@ -432,3 +432,5 @@ Produced by `mta-od-data ridership --by complex --markdown-out src/mta_od_data/r
 | Beach 44 St (A) | 1,023 | 2,197 | 530 | 494 | 0 | 10,301 | 7:00 AM | 97 |
 | Beach 98 St (A,S) | 619 | 1,314 | 317 | 303 | 0 | 1,498 | 7:00 AM | 55 |
 | Beach 105 St (A,S) | 420 | 640 | 212 | 208 | 0 | 1,103 | 7:00 AM | 48 |
+
+![Riders on and off by complex](by_complex-riders.svg)

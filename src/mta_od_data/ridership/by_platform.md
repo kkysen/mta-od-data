@@ -900,3 +900,9 @@ Produced by `mta-od-data ridership --by platform --markdown-out src/mta_od_data/
 | Beach 98 St (A,S), Rockaway Park | 298 | 632 | 9 | 289 | 0 | 686 | 6:00 PM | 31 | 779 | 0.4 | 0.04 |
 | Beach 105 St (A,S), Inbound | 216 | 330 | 212 | 4 | 0 | 612 | 7:00 AM | 35 | 589 | 0.4 | 0.06 |
 | Beach 105 St (A,S), Rockaway Park | 204 | 310 | 0 | 204 | 0 | 491 | 5:00 PM | 22 | 632 | 0.3 | 0.04 |
+
+![Riders on and off by platform](by_platform-riders.svg)
+
+![Riders on and off per m² of platform](by_platform-per-m2.svg)
+
+![Riders on and off in the peak hour per m² of platform](by_platform-peak-per-m2.svg)

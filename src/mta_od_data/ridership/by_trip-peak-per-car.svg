@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="962" height="664" viewBox="0 0 962 664" role="img" aria-label="Each route&#x27;s most crowded train, per car*">
+<style>
+svg { --bg:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --grid:#e4e3df; --s0:#2a78d6;--s1:#eb6834; }
+@media (prefers-color-scheme: dark) {
+  svg { --bg:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --grid:#3a3936; --s0:#3987e5;--s1:#d95926; }
+}
+text {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 12px;
+  fill: var(--ink2);
+}
+.title { font-size: 15px; font-weight: 600; fill: var(--ink); }
+.label { fill: var(--ink); }
+.grid { stroke: var(--grid); stroke-width: 1; }
+.s0 { fill: var(--s0); }
+.s1 { fill: var(--s1); }
+</style>
+<rect width="100%" height="100%" fill="var(--bg)"/>
+<text x="16.0" y="31.0" class="title">Each route&#x27;s most crowded train, per car*</text>
+<text x="16.0" y="51.0">Average weekday with fare evaders, 2025-08-19 to 2025-12-22; *a car is 60 ft of train</text>
+<line class="grid" x1="439.8" x2="439.8" y1="60" y2="624"/>
+<text x="439.8" y="640.0" text-anchor="middle">0</text>
+<line class="grid" x1="599.8" x2="599.8" y1="60" y2="624"/>
+<text x="599.8" y="640.0" text-anchor="middle">50</text>
+<line class="grid" x1="759.8" x2="759.8" y1="60" y2="624"/>
+<text x="759.8" y="640.0" text-anchor="middle">100</text>
+<line class="grid" x1="919.8" x2="919.8" y1="60" y2="624"/>
+<text x="919.8" y="640.0" text-anchor="middle">150</text>
+<text x="431.8" y="78.0" class="label" text-anchor="end">L: 5:51 PM 8 Av to Canarsie-Rockaway Pkwy</text>
+<path class="s0" d="M439.8,68.0h466.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-466.4z"><title>L: 5:51 PM 8 Av to Canarsie-Rockaway Pkwy, Peak per car: 147</title></path>
+<text x="914.2" y="78.0">147</text>
+<text x="431.8" y="98.0" class="label" text-anchor="end">F: 8:43 AM Jamaica-179 St to Coney Island-Stillwell Av</text>
+<path class="s0" d="M439.8,88.0h431.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-431.2z"><title>F: 8:43 AM Jamaica-179 St to Coney Island-Stillwell Av, Peak per car: 136</title></path>
+<text x="879.0" y="98.0">136</text>
+<text x="431.8" y="118.0" class="label" text-anchor="end">7: 3:56 PM 34 St-Hudson Yards to Flushing-Main St</text>
+<path class="s0" d="M439.8,108.0h412.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-412.0z"><title>7: 3:56 PM 34 St-Hudson Yards to Flushing-Main St, Peak per car: 130</title></path>
+<text x="859.8" y="118.0">130</text>
+<text x="431.8" y="138.0" class="label" text-anchor="end">5: 8:00 AM Flatbush Av-Brooklyn College to Eastchester-Dyre Av</text>
+<path class="s0" d="M439.8,128.0h396.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-396.0z"><title>5: 8:00 AM Flatbush Av-Brooklyn College to Eastchester-Dyre Av, Peak per car: 125</title></path>
+<text x="843.8" y="138.0">125</text>
+<text x="431.8" y="158.0" class="label" text-anchor="end">4: 5:17 PM Woodlawn to Crown Hts-Utica Av</text>
+<path class="s0" d="M439.8,148.0h380.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-380.0z"><title>4: 5:17 PM Woodlawn to Crown Hts-Utica Av, Peak per car: 120</title></path>
+<text x="827.8" y="158.0">120</text>
+<text x="431.8" y="178.0" class="label" text-anchor="end">A: 7:29 AM Inwood-207 St to Far Rockaway-Mott Av</text>
+<path class="s0" d="M439.8,168.0h373.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-373.6z"><title>A: 7:29 AM Inwood-207 St to Far Rockaway-Mott Av, Peak per car: 118</title></path>
+<text x="821.4" y="178.0">118</text>
+<text x="431.8" y="198.0" class="label" text-anchor="end">E: 8:32 AM Jamaica Center-Parsons/Archer to World Trade Center</text>
+<path class="s0" d="M439.8,188.0h370.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-370.4z"><title>E: 8:32 AM Jamaica Center-Parsons/Archer to World Trade Center, Peak per car: 117</title></path>
+<text x="818.2" y="198.0">117</text>
+<text x="431.8" y="218.0" class="label" text-anchor="end">G: 8:06 AM Church Av to Court Sq</text>
+<path class="s0" d="M439.8,208.0h354.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-354.4z"><title>G: 8:06 AM Church Av to Court Sq, Peak per car: 112</title></path>
+<text x="802.2" y="218.0">112</text>
+<text x="431.8" y="238.0" class="label" text-anchor="end">6: 8:20 AM Parkchester to Brooklyn Bridge-City Hall</text>
+<path class="s0" d="M439.8,228.0h344.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-344.8z"><title>6: 8:20 AM Parkchester to Brooklyn Bridge-City Hall, Peak per car: 109</title></path>
+<text x="792.6" y="238.0">109</text>
+<text x="431.8" y="258.0" class="label" text-anchor="end">2: 4:19 PM Flatbush Av-Brooklyn College to Wakefield-241 St</text>
+<path class="s0" d="M439.8,248.0h338.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-338.4z"><title>2: 4:19 PM Flatbush Av-Brooklyn College to Wakefield-241 St, Peak per car: 107</title></path>
+<text x="786.2" y="258.0">107</text>
+<text x="431.8" y="278.0" class="label" text-anchor="end">M: 3:52 PM Middle Village-Metropolitan Av to Forest Hills-71 Av</text>
+<path class="s0" d="M439.8,268.0h338.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-338.4z"><title>M: 3:52 PM Middle Village-Metropolitan Av to Forest Hills-71 Av, Peak per car: 107</title></path>
+<text x="786.2" y="278.0">107</text>
+<text x="431.8" y="298.0" class="label" text-anchor="end">6X: 8:46 AM Pelham Bay Park to Brooklyn Bridge-City Hall</text>
+<path class="s0" d="M439.8,288.0h328.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-328.8z"><title>6X: 8:46 AM Pelham Bay Park to Brooklyn Bridge-City Hall, Peak per car: 104</title></path>
+<text x="776.6" y="298.0">104</text>
+<text x="431.8" y="318.0" class="label" text-anchor="end">1: 7:19 AM South Ferry to Van Cortlandt Park-242 St</text>
+<path class="s0" d="M439.8,308.0h325.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-325.6z"><title>1: 7:19 AM South Ferry to Van Cortlandt Park-242 St, Peak per car: 103</title></path>
+<text x="773.4" y="318.0">103</text>
+<text x="431.8" y="338.0" class="label" text-anchor="end">W: 8:50 AM Astoria-Ditmars Blvd to Whitehall St-South Ferry</text>
+<path class="s0" d="M439.8,328.0h322.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-322.4z"><title>W: 8:50 AM Astoria-Ditmars Blvd to Whitehall St-South Ferry, Peak per car: 102</title></path>
+<text x="770.2" y="338.0">102</text>
+<text x="431.8" y="358.0" class="label" text-anchor="end">3: 5:23 PM New Lots Av to Harlem-148 St</text>
+<path class="s0" d="M439.8,348.0h322.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-322.4z"><title>3: 5:23 PM New Lots Av to Harlem-148 St, Peak per car: 102</title></path>
+<text x="770.2" y="358.0">102</text>
+<text x="431.8" y="378.0" class="label" text-anchor="end">N: 8:17 AM Coney Island-Stillwell Av to 96 St</text>
+<path class="s0" d="M439.8,368.0h309.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-309.6z"><title>N: 8:17 AM Coney Island-Stillwell Av to 96 St, Peak per car: 98</title></path>
+<text x="757.4" y="378.0">98</text>
+<text x="431.8" y="398.0" class="label" text-anchor="end">Q: 4:58 PM 96 St to Coney Island-Stillwell Av</text>
+<path class="s0" d="M439.8,388.0h300.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-300.0z"><title>Q: 4:58 PM 96 St to Coney Island-Stillwell Av, Peak per car: 95</title></path>
+<text x="747.8" y="398.0">95</text>
+<text x="431.8" y="418.0" class="label" text-anchor="end">FX: 4:58 PM Jamaica-179 St to Coney Island-Stillwell Av</text>
+<path class="s0" d="M439.8,408.0h293.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-293.6z"><title>FX: 4:58 PM Jamaica-179 St to Coney Island-Stillwell Av, Peak per car: 93</title></path>
+<text x="741.4" y="418.0">93</text>
+<text x="431.8" y="438.0" class="label" text-anchor="end">D: 3:57 PM Norwood-205 St to Coney Island-Stillwell Av</text>
+<path class="s0" d="M439.8,428.0h290.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-290.4z"><title>D: 3:57 PM Norwood-205 St to Coney Island-Stillwell Av, Peak per car: 92</title></path>
+<text x="738.2" y="438.0">92</text>
+<text x="431.8" y="458.0" class="label" text-anchor="end">J: 8:22 AM Jamaica Center-Parsons/Archer to Broad St</text>
+<path class="s0" d="M439.8,448.0h290.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-290.4z"><title>J: 8:22 AM Jamaica Center-Parsons/Archer to Broad St, Peak per car: 92</title></path>
+<text x="738.2" y="458.0">92</text>
+<text x="431.8" y="478.0" class="label" text-anchor="end">B: 8:41 AM Brighton Beach to Bedford Park Blvd</text>
+<path class="s0" d="M439.8,468.0h287.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-287.2z"><title>B: 8:41 AM Brighton Beach to Bedford Park Blvd, Peak per car: 91</title></path>
+<text x="735.0" y="478.0">91</text>
+<text x="431.8" y="498.0" class="label" text-anchor="end">C: 5:31 PM Euclid Av to 168 St</text>
+<path class="s0" d="M439.8,488.0h277.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-277.6z"><title>C: 5:31 PM Euclid Av to 168 St, Peak per car: 88</title></path>
+<text x="725.4" y="498.0">88</text>
+<text x="431.8" y="518.0" class="label" text-anchor="end">7X: 4:56 PM 34 St-Hudson Yards to Flushing-Main St</text>
+<path class="s0" d="M439.8,508.0h271.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-271.2z"><title>7X: 4:56 PM 34 St-Hudson Yards to Flushing-Main St, Peak per car: 86</title></path>
+<text x="719.0" y="518.0">86</text>
+<text x="431.8" y="538.0" class="label" text-anchor="end">R: 6:58 AM Bay Ridge-95 St to 96 St</text>
+<path class="s0" d="M439.8,528.0h236.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-236.0z"><title>R: 6:58 AM Bay Ridge-95 St to 96 St, Peak per car: 75</title></path>
+<text x="683.8" y="538.0">75</text>
+<text x="431.8" y="558.0" class="label" text-anchor="end">Z: 7:52 AM Jamaica Center-Parsons/Archer to Broad St</text>
+<path class="s0" d="M439.8,548.0h210.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-210.4z"><title>Z: 7:52 AM Jamaica Center-Parsons/Archer to Broad St, Peak per car: 67</title></path>
+<text x="658.2" y="558.0">67</text>
+<text x="431.8" y="578.0" class="label" text-anchor="end">GS: 4:59 PM Grand Central-42 St to Times Sq-42 St</text>
+<path class="s0" d="M439.8,568.0h204.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-204.0z"><title>GS: 4:59 PM Grand Central-42 St to Times Sq-42 St, Peak per car: 65</title></path>
+<text x="651.8" y="578.0">65</text>
+<text x="431.8" y="598.0" class="label" text-anchor="end">FS: 4:41 PM Franklin Av to Prospect Park</text>
+<path class="s0" d="M439.8,588.0h124.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-124.0z"><title>FS: 4:41 PM Franklin Av to Prospect Park, Peak per car: 40</title></path>
+<text x="571.8" y="598.0">40</text>
+<text x="431.8" y="618.0" class="label" text-anchor="end">H: 6:21 AM Rockaway Park-Beach 116 St to Broad Channel</text>
+<path class="s0" d="M439.8,608.0h31.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-31.2z"><title>H: 6:21 AM Rockaway Park-Beach 116 St to Broad Channel, Peak per car: 11</title></path>
+<text x="479.0" y="618.0">11</text>
+</svg>

@@ -955,3 +955,5 @@ Produced by `mta-od-data ridership --by station-direction --markdown-out src/mta
 | Beach 98 St (A,S) | Rockaway Park | 298 | 632 | 9 | 289 | 0 | 686 | 6:00 PM | 31 |
 | Beach 105 St (A,S) | Inbound | 216 | 330 | 212 | 4 | 0 | 612 | 7:00 AM | 35 |
 | Beach 105 St (A,S) | Rockaway Park | 204 | 310 | 0 | 204 | 0 | 491 | 5:00 PM | 22 |
+
+![Riders on and off by station direction](by_station_direction-riders.svg)

@@ -89,3 +89,5 @@ Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ride
 | Culver express | 2,423 | 3,247 | 7:00 AM | 1,385 |
 | Upper Culver express | 2,423 | 3,247 | 7:00 AM | 1,385 |
 | Hillside Av express | 2,060 | 2,970 | 7:00 AM | 857 |
+
+![Riders by line](by_line-riders.svg)

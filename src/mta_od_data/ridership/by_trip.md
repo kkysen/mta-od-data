@@ -37,3 +37,7 @@ Produced by `mta-od-data ridership --by trip --markdown-out src/mta_od_data/ride
 | H | 6:21 AM Rockaway Park-Beach 116 St to Broad Channel | 54 | 300 | 11 | Beach 90 St to Broad Channel | 6:26 AM | 60 |
 
 \* A car is 60 ft of train, about one B Division car's length, so routes with different train lengths compare (`train_lengths.json5`).
+
+![Each route's most crowded train](by_trip-peak-load.svg)
+
+![Each route's most crowded train, per car\*](by_trip-peak-per-car.svg)

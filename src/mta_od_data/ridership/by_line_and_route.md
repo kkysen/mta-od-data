@@ -236,3 +236,5 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | White Plains Rd express | 5 | 18,341 | 27,079 | 7:00 AM | 4,307 |
 | White Plains Rd local | 2 | 77,295 | 117,097 | 7:00 AM | 6,688 |
 | White Plains Rd local | 5 | 32,415 | 46,120 | 3:00 PM | 4,423 |
+
+![Riders by line and route](by_line_and_route-riders.svg)
