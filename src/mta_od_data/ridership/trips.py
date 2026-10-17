@@ -91,6 +91,83 @@ def load_trip_stops(manifest: Path, evasion: FareEvasion | None) -> TripStops:
     return TripStops(days)
 
 
+def platform_loads(
+    manifest: Path, evasion: FareEvasion | None, days: int
+) -> list[tuple[Any, ...]]:
+    """Each platform's most riders on it at once, an average weekday's,
+    at the start of a minute: those waiting to board
+    (`raptor assign-range`'s `platform-waits-<date>.parquet`),
+    and those who got off in the minute before, clearing it.
+    `(stop, dir, platform, minute, riders)` rows, a platform's busiest minute,
+    the first if more than one;
+    a stop OSM's routes don't say the platform of is its own (`stop`, `dir`),
+    and otherwise `stop` and `dir` are any of the platform's."""
+    parts = []
+    for row in read_manifest(manifest):
+        file = manifest.parent / f"platform-waits-{row['date']}.parquet"
+        if not file.exists():
+            raise ValueError(f"{file} missing; rerun `mta-od-data raptor assign-range`")
+        day = date.fromisoformat(row["date"])
+        today, tomorrow = (
+            1.0 if evasion is None else 1 / (1 - evasion.rate(x))
+            for x in (day, day + timedelta(days=1))
+        )
+        parts.append(
+            f"SELECT {int(row['days'])} * "
+            f"if(minute < {DAY // 60}, {today}, {tomorrow}) AS w, * "
+            f"FROM read_parquet('{file}')"
+        )
+    directions = ", ".join(f"({k}, '{v}')" for k, v in DIRECTIONS.items())
+    return (
+        connection()
+        .execute(
+            f"""
+            WITH waiting AS (
+                SELECT stop_id, dirs.dir, coalesce(leaving.pa, '') AS platform,
+                    minute, sum(riders * w) AS riders
+                FROM ({" UNION ALL ".join(parts)}) s
+                LEFT JOIN (VALUES {directions}) dirs(direction_id, dir)
+                    USING (direction_id)
+                LEFT JOIN directions leaving
+                    ON leaving.route = s.route_id AND leaving.a = s.stop_id
+                    AND leaving.b = s.next_stop
+                WHERE s.route_id IN (SELECT route FROM route_groups)
+                GROUP BY ALL
+            ),
+            off AS (
+                -- At the first minute's start from their train's arrival.
+                SELECT stop_id, dir, coalesce(leaving.pa, arriving.pb, '') AS platform,
+                    (arrival + 59) // 60 AS minute,
+                    sum(alightings * w) AS riders
+                FROM trip_stops t
+                LEFT JOIN directions leaving
+                    ON leaving.route = t.route_id AND leaving.a = t.stop_id
+                    AND leaving.b = t.next_stop
+                LEFT JOIN directions arriving
+                    ON arriving.route = t.route_id AND arriving.a = t.prev_stop
+                    AND arriving.b = t.stop_id
+                WHERE t.route_id IN (SELECT route FROM route_groups) AND alightings > 0
+                GROUP BY ALL
+            ),
+            minutes AS (
+                SELECT platform, if(platform = '', stop_id, '') AS s,
+                    if(platform = '', dir, '') AS d, minute,
+                    min(stop_id) AS stop_id, min(dir) AS dir,
+                    sum(riders) / {days} AS riders
+                FROM (SELECT * FROM waiting UNION ALL SELECT * FROM off)
+                GROUP BY platform, s, d, minute
+            )
+            SELECT stop_id, dir, platform, minute, riders
+            FROM minutes
+            QUALIFY row_number() OVER (
+                PARTITION BY platform, s, d ORDER BY riders DESC, minute
+            ) = 1
+            """
+        )
+        .fetchall()
+    )
+
+
 def place_hours(with_route: bool, days: int) -> list[tuple[Any, ...]]:
     """Riders on and off each stop's trains (each of `route_groups`' routes'),
     by stop, direction, platform (from `directions`), (route,)

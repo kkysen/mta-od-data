@@ -135,8 +135,12 @@ For platforms only, how busy each is for its size:
   so their rows overstate crowding.
 - **On + Off per m²**, **On + Off in Peak Hour per m²**:
   riders getting on or off over the day, or the peak hour, per m² of platform.
-  That's throughput for its size, not how many stand on it at once,
-  which would also need how long riders wait there.
+  That's throughput for its size, not how many stand on it at once.
+- **Most On Platform At**, **Most On Platform**, **Most On Platform per m²**:
+  the minute it's fullest, and how many are on it then, in all and per m².
+  That's riders waiting there (`platform-waits-<date>.parquet`)
+  and those who got off in the minute before, leaving it.
+  There's no crowding: no rider waits for a later train because one's too full.
 
 ### By route: [`by_route.md`](../src/mta_od_data/ridership/by_route.md)
 

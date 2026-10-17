@@ -272,12 +272,15 @@ def place_table(
     rows: list[tuple[Any, ...]],
     hours: list[tuple[Any, ...]],
     platforms: list[tuple[Any, ...]],
+    loads: list[tuple[Any, ...]],
     cols: list[Column],
     names_: Names,
 ) -> list[str]:
     """`place_rows`' rows as a table, with each place's busiest hour
     from `hours`, `(stop, dir, platform, [route,] hour, riders on + off)` rows,
-    and for a platform, its area and its riders on and off per m² of it."""
+    and for a platform, its area and its riders on and off per m² of it,
+    and its most riders on it at once,
+    from `loads`, `(stop, dir, platform, minute, riders)` rows."""
     platform_names = platform_labels(names_, platforms) if by is By.PLATFORM else {}
     areas: dict[str, float] = load_platform_areas() if by is By.PLATFORM else {}
 
@@ -331,6 +334,7 @@ def place_table(
         for j, v in enumerate(rest):
             merged[key][j] += v or 0.0
     peaks = busiest((*label(stop, d, p), *rest) for stop, d, p, *rest in hours)
+    most = {label(stop, d, p): (m, r) for stop, d, p, m, r in loads}
     head = [
         *(
             ["Station", "Direction"]
@@ -358,8 +362,23 @@ def place_table(
                 if areas
                 else []
             ),
+            *(
+                [
+                    "Most On Platform At",
+                    f"Most On Platform, {cols[0].label}",
+                    f"Most On Platform per m², {cols[0].label}",
+                ]
+                if most
+                else []
+            ),
         ),
-        table_rule("l" * len(head) + "r" * (k + 4) + "lr" + "rrr" * bool(areas)),
+        table_rule(
+            "l" * len(head)
+            + "r" * (k + 4)
+            + "lr"
+            + "rrr" * bool(areas)
+            + "lrr" * bool(most)
+        ),
     ]
 
     # By the riders as shown, so rows that show the same come out in a set order.
@@ -380,7 +399,18 @@ def place_table(
                 if area
                 else ["", "", ""]
             )
-        lines.append(table_row(*key, *(fmt(v) for v in vs), *peak, *crowding))
+        on_platform: list[str] = []
+        if most:
+            at, n = most.get(key, (None, 0.0))
+            area = areas.get(named[key][0])
+            on_platform = (
+                [clock_time(at * 60), fmt(n), fmt(n / area, 2) if area else ""]
+                if at is not None
+                else ["", "", ""]
+            )
+        lines.append(
+            table_row(*key, *(fmt(v) for v in vs), *peak, *crowding, *on_platform)
+        )
     return lines
 
 
@@ -525,6 +555,7 @@ def ridership(
             got.rows,
             got.hours,
             got.platforms,
+            got.loads,
             cols,
             load_names(DEFAULT_STATIONS, DEFAULT_COMPLEXES),
         )
@@ -553,6 +584,22 @@ def ridership(
                     [f"On + Off in Peak Hour per m², {first}"],
                     [first],
                     label=peak_hour_label,
+                    align="rr",
+                ),
+                Chart(
+                    "most-on-platform",
+                    "Most riders on the platform at once",
+                    [f"Most On Platform, {first}"],
+                    [first],
+                    label=most_on_label,
+                    align="rr",
+                ),
+                Chart(
+                    "most-on-platform-per-m2",
+                    "Most riders on the platform at once per m²",
+                    [f"Most On Platform per m², {first}"],
+                    [first],
+                    label=most_on_label,
                     align="rr",
                 ),
             ]
@@ -666,6 +713,11 @@ def peak_label(row: Mapping[str, str]) -> list[str]:
 def peak_hour_label(row: Mapping[str, str]) -> list[str]:
     """A `place_table` row's place, and its peak hour."""
     return [row["Platform"], row["Peak Hour"]]
+
+
+def most_on_label(row: Mapping[str, str]) -> list[str]:
+    """A `place_table` row's platform, and when it's fullest."""
+    return [row["Platform"], row["Most On Platform At"]]
 
 
 def riders_chart(title: str, cols: Sequence[Column]) -> Chart:

@@ -40,6 +40,7 @@ from mta_od_data.ridership.trips import (
     line_hours,
     load_trip_stops,
     place_hours,
+    platform_loads,
     route_hours,
 )
 
@@ -611,8 +612,9 @@ class Computed:
     rows: list[tuple[Any, ...]] = field(default_factory=list)
     # Their riders by the hour, by `place_hours`, `route_hours`, or `line_hours`.
     hours: list[tuple[Any, ...]] = field(default_factory=list)
-    # `--by platform`: `platform_routes`.
+    # `--by platform`: `platform_routes`, and `platform_loads`.
     platforms: list[tuple[Any, ...]] = field(default_factory=list)
+    loads: list[tuple[Any, ...]] = field(default_factory=list)
     # `--by route`: each row's service.
     service: dict[str, RouteService] = field(default_factory=dict)
     # `--by trip`: each route's most crowded trains.
@@ -663,6 +665,9 @@ def compute(
             place_rows(with_route, names),
             place_hours(with_route, days),
             platform_routes() if place is By.PLATFORM else [],
+            loads=platform_loads(manifest, evasion, days)
+            if place is By.PLATFORM and not with_route
+            else [],
         )
     if By.LINE in dims:
         line_hops_table(load_lines(lines))

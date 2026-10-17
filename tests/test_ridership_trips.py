@@ -7,6 +7,7 @@ from mta_od_data.ridership.trips import (
     line_hours,
     load_trip_stops,
     place_hours,
+    platform_loads,
 )
 
 SAS = [Hop("SAS", "R14", "B08"), Hop("SAS", "B08", "Q03")]
@@ -82,3 +83,24 @@ def test_crowded_trains_peak_on_their_routes_usual_line(tmp_path: Path) -> None:
     load_trip_stops(manifest, None)
     (train,) = crowded_trains(["R"], 1)
     assert (train.peak, train.peak_stop) == (30, "R11")
+
+
+def test_platform_loads_count_waiting_and_getting_off(tmp_path: Path) -> None:
+    # A Q from 63 St to 57 St at 08:01, 15 getting off at 57 St at 08:02.
+    trips = "a,Q,B08,28860,15,0,15;a,Q,R14,28920,0,15,0"
+    manifest = write_dates(tmp_path, [("2025-09-17", 2, trips)])
+    # 63 St's riders waiting for it, rising to 15 by 08:00.
+    connection().execute(
+        f"COPY (SELECT * FROM (VALUES ('Q', 0, 'B08', 'R14', 479, 7.5), "
+        f"('Q', 0, 'B08', 'R14', 480, 15.0)) "
+        "t(route_id, direction_id, stop_id, next_stop, minute, riders)) "
+        f"TO '{tmp_path / 'platform-waits-2025-09-17.parquet'}' (FORMAT parquet)"
+    )
+    days = load_trip_stops(manifest, None).days
+    route_groups_table({"Q": ["Q"]})
+    connection().execute(
+        "CREATE OR REPLACE TEMP TABLE directions AS SELECT * FROM (VALUES "
+        "('Q', 'B08', 'R14', 'N', 'N', 'p63', 'p57')) t(route, a, b, da, db, pa, pb)"
+    )
+    loads = {p: (m, r) for _, _, p, m, r in platform_loads(manifest, None, days)}
+    assert loads == {"p63": (480, 15.0), "p57": (482, 15.0)}
