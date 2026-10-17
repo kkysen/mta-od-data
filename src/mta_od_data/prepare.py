@@ -10,7 +10,7 @@ from mta_od_data import DATA, ROOT
 app = Typer()
 
 DEFAULT_CSV_GLOB = "data/MTA_Subway_Origin-Destination_Ridership_Estimate__2025_*.csv"
-DEFAULT_PARQUET = DATA / "mta_od.parquet"
+DEFAULT_PARQUET = DATA / "mta_od_2025.parquet"
 DEFAULT_COMPLEXES_CSV = DATA / "complexes.csv"
 DEFAULT_STATIONS_CSV = DATA / "stations.csv"
 COMPLEXES_URL = "https://data.ny.gov/resource/5f5g-n3cz.csv?$limit=1000"

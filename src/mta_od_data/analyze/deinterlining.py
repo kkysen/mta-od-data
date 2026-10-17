@@ -1498,7 +1498,7 @@ def deinterlining(
             ),
         ),
     ] = SCENARIOS_FILE,
-    parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
+    parquet: Annotated[Path, Option()] = DATA / "mta_od_2025.parquet",
     complexes_path: Annotated[Path, Option("--complexes")] = (DATA / "complexes.csv"),
     stations_path: Annotated[
         Path,

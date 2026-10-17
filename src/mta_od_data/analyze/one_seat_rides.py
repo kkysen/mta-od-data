@@ -748,7 +748,7 @@ def render_notes(*, close_threshold_m: float) -> str:
 @app.command()
 def one_seat_rides(
     ctx: Context,
-    parquet: Annotated[Path, Option()] = DATA / "mta_od.parquet",
+    parquet: Annotated[Path, Option()] = DATA / "mta_od_2025.parquet",
     complexes_path: Annotated[Path, Option("--complexes")] = (DATA / "complexes.csv"),
     stations_path: Annotated[
         Path,

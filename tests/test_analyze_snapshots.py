@@ -7,7 +7,7 @@ with the argv handed in rather than taken from `sys.argv`:
 `Produced by` line comes out as it would from a shell, and a run
 costs one parse rather than one interpreter.
 
-Skipped when `data/mta_od.parquet` is missing:
+Skipped when `data/mta_od_2025.parquet` is missing:
 it's gitignored, so this can't run in CI.
 """
 
@@ -20,7 +20,7 @@ import pytest
 from mta_od_data import DATA, ROOT
 from mta_od_data.cli import app
 
-PARQUET = DATA / "mta_od.parquet"
+PARQUET = DATA / "mta_od_2025.parquet"
 ANALYZE_DIR = ROOT / "src" / "mta_od_data" / "analyze"
 
 
