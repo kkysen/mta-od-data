@@ -552,6 +552,8 @@ def ridership(
                     "Riders on and off in the peak hour per m² of platform",
                     [f"On + Off in Peak Hour per m², {first}"],
                     [first],
+                    label=peak_hour_label,
+                    align="rr",
                 ),
             ]
     elif By.LINE in dims:
@@ -659,6 +661,11 @@ def peak_label(row: Mapping[str, str]) -> list[str]:
     its route between the two stations: `Court Sq-23 St`, `F`, ...."""
     a, b = row["Peak Between"].split(" to ")
     return [a, row["Route"], b, row["Leaving At"]]
+
+
+def peak_hour_label(row: Mapping[str, str]) -> list[str]:
+    """A `place_table` row's place, and its peak hour."""
+    return [row["Platform"], row["Peak Hour"]]
 
 
 def riders_chart(title: str, cols: Sequence[Column]) -> Chart:
