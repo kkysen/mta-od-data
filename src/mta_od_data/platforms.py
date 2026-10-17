@@ -19,6 +19,9 @@ then to the stop's in that direction if one platform serves it.
 Each platform's area is its OSM outline's, for how crowded it is (`platform_areas.csv`):
 every platform a route relation lists is mapped as a closed way
 but one, Elmhurst Av's northbound, a multipolygon relation, left without.
+A few are mapped in pieces, which a relation lists one after another after its stop,
+like Newkirk Plaza's southbound, in four:
+such a platform is its first piece, with all its pieces' area.
 
 Read from Geofabrik's New York extract, not the Overpass API,
 whose public servers were too busy to answer.
@@ -175,6 +178,8 @@ def fetch_platforms(
     # (route, stop, direction) and (stop, direction) -> platform -> times seen.
     by_route_dir: defaultdict[tuple[str, str, str], Counter[str]] = defaultdict(Counter)
     by_dir: defaultdict[tuple[str, str], Counter[str]] = defaultdict(Counter)
+    # Each platform's pieces, by its first: itself, and those listed right after it.
+    pieces: defaultdict[str, set[str]] = defaultdict(set)
     directions: dict[tuple[str, str, str], tuple[str, str]] = {}
     for feed_zip in sorted(gtfs_dir.glob("*.zip")):
         feed = load_feed(feed_zip)
@@ -187,15 +192,22 @@ def fetch_platforms(
             # Each matched stop, and its platform: the platform member after it.
             stops: list[tuple[str, str]] = []
             stop = None
+            # The platform being listed, so its further pieces are its.
+            first = None
             for t, ref, role in ms:
                 key = f"{t[0]}{ref}"
+                if not role.startswith("platform"):
+                    first = None
                 if role.startswith("stop") and key in locations.at and served[route]:
                     at = locations.at[key]
                     d, s = min((metres(at, coords[s]), s) for s in served[route])
                     stop = s if d <= MAX_MATCH_METRES else None
+                elif role.startswith("platform") and first is not None:
+                    pieces[first].add(key)
                 elif role.startswith("platform") and stop is not None:
                     stops.append((stop, key))
-                    stop = None
+                    stop, first = None, key
+                    pieces[key].add(key)
             for (a, pa), (b, pb) in zip(stops, stops[1:], strict=False):
                 pairs.setdefault((route, a, b), (pa, pb))
                 if (route, a, b) in feed.directions:
@@ -246,13 +258,19 @@ def fetch_platforms(
         f"{unknown} with a platform unknown"
     )
     platforms = sorted({p for r in rows for p in (r[4], r[5]) if p})
+
+    def area(p: str) -> float | None:
+        parts = pieces.get(p) or {p}
+        if not all(q in locations.areas for q in parts):
+            return None
+        return sum(locations.areas[q] for q in parts)
+
+    areas = {p: a for p in platforms if (a := area(p)) is not None}
     with areas_out.open("w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["platform", "area_m2"])
-        writer.writerows(
-            (p, f"{locations.areas[p]:.1f}") for p in platforms if p in locations.areas
-        )
-    missing = [p for p in platforms if p not in locations.areas]
+        writer.writerows((p, f"{a:.1f}") for p, a in areas.items())
+    missing = [p for p in platforms if p not in areas]
     print(
         f"wrote {areas_out}: {len(platforms) - len(missing)} platforms' areas, "
         f"{len(missing)} not closed ways: {', '.join(missing)}"

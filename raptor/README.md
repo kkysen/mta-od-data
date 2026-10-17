@@ -131,9 +131,10 @@ For platforms only, how busy each is for its size:
 
 - **Area (m²)**: its OpenStreetMap outline's area
   ([`platform_areas.csv`](../src/mta_od_data/ridership/platform_areas.csv)).
+  A platform mapped in pieces, like Newkirk Plaza's southbound, in four, has all their area.
   An outline under a quarter of another platform's at its station
-  is taken to be mapped only in part, like Newkirk Plaza's southbound, 51 m²,
-  so it has that platform's area instead, marked †.
+  is taken to be mapped only in part,
+  so it has that platform's area instead, marked † (none is, now).
 - **On + Off per m²**, **On + Off in Peak Hour per m²**:
   riders getting on or off over the day, or the peak hour, per m² of platform.
   That's throughput for its size, not how many stand on it at once.
