@@ -6,6 +6,11 @@ The peak hour is the hour, by when it starts, with the most riders in the Aug-De
 
 Produced by `mta-od-data ridership --by station --markdown-out src/mta_od_data/ridership/by_station.md`.
 
+## Table
+
+<details open>
+<summary>The table</summary>
+
 | Station | On + Off, Aug-Dec 2025 | On + Off, 2019 | On, Aug-Dec 2025 | Off, Aug-Dec 2025 | Transfers On + Off, Aug-Dec 2025 | Staying On, Aug-Dec 2025 | Peak Hour | On + Off in Peak Hour, Aug-Dec 2025 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
 | Grand Central-42 St (4,5,6) | 348,175 | 459,717 | 171,820 | 176,355 | 183,224 | 262,934 | 8:00 AM | 36,292 |
@@ -484,4 +489,15 @@ Produced by `mta-od-data ridership --by station --markdown-out src/mta_od_data/r
 | Beach 98 St (A,S) | 619 | 1,314 | 317 | 303 | 0 | 1,498 | 7:00 AM | 55 |
 | Beach 105 St (A,S) | 420 | 640 | 212 | 208 | 0 | 1,103 | 7:00 AM | 48 |
 
+</details>
+
+## Charts
+
+### Riders on and off by station
+
+<details>
+<summary>The chart</summary>
+
 ![Riders on and off by station](by_station-riders.svg)
+
+</details>

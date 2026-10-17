@@ -6,6 +6,11 @@ The peak hour is the hour, by when it starts, with the most riders in the Aug-De
 
 Produced by `mta-od-data ridership --by station-direction --markdown-out src/mta_od_data/ridership/by_station_direction.md`.
 
+## Table
+
+<details open>
+<summary>The table</summary>
+
 | Station | Direction | On + Off, Aug-Dec 2025 | On + Off, 2019 | On, Aug-Dec 2025 | Off, Aug-Dec 2025 | Transfers On + Off, Aug-Dec 2025 | Staying On, Aug-Dec 2025 | Peak Hour | On + Off in Peak Hour, Aug-Dec 2025 |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
 | Grand Central-42 St (4,5,6) | Uptown | 178,315 | 235,680 | 81,187 | 97,129 | 96,310 | 129,176 | 5:00 PM | 18,767 |
@@ -956,4 +961,15 @@ Produced by `mta-od-data ridership --by station-direction --markdown-out src/mta
 | Beach 105 St (A,S) | Inbound | 216 | 330 | 212 | 4 | 0 | 612 | 7:00 AM | 35 |
 | Beach 105 St (A,S) | Rockaway Park | 204 | 310 | 0 | 204 | 0 | 491 | 5:00 PM | 22 |
 
+</details>
+
+## Charts
+
+### Riders on and off by station direction
+
+<details>
+<summary>The chart</summary>
+
 ![Riders on and off by station direction](by_station_direction-riders.svg)
+
+</details>

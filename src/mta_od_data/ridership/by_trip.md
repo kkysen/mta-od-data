@@ -5,6 +5,11 @@ A train's load is its riders on board between two stops, averaged over the weekd
 
 Produced by `mta-od-data ridership --by trip --markdown-out src/mta_od_data/ridership/by_trip.md`.
 
+## Table
+
+<details open>
+<summary>The table</summary>
+
 | Route | Train | Peak Load, Aug-Dec 2025 | Train Length (ft) | Peak per Car\* | Peak Between | Leaving At | Weekdays Run |
 | --- | --- | ---: | ---: | ---: | --- | --- | ---: |
 | F | 8:43 AM Jamaica-179 St to Coney Island-Stillwell Av | 1,360 | 600 | 136 | Court Sq-23 St to Lexington Av/53 St | 9:09 AM | 23 |
@@ -38,6 +43,24 @@ Produced by `mta-od-data ridership --by trip --markdown-out src/mta_od_data/ride
 
 \* A car is 60 ft of train, about one B Division car's length, so routes with different train lengths compare (`train_lengths.json5`).
 
+</details>
+
+## Charts
+
+### Each route's most crowded train
+
+<details>
+<summary>The chart</summary>
+
 ![Each route's most crowded train](by_trip-peak-load.svg)
 
+</details>
+
+### Each route's most crowded train, per car\*
+
+<details>
+<summary>The chart</summary>
+
 ![Each route's most crowded train, per car\*](by_trip-peak-per-car.svg)
+
+</details>

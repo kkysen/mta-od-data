@@ -899,11 +899,36 @@ def render(
         "",
         f"Produced by `{produced_by(ctx)}`.",
         "",
+        # Each under its own heading, to link to, and collapsible, as they're long:
+        # GitHub keeps `<details>`, but not the styles a scrolling box would take.
+        "## Table",
+        "",
+        "<details open>",
+        "<summary>The table</summary>",
+        "",
         *table,
+        "",
+        "</details>",
+        *(["", "## Charts"] if charts else []),
         *(
             line
             for title, file in charts
-            for line in ("", f"![{title.replace('*', r'\*')}]({file})")
+            for line in (
+                "",
+                f"### {escaped(title)}",
+                "",
+                "<details>",
+                "<summary>The chart</summary>",
+                "",
+                f"![{escaped(title)}]({file})",
+                "",
+                "</details>",
+            )
         ),
     ]
     return "\n".join(lines) + "\n"
+
+
+def escaped(title: str) -> str:
+    """A chart's title as Markdown text: its `*`s, the car note's, kept literal."""
+    return title.replace("*", r"\*")

@@ -6,6 +6,11 @@ The peak hour is the hour, by when it starts, with the most riders in the Aug-De
 
 Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_od_data/ridership/by_line_and_route.md`.
 
+## Table
+
+<details open>
+<summary>The table</summary>
+
 | Line | Route | Aug-Dec 2025 | 2019 | Peak Hour | Riders in Peak Hour, Aug-Dec 2025 |
 | --- | --- | ---: | ---: | --- | ---: |
 | 4 Av | R | 145,403 | 180,198 | 8:00 AM | 14,546 |
@@ -237,4 +242,15 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 | White Plains Rd local | 2 | 77,295 | 117,097 | 7:00 AM | 6,688 |
 | White Plains Rd local | 5 | 32,415 | 46,120 | 3:00 PM | 4,423 |
 
+</details>
+
+## Charts
+
+### Riders by line and route
+
+<details>
+<summary>The chart</summary>
+
 ![Riders by line and route](by_line_and_route-riders.svg)
+
+</details>

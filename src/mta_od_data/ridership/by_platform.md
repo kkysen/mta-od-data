@@ -8,6 +8,11 @@ A platform's area is its OpenStreetMap outline's, and its On + Off per m² is it
 
 Produced by `mta-od-data ridership --by platform --markdown-out src/mta_od_data/ridership/by_platform.md`.
 
+## Table
+
+<details open>
+<summary>The table</summary>
+
 | Platform | On + Off, Aug-Dec 2025 | On + Off, 2019 | On, Aug-Dec 2025 | Off, Aug-Dec 2025 | Transfers On + Off, Aug-Dec 2025 | Staying On, Aug-Dec 2025 | Peak Hour | On + Off in Peak Hour, Aug-Dec 2025 | Area (m²) | On + Off per m², Aug-Dec 2025 | On + Off in Peak Hour per m², Aug-Dec 2025 | Most On Platform At | Most On Platform, Aug-Dec 2025 | Most On Platform per m², Aug-Dec 2025 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | --- | ---: | ---: |
 | Grand Central-42 St (4,5,6), Uptown | 178,315 | 235,680 | 81,187 | 97,129 | 96,310 | 129,176 | 5:00 PM | 18,767 | 1,164 | 153.2 | 16.12 | 9:04 AM | 1,048 | 0.90 |
@@ -901,12 +906,51 @@ Produced by `mta-od-data ridership --by platform --markdown-out src/mta_od_data/
 | Beach 105 St (A,S), Inbound | 216 | 330 | 212 | 4 | 0 | 612 | 7:00 AM | 35 | 589 | 0.4 | 0.06 | 7:58 AM | 7 | 0.01 |
 | Beach 105 St (A,S), Rockaway Park | 204 | 310 | 0 | 204 | 0 | 491 | 5:00 PM | 22 | 632 | 0.3 | 0.04 | 8:14 AM | 8 | 0.01 |
 
+</details>
+
+## Charts
+
+### Riders on and off by platform
+
+<details>
+<summary>The chart</summary>
+
 ![Riders on and off by platform](by_platform-riders.svg)
+
+</details>
+
+### Riders on and off per m² of platform
+
+<details>
+<summary>The chart</summary>
 
 ![Riders on and off per m² of platform](by_platform-per-m2.svg)
 
+</details>
+
+### Riders on and off in the peak hour per m² of platform
+
+<details>
+<summary>The chart</summary>
+
 ![Riders on and off in the peak hour per m² of platform](by_platform-peak-per-m2.svg)
+
+</details>
+
+### Most riders on the platform at once
+
+<details>
+<summary>The chart</summary>
 
 ![Most riders on the platform at once](by_platform-most-on-platform.svg)
 
+</details>
+
+### Most riders on the platform at once per m²
+
+<details>
+<summary>The chart</summary>
+
 ![Most riders on the platform at once per m²](by_platform-most-on-platform-per-m2.svg)
+
+</details>

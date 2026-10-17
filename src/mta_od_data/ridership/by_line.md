@@ -6,6 +6,11 @@ The peak hour is the hour, by when it starts, with the most riders in the Aug-De
 
 Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ridership/by_line.md`.
 
+## Table
+
+<details open>
+<summary>The table</summary>
+
 | Line | Aug-Dec 2025 | 2019 | Peak Hour | Riders in Peak Hour, Aug-Dec 2025 |
 | --- | ---: | ---: | --- | ---: |
 | Lexington Av | 952,577 | 1,272,974 | 5:00 PM | 103,041 |
@@ -90,4 +95,15 @@ Produced by `mta-od-data ridership --by line --markdown-out src/mta_od_data/ride
 | Upper Culver express | 2,423 | 3,247 | 7:00 AM | 1,385 |
 | Hillside Av express | 2,060 | 2,970 | 7:00 AM | 857 |
 
+</details>
+
+## Charts
+
+### Riders by line
+
+<details>
+<summary>The chart</summary>
+
 ![Riders by line](by_line-riders.svg)
+
+</details>

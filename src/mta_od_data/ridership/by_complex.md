@@ -6,6 +6,11 @@ The peak hour is the hour, by when it starts, with the most riders in the Aug-De
 
 Produced by `mta-od-data ridership --by complex --markdown-out src/mta_od_data/ridership/by_complex.md`.
 
+## Table
+
+<details open>
+<summary>The table</summary>
+
 | Complex | On + Off, Aug-Dec 2025 | On + Off, 2019 | On, Aug-Dec 2025 | Off, Aug-Dec 2025 | Transfers On + Off, Aug-Dec 2025 | Staying On, Aug-Dec 2025 | Peak Hour | On + Off in Peak Hour, Aug-Dec 2025 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
 | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) | 936,114 | 1,222,617 | 469,687 | 466,426 | 613,941 | 562,515 | 5:00 PM | 94,543 |
@@ -433,4 +438,15 @@ Produced by `mta-od-data ridership --by complex --markdown-out src/mta_od_data/r
 | Beach 98 St (A,S) | 619 | 1,314 | 317 | 303 | 0 | 1,498 | 7:00 AM | 55 |
 | Beach 105 St (A,S) | 420 | 640 | 212 | 208 | 0 | 1,103 | 7:00 AM | 48 |
 
+</details>
+
+## Charts
+
+### Riders on and off by complex
+
+<details>
+<summary>The chart</summary>
+
 ![Riders on and off by complex](by_complex-riders.svg)
+
+</details>
