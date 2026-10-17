@@ -11,7 +11,7 @@
 use std::collections::BTreeMap;
 use std::ops::Index;
 use std::path::Path;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicI64, AtomicU64, Ordering};
 
 use anyhow::{Context, Result};
 use parquet::basic::{Compression, Encoding, ZstdLevel};
@@ -23,7 +23,7 @@ use serde::Deserialize;
 use crate::gtfs::Secs;
 use crate::od::{ComplexId, Complexes, OdRow, Riders};
 use crate::raptor::{Journey, Leg, Legs, MAX_RIDES, Router};
-use crate::timetable::{DEPARTURES_UNTIL, SERVICE_DAY_START, StopIdx, Timetable};
+use crate::timetable::{DEPARTURES_UNTIL, Pattern, SERVICE_DAY_START, StopIdx, Timetable};
 
 const HOUR: Secs = 60 * 60;
 
@@ -174,40 +174,128 @@ impl AllLegs {
         self.ends[id.0 as usize].0
     }
 
-    /// `id`'s rides' patterns and board and alight positions, in order.
-    fn rides(&self, id: LegsId) -> impl Iterator<Item = (u32, u16, u16)> {
+    /// `id`'s legs, in order.
+    fn legs(&self, id: LegsId) -> &[LegKey] {
         let i = id.0 as usize;
         let start = i.checked_sub(1).map_or(0, |i| self.ends[i].1) as usize;
-        self.legs[start..self.ends[i].1 as usize]
-            .iter()
-            .filter_map(|leg| match *leg {
-                LegKey::Ride {
-                    pattern,
-                    board_pos,
-                    alight_pos,
-                } => Some((pattern, board_pos, alight_pos)),
-                LegKey::Walk { .. } => None,
-            })
+        &self.legs[start..self.ends[i].1 as usize]
+    }
+
+    /// `id`'s rides' patterns and board and alight positions, in order.
+    fn rides(&self, id: LegsId) -> impl Iterator<Item = (u32, u16, u16)> {
+        self.legs(id).iter().filter_map(|leg| match *leg {
+            LegKey::Ride {
+                pattern,
+                board_pos,
+                alight_pos,
+            } => Some((pattern, board_pos, alight_pos)),
+            LegKey::Walk { .. } => None,
+        })
     }
 }
 
 /// Riders boarding and alighting each train at each of its stops, over a date's rows,
-/// in billionths of a rider.
+/// and waiting on each platform each minute, in billionths of a rider.
 /// Integers, added atomically from every origin's thread at once:
 /// integer sums are the same in any order, as floating-point ones aren't.
-pub struct TripLoads {
+pub struct TripLoads<'a> {
+    tt: &'a Timetable,
     /// Each pattern's first slot and stop count: a trip's stops are consecutive slots.
     patterns: Vec<(usize, usize)>,
     on: Vec<AtomicU64>,
     off: Vec<AtomicU64>,
+    waits: Waits,
+}
+
+/// Riders waiting on each platform, a stop's trains one way, at the start of each minute,
+/// as differences, so a rider's whole wait is a few additions:
+/// `steps` adds to the count from its minute on,
+/// and `slopes` to how much it rises each minute from its minute on.
+struct Waits {
+    steps: Vec<AtomicI64>,
+    slopes: Vec<AtomicI64>,
+}
+
+/// The minutes a platform's waits are counted over: the service day's clock,
+/// through the last departure a journey can take.
+pub const WAIT_MINUTES: usize = (DEPARTURES_UNTIL / 60) as usize + 4 * 60;
+
+/// A platform's slot among a stop's: GTFS's direction 0, 1, or none.
+const DIRECTIONS: usize = 3;
+
+fn direction_slot(direction_id: Option<u8>) -> usize {
+    direction_id.map_or(2, usize::from)
+}
+
+fn minute(t: Secs) -> usize {
+    usize::try_from(t.div_euclid(60))
+        .unwrap_or(0)
+        .min(WAIT_MINUTES - 1)
+}
+
+impl Waits {
+    fn new(stops: usize) -> Self {
+        let zeros = || {
+            (0..stops * DIRECTIONS * WAIT_MINUTES)
+                .map(|_| AtomicI64::new(0))
+                .collect()
+        };
+        Self {
+            steps: zeros(),
+            slopes: zeros(),
+        }
+    }
+
+    fn slot(platform: usize, t: Secs) -> usize {
+        platform * WAIT_MINUTES + minute(t)
+    }
+
+    /// `nano` riders on `platform` from `from` until `until`.
+    fn wait(&self, platform: usize, from: Secs, until: Secs, nano: i64) {
+        if from >= until {
+            return;
+        }
+        self.steps[Self::slot(platform, from)].fetch_add(nano, Ordering::Relaxed);
+        self.steps[Self::slot(platform, until)].fetch_sub(nano, Ordering::Relaxed);
+    }
+
+    /// `nano` riders reaching `platform` evenly from `from` to `to`,
+    /// and all waiting until `until`.
+    fn ramp(&self, platform: usize, from: Secs, to: Secs, until: Secs, nano: i64) {
+        let to = to.min(until);
+        let (a, b) = (minute(from), minute(to));
+        if a >= b {
+            return self.wait(platform, to, until, nano);
+        }
+        let minutes = (b - a) as i64;
+        let slope = nano / minutes;
+        let first = platform * WAIT_MINUTES;
+        self.slopes[first + a].fetch_add(slope, Ordering::Relaxed);
+        self.slopes[first + b].fetch_sub(slope, Ordering::Relaxed);
+        // What the slope's rounding left, so they're all there from `to`.
+        self.steps[first + b].fetch_add(nano - slope * minutes, Ordering::Relaxed);
+        self.steps[Self::slot(platform, until)].fetch_sub(nano, Ordering::Relaxed);
+    }
+
+    /// Each minute's riders waiting on `platform`, in billionths.
+    fn at(&self, platform: usize) -> impl Iterator<Item = i64> + '_ {
+        let first = platform * WAIT_MINUTES;
+        let (mut count, mut rise, mut ramped) = (0i64, 0i64, 0i64);
+        (0..WAIT_MINUTES).map(move |m| {
+            ramped += rise;
+            rise += self.slopes[first + m].load(Ordering::Relaxed);
+            count += self.steps[first + m].load(Ordering::Relaxed);
+            count + ramped
+        })
+    }
 }
 
 /// Billionths of a rider: an OD row's share on a choice is often well under 1e-4,
 /// the riders' precision elsewhere, and rounding each to that would lose them.
 pub const NANO: f64 = 1e9;
 
-impl TripLoads {
-    pub fn new(tt: &Timetable) -> Self {
+impl<'a> TripLoads<'a> {
+    pub fn new(tt: &'a Timetable) -> Self {
         let mut patterns = Vec::with_capacity(tt.patterns.len());
         let mut slots = 0;
         for p in &tt.patterns {
@@ -216,10 +304,72 @@ impl TripLoads {
         }
         let zeros = || (0..slots).map(|_| AtomicU64::new(0)).collect();
         Self {
+            tt,
             patterns,
             on: zeros(),
             off: zeros(),
+            waits: Waits::new(tt.stops.len()),
         }
+    }
+
+    /// Where `pattern` boards at `pos`.
+    fn platform(&self, pattern: &Pattern, pos: u16) -> usize {
+        pattern.stops[usize::from(pos)] as usize * DIRECTIONS + direction_slot(pattern.direction_id)
+    }
+
+    /// `nano` riders entering evenly from `from` to `to` waiting for the trains of `legs`,
+    /// on `trains`, and each transfer's riders waiting from reaching its platform.
+    fn add_waits(&self, legs: &[LegKey], trains: &[Train], from: Secs, to: Secs, nano: u64) {
+        let nano = i64::try_from(nano).expect("under 2^63 billionths");
+        let mut trains = trains.iter();
+        // Walked so far before the first ride, or when the last ride's riders are ready.
+        let (mut walked, mut ready) = (0, None);
+        for leg in legs {
+            match *leg {
+                LegKey::Ride {
+                    pattern,
+                    board_pos,
+                    alight_pos,
+                } => {
+                    let train = *trains.next().expect("a train per ride");
+                    let p = &self.tt.patterns[pattern as usize];
+                    let times = &p.trips[usize::from(train)].times;
+                    let depart = times[usize::from(board_pos)].1;
+                    let platform = self.platform(p, board_pos);
+                    match ready {
+                        None => self
+                            .waits
+                            .ramp(platform, from + walked, to + walked, depart, nano),
+                        Some(t) => self.waits.wait(platform, t, depart, nano),
+                    }
+                    ready = Some(times[usize::from(alight_pos)].0);
+                }
+                LegKey::Walk { from, to } => {
+                    let duration = self.tt.footpaths[from as usize]
+                        .iter()
+                        .find(|&&(s, _)| s == to)
+                        .map_or(0, |&(_, d)| d);
+                    match &mut ready {
+                        None => walked += duration,
+                        Some(t) => *t += duration,
+                    }
+                }
+            }
+        }
+    }
+
+    /// Riders waiting on each platform each minute:
+    /// `(stop, direction_id, minute, billionths)`, only minutes with any.
+    pub fn waits(&self) -> impl Iterator<Item = (StopIdx, Option<u8>, usize, i64)> + '_ {
+        (0..self.tt.stops.len() * DIRECTIONS).flat_map(move |platform| {
+            let stop = (platform / DIRECTIONS) as StopIdx;
+            let direction = [Some(0), Some(1), None][platform % DIRECTIONS];
+            self.waits
+                .at(platform)
+                .enumerate()
+                .filter(|&(_, n)| n != 0)
+                .map(move |(m, n)| (stop, direction, m, n))
+        })
     }
 
     fn slot(&self, pattern: usize, trip: usize, pos: usize) -> usize {
@@ -701,14 +851,17 @@ fn assign_row(
         // A rider entering in `(after, until]` chooses as one entering at `until`,
         // the departure that ends the interval.
         shares_into(choices, until, config, shares);
-        let mut trains = trains.iter();
+        let mut trains = trains;
         for (o, &s) in choices.iter().zip(shares.iter()) {
             let share = weight * s;
             let nano = (share * row.riders.to_f64() * NANO).round() as u64;
-            for (ride, &train) in legs.rides(o.legs).zip(trains.by_ref().take(o.rides.into())) {
-                if nano > 0 {
+            let (these, rest) = trains.split_at(o.rides.into());
+            trains = rest;
+            if nano > 0 {
+                for (ride, &train) in legs.rides(o.legs).zip(these) {
                     loads.add(ride, train, nano);
                 }
+                loads.add_waits(legs.legs(o.legs), these, lo, hi, nano);
             }
             let acc = accs.entry(legs.path(o.legs)).or_default();
             acc.rides = o.rides;
@@ -999,6 +1152,65 @@ pub fn write_trips(
     Ok(())
 }
 
+/// Writes riders waiting on each platform at the start of each minute to `out`:
+/// GTFS parent stop ID and `direction_id`, the platform being a stop's trains one way,
+/// the minute on the service day's clock (240 is 4 AM), and the riders waiting.
+/// Riders entering wait from when they enter, evenly over their hour,
+/// and transfers from when their last train reaches the stop, or they walk to it.
+pub fn write_platform_waits(
+    out: &Path,
+    tt: &Timetable,
+    loads: &TripLoads,
+    metadata: Vec<(String, String)>,
+    zstd_level: i32,
+) -> Result<()> {
+    use std::sync::Arc;
+
+    use arrow_array::builder::{Float64Builder, StringBuilder, UInt8Builder, UInt16Builder};
+    use arrow_array::{ArrayRef, RecordBatch};
+    use arrow_schema::{DataType, Field, Schema};
+    use parquet::arrow::ArrowWriter;
+
+    let schema = Arc::new(Schema::new(vec![
+        Field::new("stop_id", DataType::Utf8, false),
+        Field::new("direction_id", DataType::UInt8, true),
+        Field::new("minute", DataType::UInt16, false),
+        Field::new("riders", DataType::Float64, false),
+    ]));
+    let (mut stop, mut direction, mut minute, mut riders) = (
+        StringBuilder::new(),
+        UInt8Builder::new(),
+        UInt16Builder::new(),
+        Float64Builder::new(),
+    );
+    for (s, d, m, nano) in loads.waits() {
+        anyhow::ensure!(
+            nano > 0,
+            "{} riders waiting at {}",
+            nano,
+            tt.stops[s as usize].id
+        );
+        stop.append_value(&tt.stops[s as usize].id);
+        direction.append_option(d);
+        minute.append_value(u16::try_from(m)?);
+        riders.append_value(nano as f64 / NANO);
+    }
+    let batch = RecordBatch::try_new(
+        Arc::clone(&schema),
+        vec![
+            Arc::new(stop.finish()) as ArrayRef,
+            Arc::new(direction.finish()),
+            Arc::new(minute.finish()),
+            Arc::new(riders.finish()),
+        ],
+    )?;
+    let props = properties(metadata, zstd_level)?.build();
+    let mut writer = ArrowWriter::try_new(create(out)?, schema, Some(props))?;
+    writer.write(&batch)?;
+    writer.close()?;
+    Ok(())
+}
+
 /// Creates `out` and its directory.
 fn create(out: &Path) -> Result<std::fs::File> {
     if let Some(dir) = out.parent() {
@@ -1106,6 +1318,57 @@ mod tests {
         // Waits average 5 min over the first 10 min, 15 over the next 30.
         assert_eq!(p.wait, (10 * 5 + 30 * 15) * 60 / 40);
         assert_eq!((p.in_vehicle, p.walk), (20 * 60, 0));
+    }
+
+    /// Riders waiting at `stop` each minute, by `TripLoads::waits`.
+    fn waits_at(tt: &Timetable, rows: &[OdRow], stop: &str) -> BTreeMap<usize, f64> {
+        let loads = TripLoads::new(tt);
+        split(
+            &route(tt, &complexes(tt)),
+            &complexes(tt),
+            rows,
+            &NEUTRAL,
+            &loads,
+        );
+        loads
+            .waits()
+            .filter(|&(s, ..)| tt.stops[s as usize].id == stop)
+            .map(|(_, _, m, n)| (m, n as f64 / NANO))
+            .collect()
+    }
+
+    #[test]
+    fn riders_wait_from_entering_until_their_train() {
+        // A to C at 08:10 and 08:40, a rider entering each minute from 08:00.
+        let trips = "route_id,trip_id,service_id\n1,t1,W\n1,t2,W\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            t1,A,08:10:00,08:10:00,1\nt1,C,08:30:00,08:30:00,2\n\
+            t2,A,08:40:00,08:40:00,1\nt2,C,09:00:00,09:00:00,2\n";
+        let tt = timetable(trips, stop_times, NO_TRANSFERS);
+        let waits = waits_at(&tt, &[row(0, 2)], "A");
+        let at = |h: usize, m: usize| waits.get(&(h * 60 + m)).copied().unwrap_or(0.0);
+        assert!((at(8, 5) - 5.0).abs() < 1e-6);
+        assert_eq!(at(8, 10), 0.0);
+        assert!((at(8, 25) - 15.0).abs() < 1e-6);
+        assert!((at(8, 39) - 29.0).abs() < 1e-6);
+        assert_eq!(at(8, 40), 0.0);
+        assert!(waits_at(&tt, &[row(0, 2)], "C").is_empty());
+    }
+
+    #[test]
+    fn transfers_wait_from_their_last_train_until_their_next() {
+        // The 2 reaches B at 08:20, and the 5 leaves it at 08:22.
+        let trips = "route_id,trip_id,service_id\n2,feeder,W\n5,fast,W\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            feeder,A,08:10:00,08:10:00,1\nfeeder,B,08:20:00,08:20:00,2\n\
+            fast,B,08:22:00,08:22:00,1\nfast,C,08:30:00,08:30:00,2\n";
+        let transfers = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nB,B,2,60\n";
+        let tt = timetable(trips, stop_times, transfers);
+        let waits = waits_at(&tt, &[row(0, 2)], "B");
+        // The 10 riders entering by 08:10.
+        let ten = |m: usize| (waits[&(8 * 60 + m)] - 10.0).abs() < 1e-6;
+        assert!(ten(20) && ten(21));
+        assert_eq!(waits.keys().copied().collect::<Vec<_>>(), [500, 501]);
     }
 
     #[test]

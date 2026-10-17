@@ -15,7 +15,7 @@ This explains what it produces and how to read it.
 
 ```sh
 uv run mta-od-data fetch-gtfs                  # the GTFS versions, into data/gtfs/
-uv run mta-od-data raptor assign-range --from 2025-08-01 --to 2025-12-31
+uv run mta-od-data raptor assign-range --from 2025-08-11 --to 2025-12-31
 uv run mta-od-data fetch-platforms             # each route's stops' OSM platforms
 uv run mta-od-data ridership --by route        # or any report's own `Produced by` line
 ```
@@ -61,6 +61,13 @@ August to December 2025 is 25 dates, Monday to Friday.
   - `day`: 0 for the date's own trips, -1 for the previous date's still running after midnight.
   - `arrival`, `departure`: seconds on the service day's clock.
   - `boardings`, `alightings`, `load`: riders getting on, off, and on board as it leaves.
+- **`platform-waits-<date>.parquet`**: riders waiting on each platform at the start of each minute.
+  - `stop_id`, `direction_id`: the platform, as a stop's trains one way.
+  - `minute`: on the service day's clock, 240 being 4 AM.
+  - `riders`: those waiting then:
+    riders entering wait from when they enter, evenly over their hour, until their train,
+    and transfers from when their last train reaches the stop, or they walk to it.
+    Only minutes with any.
 - **`assign-range.log`**: the run's log.
 
 `data/raptor-walk/` is the same run with `transfers: "walk_distance"`,

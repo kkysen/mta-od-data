@@ -23,7 +23,7 @@ use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::assign::{
     Config, Transfers, TripLoads, Unassigned, route, split, write_path_texts, write_paths,
-    write_trips,
+    write_platform_waits, write_trips,
 };
 use crate::batch::{Version, load_versions, pick_dates};
 use crate::gtfs::{Feed, Secs, parse_time};
@@ -254,6 +254,8 @@ pub fn assign_dates(
                 let ids = &job_trip_ids[i];
                 let trips = trips_out(&job.out, job.date);
                 let trips_metadata = metadata.clone();
+                let waits = waits_out(&job.out, job.date);
+                let waits_metadata = metadata.clone();
                 writing.push_back(scope.spawn(move || -> Result<()> {
                     let start = Instant::now();
                     write_paths(&job.out, &paths, job.date, metadata, zstd_level)?;
@@ -261,6 +263,9 @@ pub fn assign_dates(
                     let start = Instant::now();
                     write_trips(&trips, tt, ids, &loads, trips_metadata, zstd_level)?;
                     eprintln!("wrote {} in {:.1?}", trips.display(), start.elapsed());
+                    let start = Instant::now();
+                    write_platform_waits(&waits, tt, &loads, waits_metadata, zstd_level)?;
+                    eprintln!("wrote {} in {:.1?}", waits.display(), start.elapsed());
                     Ok(())
                 }));
             }
@@ -279,6 +284,11 @@ pub fn assign_dates(
 /// Where a date's trips go: beside its paths, `out`.
 pub fn trips_out(out: &Path, date: Date) -> PathBuf {
     out.with_file_name(format!("trips-{date}.parquet"))
+}
+
+/// Where a date's platform waits go: beside its paths, `out`.
+pub fn waits_out(out: &Path, date: Date) -> PathBuf {
+    out.with_file_name(format!("platform-waits-{date}.parquet"))
 }
 
 /// Where a group's path texts go: beside its first date's paths, `out`.
