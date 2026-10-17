@@ -61,8 +61,9 @@ August to December 2025 is 25 dates, Monday to Friday.
   - `day`: 0 for the date's own trips, -1 for the previous date's still running after midnight.
   - `arrival`, `departure`: seconds on the service day's clock.
   - `boardings`, `alightings`, `load`: riders getting on, off, and on board as it leaves.
-- **`platform-waits-<date>.parquet`**: riders waiting on each platform at the start of each minute.
-  - `stop_id`, `direction_id`: the platform, as a stop's trains one way.
+- **`platform-waits-<date>.parquet`**: riders waiting to board at the start of each minute.
+  - `route_id`, `direction_id`, `stop_id`, `next_stop`: where they board,
+    which tell the platform, as for the reports' platforms.
   - `minute`: on the service day's clock, 240 being 4 AM.
   - `riders`: those waiting then:
     riders entering wait from when they enter, evenly over their hour, until their train,

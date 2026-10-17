@@ -204,10 +204,16 @@ pub struct TripLoads<'a> {
     patterns: Vec<(usize, usize)>,
     on: Vec<AtomicU64>,
     off: Vec<AtomicU64>,
+    /// Each pattern's stops' boardings' slots in `waits`:
+    /// patterns boarding on the same route, way, and stop, to the same next stop, share one,
+    /// since a platform is told by a route's trains between two stops.
+    board_slots: Vec<Vec<u32>>,
+    /// Each slot's first pattern and stop position boarding there.
+    boardings: Vec<(u32, u16)>,
     waits: Waits,
 }
 
-/// Riders waiting on each platform, a stop's trains one way, at the start of each minute,
+/// Riders waiting to board each slot's trains at the start of each minute,
 /// as differences, so a rider's whole wait is a few additions:
 /// `steps` adds to the count from its minute on,
 /// and `slopes` to how much it rises each minute from its minute on.
@@ -220,13 +226,6 @@ struct Waits {
 /// through the last departure a journey can take.
 pub const WAIT_MINUTES: usize = (DEPARTURES_UNTIL / 60) as usize + 4 * 60;
 
-/// A platform's slot among a stop's: GTFS's direction 0, 1, or none.
-const DIRECTIONS: usize = 3;
-
-fn direction_slot(direction_id: Option<u8>) -> usize {
-    direction_id.map_or(2, usize::from)
-}
-
 fn minute(t: Secs) -> usize {
     usize::try_from(t.div_euclid(60))
         .unwrap_or(0)
@@ -234,9 +233,9 @@ fn minute(t: Secs) -> usize {
 }
 
 impl Waits {
-    fn new(stops: usize) -> Self {
+    fn new(slots: usize) -> Self {
         let zeros = || {
-            (0..stops * DIRECTIONS * WAIT_MINUTES)
+            (0..slots * WAIT_MINUTES)
                 .map(|_| AtomicI64::new(0))
                 .collect()
         };
@@ -303,18 +302,38 @@ impl<'a> TripLoads<'a> {
             slots += p.trips.len() * p.stops.len();
         }
         let zeros = || (0..slots).map(|_| AtomicU64::new(0)).collect();
+        let mut by_key = FxHashMap::default();
+        let mut boardings = Vec::new();
+        let board_slots = tt
+            .patterns
+            .iter()
+            .enumerate()
+            .map(|(i, p)| {
+                (0..p.stops.len().saturating_sub(1))
+                    .map(|k| {
+                        let key = (&p.route_id, p.direction_id, p.stops[k], p.stops[k + 1]);
+                        *by_key.entry(key).or_insert_with(|| {
+                            boardings.push((i as u32, k as u16));
+                            (boardings.len() - 1) as u32
+                        })
+                    })
+                    .collect()
+            })
+            .collect();
         Self {
             tt,
             patterns,
             on: zeros(),
             off: zeros(),
-            waits: Waits::new(tt.stops.len()),
+            waits: Waits::new(boardings.len()),
+            board_slots,
+            boardings,
         }
     }
 
-    /// Where `pattern` boards at `pos`.
-    fn platform(&self, pattern: &Pattern, pos: u16) -> usize {
-        pattern.stops[usize::from(pos)] as usize * DIRECTIONS + direction_slot(pattern.direction_id)
+    /// Where `pattern`'s riders board at `pos`.
+    fn platform(&self, pattern: u32, pos: u16) -> usize {
+        self.board_slots[pattern as usize][usize::from(pos)] as usize
     }
 
     /// `nano` riders entering evenly from `from` to `to` waiting for the trains of `legs`,
@@ -335,7 +354,7 @@ impl<'a> TripLoads<'a> {
                     let p = &self.tt.patterns[pattern as usize];
                     let times = &p.trips[usize::from(train)].times;
                     let depart = times[usize::from(board_pos)].1;
-                    let platform = self.platform(p, board_pos);
+                    let platform = self.platform(pattern, board_pos);
                     match ready {
                         None => self
                             .waits
@@ -358,18 +377,20 @@ impl<'a> TripLoads<'a> {
         }
     }
 
-    /// Riders waiting on each platform each minute:
-    /// `(stop, direction_id, minute, billionths)`, only minutes with any.
-    pub fn waits(&self) -> impl Iterator<Item = (StopIdx, Option<u8>, usize, i64)> + '_ {
-        (0..self.tt.stops.len() * DIRECTIONS).flat_map(move |platform| {
-            let stop = (platform / DIRECTIONS) as StopIdx;
-            let direction = [Some(0), Some(1), None][platform % DIRECTIONS];
-            self.waits
-                .at(platform)
-                .enumerate()
-                .filter(|&(_, n)| n != 0)
-                .map(move |(m, n)| (stop, direction, m, n))
-        })
+    /// Riders waiting to board each minute, by where they board:
+    /// `(pattern, its stop position, minute, billionths)`, only minutes with any.
+    pub fn waits(&self) -> impl Iterator<Item = (&Pattern, usize, usize, i64)> + '_ {
+        self.boardings
+            .iter()
+            .enumerate()
+            .flat_map(move |(slot, &(pattern, pos))| {
+                let p = &self.tt.patterns[pattern as usize];
+                self.waits
+                    .at(slot)
+                    .enumerate()
+                    .filter(|&(_, n)| n != 0)
+                    .map(move |(m, n)| (p, usize::from(pos), m, n))
+            })
     }
 
     fn slot(&self, pattern: usize, trip: usize, pos: usize) -> usize {
@@ -1152,8 +1173,9 @@ pub fn write_trips(
     Ok(())
 }
 
-/// Writes riders waiting on each platform at the start of each minute to `out`:
-/// GTFS parent stop ID and `direction_id`, the platform being a stop's trains one way,
+/// Writes riders waiting to board at the start of each minute to `out`,
+/// by where they board: the route, `direction_id`, GTFS parent stop ID,
+/// and next stop's, which tell the platform;
 /// the minute on the service day's clock (240 is 4 AM), and the riders waiting.
 /// Riders entering wait from when they enter, evenly over their hour,
 /// and transfers from when their last train reaches the stop, or they walk to it.
@@ -1172,34 +1194,37 @@ pub fn write_platform_waits(
     use parquet::arrow::ArrowWriter;
 
     let schema = Arc::new(Schema::new(vec![
-        Field::new("stop_id", DataType::Utf8, false),
+        Field::new("route_id", DataType::Utf8, false),
         Field::new("direction_id", DataType::UInt8, true),
+        Field::new("stop_id", DataType::Utf8, false),
+        Field::new("next_stop", DataType::Utf8, false),
         Field::new("minute", DataType::UInt16, false),
         Field::new("riders", DataType::Float64, false),
     ]));
-    let (mut stop, mut direction, mut minute, mut riders) = (
+    let (mut route, mut direction, mut stop, mut next) = (
         StringBuilder::new(),
         UInt8Builder::new(),
-        UInt16Builder::new(),
-        Float64Builder::new(),
+        StringBuilder::new(),
+        StringBuilder::new(),
     );
-    for (s, d, m, nano) in loads.waits() {
-        anyhow::ensure!(
-            nano > 0,
-            "{} riders waiting at {}",
-            nano,
-            tt.stops[s as usize].id
-        );
-        stop.append_value(&tt.stops[s as usize].id);
-        direction.append_option(d);
+    let (mut minute, mut riders) = (UInt16Builder::new(), Float64Builder::new());
+    for (p, k, m, nano) in loads.waits() {
+        let id = |k: usize| &tt.stops[p.stops[k] as usize].id;
+        anyhow::ensure!(nano > 0, "{nano} billionths waiting at {}", id(k));
+        route.append_value(&p.route_id);
+        direction.append_option(p.direction_id);
+        stop.append_value(id(k));
+        next.append_value(id(k + 1));
         minute.append_value(u16::try_from(m)?);
         riders.append_value(nano as f64 / NANO);
     }
     let batch = RecordBatch::try_new(
         Arc::clone(&schema),
         vec![
-            Arc::new(stop.finish()) as ArrayRef,
+            Arc::new(route.finish()) as ArrayRef,
             Arc::new(direction.finish()),
+            Arc::new(stop.finish()),
+            Arc::new(next.finish()),
             Arc::new(minute.finish()),
             Arc::new(riders.finish()),
         ],
@@ -1332,7 +1357,7 @@ mod tests {
         );
         loads
             .waits()
-            .filter(|&(s, ..)| tt.stops[s as usize].id == stop)
+            .filter(|&(p, k, ..)| tt.stops[p.stops[k] as usize].id == stop)
             .map(|(_, _, m, n)| (m, n as f64 / NANO))
             .collect()
     }
