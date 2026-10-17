@@ -311,7 +311,7 @@ Produced by `mta-od-data ridership --by platform --markdown-out src/mta_od_data/
 | Prince St (R,W), Uptown | 12,271 | 15,964 | 8,264 | 4,007 | 17 | 21,024 | 5:00 PM | 1,469 | 565 | 21.7 | 2.60 | 6:56 PM | 121 | 0.21 |
 | Parkchester (6), NB | 12,186 | 19,517 | 1,104 | 11,082 | 1,935 | 15,464 | 4:00 PM | 1,490 | 810 | 15.1 | 1.84 | 4:04 PM | 218 | 0.27 |
 | Bergen St (F,G), NB | 12,181 | 14,387 | 10,187 | 1,995 | 1,875 | 54,284 | 8:00 AM | 1,432 | 406 | 30.0 | 3.53 | 6:14 PM | 108 | 0.27 |
-| Newkirk Plaza (B,Q), SB | 12,157 | 16,311 | 3,139 | 9,018 | 4,195 | 42,057 | 6:00 PM | 1,504 | 51 | 237.9 | 29.42 | 6:38 PM | 210 | 4.11 |
+| Newkirk Plaza (B,Q), SB | 12,157 | 16,311 | 3,139 | 9,018 | 4,195 | 42,057 | 6:00 PM | 1,504 | 650† | 18.7 | 2.31 | 6:38 PM | 210 | 0.32 |
 | 110 St-Malcolm X Plaza (2,3) | 12,067 | 18,568 | 5,963 | 6,104 | 210 | 99,418 | 8:00 AM | 1,134 | 906 | 13.3 | 1.25 | 6:27 PM | 76 | 0.08 |
 | 63 Dr-Rego Park (M,R), Manhattan | 11,914 | 17,089 | 7,392 | 4,522 | 0 | 15,126 | 8:00 AM | 1,358 | 684 | 17.4 | 1.99 | 8:35 AM | 103 | 0.15 |
 | Grand Army Plaza (2,3) | 11,904 | 15,622 | 5,884 | 6,020 | 6 | 68,650 | 8:00 AM | 1,309 | 1,383 | 8.6 | 0.95 | 6:01 PM | 92 | 0.07 |
@@ -900,6 +900,8 @@ Produced by `mta-od-data ridership --by platform --markdown-out src/mta_od_data/
 | Beach 98 St (A,S), Rockaway Park | 298 | 632 | 9 | 289 | 0 | 686 | 6:00 PM | 31 | 779 | 0.4 | 0.04 | 4:40 PM | 10 | 0.01 |
 | Beach 105 St (A,S), Inbound | 216 | 330 | 212 | 4 | 0 | 612 | 7:00 AM | 35 | 589 | 0.4 | 0.06 | 7:58 AM | 7 | 0.01 |
 | Beach 105 St (A,S), Rockaway Park | 204 | 310 | 0 | 204 | 0 | 491 | 5:00 PM | 22 | 632 | 0.3 | 0.04 | 8:14 AM | 8 | 0.01 |
+
+† Its OpenStreetMap outline is under 25% of another platform's at its station, so likely mapped only in part, and it has that platform's area instead: `w813457105`, 51 m², has `w427044407`'s.
 
 ![Riders on and off by platform](by_platform-riders.svg)
 

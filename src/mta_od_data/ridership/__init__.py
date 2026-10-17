@@ -283,6 +283,7 @@ def place_table(
     from `loads`, `(stop, dir, platform, minute, riders)` rows."""
     platform_names = platform_labels(names_, platforms) if by is By.PLATFORM else {}
     areas: dict[str, float] = load_platform_areas() if by is By.PLATFORM else {}
+    fixed = fix_platform_areas(areas, platforms)
 
     def label(stop: str, d: str, platform: str) -> tuple[str, ...]:
         match by:
@@ -394,8 +395,9 @@ def place_table(
         crowding: list[str] = []
         if areas:
             area = areas.get(named[key][0])
+            mark = "†" if named[key][0] in fixed else ""
             crowding = (
-                [fmt(area), fmt(vs[0] / area, 1), fmt(riders / area, 2)]
+                [fmt(area) + mark, fmt(vs[0] / area, 1), fmt(riders / area, 2)]
                 if area
                 else ["", "", ""]
             )
@@ -411,7 +413,45 @@ def place_table(
         lines.append(
             table_row(*key, *(fmt(v) for v in vs), *peak, *crowding, *on_platform)
         )
+    if fixed:
+        outlines = ", ".join(
+            f"`{p}`, {fmt(own)} m², has `{big}`'s"
+            for p, (own, big) in sorted(fixed.items())
+        )
+        lines += [
+            "",
+            f"† Its OpenStreetMap outline is under {PART_MAPPED:.0%} "
+            "of another platform's at its station, so likely mapped only in part, "
+            f"and it has that platform's area instead: {outlines}.",
+        ]
     return lines
+
+
+# A platform under this share of its station's biggest is taken to be mapped in part.
+PART_MAPPED = 0.25
+
+
+def fix_platform_areas(
+    areas: dict[str, float], platforms: list[tuple[Any, ...]]
+) -> dict[str, tuple[float, str]]:
+    """Gives each platform of `areas` under `PART_MAPPED` of its stop's biggest
+    the biggest's area, as its OpenStreetMap outline is likely only part of it,
+    like Newkirk Plaza's southbound, 20 m of a 150 m platform.
+    `platforms` are `platform_routes`' `(platform, stop, dir, routes)` rows.
+    Each fixed platform's own area and the platform it now has the area of."""
+    at: defaultdict[str, set[str]] = defaultdict(set)
+    for platform, stop, *_ in platforms:
+        if platform in areas:
+            at[stop].add(platform)
+    fixed: dict[str, tuple[float, str]] = {}
+    for ps in at.values():
+        big = max(sorted(ps), key=areas.__getitem__)
+        for p in sorted(ps):
+            if areas[p] < PART_MAPPED * areas[big] and p not in fixed:
+                fixed[p] = (areas[p], big)
+    for p, (_, big) in fixed.items():
+        areas[p] = areas[big]
+    return fixed
 
 
 def load_platform_areas() -> dict[str, float]:
