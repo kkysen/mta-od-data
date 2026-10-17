@@ -3,6 +3,11 @@
 .ruff_cache/
 __pycache__/
 
+# Rust
+raptor/target/
+# The `raptor` extension module, built by `maturin`.
+src/mta_od_data/_raptor.*.so
+
 # Data
 *.csv
 *.csv.xz
@@ -14,6 +19,12 @@ data/*
 # so checked in rather than refetched from `data.ny.gov` by `mta-od-data prepare`.
 !data/complexes.csv
 !data/stations.csv
+# Hand-reviewed, so checked in rather than regenerated.
+!src/mta_od_data/station_ridership_complexes.csv
+# Small (~100K), and ~100 s to build from a ~500MB OSM extract,
+# so checked in rather than built by `mta-od-data fetch-platforms` on every checkout.
+!src/mta_od_data/ridership/platforms.csv
+!src/mta_od_data/ridership/platform_areas.csv
 
 # Contains useful settings for JSON schemas.
 !.vscode/

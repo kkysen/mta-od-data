@@ -1,0 +1,44 @@
+// Each route's train length in feet, for loads per length of train.
+// By length, not cars: a route can run both 8 75-ft cars and 10 60-ft cars (600 ft),
+// and cars of different lengths hold different numbers of riders.
+// Car models and lengths from Wikipedia's "New York City Subway rolling stock"
+// and its `NYCS const` template, citing NYCT's car assignments of November 2, 2025;
+// trains as long as their routes' platforms allow.
+{
+  // A Division: 51-ft cars, 10 a train.
+  "1": 510,
+  "2": 510,
+  "3": 510,
+  "4": 510,
+  "5": 510,
+  "6": 510,
+  "6X": 510,
+  // 11 cars (R188).
+  "7": 561,
+  "7X": 561,
+  // 6 R62A cars since the shuttle's 2021 rebuild: to confirm.
+  "GS": 306,
+  // B Division: 600-ft platforms, 10 60-ft or 8 75-ft cars.
+  "A": 600,
+  "B": 600,
+  "C": 600,
+  "D": 600,
+  "E": 600,
+  "F": 600,
+  "FX": 600,
+  "N": 600,
+  "Q": 600,
+  "R": 600,
+  "W": 600,
+  // Eastern Division platforms: 8 60-ft cars.
+  "J": 480,
+  "Z": 480,
+  "L": 480,
+  "M": 480,
+  // 5 60-ft cars, or 4 75-ft.
+  "G": 300,
+  // 2 75-ft R68 cars.
+  "FS": 150,
+  // Rockaway Park Shuttle, R211A: to confirm.
+  "H": 300,
+}

@@ -1,0 +1,19 @@
+// Mobility Database dataset versions of the regular NYC Subway GTFS feed
+// (`mdb-516`, https://mobilitydatabase.org/feeds/gtfs/mdb-516),
+// fetched by `mta-od-data fetch-gtfs`.
+// Listed by hand from that page, oldest first;
+// a new version is a new line here.
+// The comment on each is its `calendar.txt` service range, inclusive,
+// as `fetch-gtfs` prints it.
+[
+  "mdb-516-202510180014", // 2025-08-11 to 2025-11-01
+  "mdb-516-202510310045", // 2025-11-02 to 2025-12-07
+  "mdb-516-202511010043", // 2025-11-02 to 2025-12-07
+  "mdb-516-202512050000", // 2025-12-08 to 2026-05-16
+  "mdb-516-202602270137", // 2026-03-01 to 2026-05-16
+  "mdb-516-202605140138", // 2026-05-17 to 2026-09-07
+  "mdb-516-202605270017", // 2026-05-26 to 2026-09-07
+  "mdb-516-202608010139", // 2026-05-26 to 2026-09-07
+  "mdb-516-202608080035", // 2026-05-26 to 2026-10-31
+  "mdb-516-202608280038", // 2026-05-26 to 2026-10-31
+]
