@@ -15,8 +15,8 @@ Produced by `mta-od-data ridership --by trip --markdown-out src/mta_od_data/ride
 | 5 | 8:00 AM Flatbush Av-Brooklyn College to Eastchester-Dyre Av | 1,065 | 510 | 125 | 14 St-Union Sq to Grand Central-42 St | 8:39 AM | 103 |
 | 4 | 5:17 PM Woodlawn to Crown Hts-Utica Av | 1,022 | 510 | 120 | Grand Central-42 St to 14 St-Union Sq | 5:54 PM | 103 |
 | W | 8:50 AM Astoria-Ditmars Blvd to Whitehall St-South Ferry | 1,021 | 600 | 102 | Queensboro Plaza to Lexington Av/59 St | 9:01 AM | 103 |
+| N | 8:17 AM Coney Island-Stillwell Av to 96 St | 978 | 600 | 98 | Atlantic Av to Canal St | 8:51 AM | 103 |
 | Q | 4:58 PM 96 St to Coney Island-Stillwell Av | 945 | 600 | 95 | Canal St to DeKalb Av | 5:19 PM | 103 |
-| N | 7:59 AM Astoria-Ditmars Blvd to Coney Island-Stillwell Av | 936 | 600 | 94 | Queensboro Plaza to Lexington Av/59 St | 8:10 AM | 103 |
 | 6 | 8:20 AM Parkchester to Brooklyn Bridge-City Hall | 929 | 510 | 109 | 51 St to Grand Central-42 St | 8:54 AM | 60 |
 | FX | 4:58 PM Jamaica-179 St to Coney Island-Stillwell Av | 928 | 600 | 93 | Broadway-Lafayette St to 2 Av | 5:45 PM | 80 |
 | D | 3:57 PM Norwood-205 St to Coney Island-Stillwell Av | 916 | 600 | 92 | Broadway-Lafayette St to Grand St | 4:43 PM | 43 |

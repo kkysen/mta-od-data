@@ -74,18 +74,18 @@ text {
 <text x="376.6" y="218.0" class="label" text-anchor="end">9:01 AM</text>
 <path class="s0" d="M384.6,208.0h322.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-322.7z"><title>Queensboro Plaza W Lexington Av/59 St 9:01 AM, Peak load: 1,021</title></path>
 <text x="715.3" y="218.0">1,021</text>
-<text x="154.6" y="238.0" class="label" text-anchor="end">Canal St</text>
-<text x="169.2" y="238.0" class="label" text-anchor="middle">Q</text>
-<text x="183.8" y="238.0" class="label" text-anchor="start">DeKalb Av</text>
-<text x="376.6" y="238.0" class="label" text-anchor="end">5:19 PM</text>
-<path class="s0" d="M384.6,228.0h298.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-298.4z"><title>Canal St Q DeKalb Av 5:19 PM, Peak load: 945</title></path>
-<text x="691.0" y="238.0">945</text>
-<text x="154.6" y="258.0" class="label" text-anchor="end">Queensboro Plaza</text>
-<text x="169.2" y="258.0" class="label" text-anchor="middle">N</text>
-<text x="183.8" y="258.0" class="label" text-anchor="start">Lexington Av/59 St</text>
-<text x="376.6" y="258.0" class="label" text-anchor="end">8:10 AM</text>
-<path class="s0" d="M384.6,248.0h295.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-295.5z"><title>Queensboro Plaza N Lexington Av/59 St 8:10 AM, Peak load: 936</title></path>
-<text x="688.1" y="258.0">936</text>
+<text x="154.6" y="238.0" class="label" text-anchor="end">Atlantic Av</text>
+<text x="169.2" y="238.0" class="label" text-anchor="middle">N</text>
+<text x="183.8" y="238.0" class="label" text-anchor="start">Canal St</text>
+<text x="376.6" y="238.0" class="label" text-anchor="end">8:51 AM</text>
+<path class="s0" d="M384.6,228.0h309.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-309.0z"><title>Atlantic Av N Canal St 8:51 AM, Peak load: 978</title></path>
+<text x="701.6" y="238.0">978</text>
+<text x="154.6" y="258.0" class="label" text-anchor="end">Canal St</text>
+<text x="169.2" y="258.0" class="label" text-anchor="middle">Q</text>
+<text x="183.8" y="258.0" class="label" text-anchor="start">DeKalb Av</text>
+<text x="376.6" y="258.0" class="label" text-anchor="end">5:19 PM</text>
+<path class="s0" d="M384.6,248.0h298.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-298.4z"><title>Canal St Q DeKalb Av 5:19 PM, Peak load: 945</title></path>
+<text x="691.0" y="258.0">945</text>
 <text x="154.6" y="278.0" class="label" text-anchor="end">51 St</text>
 <text x="169.2" y="278.0" class="label" text-anchor="middle">6</text>
 <text x="183.8" y="278.0" class="label" text-anchor="start">Grand Central-42 St</text>

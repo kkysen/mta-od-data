@@ -206,9 +206,10 @@ class Train:
 
 def crowded_trains(routes: Sequence[str], top: int) -> list[Train]:
     """Each of `routes`' `top` trains by their average peak load, busiest first,
-    of those running its usual line:
-    stopping only at stations a tenth of its trains stop at,
-    so not an R to 96 St via Second Av, or an E to Jamaica-179 St."""
+    of those fullest on its usual line:
+    between stations a tenth of its trains stop at,
+    so not an R to 96 St fullest on Second Av,
+    though an E to Jamaica-179 St fullest on Queens Blvd counts."""
     rows = (
         connection()
         .execute(
@@ -231,8 +232,12 @@ def crowded_trains(routes: Sequence[str], top: int) -> list[Train]:
                 SELECT route_id, direction_id, first_stop, first_departure, stops,
                     stop_sequence, stop_id, next_stop, min(departure) AS departure,
                     sum(load * w) / sum(days) AS load, sum(days) AS days,
-                    u.stop_id IS NOT NULL AS unusual
-                FROM trip_stops LEFT JOIN unusual u USING (route_id, stop_id)
+                    u.stop_id IS NOT NULL OR un.stop_id IS NOT NULL AS unusual
+                FROM trip_stops
+                LEFT JOIN unusual u USING (route_id, stop_id)
+                LEFT JOIN unusual un
+                    ON un.route_id = trip_stops.route_id
+                    AND un.stop_id = trip_stops.next_stop
                 WHERE route_id IN (SELECT unnest($routes))
                 GROUP BY ALL
             ),
@@ -249,9 +254,9 @@ def crowded_trains(routes: Sequence[str], top: int) -> list[Train]:
                         route_id, direction_id, first_stop, first_departure, stops
                 )
                 -- Where it peaks: its first stop with its greatest load,
-                -- if all its stops are usual.
+                -- if it and the next are usual.
                 QUALIFY row_number() OVER (k ORDER BY load DESC, stop_sequence) = 1
-                    AND NOT bool_or(unusual) OVER k
+                    AND NOT unusual
             )
             SELECT route_id, first_stop, first_departure, last_stop, peak,
                 stop_id, coalesce(next_stop, ''), departure, days
