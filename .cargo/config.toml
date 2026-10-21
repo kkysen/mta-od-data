@@ -1,0 +1,4 @@
+# Here rather than in `raptor/`: `maturin` runs `cargo` from the repo root.
+[build]
+# Built only to run here, so tuned to this machine's CPU, not portable.
+rustflags = ["-C", "target-cpu=native"]

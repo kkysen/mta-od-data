@@ -1,0 +1,88 @@
+# Ridership by route
+
+Average weekday riders with fare evaders, over 103 weekdays from 2025-08-19 to 2025-12-22 (`data/raptor/manifest.csv`).
+The 2019 column scales the OD data on these dates to 2019's counted station entries.
+The peak hour is the hour, by when it starts, with the most riders in the Aug-Dec 2025 column on its trains there (getting on or off at a place, boarding a route, or joining a line), and those riders.
+
+Produced by `mta-od-data ridership --by route --markdown-out src/mta_od_data/ridership/by_route.md`.
+
+## Table
+
+<details open>
+<summary>The table</summary>
+
+| Route | Aug-Dec 2025 | 2019 | Route-km | Per Route-km, Aug-Dec 2025 | Trips | Train-km | Per Train-km, Aug-Dec 2025 | Per Car\*-km, Aug-Dec 2025 | Peak Hour | Riders in Peak Hour, Aug-Dec 2025 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
+| 6 | 560,123 | 745,403 | 24.1 | 23,245 | 552 | 12,495 | 44.8 | 5.27 | 5:00 PM | 53,437 |
+| 6L | 425,011 | 562,254 | 24.1 | 17,638 | 439 | 9,772 | 43.5 | 5.12 | 5:00 PM | 36,492 |
+| 6X | 141,144 | 191,670 | 24.1 | 5,858 | 113 | 2,723 | 51.8 | 6.10 | 5:00 PM | 16,945 |
+| 1 | 513,210 | 680,527 | 23.5 | 21,823 | 462 | 10,750 | 47.7 | 5.62 | 5:00 PM | 50,439 |
+| F | 510,780 | 653,098 | 44.8 | 11,391 | 392 | 16,278 | 31.4 | 3.14 | 5:00 PM | 51,386 |
+| FL | 504,563 | 644,988 | 44.8 | 11,252 | 388 | 16,104 | 31.3 | 3.13 | 5:00 PM | 48,509 |
+| FX | 6,471 | 8,449 | 42.4 | 153 | 4 | 174 | 37.2 | 3.72 | 5:00 PM | 2,877 |
+| 7 | 508,588 | 586,951 | 16.0 | 31,803 | 642 | 10,307 | 49.3 | 5.28 | 5:00 PM | 49,047 |
+| 7L | 413,854 | 478,452 | 16.0 | 25,879 | 535 | 8,598 | 48.1 | 5.15 | 5:00 PM | 33,790 |
+| 7X | 98,527 | 113,068 | 16.0 | 6,164 | 107 | 1,709 | 57.7 | 6.17 | 5:00 PM | 15,257 |
+| A | 442,093 | 609,931 | 53.5 | 8,268 | 377 | 15,662 | 28.2 | 2.82 | 5:00 PM | 45,609 |
+| 4 | 407,201 | 562,286 | 25.1 | 16,193 | 370 | 12,098 | 33.7 | 3.96 | 5:00 PM | 35,700 |
+| E | 386,343 | 494,549 | 25.4 | 15,214 | 410 | 10,252 | 37.7 | 3.77 | 5:00 PM | 39,025 |
+| L | 376,101 | 424,267 | 16.3 | 23,082 | 549 | 8,809 | 42.7 | 5.34 | 5:00 PM | 35,446 |
+| R | 372,359 | 488,916 | 34.8 | 10,713 | 303 | 9,453 | 39.4 | 3.94 | 5:00 PM | 38,655 |
+| 2 | 345,132 | 486,095 | 32.1 | 10,768 | 324 | 13,264 | 26.0 | 3.06 | 8:00 AM | 31,627 |
+| Q | 340,069 | 447,741 | 28.1 | 12,106 | 315 | 8,839 | 38.5 | 3.85 | 5:00 PM | 32,194 |
+| D | 294,829 | 407,082 | 40.5 | 7,276 | 296 | 12,154 | 24.3 | 2.43 | 5:00 PM | 24,927 |
+| N | 290,745 | 349,349 | 34.4 | 8,464 | 285 | 9,328 | 31.2 | 3.12 | 5:00 PM | 27,389 |
+| 5 | 287,132 | 392,360 | 38.8 | 7,406 | 329 | 10,481 | 27.4 | 3.22 | 5:00 PM | 30,072 |
+| B | 238,339 | 321,483 | 37.9 | 6,284 | 220 | 7,628 | 31.2 | 3.12 | 5:00 PM | 26,959 |
+| M | 234,835 | 310,287 | 29.1 | 8,060 | 293 | 7,017 | 33.5 | 4.18 | 8:00 AM | 22,750 |
+| C | 231,502 | 300,093 | 29.9 | 7,739 | 222 | 6,636 | 34.9 | 3.49 | 5:00 PM | 18,690 |
+| 3 | 230,585 | 320,659 | 29.2 | 7,891 | 294 | 7,782 | 29.6 | 3.49 | 8:00 AM | 23,505 |
+| J | 152,000 | 205,858 | 21.4 | 7,102 | 285 | 6,025 | 25.2 | 3.15 | 4:00 PM | 12,406 |
+| W | 151,528 | 196,163 | 15.6 | 9,709 | 187 | 2,997 | 50.6 | 5.06 | 5:00 PM | 15,077 |
+| G | 149,458 | 174,785 | 16.5 | 9,046 | 298 | 5,037 | 29.7 | 5.93 | 5:00 PM | 13,622 |
+| GS | 63,151 | 84,848 | 0.7 | 90,478 | 508 | 355 | 178.1 | 34.92 | 5:00 PM | 7,500 |
+| FS | 12,854 | 17,160 | 2.2 | 5,884 | 238 | 520 | 24.7 | 9.89 | 8:00 AM | 1,099 |
+| Z | 10,116 | 13,720 | 21.4 | 473 | 12 | 257 | 39.4 | 4.92 | 5:00 PM | 3,969 |
+| H | 2,769 | 5,415 | 4.5 | 610 | 168 | 763 | 3.6 | 0.73 | 4:00 PM | 242 |
+
+\* A car is 60 ft of train, about one B Division car's length, so routes with different train lengths compare (`train_lengths.json5`).
+
+</details>
+
+## Charts
+
+### Riders by route
+
+<details>
+<summary>The chart</summary>
+
+![Riders by route](by_route-riders.svg)
+
+</details>
+
+### Riders per route-km
+
+<details>
+<summary>The chart</summary>
+
+![Riders per route-km](by_route-per-route-km.svg)
+
+</details>
+
+### Riders per train-km
+
+<details>
+<summary>The chart</summary>
+
+![Riders per train-km](by_route-per-train-km.svg)
+
+</details>
+
+### Riders per car\*-km
+
+<details>
+<summary>The chart</summary>
+
+![Riders per car\*-km](by_route-per-car-km.svg)
+
+</details>

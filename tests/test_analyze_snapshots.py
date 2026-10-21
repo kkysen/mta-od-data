@@ -7,7 +7,8 @@ with the argv handed in rather than taken from `sys.argv`:
 `Produced by` line comes out as it would from a shell, and a run
 costs one parse rather than one interpreter.
 
-Skipped when `data/mta_od_2025.parquet` is missing:
+Skipped when the data a command reads is missing
+(`data/mta_od_2025.parquet`, and for `ridership`, the routed paths and OD factors):
 it's gitignored, so this can't run in CI.
 """
 
@@ -22,6 +23,13 @@ from mta_od_data.cli import app
 
 PARQUET = DATA / "mta_od_2025.parquet"
 ANALYZE_DIR = ROOT / "src" / "mta_od_data" / "analyze"
+RIDERSHIP_DIR = ROOT / "src" / "mta_od_data" / "ridership"
+# What `ridership` reads by default, besides the OD data's stations.
+RIDERSHIP_DATA = (
+    DATA / "raptor" / "manifest.csv",
+    DATA / "mta_od_2025_counted.factors.parquet",
+    DATA / "mta_od_2019_counted.factors.parquet",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,6 +39,8 @@ class Snapshot:
     # Keep in sync with the snapshot file's own "Produced by" line.
     cmd: list[str]
     path: Path
+    # The gitignored data it reads, without which it's skipped.
+    needs: tuple[Path, ...] = (PARQUET,)
 
 
 SNAPSHOTS = [
@@ -110,20 +120,37 @@ SNAPSHOTS = [
         cmd=["mta-od-data", "analyze", "deinterlining", "--category", "F/M Swap"],
         path=ANALYZE_DIR / "fm_swap_deinterlining.md",
     ),
+    *(
+        Snapshot(
+            name=f"ridership-by-{'-and-'.join(by)}",
+            cmd=["mta-od-data", "ridership", *(a for b in by for a in ("--by", b))],
+            path=RIDERSHIP_DIR / f"by_{'_and_'.join(by).replace('-', '_')}.md",
+            needs=RIDERSHIP_DATA,
+        )
+        for by in [
+            ["complex"],
+            ["station"],
+            ["station-direction"],
+            ["platform"],
+            ["route"],
+            ["line"],
+            ["line", "route"],
+            ["trip"],
+        ]
+    ),
 ]
 
 
-@pytest.mark.skipif(
-    not PARQUET.exists(),
-    reason=(
-        f"{PARQUET.relative_to(ROOT)} not found "
-        "(run `uv run mta-od-data prepare` first)"
-    ),
-)
 @pytest.mark.parametrize("snapshot", SNAPSHOTS, ids=lambda s: s.name)
 def test_snapshot_matches_fresh_run(
     snapshot: Snapshot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    if missing := [p for p in snapshot.needs if not p.exists()]:
+        pytest.skip(
+            f"{', '.join(str(p.relative_to(ROOT)) for p in missing)} not found "
+            "(run `uv run mta-od-data prepare` first, "
+            "and for `ridership`, `raptor assign-range` and `scale-od`)"
+        )
     tmp_out = tmp_path / snapshot.path.name
     prog, *args = snapshot.cmd
     # `cmd` names its paths relative to the repo root, and the committed
@@ -157,6 +184,18 @@ def test_snapshot_matches_fresh_run(
     assert fresh == committed, (
         f"{rel_path} is {'out of date' if committed is not None else 'missing'}. "
         "Regenerate it with:\n"
+        f"  {rerun}\n"
+        "and commit the result."
+    )
+
+    # And its charts, `<its name>-<chart>.svg` beside it, the same way.
+    charts = f"{snapshot.path.stem}-*.svg"
+    fresh_charts = {p.name: p.read_text() for p in tmp_path.glob(charts)}
+    committed_charts = {
+        p.name: p.read_text() for p in snapshot.path.parent.glob(charts)
+    }
+    assert fresh_charts == committed_charts, (
+        f"{rel_path}'s charts are out of date. Regenerate them with:\n"
         f"  {rerun}\n"
         "and commit the result."
     )
