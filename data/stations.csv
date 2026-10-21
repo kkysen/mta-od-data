@@ -304,7 +304,7 @@
 "112","302","605","IRT","Broadway - 7Av","168 St-Washington Hts","M","false","1","Subway","40.840556","-73.940133","Uptown","Downtown","0","0","0","NaN","POINT (-73.940133 40.840556)"
 "113","303","303","IRT","Broadway - 7Av","157 St","M","false","1","Subway","40.834041","-73.94489","Uptown","Downtown","0","0","0","NaN","POINT (-73.94489 40.834041)"
 "114","304","304","IRT","Broadway - 7Av","145 St","M","false","1","Subway","40.826551","-73.95036","Uptown","Downtown","0","0","0","NaN","POINT (-73.95036 40.826551)"
-"115","305","305","IRT","Broadway - 7Av","137 St-City College","M","false","1","Subway","40.822008","-73.953676","Uptown","Downtown","2","1","0","Uptown only","POINT (-73.953676 40.822008)"
+"115","305","305","IRT","Broadway - 7Av","137 St-City College","M","false","1","Subway","40.822008","-73.953676","Uptown","Downtown","1","1","1","NaN","POINT (-73.953676 40.822008)"
 "116","306","306","IRT","Broadway - 7Av","125 St","M","false","1","Elevated","40.815581","-73.958372","Uptown","Downtown","0","0","0","NaN","POINT (-73.958372 40.815581)"
 "117","307","307","IRT","Broadway - 7Av","116 St-Columbia University","M","false","1","Subway","40.807722","-73.96411","Uptown","Downtown","0","0","0","NaN","POINT (-73.96411 40.807722)"
 "118","308","308","IRT","Broadway - 7Av","Cathedral Pkwy (110 St)","M","false","1","Subway","40.803967","-73.966847","Uptown","Downtown","0","0","0","NaN","POINT (-73.966847 40.803967)"
