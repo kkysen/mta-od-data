@@ -282,7 +282,8 @@ shape, once there's a real geojson file to build and test it against.
 ## Development
 
 ```sh
-uv run pre-commit install
+mise install        # uv and pre-commit, pinned in mise.toml
+pre-commit install
 ```
 
 installs the `git` hooks in

@@ -1,0 +1,5 @@
+# `uv` and `pre-commit` are here so that `mise install` is the whole of setup.
+# Python and the Python tools are not: `uv` manages those through `uv.lock`.
+[tools]
+pre-commit = "4.7.0"
+uv = "0.13.3"
