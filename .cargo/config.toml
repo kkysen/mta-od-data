@@ -2,3 +2,8 @@
 [build]
 # Built only to run here, so tuned to this machine's CPU, not portable.
 rustflags = ["-C", "target-cpu=native"]
+
+# Build against the project's `uv` Python, not whatever `python3` is first on `$PATH`.
+# `maturin` sets its own, which this doesn't override.
+[env]
+PYO3_PYTHON = { value = ".venv/bin/python", relative = true }

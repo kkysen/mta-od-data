@@ -903,6 +903,7 @@ dependencies = [
  "mimalloc",
  "parquet",
  "pyo3",
+ "pyo3-build-config",
  "rayon",
  "rustc-hash 2.1.3",
  "serde",
