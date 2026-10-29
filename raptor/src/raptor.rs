@@ -7,7 +7,7 @@
 //! Every label has its own backpointer per round,
 //! so a journey is always extracted from the round that computed it.
 
-use std::ops::Range;
+use std::ops::{Index, IndexMut, Range};
 
 use crate::gtfs::Secs;
 use crate::timetable::{Pattern, StopIdx, Timetable};
@@ -127,18 +127,62 @@ pub struct Labels<'a> {
     router: &'a Router<'a>,
     /// The latest run's departure.
     depart: Secs,
-    /// `ride_arrival[k][s]`: arriving at `s` on the `k`th ride.
-    ride_arrival: Vec<Vec<Secs>>,
-    ride_from: Vec<Vec<Option<Ride>>>,
-    /// `ready[k][s]`: able to board at `s` after `k` rides.
-    ready: Vec<Vec<Secs>>,
-    ready_from: Vec<Vec<Option<Ready>>>,
+    /// `ride_arrival[(k, s)]`: arriving at `s` on the `k`th ride.
+    ride_arrival: Rounds<Secs>,
+    ride_from: Rounds<Option<Ride>>,
+    /// `ready[(k, s)]`: able to board at `s` after `k` rides.
+    ready: Rounds<Secs>,
+    ready_from: Rounds<Option<Ready>>,
     /// Scratch for a round: each pattern's earliest marked position,
     /// `UNMARKED` for a pattern no marked stop serves.
     scan_from: Vec<u32>,
 }
 
 const UNMARKED: u32 = u32::MAX;
+
+/// A label per (round, stop), indexed `[(k, s)]`.
+/// One `Vec`, not one per round: routing ran ~5% fewer instructions.
+/// Round-major, not stop-major: a round touches many stops' labels in it
+/// and the round before, and packing each round's densely kept L1 misses
+/// ~3% fewer than keeping a stop's rounds together.
+struct Rounds<T> {
+    labels: Vec<T>,
+    rounds: usize,
+    stops: usize,
+}
+
+impl<T: Clone> Rounds<T> {
+    fn new(rounds: usize, stops: usize, label: T) -> Self {
+        Self {
+            labels: vec![label; rounds * stops],
+            rounds,
+            stops,
+        }
+    }
+
+    /// Stop `s`'s labels in rounds `0..=k`.
+    fn up_to(&self, k: usize, s: usize) -> impl Iterator<Item = &T> {
+        self.labels[s..=k * self.stops + s]
+            .iter()
+            .step_by(self.stops)
+    }
+}
+
+impl<T> Index<(usize, usize)> for Rounds<T> {
+    type Output = T;
+
+    fn index(&self, (k, s): (usize, usize)) -> &T {
+        debug_assert!(k < self.rounds && s < self.stops);
+        &self.labels[k * self.stops + s]
+    }
+}
+
+impl<T> IndexMut<(usize, usize)> for Rounds<T> {
+    fn index_mut(&mut self, (k, s): (usize, usize)) -> &mut T {
+        debug_assert!(k < self.rounds && s < self.stops);
+        &mut self.labels[k * self.stops + s]
+    }
+}
 
 impl<'a> Router<'a> {
     pub fn new(tt: &'a Timetable) -> Self {
@@ -179,10 +223,10 @@ impl<'a> Router<'a> {
         Labels {
             router: self,
             depart: NEVER,
-            ride_arrival: vec![vec![NEVER; n]; rounds],
-            ride_from: vec![vec![None; n]; rounds],
-            ready: vec![vec![NEVER; n]; rounds],
-            ready_from: vec![vec![None; n]; rounds],
+            ride_arrival: Rounds::new(rounds, n, NEVER),
+            ride_from: Rounds::new(rounds, n, None),
+            ready: Rounds::new(rounds, n, NEVER),
+            ready_from: Rounds::new(rounds, n, None),
             scan_from: vec![UNMARKED; self.tt.patterns.len()],
         }
     }
@@ -282,7 +326,7 @@ impl Labels<'_> {
             }
         }
 
-        for k in 1..self.ride_arrival.len() {
+        for k in 1..self.ride_arrival.rounds {
             if marked.is_empty() {
                 break;
             }
@@ -324,7 +368,7 @@ impl Labels<'_> {
                         }
                     }
                     // Catch an earlier trip here, if the previous round makes one reachable.
-                    let ready = self.ready[k - 1][s as usize];
+                    let ready = self.ready[(k - 1, s as usize)];
                     if ready == NEVER {
                         continue;
                     }
@@ -342,13 +386,13 @@ impl Labels<'_> {
             improved.sort_unstable();
             improved.dedup();
             for &s in &improved {
-                let arrive = self.ride_arrival[k][s as usize];
+                let arrive = self.ride_arrival[(k, s as usize)];
                 if self.lower_ready(k, s, arrive + tt.min_change[s as usize], Ready::Change) {
                     marked.push(s);
                 }
             }
             for &s in &improved {
-                let arrive = self.ride_arrival[k][s as usize];
+                let arrive = self.ride_arrival[(k, s as usize)];
                 for &(to, walk) in &tt.footpaths[s as usize] {
                     if self.lower_ready(k, to, arrive + walk, Ready::Walk { from: s }) {
                         marked.push(to);
@@ -360,26 +404,26 @@ impl Labels<'_> {
         }
     }
 
-    /// Lowers `ride_arrival[k][s]` if `arrive` beats it
+    /// Lowers `ride_arrival[(k, s)]` if `arrive` beats it
     /// and every arrival there with fewer rides.
     fn lower_ride(&mut self, k: usize, s: StopIdx, arrive: Secs, ride: Ride) -> bool {
         let s = s as usize;
-        if (0..=k).any(|j| self.ride_arrival[j][s] <= arrive) {
+        if self.ride_arrival.up_to(k, s).any(|&a| a <= arrive) {
             return false;
         }
-        self.ride_arrival[k][s] = arrive;
-        self.ride_from[k][s] = Some(ride);
+        self.ride_arrival[(k, s)] = arrive;
+        self.ride_from[(k, s)] = Some(ride);
         true
     }
 
-    /// Lowers `ready[k][s]` if `t` beats it and every readiness there with fewer rides.
+    /// Lowers `ready[(k, s)]` if `t` beats it and every readiness there with fewer rides.
     fn lower_ready(&mut self, k: usize, s: StopIdx, t: Secs, how: Ready) -> bool {
         let s = s as usize;
-        if (0..=k).any(|j| self.ready[j][s] <= t) {
+        if self.ready.up_to(k, s).any(|&r| r <= t) {
             return false;
         }
-        self.ready[k][s] = t;
-        self.ready_from[k][s] = Some(how);
+        self.ready[(k, s)] = t;
+        self.ready_from[(k, s)] = Some(how);
         true
     }
 
@@ -387,7 +431,7 @@ impl Labels<'_> {
     fn earliest(&self, k: usize, targets: &[StopIdx]) -> (Secs, StopIdx) {
         targets
             .iter()
-            .map(|&t| (self.ride_arrival[k][t as usize], t))
+            .map(|&t| (self.ride_arrival[(k, t as usize)], t))
             .min()
             .unwrap_or((NEVER, 0))
     }
@@ -398,7 +442,7 @@ impl Labels<'_> {
         let mut legs = Legs::default();
         let mut journeys = Vec::new();
         let mut fewer = NEVER;
-        for k in 1..self.ride_arrival.len() {
+        for k in 1..self.ride_arrival.rounds {
             let (arrive, stop) = self.earliest(k, targets);
             if arrive < fewer {
                 journeys.push(self.extract(k, stop, &mut legs));
@@ -414,10 +458,11 @@ impl Labels<'_> {
         let start = legs.len();
         let mut stop = target;
         for k in (1..=rides).rev() {
-            let r = self.ride_from[k][stop as usize].expect("a reached stop has a ride label");
+            let r = self.ride_from[(k, stop as usize)].expect("a reached stop has a ride label");
             legs.push(Leg::Ride(r));
             stop = r.board_stop(tt);
-            match self.ready_from[k - 1][stop as usize].expect("a boarded stop has a ready label") {
+            match self.ready_from[(k - 1, stop as usize)].expect("a boarded stop has a ready label")
+            {
                 Ready::Origin | Ready::Change => {}
                 Ready::Walk { from } => {
                     let duration = tt.footpaths[from as usize]
@@ -437,7 +482,7 @@ impl Labels<'_> {
         legs[start..].reverse();
         let journey = Journey {
             depart: self.depart,
-            arrive: self.ride_arrival[rides][target as usize],
+            arrive: self.ride_arrival[(rides, target as usize)],
             rides: u8::try_from(rides).expect("`Router::max_rides` fits a `u8`"),
             legs: u32::try_from(start).expect("under 2^32 legs")
                 ..u32::try_from(legs.len()).expect("under 2^32 legs"),
