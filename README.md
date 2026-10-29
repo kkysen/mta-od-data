@@ -206,6 +206,20 @@ so it only needs rerunning when the feeds or OSM change.
 uv run mta-od-data fetch-platforms
 ```
 
+### `mta-od-data fetch-mbta`
+
+Fetches a pinned version of the MBTA's GTFS to `data/mbta-gtfs/` (~22MB),
+which has `pathways.txt`, as the MTA's doesn't yet,
+and cuts from it the checked-in [`raptor/tests/data/mbta-downtown/`](raptor/tests/data/mbta-downtown/),
+four downtown Boston stations RAPTOR's pathways tests read.
+Data provided by MassDOT, under its
+[Developers License Agreement](https://github.com/mbta/gtfs-documentation/blob/master/developers-license-agreement.pdf).
+With the whole version fetched, `cargo test -- --ignored` in `raptor/` checks it too.
+
+```sh
+uv run mta-od-data fetch-mbta
+```
+
 ## How the classification works
 
 - **Origin set**: stations served by at least one route in `--routes`,

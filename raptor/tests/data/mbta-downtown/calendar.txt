@@ -1,0 +1,4 @@
+service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+LRV20264-alb46011-Weekday-01,1,1,1,1,0,0,0,20261020,20261210
+RTL20264-hmo46011-Weekday-01,1,1,1,1,0,0,0,20261020,20261210
+RTL20264-hms46011-Weekday-01,1,1,1,1,0,0,0,20261020,20261210

@@ -1,0 +1,4 @@
+service_id,date,exception_type,holiday_name
+LRV20264-alb46011-Weekday-01,20261126,2,Thanksgiving Day
+RTL20264-hmo46011-Weekday-01,20261126,2,Thanksgiving Day
+RTL20264-hms46011-Weekday-01,20261126,2,Thanksgiving Day

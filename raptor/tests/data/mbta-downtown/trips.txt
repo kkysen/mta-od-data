@@ -1,0 +1,333 @@
+route_id,service_id,trip_id,trip_headsign,trip_short_name,direction_id,block_id,shape_id,wheelchair_accessible,trip_route_type,route_pattern_id,bikes_allowed
+Green-D,LRV20264-alb46011-Weekday-01,77744705,Union Square,,1,B800-29,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744742,Union Square,,1,B800-39,8000009,1,,Green-D-855-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77744749,Medford/Tufts,,1,B800-57,8000015,1,,Green-E-886-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744750,Riverside,,0,B800-26,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77744751,Union Square,,1,B800-40,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744760,Riverside,,0,B800-28,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77744783,Union Square,,1,B800-43,8000009,1,,Green-D-855-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77744792,Medford/Tufts,,1,B800-55,8000015,1,,Green-E-886-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744802,Riverside,,0,B800-42,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77744804,Union Square,,1,B800-26,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744822,Union Square,,1,B800-44,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744826,Riverside,,0,B800-38,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77744828,Riverside,,0,B800-37,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77744830,Riverside,,0,B800-34,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77744835,Union Square,,1,B800-36,8000009,1,,Green-D-855-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77744836,Medford/Tufts,,1,B800-51,8000015,1,,Green-E-886-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744840,Riverside,,0,B800-35,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77744849,Union Square,,1,B800-39,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744863,Union Square,,1,B800-35,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744865,Union Square,,1,B800-28,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744866,Union Square,,1,B800-42,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744869,Riverside,,0,B800-36,8000008,1,,Green-D-855-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77744877,Cleveland Circle,,0,B800-16,8000006,1,,Green-C-832-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77744913,Medford/Tufts,,1,B800-58,8000015,1,,Green-E-886-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744919,Riverside,,0,B800-41,8000008,1,,Green-D-855-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77744923,Medford/Tufts,,1,B800-61,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77744924,Medford/Tufts,,1,B800-60,8000015,1,,Green-E-886-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77744938,Riverside,,0,B800-43,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77744939,Riverside,,0,B800-44,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77744941,Union Square,,1,B800-34,8000009,1,,Green-D-855-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745068,Medford/Tufts,,1,B800-52,8000015,1,,Green-E-886-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77745081,Union Square,,1,B800-38,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77745108,Riverside,,0,B800-40,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77745134,Union Square,,1,B800-41,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77745144,Riverside,,0,B800-29,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77745160,Union Square,,1,B800-37,8000009,1,,Green-D-855-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745161,Medford/Tufts,,1,B800-54,8000015,1,,Green-E-886-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77745166,Riverside,,0,B800-27,8000008,1,,Green-D-855-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745182,Heath Street,,0,B800-61,8000018,1,,Green-E-886-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77745183,Union Square,,1,B800-38,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77745188,Union Square,,1,B800-27,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77745189,Riverside,,0,B800-39,8000008,1,,Green-D-855-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745207,Medford/Tufts,,1,B800-50,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745417,Heath Street,,0,B800-54,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745418,Heath Street,,0,B800-55,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745421,Heath Street,,0,B800-57,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745422,Heath Street,,0,B800-60,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745426,Heath Street,,0,B800-58,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745488,Heath Street,,0,B800-61,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745489,Heath Street,,0,B800-62,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745500,Heath Street,,0,B800-53,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745508,Heath Street,,0,B800-45,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745509,Heath Street,,0,B800-46,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745516,Heath Street,,0,B800-62,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745522,Heath Street,,0,B800-53,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745524,Medford/Tufts,,1,B800-48,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745525,Medford/Tufts,,1,B800-45,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745529,Medford/Tufts,,1,B800-62,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745530,Heath Street,,0,B800-45,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745531,Medford/Tufts,,1,B800-46,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745532,Heath Street,,0,B800-46,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745533,Medford/Tufts,,1,B800-53,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745534,Medford/Tufts,,1,B800-47,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745535,Heath Street,,0,B800-47,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745536,Heath Street,,0,B800-48,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745537,Medford/Tufts,,1,B800-54,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745538,Heath Street,,0,B800-52,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745539,Heath Street,,0,B800-51,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745540,Heath Street,,0,B800-50,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745541,Heath Street,,0,B800-49,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745542,Medford/Tufts,,1,B800-49,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745543,Medford/Tufts,,1,B800-51,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745544,Medford/Tufts,,1,B800-59,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745545,Medford/Tufts,,1,B800-52,8000015,1,,Green-E-886-1,2
+Green-E,LRV20264-alb46011-Weekday-01,77745546,Heath Street,,0,B800-59,8000018,1,,Green-E-886-0,2
+Green-E,LRV20264-alb46011-Weekday-01,77745548,Medford/Tufts,,1,B800-50,8000015,1,,Green-E-886-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77745551,Riverside,,0,B800-32,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77745558,Union Square,,1,B800-31,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77745560,Union Square,,1,B800-30,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77745561,Riverside,,0,B800-31,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77745570,Riverside,,0,B800-30,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77745575,Union Square,,1,B800-32,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77745577,Riverside,,0,B800-33,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77745578,Union Square,,1,B800-33,8000009,1,,Green-D-855-1,2
+Green-D,LRV20264-alb46011-Weekday-01,77745583,Riverside,,0,B800-34,8000008,1,,Green-D-855-0,2
+Green-D,LRV20264-alb46011-Weekday-01,77745584,Riverside,,0,B800-33,8000008,1,,Green-D-855-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745585,Government Center,,1,B800-25,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745586,Government Center,,1,B800-15,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745587,Government Center,,1,B800-24,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745588,Cleveland Circle,,0,B800-25,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745589,Government Center,,1,B800-15,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745590,Cleveland Circle,,0,B800-24,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745591,Cleveland Circle,,0,B800-25,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745592,Cleveland Circle,,0,B800-15,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745593,Government Center,,1,B800-25,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745594,Cleveland Circle,,0,B800-24,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745595,Cleveland Circle,,0,B800-15,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745596,Government Center,,1,B800-16,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745597,Cleveland Circle,,0,B800-16,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745598,Government Center,,1,B800-16,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745599,Cleveland Circle,,0,B800-16,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745600,Government Center,,1,B800-17,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745601,Cleveland Circle,,0,B800-17,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745602,Government Center,,1,B800-17,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745603,Cleveland Circle,,0,B800-17,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745604,Government Center,,1,B800-17,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745606,Government Center,,1,B800-18,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745607,Cleveland Circle,,0,B800-18,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745608,Government Center,,1,B800-18,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745609,Cleveland Circle,,0,B800-18,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745612,Government Center,,1,B800-19,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745613,Cleveland Circle,,0,B800-19,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745614,Government Center,,1,B800-19,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745615,Cleveland Circle,,0,B800-19,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745616,Government Center,,1,B800-20,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745617,Cleveland Circle,,0,B800-20,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745618,Government Center,,1,B800-20,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745619,Cleveland Circle,,0,B800-20,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745620,Government Center,,1,B800-21,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745621,Cleveland Circle,,0,B800-21,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745622,Government Center,,1,B800-21,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745623,Cleveland Circle,,0,B800-21,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745624,Government Center,,1,B800-22,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745625,Cleveland Circle,,0,B800-22,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745626,Government Center,,1,B800-22,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745627,Cleveland Circle,,0,B800-22,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745628,Government Center,,1,B800-23,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745629,Cleveland Circle,,0,B800-23,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745630,Government Center,,1,B800-23,8000005,1,,Green-C-832-1,2
+Green-C,LRV20264-alb46011-Weekday-01,77745631,Cleveland Circle,,0,B800-23,8000006,1,,Green-C-832-0,2
+Green-C,LRV20264-alb46011-Weekday-01,77745632,Government Center,,1,B800-24,8000005,1,,Green-C-832-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745660,Government Center,,1,B800-13,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745661,Boston College,,0,B800-13,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745662,Government Center,,1,B800-14,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745663,Boston College,,0,B800-14,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745664,Government Center,,1,B800-1,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745665,Boston College,,0,B800-1,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745666,Government Center,,1,B800-2,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745667,Boston College,,0,B800-2,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745668,Government Center,,1,B800-3,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745669,Boston College,,0,B800-3,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745670,Government Center,,1,B800-3,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745671,Boston College,,0,B800-3,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745682,Government Center,,1,B800-4,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745683,Boston College,,0,B800-4,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745685,Government Center,,1,B800-4,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745686,Boston College,,0,B800-4,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745696,Government Center,,1,B800-5,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745697,Boston College,,0,B800-5,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745698,Government Center,,1,B800-5,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745699,Boston College,,0,B800-5,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745710,Government Center,,1,B800-6,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745711,Boston College,,0,B800-6,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745712,Government Center,,1,B800-6,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745721,Government Center,,1,B800-7,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745725,Boston College,,0,B800-7,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745736,Government Center,,1,B800-8,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745737,Boston College,,0,B800-8,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745748,Government Center,,1,B800-9,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745749,Boston College,,0,B800-9,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745758,Boston College,,0,B800-10,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745761,Government Center,,1,B800-10,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745772,Government Center,,1,B800-11,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745773,Boston College,,0,B800-11,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745784,Government Center,,1,B800-12,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745785,Boston College,,0,B800-12,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745797,Government Center,,1,B800-13,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745798,Boston College,,0,B800-13,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745808,Government Center,,1,B800-14,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745809,Boston College,,0,B800-14,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745820,Government Center,,1,B800-1,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745821,Boston College,,0,B800-1,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745833,Government Center,,1,B800-2,8000012,1,,Green-B-812-1,2
+Green-B,LRV20264-alb46011-Weekday-01,77745834,Boston College,,0,B800-2,8000013,1,,Green-B-812-0,2
+Green-B,LRV20264-alb46011-Weekday-01,77745852,Boston College,,0,B800-12,8000013,1,,Green-B-812-0,2
+Orange,RTL20264-hmo46011-Weekday-01,77797531,Oak Grove,,1,O903_-11,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797532,Forest Hills,,0,O903_-11,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797533,Oak Grove,,1,O903_-11,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797534,Forest Hills,,0,O903_-11,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797539,Oak Grove,,1,O903_-12,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797540,Forest Hills,,0,O903_-12,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797541,Oak Grove,,1,O903_-12,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797542,Forest Hills,,0,O903_-12,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797547,Oak Grove,,1,O903_-14,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797548,Forest Hills,,0,O903_-14,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797549,Oak Grove,,1,O903_-14,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797550,Forest Hills,,0,O903_-14,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797555,Oak Grove,,1,O903_-15,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797556,Forest Hills,,0,O903_-15,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797557,Oak Grove,,1,O903_-15,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797558,Forest Hills,,0,O903_-15,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797563,Oak Grove,,1,O903_-16,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797564,Forest Hills,,0,O903_-16,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797565,Oak Grove,,1,O903_-16,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797566,Forest Hills,,0,O903_-16,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797570,Forest Hills,,0,O903_-17,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797571,Oak Grove,,1,O903_-17,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797572,Forest Hills,,0,O903_-17,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797573,Oak Grove,,1,O903_-17,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797574,Forest Hills,,0,O903_-17,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797578,Forest Hills,,0,O903_-18,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797579,Oak Grove,,1,O903_-18,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797580,Forest Hills,,0,O903_-18,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797581,Oak Grove,,1,O903_-18,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797582,Forest Hills,,0,O903_-18,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797586,Forest Hills,,0,O903_-19,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797587,Oak Grove,,1,O903_-19,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797588,Forest Hills,,0,O903_-19,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797589,Oak Grove,,1,O903_-19,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797590,Forest Hills,,0,O903_-19,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797594,Forest Hills,,0,O903_-20,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797595,Oak Grove,,1,O903_-20,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797596,Forest Hills,,0,O903_-20,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797597,Oak Grove,,1,O903_-20,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797598,Forest Hills,,0,O903_-20,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797602,Forest Hills,,0,O903_-1,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797603,Oak Grove,,1,O903_-1,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797604,Forest Hills,,0,O903_-1,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797605,Oak Grove,,1,O903_-1,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797610,Forest Hills,,0,O903_-2,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797611,Oak Grove,,1,O903_-2,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797612,Forest Hills,,0,O903_-2,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797613,Oak Grove,,1,O903_-2,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797618,Forest Hills,,0,O903_-3,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77797619,Oak Grove,,1,O903_-3,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77797620,Forest Hills,,0,O903_-3,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77798221,Oak Grove,,1,O903_-3,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798226,Forest Hills,,0,O903_-5,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77798227,Oak Grove,,1,O903_-5,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798228,Forest Hills,,0,O903_-5,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77798229,Oak Grove,,1,O903_-5,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798233,Oak Grove,,1,O903_-6,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798234,Forest Hills,,0,O903_-6,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77798235,Oak Grove,,1,O903_-6,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798236,Forest Hills,,0,O903_-6,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77798237,Oak Grove,,1,O903_-6,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798239,Oak Grove,,1,O903_-7,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798240,Forest Hills,,0,O903_-7,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77798241,Oak Grove,,1,O903_-7,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798242,Forest Hills,,0,O903_-7,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77798243,Oak Grove,,1,O903_-7,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798245,Oak Grove,,1,O903_-8,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798246,Forest Hills,,0,O903_-8,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77798247,Oak Grove,,1,O903_-8,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798248,Forest Hills,,0,O903_-8,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77798249,Oak Grove,,1,O903_-8,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798251,Oak Grove,,1,O903_-9,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798252,Forest Hills,,0,O903_-9,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77798253,Oak Grove,,1,O903_-9,903_0029,1,,Orange-3-1,0
+Orange,RTL20264-hmo46011-Weekday-01,77798254,Forest Hills,,0,O903_-9,903_0026,1,,Orange-3-0,0
+Orange,RTL20264-hmo46011-Weekday-01,77798255,Oak Grove,,1,O903_-9,903_0029,1,,Orange-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871023,Alewife,,1,S931_-7,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871024,Ashmont,,0,S931_-7,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871025,Alewife,,1,S931_-7,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871026,Ashmont,,0,S931_-7,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871027,Alewife,,1,S931_-7,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871031,Alewife,,1,S931_-8,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871032,Ashmont,,0,S931_-8,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871033,Alewife,,1,S931_-8,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871034,Ashmont,,0,S931_-8,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871039,Alewife,,1,S931_-9,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871040,Ashmont,,0,S931_-9,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871041,Alewife,,1,S931_-9,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871042,Ashmont,,0,S931_-9,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871047,Alewife,,1,S931_-10,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871048,Ashmont,,0,S931_-10,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871049,Alewife,,1,S931_-10,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871050,Ashmont,,0,S931_-10,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871053,Alewife,,1,S931_-11,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871054,Ashmont,,0,S931_-11,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871055,Alewife,,1,S931_-11,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871056,Ashmont,,0,S931_-11,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871059,Alewife,,1,S931_-1,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871060,Ashmont,,0,S931_-1,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871061,Alewife,,1,S931_-1,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871062,Ashmont,,0,S931_-1,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871064,Ashmont,,0,S931_-2,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871065,Alewife,,1,S931_-2,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871066,Ashmont,,0,S931_-2,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871067,Alewife,,1,S931_-2,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871070,Ashmont,,0,S931_-3,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871071,Alewife,,1,S931_-3,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871072,Ashmont,,0,S931_-3,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871073,Alewife,,1,S931_-3,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871076,Ashmont,,0,S931_-4,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871077,Alewife,,1,S931_-4,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871078,Ashmont,,0,S931_-4,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871079,Alewife,,1,S931_-4,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871082,Ashmont,,0,S931_-6,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871083,Alewife,,1,S931_-6,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871084,Ashmont,,0,S931_-6,931_0019,1,,Red-1-0,0
+Red,RTL20264-hms46011-Weekday-01,77871085,Alewife,,1,S931_-6,931_0020,1,,Red-1-1,0
+Red,RTL20264-hms46011-Weekday-01,77871267,Alewife,,1,S933_-23,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871268,Alewife,,1,S933_-24,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871269,Alewife,,1,S933_-12,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871270,Alewife,,1,S933_-13,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871271,Alewife,,1,S933_-15,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871272,Alewife,,1,S933_-16,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871273,Alewife,,1,S933_-17,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871274,Alewife,,1,S933_-18,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871275,Alewife,,1,S933_-19,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871276,Alewife,,1,S933_-20,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871277,Alewife,,1,S933_-21,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871278,Alewife,,1,S933_-22,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871279,Alewife,,1,S933_-23,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871280,Alewife,,1,S933_-24,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871281,Alewife,,1,S933_-12,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871282,Alewife,,1,S933_-13,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871283,Alewife,,1,S933_-15,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871284,Alewife,,1,S933_-16,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871285,Alewife,,1,S933_-17,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871286,Alewife,,1,S933_-18,933_0019,1,,Red-3-1,0
+Red,RTL20264-hms46011-Weekday-01,77871379,Braintree,,0,S933_-18,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871380,Braintree,,0,S933_-19,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871381,Braintree,,0,S933_-20,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871382,Braintree,,0,S933_-21,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871383,Braintree,,0,S933_-22,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871384,Braintree,,0,S933_-23,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871385,Braintree,,0,S933_-24,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871386,Braintree,,0,S933_-12,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871387,Braintree,,0,S933_-13,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871388,Braintree,,0,S933_-15,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871389,Braintree,,0,S933_-16,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871390,Braintree,,0,S933_-17,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871391,Braintree,,0,S933_-18,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871392,Braintree,,0,S933_-19,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871393,Braintree,,0,S933_-20,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871394,Braintree,,0,S933_-21,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871395,Braintree,,0,S933_-22,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871396,Braintree,,0,S933_-23,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871397,Braintree,,0,S933_-24,933_0020,1,,Red-3-0,0
+Red,RTL20264-hms46011-Weekday-01,77871398,Braintree,,0,S933_-12,933_0020,1,,Red-3-0,0
