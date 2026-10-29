@@ -6,6 +6,7 @@ pub mod batch;
 pub mod calendar;
 pub mod gtfs;
 pub mod od;
+pub mod pathways;
 pub mod platforms;
 pub mod raptor;
 pub mod report;
@@ -23,8 +24,8 @@ use pyo3::{Bound, PyResult, Python, pyclass, pyfunction, pymethods, pymodule, wr
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::assign::{
-    Config, Transfers, TripLoads, Unassigned, route, split, write_path_texts, write_paths,
-    write_platform_waits, write_trips,
+    Config, DEFAULT_FARE_GATE_PENALTY_MIN, Transfers, TripLoads, Unassigned, route, split,
+    write_path_texts, write_paths, write_platform_waits, write_trips,
 };
 use crate::batch::{Version, load_versions, pick_dates};
 use crate::gtfs::{Feed, Secs, parse_time};
@@ -127,7 +128,7 @@ pub fn assign_dates(
 
     let platforms = match config.transfers {
         Transfers::WalkDistance => Some(Platforms::load(platforms)?),
-        Transfers::Gtfs => None,
+        Transfers::Gtfs | Transfers::Pathways => None,
     };
 
     let start = Instant::now();
@@ -139,11 +140,17 @@ pub fn assign_dates(
                 tt.split_platforms(platforms);
             }
             let complexes = Complexes::load(stations, &tt)?;
-            if config.transfers == Transfers::WalkDistance {
-                tt.use_walk_distance_transfers(
+            match config.transfers {
+                Transfers::Gtfs => {}
+                Transfers::WalkDistance => tt.use_walk_distance_transfers(
                     complexes.stops.values().map(Vec::as_slice),
                     config.up_and_over_secs,
-                );
+                ),
+                Transfers::Pathways => {
+                    let gate_penalty = (config.fare_gate_penalty_min * 60.0).round() as Secs;
+                    let (walks, _) = pathways::walks(&job.version.feed, &tt, gate_penalty);
+                    tt.use_pathways(&walks);
+                }
             }
             Ok((tt, complexes))
         })
@@ -460,8 +467,14 @@ fn feed_report(py: Python<'_>, feed: PathBuf) -> Result<String> {
 #[pyfunction]
 fn timetable_report(py: Python<'_>, feed: PathBuf, date: Date) -> Result<String> {
     py.detach(|| {
-        let tt = Timetable::build(&Feed::open(&feed)?, date)?;
-        Ok(report::timetable(&tt))
+        let feed = Feed::open(&feed)?;
+        let tt = Timetable::build(&feed, date)?;
+        let mut out = report::timetable(&tt);
+        if !feed.pathways.is_empty() {
+            let gate_penalty = (DEFAULT_FARE_GATE_PENALTY_MIN * 60.0) as Secs;
+            out += &report::pathways(&pathways::walks(&feed, &tt, gate_penalty).1);
+        }
+        Ok(out)
     })
 }
 

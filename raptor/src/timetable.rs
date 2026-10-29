@@ -11,6 +11,7 @@ use jiff::civil::Date;
 
 use crate::calendar::{active_services, span};
 use crate::gtfs::{DAY, Feed, Secs};
+use crate::pathways::Walk;
 use crate::platforms::Platforms;
 
 /// A date's service day runs from 04:00 to 04:00 the next morning,
@@ -71,6 +72,8 @@ pub struct Timetable {
     pub min_change: Vec<Secs>,
     /// `(to, walk time)` from each stop to other stops.
     pub footpaths: Vec<Vec<(StopIdx, Secs)>>,
+    /// Footpaths out of the paid area through the gates and back in (`use_pathways`).
+    pub exits: HashSet<(StopIdx, StopIdx)>,
     pub report: Report,
 }
 
@@ -128,6 +131,7 @@ impl Timetable {
             .eq(other.stops.iter().map(|s| &s.id))
             && self.min_change == other.min_change
             && self.footpaths == other.footpaths
+            && self.exits == other.exits
             && self.patterns.len() == other.patterns.len()
             && self
                 .patterns
@@ -377,6 +381,7 @@ impl Timetable {
             patterns,
             min_change,
             footpaths,
+            exits: HashSet::new(),
             report,
         })
     }
@@ -498,6 +503,25 @@ impl Timetable {
                     let walk = BASE_WALK + (distance_m(from, to) / WALK_SPEED) as Secs;
                     self.footpaths[a as usize].push((b, walk));
                 }
+            }
+        }
+    }
+}
+
+impl Timetable {
+    /// `pathways.txt`'s walks instead of `transfers.txt`'s times between the stops they join,
+    /// and changing trains at a stop a pathway reaches is free, on one platform.
+    /// Stops pathways don't join keep `transfers.txt`'s.
+    pub fn use_pathways(&mut self, walks: &[Walk]) {
+        for w in walks {
+            self.min_change[w.from as usize] = 0;
+            let paths = &mut self.footpaths[w.from as usize];
+            match paths.iter_mut().find(|(s, _)| *s == w.to) {
+                Some((_, t)) => *t = w.secs,
+                None => paths.push((w.to, w.secs)),
+            }
+            if w.exits {
+                self.exits.insert((w.from, w.to));
             }
         }
     }

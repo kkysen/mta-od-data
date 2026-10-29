@@ -43,7 +43,18 @@ pub struct Config {
     /// up the stairs, over, and down, or down, under, and up.
     #[serde(default = "default_up_and_over_secs")]
     pub up_and_over_secs: Secs,
+    /// Under `pathways`, minutes added per walk out through the fare gates and back in,
+    /// on top of its walk: paying again, or the bother of it.
+    #[serde(default = "default_fare_gate_penalty_min")]
+    pub fare_gate_penalty_min: f64,
 }
+
+fn default_fare_gate_penalty_min() -> f64 {
+    DEFAULT_FARE_GATE_PENALTY_MIN
+}
+
+/// A placeholder, as `logit_scale_per_min`: no source gives one.
+pub const DEFAULT_FARE_GATE_PENALTY_MIN: f64 = 10.0;
 
 fn default_up_and_over_secs() -> Secs {
     DEFAULT_UP_AND_OVER_SECS
@@ -65,6 +76,9 @@ pub enum Transfers {
     Gtfs,
     /// Anita's rules (`Timetable::use_walk_distance_transfers`).
     WalkDistance,
+    /// `pathways.txt`'s walks where it has them, `transfers.txt`'s elsewhere
+    /// (`Timetable::use_pathways`).
+    Pathways,
 }
 
 impl Config {
@@ -661,6 +675,8 @@ struct Choice {
     arrive: Secs,
     in_vehicle: Secs,
     walk: Secs,
+    /// Walks out through the fare gates and back in.
+    exits: u8,
 }
 
 /// The choice intervals of one OD pair's profile (latest departure first).
@@ -729,6 +745,13 @@ fn choices_into(
 ) {
     choices.extend(candidates.iter().map(|j| {
         let (in_vehicle, walk) = in_vehicle_and_walk(tt, legs.of(j));
+        let exits = legs
+            .of(j)
+            .iter()
+            .filter(
+                |leg| matches!(**leg, Leg::Walk { from, to, .. } if tt.exits.contains(&(from, to))),
+            )
+            .count() as u8;
         trains.extend(legs.of(j).iter().filter_map(|leg| match *leg {
             Leg::Ride(r) => Some(Train::try_from(r.trip).expect("under 2^16 trips a pattern")),
             Leg::Walk { .. } => None,
@@ -739,6 +762,7 @@ fn choices_into(
             arrive: j.arrive,
             in_vehicle,
             walk,
+            exits,
         }
     }));
 }
@@ -751,6 +775,7 @@ fn shares_into(choices: &[Choice], t: Secs, config: &Config, shares: &mut Vec<f6
         (o.in_vehicle as f64 + config.wait_weight * wait + config.walk_weight * o.walk as f64)
             / 60.0
             + config.transfer_penalty_min * f64::from(o.rides - 1)
+            + config.fare_gate_penalty_min * f64::from(o.exits)
     };
     // Each share holds its cost, then its weight, then its share.
     shares.clear();
@@ -1321,6 +1346,7 @@ mod tests {
         transfers: Transfers::Gtfs,
         max_rides: DEFAULT_MAX_RIDES,
         up_and_over_secs: DEFAULT_UP_AND_OVER_SECS,
+        fare_gate_penalty_min: DEFAULT_FARE_GATE_PENALTY_MIN,
     };
 
     fn timetable(trips: &str, stop_times: &str, transfers: &str) -> Timetable {
@@ -1483,6 +1509,34 @@ mod tests {
             ..NEUTRAL
         };
         assert!(riders(&penalized, "2 A>B | 5 B>C") < riders(&penalized, "1 A>C"));
+    }
+
+    #[test]
+    fn going_out_and_back_in_costs_the_fare_gate_penalty() {
+        // Out of B's gates and in at D's, 3 minutes faster than staying on.
+        let trips = "route_id,trip_id,service_id\n1,slow,W\n2,feeder,W\n5,fast,W\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            slow,A,08:10:00,08:10:00,1\nslow,C,08:33:00,08:33:00,2\n\
+            feeder,A,08:10:00,08:10:00,1\nfeeder,B,08:20:00,08:20:00,2\n\
+            fast,D,08:21:00,08:21:00,1\nfast,C,08:30:00,08:30:00,2\n";
+        let transfers = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nB,D,2,60\n";
+        let mut tt = timetable(trips, stop_times, transfers);
+        tt.exits.insert((1, 3));
+        let riders = |config: &Config, path: &str| {
+            let (paths, texts, _) = assign(&tt, &complexes(&tt), &[row(0, 2)], config);
+            paths
+                .iter()
+                .find(|p| &texts[p.path] == path)
+                .unwrap()
+                .riders
+        };
+        let out = "2 A>B | walk B>D | 5 D>C";
+        let free = Config {
+            fare_gate_penalty_min: 0.0,
+            ..NEUTRAL
+        };
+        assert!(riders(&free, out) > riders(&free, "1 A>C"));
+        assert!(riders(&NEUTRAL, out) < riders(&NEUTRAL, "1 A>C"));
     }
 
     #[test]

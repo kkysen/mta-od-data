@@ -7,6 +7,7 @@ use std::time::Duration;
 use crate::assign::{PathRow, Unassigned};
 use crate::gtfs::{DAY, Feed, Secs};
 use crate::od::{ComplexId, Complexes, OdRow};
+use crate::pathways;
 use crate::raptor::{Journey, Leg, Legs};
 use crate::timetable::{DEPARTURES_UNTIL, SERVICE_DAY_START, Timetable};
 
@@ -35,6 +36,35 @@ pub fn feed(feed: &Feed) -> String {
     line!(out, "calendar_dates: {}", feed.calendar_dates.len());
     line!(out, "transfers: {}", feed.transfers.len());
     line!(out, "frequencies: {}", feed.frequencies.len());
+    line!(out, "pathways: {}", feed.pathways.len());
+    out
+}
+
+/// What reading `pathways.txt` found, for a timetable.
+pub fn pathways(r: &pathways::Report) -> String {
+    let mut out = String::new();
+    line!(
+        out,
+        "pathways: {}, {} without a time, so estimated, by mode {:?}, {} from nothing",
+        r.pathways,
+        r.estimated.values().sum::<usize>(),
+        r.estimated,
+        r.unknown
+    );
+    line!(
+        out,
+        "boarding areas (taken as their platforms): {}",
+        r.boarding_areas
+    );
+    line!(
+        out,
+        "served stops with pathways: {}, {} walks between them, \
+         {} across one platform, {} out through the fare gates and back in",
+        r.stops,
+        r.walks,
+        r.level_walks,
+        r.exit_walks
+    );
     out
 }
 

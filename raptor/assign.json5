@@ -20,6 +20,8 @@
   logit_scale_per_min: 0.2,
   // Where transfer times come from:
   // "gtfs", `transfers.txt` at its word,
+  // "pathways", `pathways.txt`'s quickest walks between the stops it reaches,
+  // free across one platform, and `transfers.txt`'s elsewhere,
   // or "walk_distance", Anita's rules: changing trains on one platform is free,
   // changing to another of a station's platforms takes `up_and_over_secs`
   // (platforms from OSM, `platforms.csv`),
@@ -29,6 +31,10 @@
   // Under "walk_distance", up the stairs, over, and down to another platform,
   // or down, under, and up.
   up_and_over_secs: 90,
+  // Under "pathways", minutes added per walk out through the fare gates and back in,
+  // on top of its walk.
+  // A placeholder, like `logit_scale_per_min`: no source gives one.
+  fare_gate_penalty_min: 10.0,
   // Most rides in a journey: riders take up to 4-ride trips,
   // and one more allows the rare fastest trip that takes 5.
   max_rides: 5,

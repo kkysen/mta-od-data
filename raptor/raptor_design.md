@@ -201,6 +201,38 @@ and every other pair of a complex's stops gets a footpath
 of 60s plus their straight-line distance at 1.2 m/s.
 Cross-platform changes are free under both.
 
+`transfers: "pathways"` uses `pathways.txt` where a feed has it,
+which the MTA's doesn't yet, so it's tested on the MBTA's.
+From each served stop, Dijkstra over every station's pathways at once
+finds the quickest walk to every other it reaches within 20 minutes,
+so a walk can run from one station to another,
+as Park St to Downtown Crossing through the Winter St concourse.
+Each replaces `transfers.txt`'s time between those stops,
+and changing at a stop pathways reach is free;
+stops they don't reach keep `transfers.txt`'s.
+
+- Pathways are one-way unless `is_bidirectional`:
+  the MBTA's are all one-way, and not always alike each way.
+- Without a `traversal_time`, as 93% of the MBTA's,
+  a walkway takes its length at 1.2 m/s,
+  stairs 0.6s a step (a guess),
+  an elevator 60s, and a gate 5s.
+- A walk over walkways alone between two of a station's platforms is free:
+  they're one platform, as an island's two sides or a row of Green Line berths,
+  since anything else means crossing tracks.
+- Going out through an exit gate and back in through a fare gate is allowed,
+  chosen by its time plus `fare_gate_penalty_min`, 10 minutes (a placeholder),
+  and the cost model charges the penalty on top of the walk.
+  Walking in from a bus stop outside the paid area, or out to one, is no going out and back in.
+- Boarding areas (`location_type` 4) are taken as their platforms,
+  and counted in `mta-od-data raptor timetable`'s report.
+
+On the MBTA's 2026-10-27 version, 321 served stops have pathways,
+with 1,344 walks between them,
+517 across one platform and 18 out and back in:
+between the Orange or Green Line and the commuter rail at North Station and Ruggles,
+behind gates of their own, and between Courthouse's two platforms.
+
 Everything below is the plan for making it accurate later.
 
 GTFS `transfers.txt` is not good enough on its own.
