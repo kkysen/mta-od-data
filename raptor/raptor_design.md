@@ -181,6 +181,12 @@ keyed on parent stops as the feed does:
 - other rows are footpaths;
 - `transfer_type` 3 (not possible) rows are dropped.
 
+A row on a station applies to each of its directional stops:
+a same-stop row is each one's minimum change time,
+and a row between stations is a footpath between each pair of their stops.
+Changing to another of a station's stops, as uptown to downtown,
+takes its same-stop time, as when the station was one stop.
+
 The timetable reports asymmetric footpaths
 and footpaths not transitively closed,
 since RAPTOR relaxes footpaths once a round and assumes closure.
@@ -282,6 +288,13 @@ Labels are per round `k` (at most `max_rides` rides, 5 by default and in `assign
 with a backpointer per (round, stop),
 so every Pareto-optimal (arrival, rides) journey per departure
 is extractable without ambiguity.
+
+Of journeys arriving at the same time in the same round,
+the one boarding its last train earliest wins:
+changing from a local to an express at the first cross-platform chance,
+not after riding past it,
+as Fulton St to Bleecker St on the 5 and changing to the 6 at Brooklyn Bridge, not 14 St.
+Riding further first is never better, and nothing else breaks the tie.
 
 Each journey is dominated by another departing no earlier
 and arriving no later, with no more rides, and dropped.
