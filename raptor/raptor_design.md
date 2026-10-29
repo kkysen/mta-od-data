@@ -109,10 +109,16 @@ the passing-stop tie-breaker) without crowding, at least initially.
    Resolve active `service_id`s through
    `calendar.txt` + `calendar_dates.txt` for that date,
    never by matching `service_id` names.
-2. Build patterns: trips grouped by (route, direction, stop sequence),
+2. Expand each `frequencies.txt` trip, when loading the feed,
+   into one trip per departure from `start_time` every `headway_secs` until before `end_time`,
+   as if the feed had listed them.
+   This is exact for `exact_times=1`;
+   for `exact_times=0`, which promises only headways,
+   starting at `start_time` is an approximation.
+3. Build patterns: trips grouped by (route, direction, stop sequence),
    sorted by departure; verify FIFO (no overtaking within a pattern)
    and split a pattern if it isn't.
-3. A date's service day runs from 04:00 to 04:00 the next morning
+4. A date's service day runs from 04:00 to 04:00 the next morning
    (`SERVICE_DAY_START`), around when the subway is quietest,
    so a night counts with the evening before it, as the MTA plans service.
    Its timetable has every trip running in it, shifted onto the date's clock,

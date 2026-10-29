@@ -34,6 +34,7 @@ pub fn feed(feed: &Feed) -> String {
     line!(out, "calendar: {}", feed.calendar.len());
     line!(out, "calendar_dates: {}", feed.calendar_dates.len());
     line!(out, "transfers: {}", feed.transfers.len());
+    line!(out, "frequencies: {}", feed.frequencies.len());
     out
 }
 

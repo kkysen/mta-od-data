@@ -1,6 +1,6 @@
 //! Raw static GTFS records, read by header name from a feed zip.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -66,7 +66,7 @@ pub struct Stop {
     pub parent_station: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Trip {
     pub route_id: String,
     pub trip_id: String,
@@ -75,7 +75,7 @@ pub struct Trip {
     pub direction_id: Option<u8>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct StopTime {
     pub trip_id: String,
     pub stop_id: String,
@@ -119,6 +119,25 @@ pub struct Transfer {
     pub min_transfer_time: Option<Secs>,
 }
 
+/// A trip running every `headway_secs` from `start_time` until before `end_time`,
+/// its `stop_times.txt` times giving only the times between stops.
+#[derive(Debug, Deserialize)]
+pub struct Frequency {
+    pub trip_id: String,
+    #[serde(deserialize_with = "de_time")]
+    pub start_time: Secs,
+    #[serde(deserialize_with = "de_time")]
+    pub end_time: Secs,
+    pub headway_secs: Secs,
+    /// 1 for trips leaving exactly on the headway; 0 or missing for headways only,
+    /// which are taken as exact from `start_time` too.
+    #[serde(default)]
+    pub exact_times: Option<u8>,
+}
+
+/// `trips` and `stop_times` have each frequency-based trip expanded
+/// into one trip per departure, as if the feed had listed them,
+/// with IDs `<trip_id>@<HH:MM:SS>` of their first departure.
 pub struct Feed {
     pub stops: Vec<Stop>,
     pub trips: Vec<Trip>,
@@ -126,18 +145,91 @@ pub struct Feed {
     pub calendar: Vec<Calendar>,
     pub calendar_dates: Vec<CalendarDate>,
     pub transfers: Vec<Transfer>,
+    pub frequencies: Vec<Frequency>,
 }
 
 impl Feed {
     pub fn load(source: &mut impl Source) -> Result<Self> {
-        Ok(Self {
+        let mut feed = Self {
             stops: required(source, "stops.txt")?,
             trips: required(source, "trips.txt")?,
             stop_times: required(source, "stop_times.txt")?,
             calendar: optional(source, "calendar.txt")?,
             calendar_dates: optional(source, "calendar_dates.txt")?,
             transfers: optional(source, "transfers.txt")?,
-        })
+            frequencies: optional(source, "frequencies.txt")?,
+        };
+        feed.expand_frequencies()?;
+        Ok(feed)
+    }
+
+    /// Replaces each trip in `frequencies` with one trip per departure.
+    fn expand_frequencies(&mut self) -> Result<()> {
+        if self.frequencies.is_empty() {
+            return Ok(());
+        }
+        let templates: HashSet<&str> = self
+            .frequencies
+            .iter()
+            .map(|f| f.trip_id.as_str())
+            .collect();
+        let mut stop_times: HashMap<&str, Vec<&StopTime>> = HashMap::new();
+        for st in &self.stop_times {
+            if templates.contains(st.trip_id.as_str()) {
+                stop_times.entry(st.trip_id.as_str()).or_default().push(st);
+            }
+        }
+        let trips: HashMap<&str, &Trip> =
+            self.trips.iter().map(|t| (t.trip_id.as_str(), t)).collect();
+
+        let (mut new_trips, mut new_stop_times) = (Vec::new(), Vec::new());
+        for f in &self.frequencies {
+            let trip = trips
+                .get(f.trip_id.as_str())
+                .with_context(|| format!("frequencies.txt trip {} not in trips.txt", f.trip_id))?;
+            let sts = stop_times
+                .get(f.trip_id.as_str())
+                .map_or(&[][..], Vec::as_slice);
+            let Some(first) = sts.iter().min_by_key(|st| st.stop_sequence) else {
+                bail!("frequencies.txt trip {} has no stop times", f.trip_id);
+            };
+            if f.headway_secs <= 0 {
+                bail!(
+                    "frequencies.txt trip {} has headway {}",
+                    f.trip_id,
+                    f.headway_secs
+                );
+            }
+            let mut start = f.start_time;
+            while start < f.end_time {
+                let trip_id = format!(
+                    "{}@{:02}:{:02}:{:02}",
+                    f.trip_id,
+                    start / 3600,
+                    start / 60 % 60,
+                    start % 60
+                );
+                let shift = start - first.departure_time;
+                new_stop_times.extend(sts.iter().map(|&st| StopTime {
+                    trip_id: trip_id.clone(),
+                    arrival_time: st.arrival_time + shift,
+                    departure_time: st.departure_time + shift,
+                    ..st.clone()
+                }));
+                new_trips.push(Trip {
+                    trip_id,
+                    ..(*trip).clone()
+                });
+                start += f.headway_secs;
+            }
+        }
+        self.trips
+            .retain(|t| !templates.contains(t.trip_id.as_str()));
+        self.stop_times
+            .retain(|st| !templates.contains(st.trip_id.as_str()));
+        self.trips.extend(new_trips);
+        self.stop_times.extend(new_stop_times);
+        Ok(())
     }
 
     pub fn open(path: &Path) -> Result<Self> {
@@ -235,5 +327,37 @@ mod tests {
             ("A", "B")
         );
         assert_eq!(rows[0].min_transfer_time, None);
+    }
+
+    #[test]
+    fn frequencies_expand_into_trips() {
+        let files = HashMap::from([
+            ("stops.txt", "stop_id,stop_name\nA,A\nB,B\n"),
+            ("trips.txt", "route_id,trip_id,service_id\n1,f,W\n1,t,W\n"),
+            (
+                "stop_times.txt",
+                "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+                 f,B,00:10:00,00:10:00,2\nf,A,00:00:00,00:01:00,1\n\
+                 t,A,09:00:00,09:00:00,1\nt,B,09:10:00,09:10:00,2\n",
+            ),
+            (
+                "frequencies.txt",
+                "trip_id,start_time,end_time,headway_secs,exact_times\n\
+                 f,08:00:00,08:20:00,600,1\nf,17:00:00,17:05:00,600,1\n",
+            ),
+        ]);
+        let feed = Feed::load(&mut { files }).unwrap();
+        let ids: Vec<_> = feed.trips.iter().map(|t| t.trip_id.as_str()).collect();
+        // Up to but not including `end_time`; `t` isn't on frequencies so stays as it was.
+        assert_eq!(ids, ["t", "f@08:00:00", "f@08:10:00", "f@17:00:00"]);
+        let times: Vec<_> = feed
+            .stop_times
+            .iter()
+            .filter(|st| st.trip_id == "f@08:10:00")
+            .map(|st| (st.stop_id.as_str(), st.arrival_time, st.departure_time))
+            .collect();
+        // The first departure lands on the start; the rest keep their gaps.
+        let t = |h: Secs, m: Secs| h * 3600 + m * 60;
+        assert_eq!(times, [("B", t(8, 19), t(8, 19)), ("A", t(8, 9), t(8, 10))]);
     }
 }
