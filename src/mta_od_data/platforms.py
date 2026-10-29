@@ -30,7 +30,7 @@ such a platform is its first piece, with all its pieces' area.
 
 Platforms stacked one right over another, on different levels (by OSM's `level`)
 and overlapping by at least half the smaller one,
-are a flight of stairs a level apart, for Anita's transfers (`stacked_platforms.csv`):
+are a flight of stairs a level apart, for OSM transfers (`stacked_platforms.csv`):
 7 Av's on 53 St, say, one level apart, or W 4 St's, two,
 but not 59 St-Columbus Circle's 1 and A/B/C/D, crossing at an angle,
 nor 74 St-Broadway's 7, on the el.

@@ -127,8 +127,8 @@ pub fn assign_dates(
     let (config, config_text) = Config::load(config)?;
 
     let platforms = match config.transfers {
-        Transfers::WalkDistance => Some(Platforms::load(platforms)?),
-        Transfers::Gtfs | Transfers::Pathways => None,
+        Transfers::Osm => Some(Platforms::load(platforms)?),
+        Transfers::Gtfs => None,
     };
 
     let start = Instant::now();
@@ -142,18 +142,19 @@ pub fn assign_dates(
             let complexes = Complexes::load(stations, &tt)?;
             match config.transfers {
                 Transfers::Gtfs => {}
-                Transfers::WalkDistance => tt.use_walk_distance_transfers(
+                Transfers::Osm => tt.use_osm_transfers(
                     complexes.stops.values().map(Vec::as_slice),
-                    platforms.as_ref().expect("loaded for walk_distance"),
+                    platforms.as_ref().expect("loaded for osm"),
                     config.up_and_over_secs,
                     config.stacked_secs_per_level,
                 ),
-                Transfers::Pathways => {
-                    let gate_penalty = (config.fare_gate_penalty_min * 60.0).round() as Secs;
-                    let (walks, report) =
-                        pathways::walks(&job.version.feed, &tt, gate_penalty, pathways::MAX_WALK);
-                    tt.use_pathways(&walks, &report.covered);
-                }
+            }
+            // Pathways, where a feed has them, over either.
+            if !job.version.feed.pathways.is_empty() {
+                let gate_penalty = (config.fare_gate_penalty_min * 60.0).round() as Secs;
+                let (walks, report) =
+                    pathways::walks(&job.version.feed, &tt, gate_penalty, pathways::MAX_WALK);
+                tt.use_pathways(&walks, &report.covered);
             }
             Ok((tt, complexes))
         })

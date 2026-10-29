@@ -158,6 +158,11 @@ impl Timetable {
         self.stops[a as usize].station == self.stops[b as usize].station
     }
 
+    /// Whether `a` and `b` are one GTFS stop, split by platform.
+    pub fn same_stop(&self, a: StopIdx, b: StopIdx) -> bool {
+        self.stops[a as usize].id == self.stops[b as usize].id
+    }
+
     pub fn build(feed: &Feed, date: Date) -> Result<Self> {
         let mut report = Report::default();
 
@@ -466,7 +471,7 @@ impl Timetable {
         }
     }
 
-    /// Anita's transfer rules instead of `transfers.txt`'s at its word:
+    /// Transfers by OSM's platforms instead of `transfers.txt`'s at its word:
     /// changing trains on one platform is free, at one stop or across an island,
     /// changing to another of the station's platforms takes `up_and_over`,
     /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
@@ -476,7 +481,7 @@ impl Timetable {
     /// within a station or a complex.
     /// A stop's platform is from `split_platforms`;
     /// two stops whose platforms aren't both known are up and over.
-    pub fn use_walk_distance_transfers<'a>(
+    pub fn use_osm_transfers<'a>(
         &mut self,
         complexes: impl Iterator<Item = &'a [StopIdx]>,
         platforms: &Platforms,
@@ -531,14 +536,17 @@ impl Timetable {
     /// and changing trains at a stop a pathway reaches is free, on one platform.
     /// Two of a station's `covered` stops with no walk between them have no footpath,
     /// not the station's same-stop time: pathways say there's no way, or none short enough.
-    /// Stops pathways don't reach keep `transfers.txt`'s.
+    /// Stops pathways don't reach keep their footpaths from before,
+    /// as do one GTFS stop's copies split by platform, which pathways can't tell apart.
     pub fn use_pathways(&mut self, walks: &[Walk], covered: &[StopIdx]) {
         let is_covered = |s: StopIdx| covered.binary_search(&s).is_ok();
         for &a in covered {
-            let station = &self.stops[a as usize].station;
+            let a_stop = &self.stops[a as usize];
             let stops = &self.stops;
-            self.footpaths[a as usize]
-                .retain(|&(b, _)| !(is_covered(b) && stops[b as usize].station == *station));
+            self.footpaths[a as usize].retain(|&(b, _)| {
+                let b_stop = &stops[b as usize];
+                !is_covered(b) || b_stop.station != a_stop.station || b_stop.id == a_stop.id
+            });
         }
         for w in walks {
             self.min_change[w.from as usize] = 0;
@@ -694,9 +702,9 @@ mod tests {
         assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 90)]);
         assert_eq!(tt.footpaths[2], [(0, 120), (1, 120), (3, 90)]);
         assert!(tt.report.unclosed_footpaths.is_empty());
-        // Anita's rules make changing at one stop free,
+        // OSM transfers make changing at one stop free,
         // and to the other direction's, on a platform not known to be the same, up and over.
-        tt.use_walk_distance_transfers(std::iter::empty(), &Platforms::default(), 90, 30);
+        tt.use_osm_transfers(std::iter::empty(), &Platforms::default(), 90, 30);
         assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 90)]);
     }
 
@@ -751,7 +759,7 @@ mod tests {
             (180, 180, 180)
         );
 
-        tt.use_walk_distance_transfers(std::iter::empty(), &platforms, 90, 30);
+        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30);
         // Across the island is free, whichever direction; up and over isn't.
         assert_eq!((walk(&tt, 5, 3), walk(&tt, 3, 5)), (0, 0));
         assert_eq!((walk(&tt, 2, 5), walk(&tt, 2, 3)), (90, 90));
@@ -759,11 +767,36 @@ mod tests {
     }
 
     #[test]
+    fn pathways_over_osm_transfers_but_not_between_copies() {
+        let platforms = beta_platforms();
+        let mut tt = beta_split(&platforms);
+        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30);
+        // Pathways reach Beta's uptown and downtown stops, and the uptown 2s' copy,
+        // but can't tell the copy from the uptown stop it was split from.
+        let walk_of = |from, to, secs| Walk {
+            from,
+            to,
+            secs,
+            exits: 0,
+        };
+        let walks = [walk_of(2, 3, 40), walk_of(3, 2, 40), walk_of(5, 3, 40)];
+        tt.use_pathways(&walks, &[2, 3, 5]);
+        assert_eq!(
+            (walk(&tt, 2, 3), walk(&tt, 3, 2), walk(&tt, 5, 3)),
+            (40, 40, 40)
+        );
+        // From the island to the local platform, by OSM.
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (90, 90));
+        // No pathway from downtown to the copy: none at all.
+        assert!(!tt.footpaths[3].iter().any(|p| p.0 == 5));
+    }
+
+    #[test]
     fn stacked_platforms_are_a_flight_a_level_apart() {
         // Beta's local platform right over its island, two levels up, as at W 4 St.
         let platforms = beta_platforms().with_stacked(&[("local", "island", 2)]);
         let mut tt = beta_split(&platforms);
-        tt.use_walk_distance_transfers(std::iter::empty(), &platforms, 90, 30);
+        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30);
         assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (60, 60));
         assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (60, 60));
         // Across the island is still free.
@@ -869,7 +902,7 @@ mod tests {
     }
 
     #[test]
-    fn walk_distance_transfers() {
+    fn osm_transfers() {
         // A and B 120m apart, C 240m north of A; one complex of all three.
         let stops = "stop_id,stop_name,stop_lat,stop_lon\n\
             A,A,40.0,-74.0\nB,B,40.0,-73.99859\nC,C,40.002156,-74.0\n";
@@ -890,7 +923,7 @@ mod tests {
         ]);
         let feed = Feed::load(&mut { files }).unwrap();
         let mut tt = Timetable::build(&feed, wednesday()).unwrap();
-        tt.use_walk_distance_transfers(
+        tt.use_osm_transfers(
             [[0, 1, 2].as_slice()].into_iter(),
             &Platforms::default(),
             90,
@@ -969,7 +1002,7 @@ mod tests {
         // `A`'s same-stop row is 0 in `transfers.txt`: a cross-platform change.
         let mut tt = build(TRIPS, STOP_TIMES, TRANSFERS, wednesday());
         assert_eq!(tt.min_change[0], 0);
-        tt.use_walk_distance_transfers(std::iter::empty(), &Platforms::default(), 90, 30);
+        tt.use_osm_transfers(std::iter::empty(), &Platforms::default(), 90, 30);
         assert_eq!(tt.min_change[0], 0);
     }
 

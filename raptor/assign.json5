@@ -18,24 +18,24 @@
   // a journey costing 1/scale more minutes gets 1/e of the riders.
   // A placeholder: no neutral value exists, and this one has no source.
   logit_scale_per_min: 0.2,
-  // Where transfer times come from:
-  // "gtfs", `transfers.txt` at its word,
-  // "pathways", `pathways.txt`'s quickest walks between the stops it reaches,
-  // free across one platform, and `transfers.txt`'s elsewhere,
-  // or "walk_distance", Anita's rules: changing trains on one platform is free,
+  // Where transfer times come from, where `pathways.txt` doesn't have them:
+  // a feed's pathways always come first, their quickest walks between the stops they reach,
+  // free across one platform.
+  // Elsewhere, "gtfs", `transfers.txt` at its word,
+  // or "osm", by OSM's platforms: changing trains on one platform is free,
   // changing to another of a station's platforms takes `up_and_over_secs`
-  // (platforms from OSM, `platforms.csv`),
+  // (`platforms.csv`),
   // and a complex's stops without a `transfers.txt` footpath are
   // 60s plus their straight-line distance at 1.2 m/s apart.
   transfers: "gtfs",
-  // Under "walk_distance", up the stairs, over, and down to another platform,
+  // Under "osm", up the stairs, over, and down to another platform,
   // or down, under, and up.
   up_and_over_secs: 90,
-  // Under "walk_distance", between platforms stacked one right over another
+  // Under "osm", between platforms stacked one right over another
   // (OSM's, `stacked_platforms.csv`), each level apart: a flight of stairs each,
   // as 7 Av's on 53 St, one level apart, or W 4 St's, two.
   stacked_secs_per_level: 30,
-  // Under "pathways", minutes added per walk out through the fare gates and back in,
+  // Where pathways are, minutes added per walk out through the fare gates and back in,
   // on top of its walk.
   // A placeholder, like `logit_scale_per_min`: no source gives one.
   fare_gate_penalty_min: 10.0,

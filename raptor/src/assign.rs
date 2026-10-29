@@ -39,15 +39,15 @@ pub struct Config {
     /// Most rides in a journey.
     #[serde(default = "default_max_rides")]
     pub max_rides: usize,
-    /// Under Anita's rules, changing to another of a station's platforms:
+    /// Under OSM transfers, changing to another of a station's platforms:
     /// up the stairs, over, and down, or down, under, and up.
     #[serde(default = "default_up_and_over_secs")]
     pub up_and_over_secs: Secs,
-    /// Under Anita's rules, changing between platforms stacked one right over another:
+    /// Under OSM transfers, changing between platforms stacked one right over another:
     /// one flight of stairs a level apart.
     #[serde(default = "default_stacked_secs_per_level")]
     pub stacked_secs_per_level: Secs,
-    /// Under `pathways`, minutes added per walk out through the fare gates and back in,
+    /// Where pathways are, minutes added per walk out through the fare gates and back in,
     /// on top of its walk: paying again, or the bother of it.
     #[serde(default = "default_fare_gate_penalty_min")]
     pub fare_gate_penalty_min: f64,
@@ -77,18 +77,16 @@ fn default_max_rides() -> usize {
     DEFAULT_MAX_RIDES
 }
 
-/// Where transfer times come from.
+/// Where transfer times come from, where `pathways.txt` doesn't have them
+/// (`Timetable::use_pathways`, whenever a feed has it).
 #[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum Transfers {
     /// `transfers.txt` at its word (`Timetable::build`).
     #[default]
     Gtfs,
-    /// Anita's rules (`Timetable::use_walk_distance_transfers`).
-    WalkDistance,
-    /// `pathways.txt`'s walks where it has them, `transfers.txt`'s elsewhere
-    /// (`Timetable::use_pathways`).
-    Pathways,
+    /// OSM's platforms (`Timetable::use_osm_transfers`).
+    Osm,
 }
 
 impl Config {

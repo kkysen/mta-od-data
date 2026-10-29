@@ -228,7 +228,9 @@ pub fn walks(
                 .min_by_key(|&(cost, ..)| cost)
                 .expect("seen");
             for &from in &stops_of[source] {
-                for &to in stops_of[n].iter().filter(|&&to| to != from) {
+                // Not between one GTFS stop's copies split by platform:
+                // pathways can't tell them apart.
+                for &to in stops_of[n].iter().filter(|&&to| !tt.same_stop(from, to)) {
                     let across = level && tt.same_station(from, to);
                     walks.push(Walk {
                         from,
@@ -245,7 +247,7 @@ pub fn walks(
         walks.iter().map(|w| (w.from, w.to)).collect();
     for &a in &report.covered {
         for &b in &report.covered {
-            if a != b && tt.same_station(a, b) && !walked.contains(&(a, b)) {
+            if !tt.same_stop(a, b) && tt.same_station(a, b) && !walked.contains(&(a, b)) {
                 report.unreached += 1;
             }
         }

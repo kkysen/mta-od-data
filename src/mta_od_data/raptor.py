@@ -66,7 +66,7 @@ Config = Annotated[Path, Option(help="Generalized cost weights")]
 Platforms = Annotated[
     Path,
     Option(
-        help="Each route's stops' platforms, for Anita's transfers, "
+        help="Each route's stops' platforms, for OSM transfers, "
         "with `stacked_platforms.csv` beside it"
     ),
 ]

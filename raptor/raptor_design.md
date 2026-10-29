@@ -192,8 +192,8 @@ and footpaths not transitively closed,
 since RAPTOR relaxes footpaths once a round and assumes closure.
 Every version so far has none of either.
 
-`transfers: "walk_distance"` in `raptor/assign.json5`
-switches to Anita's rules instead, for comparing with it:
+`transfers: "osm"` in `raptor/assign.json5`
+switches to transfers by OSM's platforms instead, begun as Anita's rules:
 changing trains on one platform is free,
 at one stop or across an island to the other direction's;
 changing to another of the station's platforms, up and over, takes `up_and_over_secs`, 90s,
@@ -214,7 +214,7 @@ and every other pair of a complex's stops gets a footpath
 of 60s plus their straight-line distance at 1.2 m/s.
 Cross-platform changes are free under both.
 
-`transfers: "pathways"` uses `pathways.txt` where a feed has it,
+`pathways.txt`, where a feed has it, comes first under either,
 which the MTA's doesn't yet, so it's tested on the MBTA's.
 From each served stop, Dijkstra over every station's pathways at once
 finds the quickest walk to every other it reaches within 20 minutes on foot,
@@ -224,7 +224,9 @@ Each replaces `transfers.txt`'s time between those stops,
 and changing at a stop pathways reach is free;
 two of a station's stops pathways reach with no walk between them have no footpath
 (26 pairs on the MBTA's), not the station's same-stop time, 0s on the MBTA's;
-stops they don't reach keep `transfers.txt`'s.
+stops they don't reach keep `transfers.txt`'s, or OSM's.
+One GTFS stop's copies split by platform keep OSM's between them,
+as pathways can't tell them apart.
 
 - Pathways are one-way unless `is_bidirectional`:
   the MBTA's are all one-way, and not always alike each way.
