@@ -222,8 +222,8 @@ stops they don't reach keep `transfers.txt`'s.
 - Pathways are one-way unless `is_bidirectional`:
   the MBTA's are all one-way, and not always alike each way.
 - Without a `traversal_time`, as 93% of the MBTA's,
-  a walkway takes its length at 1.2 m/s,
-  stairs 0.6s a step (a guess),
+  a walkway takes its length at 3 mph (1.34 m/s), on the level,
+  stairs 0.6s a step (a guess), or their length at 1.2 m/s with no count,
   an elevator 60s, and a gate 5s.
 - A walk over walkways alone between two of a station's platforms is free:
   they're one platform, as an island's two sides or a row of Green Line berths,
@@ -237,7 +237,7 @@ stops they don't reach keep `transfers.txt`'s.
 
 On the MBTA's 2026-10-27 version, 321 served stops have pathways,
 with 1,344 walks between them,
-517 across one platform and 18 out and back in:
+518 across one platform and 18 out and back in:
 between the Orange or Green Line and the commuter rail at North Station and Ruggles,
 behind gates of their own, and between Courthouse's two platforms.
 

@@ -9,6 +9,9 @@ use std::collections::{BTreeMap, BinaryHeap, HashMap};
 use crate::gtfs::{Feed, Pathway, Secs};
 use crate::timetable::{StopIdx, Timetable, WALK_SPEED};
 
+/// Walking on the level, in meters a second: 3 mph.
+/// Slower than `WALK_SPEED`, which allows for stairs on the way.
+pub const LEVEL_WALK_SPEED: f64 = 1.34112;
 /// Seconds a step, up or down: a guess, as no source gives one.
 pub const STEP_SECS: f64 = 0.6;
 /// An elevator without a `traversal_time`: waiting for it, and riding.
@@ -63,12 +66,14 @@ fn traversal(p: &Pathway) -> (Secs, bool, bool) {
     if let Some(t) = p.traversal_time {
         return (t, false, false);
     }
-    let by_length = p.length.map(|m| (m / WALK_SPEED).round() as Secs);
+    let at = |speed: f64| p.length.map(|m| (m / speed).round() as Secs);
+    let by_length = at(LEVEL_WALK_SPEED);
     let estimate = match p.pathway_mode {
+        // Stairs with no count, by their length at the pace allowing for stairs.
         2 => p
             .stair_count
             .map(|n| (f64::from(n.unsigned_abs()) * STEP_SECS).round() as Secs)
-            .or(by_length),
+            .or(at(WALK_SPEED)),
         5 => Some(ELEVATOR_SECS),
         6 | 7 => Some(GATE_SECS),
         _ => by_length,
@@ -315,9 +320,9 @@ mod tests {
     fn across_an_island_is_free_and_stairs_are_estimated() {
         let (tt, walks, report) = walks_of(ALPHA, 600);
         assert_eq!(walk(&tt, &walks, "AN", "AS"), Some((0, 0)));
-        // 12 m and 24 m at 1.2 m/s, and 20 steps at 0.6s.
-        assert_eq!(walk(&tt, &walks, "AN", "AU"), Some((10 + 12 + 20, 0)));
-        assert_eq!(walk(&tt, &walks, "AU", "AS"), Some((20 + 12 + 10, 0)));
+        // 12 m and 24 m at 3 mph, and 20 steps at 0.6s.
+        assert_eq!(walk(&tt, &walks, "AN", "AU"), Some((9 + 12 + 18, 0)));
+        assert_eq!(walk(&tt, &walks, "AU", "AS"), Some((18 + 12 + 9, 0)));
         assert_eq!(report.estimated, BTreeMap::from([(1, 3), (2, 1)]));
         assert_eq!((report.stops, report.walks, report.level_walks), (3, 6, 2));
     }
@@ -414,7 +419,7 @@ mod tests {
                 .map(|p| p.1)
         };
         assert_eq!(path(au, bp), Some(240));
-        assert_eq!(path(au, an), Some(42));
+        assert_eq!(path(au, an), Some(39));
         assert_eq!(tt.exits.get(&(au, bp)), Some(&1));
         assert!(!tt.exits.contains_key(&(au, an)));
     }

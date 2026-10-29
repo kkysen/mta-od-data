@@ -109,7 +109,7 @@ fn whole_feed() {
             report.level_walks,
             report.exit_walks
         ),
-        (9309, 321, 1344, 517, 18)
+        (9309, 321, 1344, 518, 18)
     );
     // Shortest walks are closed: none beats going by way of a third stop.
     let at: HashMap<(u32, u32), &Walk> = walks.iter().map(|w| ((w.from, w.to), w)).collect();
