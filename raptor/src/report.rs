@@ -65,6 +65,11 @@ pub fn pathways(r: &pathways::Report) -> String {
         r.level_walks,
         r.exit_walks
     );
+    line!(
+        out,
+        "pairs of a station's stops with pathways but no walk between them: {}",
+        r.unreached
+    );
     out
 }
 

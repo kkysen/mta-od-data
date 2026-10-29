@@ -675,7 +675,7 @@ struct Choice {
     arrive: Secs,
     in_vehicle: Secs,
     walk: Secs,
-    /// Walks out through the fare gates and back in.
+    /// Times out through the fare gates and back in.
     exits: u8,
 }
 
@@ -748,10 +748,11 @@ fn choices_into(
         let exits = legs
             .of(j)
             .iter()
-            .filter(
-                |leg| matches!(**leg, Leg::Walk { from, to, .. } if tt.exits.contains(&(from, to))),
-            )
-            .count() as u8;
+            .filter_map(|leg| match *leg {
+                Leg::Walk { from, to, .. } => tt.exits.get(&(from, to)).copied(),
+                Leg::Ride(_) => None,
+            })
+            .sum();
         trains.extend(legs.of(j).iter().filter_map(|leg| match *leg {
             Leg::Ride(r) => Some(Train::try_from(r.trip).expect("under 2^16 trips a pattern")),
             Leg::Walk { .. } => None,
@@ -1521,7 +1522,7 @@ mod tests {
             fast,D,08:21:00,08:21:00,1\nfast,C,08:30:00,08:30:00,2\n";
         let transfers = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nB,D,2,60\n";
         let mut tt = timetable(trips, stop_times, transfers);
-        tt.exits.insert((1, 3));
+        tt.exits.insert((1, 3), 1);
         let riders = |config: &Config, path: &str| {
             let (paths, texts, _) = assign(&tt, &complexes(&tt), &[row(0, 2)], config);
             paths

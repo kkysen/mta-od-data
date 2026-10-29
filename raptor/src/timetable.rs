@@ -72,8 +72,9 @@ pub struct Timetable {
     pub min_change: Vec<Secs>,
     /// `(to, walk time)` from each stop to other stops.
     pub footpaths: Vec<Vec<(StopIdx, Secs)>>,
-    /// Footpaths out of the paid area through the gates and back in (`use_pathways`).
-    pub exits: HashSet<(StopIdx, StopIdx)>,
+    /// Footpaths out of the paid area through the gates and back in,
+    /// and how many times (`use_pathways`).
+    pub exits: HashMap<(StopIdx, StopIdx), u8>,
     pub report: Report,
 }
 
@@ -381,7 +382,7 @@ impl Timetable {
             patterns,
             min_change,
             footpaths,
-            exits: HashSet::new(),
+            exits: HashMap::new(),
             report,
         })
     }
@@ -511,8 +512,17 @@ impl Timetable {
 impl Timetable {
     /// `pathways.txt`'s walks instead of `transfers.txt`'s times between the stops they join,
     /// and changing trains at a stop a pathway reaches is free, on one platform.
-    /// Stops pathways don't join keep `transfers.txt`'s.
-    pub fn use_pathways(&mut self, walks: &[Walk]) {
+    /// Two of a station's `covered` stops with no walk between them have no footpath,
+    /// not the station's same-stop time: pathways say there's no way, or none short enough.
+    /// Stops pathways don't reach keep `transfers.txt`'s.
+    pub fn use_pathways(&mut self, walks: &[Walk], covered: &[StopIdx]) {
+        let is_covered = |s: StopIdx| covered.binary_search(&s).is_ok();
+        for &a in covered {
+            let station = &self.stops[a as usize].station;
+            let stops = &self.stops;
+            self.footpaths[a as usize]
+                .retain(|&(b, _)| !(is_covered(b) && stops[b as usize].station == *station));
+        }
         for w in walks {
             self.min_change[w.from as usize] = 0;
             let paths = &mut self.footpaths[w.from as usize];
@@ -520,8 +530,8 @@ impl Timetable {
                 Some((_, t)) => *t = w.secs,
                 None => paths.push((w.to, w.secs)),
             }
-            if w.exits {
-                self.exits.insert((w.from, w.to));
+            if w.exits > 0 {
+                self.exits.insert((w.from, w.to), w.exits);
             }
         }
     }

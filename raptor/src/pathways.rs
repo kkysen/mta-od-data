@@ -17,7 +17,7 @@ pub const ELEVATOR_SECS: Secs = 60;
 pub const GATE_SECS: Secs = 5;
 /// A pathway with neither a time nor anything to estimate one from.
 pub const UNKNOWN_SECS: Secs = 30;
-/// No walk is longer than this, fare gate penalty included:
+/// No walk is longer than this on foot, fare gate penalty aside:
 /// a transfer that long is no transfer.
 pub const MAX_WALK: Secs = 20 * 60;
 
@@ -30,8 +30,8 @@ pub struct Walk {
     /// Its time on foot: 0 for a walk over walkways alone within a station,
     /// across one platform, as an island's two sides.
     pub secs: Secs,
-    /// Out of the paid area through the gates and back in.
-    pub exits: bool,
+    /// Times out of the paid area through the gates and back in.
+    pub exits: u8,
 }
 
 /// What reading `pathways.txt` found.
@@ -46,6 +46,11 @@ pub struct Report {
     pub unknown: usize,
     /// Served stops a pathway starts or ends at.
     pub stops: usize,
+    /// Those stops, which `Timetable::use_pathways` takes pathways' word on.
+    pub covered: Vec<StopIdx>,
+    /// Pairs of one station's covered stops with no walk between them
+    /// within `max_walk`, so no footpath.
+    pub unreached: usize,
     pub walks: usize,
     /// Walks over walkways alone within a station, so free.
     pub level_walks: usize,
@@ -86,8 +91,16 @@ const FARE_GATE: u8 = 6;
 const EXIT_GATE: u8 = 7;
 
 /// The quickest walks between `tt`'s served stops through `feed`'s pathways,
-/// each chosen by its time plus `gate_penalty` for going out and back in.
-pub fn walks(feed: &Feed, tt: &Timetable, gate_penalty: Secs) -> (Vec<Walk>, Report) {
+/// each chosen by its time plus `gate_penalty` for going out and back in,
+/// none over `max_walk` on foot (`MAX_WALK`).
+/// The cheapest way to a node over `max_walk` hides a dearer one under it,
+/// which only matters for walks near it.
+pub fn walks(
+    feed: &Feed,
+    tt: &Timetable,
+    gate_penalty: Secs,
+    max_walk: Secs,
+) -> (Vec<Walk>, Report) {
     let mut report = Report {
         pathways: feed.pathways.len(),
         ..Report::default()
@@ -144,14 +157,16 @@ pub fn walks(feed: &Feed, tt: &Timetable, gate_penalty: Secs) -> (Vec<Walk>, Rep
             stops_of[n].push(i);
         }
     }
-    report.stops = stops_of.iter().map(Vec::len).sum();
+    report.covered = stops_of.iter().flatten().copied().collect();
+    report.covered.sort_unstable();
+    report.stops = report.covered.len();
 
     // Each state's `(cost, secs, exits, level)`, for the current source only,
     // a state being a node, and whether the walk is out of the paid area there,
     // through an exit gate, so a fare gate after is back in (`node * 2 + out`):
     // walking in from a bus stop outside it is no going out and back in.
     // `seen` lists the states set, to reset.
-    let mut best: Vec<Option<(Secs, Secs, bool, bool)>> = vec![None; edges.len() * 2];
+    let mut best: Vec<Option<(Secs, Secs, u8, bool)>> = vec![None; edges.len() * 2];
     let mut seen = Vec::new();
     let mut reached = Vec::new();
     let mut heap = BinaryHeap::new();
@@ -163,7 +178,7 @@ pub fn walks(feed: &Feed, tt: &Timetable, gate_penalty: Secs) -> (Vec<Walk>, Rep
         for state in seen.drain(..) {
             best[state] = None;
         }
-        best[source * 2] = Some((0, 0, false, true));
+        best[source * 2] = Some((0, 0, 0, true));
         seen.push(source * 2);
         heap.push(Reverse((0, source * 2)));
         while let Some(Reverse((cost, state))) = heap.pop() {
@@ -181,7 +196,7 @@ pub fn walks(feed: &Feed, tt: &Timetable, gate_penalty: Secs) -> (Vec<Walk>, Rep
                 };
                 let next = to * 2 + usize::from(next_out);
                 let next_cost = cost + t + if back_in { gate_penalty } else { 0 };
-                if next_cost > MAX_WALK || best[next].is_some_and(|(c, ..)| c <= next_cost) {
+                if secs + t > max_walk || best[next].is_some_and(|(c, ..)| c <= next_cost) {
                     continue;
                 }
                 if best[next].is_none() {
@@ -190,7 +205,7 @@ pub fn walks(feed: &Feed, tt: &Timetable, gate_penalty: Secs) -> (Vec<Walk>, Rep
                 best[next] = Some((
                     next_cost,
                     secs + t,
-                    exits || back_in,
+                    exits + u8::from(back_in),
                     level && is_level(mode),
                 ));
                 heap.push(Reverse((next_cost, next)));
@@ -221,9 +236,18 @@ pub fn walks(feed: &Feed, tt: &Timetable, gate_penalty: Secs) -> (Vec<Walk>, Rep
         }
     }
     walks.sort_by_key(|w| (w.from, w.to));
+    let walked: std::collections::HashSet<(StopIdx, StopIdx)> =
+        walks.iter().map(|w| (w.from, w.to)).collect();
+    for &a in &report.covered {
+        for &b in &report.covered {
+            if a != b && tt.same_station(a, b) && !walked.contains(&(a, b)) {
+                report.unreached += 1;
+            }
+        }
+    }
     report.walks = walks.len();
     report.level_walks = walks.iter().filter(|w| w.secs == 0).count();
-    report.exit_walks = walks.iter().filter(|w| w.exits).count();
+    report.exit_walks = walks.iter().filter(|w| w.exits > 0).count();
     (walks, report)
 }
 
@@ -271,11 +295,11 @@ mod tests {
     fn walks_of(pathways: &str, gate_penalty: Secs) -> (Timetable, Vec<Walk>, Report) {
         let feed = feed(&format!("{HEADER}{pathways}"));
         let tt = Timetable::build(&feed, Date::new(2025, 9, 3).unwrap()).unwrap();
-        let (walks, report) = walks(&feed, &tt, gate_penalty);
+        let (walks, report) = walks(&feed, &tt, gate_penalty, MAX_WALK);
         (tt, walks, report)
     }
 
-    fn walk(tt: &Timetable, walks: &[Walk], from: &str, to: &str) -> Option<(Secs, bool)> {
+    fn walk(tt: &Timetable, walks: &[Walk], from: &str, to: &str) -> Option<(Secs, u8)> {
         let (from, to) = (tt.stop(from).unwrap(), tt.stop(to).unwrap());
         walks
             .iter()
@@ -290,10 +314,10 @@ mod tests {
     #[test]
     fn across_an_island_is_free_and_stairs_are_estimated() {
         let (tt, walks, report) = walks_of(ALPHA, 600);
-        assert_eq!(walk(&tt, &walks, "AN", "AS"), Some((0, false)));
+        assert_eq!(walk(&tt, &walks, "AN", "AS"), Some((0, 0)));
         // 12 m and 24 m at 1.2 m/s, and 20 steps at 0.6s.
-        assert_eq!(walk(&tt, &walks, "AN", "AU"), Some((10 + 12 + 20, false)));
-        assert_eq!(walk(&tt, &walks, "AU", "AS"), Some((20 + 12 + 10, false)));
+        assert_eq!(walk(&tt, &walks, "AN", "AU"), Some((10 + 12 + 20, 0)));
+        assert_eq!(walk(&tt, &walks, "AU", "AS"), Some((20 + 12 + 10, 0)));
         assert_eq!(report.estimated, BTreeMap::from([(1, 3), (2, 1)]));
         assert_eq!((report.stops, report.walks, report.level_walks), (3, 6, 2));
     }
@@ -301,7 +325,7 @@ mod tests {
     #[test]
     fn one_way_unless_bidirectional() {
         let (tt, walks, _) = walks_of("n,AN,landing,1,0,12,,\ns,landing,AS,1,0,12,,\n", 600);
-        assert_eq!(walk(&tt, &walks, "AN", "AS"), Some((0, false)));
+        assert_eq!(walk(&tt, &walks, "AN", "AS"), Some((0, 0)));
         assert_eq!(walk(&tt, &walks, "AS", "AN"), None);
     }
 
@@ -317,41 +341,71 @@ mod tests {
     fn out_and_back_in_only_when_worth_the_penalty() {
         let (tt, walks, report) = walks_of(&format!("{ALPHA}{TO_BETA}"), 600);
         // The only way: out and back in, its time on foot alone.
-        assert_eq!(walk(&tt, &walks, "AU", "BP"), Some((240, true)));
+        assert_eq!(walk(&tt, &walks, "AU", "BP"), Some((240, 1)));
         assert_eq!(report.exit_walks, 3);
         // Beta's way back is in: its fare gate only goes in.
         assert_eq!(walk(&tt, &walks, "BP", "AU"), None);
 
         let (tt, walks, _) = walks_of(&format!("{ALPHA}{TO_BETA}{PASSAGE}"), 600);
-        assert_eq!(walk(&tt, &walks, "AU", "BP"), Some((360, false)));
+        assert_eq!(walk(&tt, &walks, "AU", "BP"), Some((360, 0)));
         // Unless the penalty is under the 2 minutes it saves.
         let (tt, walks, _) = walks_of(&format!("{ALPHA}{TO_BETA}{PASSAGE}"), 60);
-        assert_eq!(walk(&tt, &walks, "AU", "BP"), Some((240, true)));
+        assert_eq!(walk(&tt, &walks, "AU", "BP"), Some((240, 1)));
     }
 
     #[test]
     fn in_from_outside_is_no_going_out() {
         let bus = "busway,AB,street,1,1,,30,\nfare,street,paid,6,0,,5,\n";
         let (tt, walks, report) = walks_of(&format!("{ALPHA}{TO_BETA}{bus}"), 600);
-        assert_eq!(walk(&tt, &walks, "AB", "AU"), Some((35, false)));
+        assert_eq!(walk(&tt, &walks, "AB", "AU"), Some((35, 0)));
         // Out to the busway is no going back in either.
-        assert_eq!(walk(&tt, &walks, "AU", "AB"), Some((35, false)));
+        assert_eq!(walk(&tt, &walks, "AU", "AB"), Some((35, 0)));
         // But out of Alpha and in at Beta is, from either.
-        assert_eq!(walk(&tt, &walks, "AU", "BP"), Some((240, true)));
-        assert_eq!(walk(&tt, &walks, "AB", "BP"), Some((265, false)));
+        assert_eq!(walk(&tt, &walks, "AU", "BP"), Some((240, 1)));
+        assert_eq!(walk(&tt, &walks, "AB", "BP"), Some((265, 0)));
         assert_eq!(report.exit_walks, 3);
     }
 
     #[test]
+    fn a_penalty_over_the_longest_walk_still_finds_the_way_out_and_in() {
+        // Alpha's Upper and its island, both on pathways: walked, no fallback.
+        let (mut tt, walks, report) = walks_of(&format!("{ALPHA}{TO_BETA}"), 1200);
+        tt.use_pathways(&walks, &report.covered);
+        let (au, bp) = (tt.stop("AU").unwrap(), tt.stop("BP").unwrap());
+        let path = |a: StopIdx, b: StopIdx| {
+            tt.footpaths[a as usize]
+                .iter()
+                .find(|p| p.0 == b)
+                .map(|p| p.1)
+        };
+        assert_eq!(path(au, bp), Some(240));
+        assert_eq!(tt.exits.get(&(au, bp)), Some(&1));
+        assert_eq!(report.unreached, 0);
+    }
+
+    #[test]
+    fn one_station_without_a_way_between_has_no_footpath() {
+        // North and South, with no pathway from South: not the station's same-stop time.
+        let (mut tt, walks, report) =
+            walks_of("n,AN,landing,1,0,12,,\ns,landing,AS,1,0,12,,\n", 600);
+        let (an, as_) = (tt.stop("AN").unwrap(), tt.stop("AS").unwrap());
+        assert!(tt.footpaths[as_ as usize].iter().any(|p| p.0 == an));
+        assert_eq!(report.unreached, 1);
+        tt.use_pathways(&walks, &report.covered);
+        assert!(!tt.footpaths[as_ as usize].iter().any(|p| p.0 == an));
+        assert!(tt.footpaths[an as usize].contains(&(as_, 0)));
+    }
+
+    #[test]
     fn pathways_replace_transfers_where_they_reach() {
-        let (mut tt, walks, _) = walks_of(&format!("{ALPHA}{TO_BETA}"), 600);
+        let (mut tt, walks, report) = walks_of(&format!("{ALPHA}{TO_BETA}"), 600);
         let (au, bp, an) = (
             tt.stop("AU").unwrap(),
             tt.stop("BP").unwrap(),
             tt.stop("AN").unwrap(),
         );
         assert_eq!(tt.min_change[au as usize], tt.report.default_change);
-        tt.use_pathways(&walks);
+        tt.use_pathways(&walks, &report.covered);
         assert_eq!(tt.min_change[au as usize], 0);
         let path = |a: StopIdx, b: StopIdx| {
             tt.footpaths[a as usize]
@@ -361,8 +415,8 @@ mod tests {
         };
         assert_eq!(path(au, bp), Some(240));
         assert_eq!(path(au, an), Some(42));
-        assert!(tt.exits.contains(&(au, bp)));
-        assert!(!tt.exits.contains(&(au, an)));
+        assert_eq!(tt.exits.get(&(au, bp)), Some(&1));
+        assert!(!tt.exits.contains_key(&(au, an)));
     }
 
     /// Floyd–Warshall over every `(node, out)` state:
@@ -426,7 +480,7 @@ mod tests {
                     continue;
                 };
                 let cost = d[x * 2][y * 2].min(d[x * 2][y * 2 + 1]);
-                if a != b && cost <= MAX_WALK {
+                if a != b && cost < Secs::MAX / 4 {
                     costs.insert((a, b), cost);
                 }
             }
@@ -461,7 +515,7 @@ mod tests {
             let penalty = [0, 60, 600][next(3) as usize] as Secs;
             let feed = feed(&format!("{HEADER}{pathways}"));
             let tt = Timetable::build(&feed, Date::new(2025, 9, 3).unwrap()).unwrap();
-            let (walks, _) = walks(&feed, &tt, penalty);
+            let (walks, _) = walks(&feed, &tt, penalty, Secs::MAX / 4);
             let want = reference(&feed, &tt, penalty);
             let got: HashMap<(StopIdx, StopIdx), &Walk> =
                 walks.iter().map(|w| ((w.from, w.to), w)).collect();
@@ -473,7 +527,7 @@ mod tests {
             for (pair, w) in got {
                 // A walk across one platform is free, whatever its cost.
                 if w.secs != 0 {
-                    let cost = w.secs + if w.exits { penalty } else { 0 };
+                    let cost = w.secs + penalty * Secs::from(w.exits);
                     assert_eq!(cost, want[&pair], "{pair:?} {pathways}");
                 }
             }

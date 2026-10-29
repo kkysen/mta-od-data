@@ -148,8 +148,9 @@ pub fn assign_dates(
                 ),
                 Transfers::Pathways => {
                     let gate_penalty = (config.fare_gate_penalty_min * 60.0).round() as Secs;
-                    let (walks, _) = pathways::walks(&job.version.feed, &tt, gate_penalty);
-                    tt.use_pathways(&walks);
+                    let (walks, report) =
+                        pathways::walks(&job.version.feed, &tt, gate_penalty, pathways::MAX_WALK);
+                    tt.use_pathways(&walks, &report.covered);
                 }
             }
             Ok((tt, complexes))
@@ -472,7 +473,8 @@ fn timetable_report(py: Python<'_>, feed: PathBuf, date: Date) -> Result<String>
         let mut out = report::timetable(&tt);
         if !feed.pathways.is_empty() {
             let gate_penalty = (DEFAULT_FARE_GATE_PENALTY_MIN * 60.0) as Secs;
-            out += &report::pathways(&pathways::walks(&feed, &tt, gate_penalty).1);
+            let walks = pathways::walks(&feed, &tt, gate_penalty, pathways::MAX_WALK);
+            out += &report::pathways(&walks.1);
         }
         Ok(out)
     })

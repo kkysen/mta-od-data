@@ -210,11 +210,13 @@ Cross-platform changes are free under both.
 `transfers: "pathways"` uses `pathways.txt` where a feed has it,
 which the MTA's doesn't yet, so it's tested on the MBTA's.
 From each served stop, Dijkstra over every station's pathways at once
-finds the quickest walk to every other it reaches within 20 minutes,
+finds the quickest walk to every other it reaches within 20 minutes on foot,
 so a walk can run from one station to another,
 as Park St to Downtown Crossing through the Winter St concourse.
 Each replaces `transfers.txt`'s time between those stops,
 and changing at a stop pathways reach is free;
+two of a station's stops pathways reach with no walk between them have no footpath
+(26 pairs on the MBTA's), not the station's same-stop time, 0s on the MBTA's;
 stops they don't reach keep `transfers.txt`'s.
 
 - Pathways are one-way unless `is_bidirectional`:
@@ -228,7 +230,7 @@ stops they don't reach keep `transfers.txt`'s.
   since anything else means crossing tracks.
 - Going out through an exit gate and back in through a fare gate is allowed,
   chosen by its time plus `fare_gate_penalty_min`, 10 minutes (a placeholder),
-  and the cost model charges the penalty on top of the walk.
+  and the cost model charges the penalty on top of the walk, once each time.
   Walking in from a bus stop outside the paid area, or out to one, is no going out and back in.
 - Boarding areas (`location_type` 4) are taken as their platforms,
   and counted in `mta-od-data raptor timetable`'s report.
