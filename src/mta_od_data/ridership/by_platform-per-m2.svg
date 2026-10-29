@@ -73,54 +73,54 @@ text {
 <text x="365.8" y="358.0" class="label" text-anchor="end">51 St (6), Downtown</text>
 <path class="s0" d="M373.8,348.0h241.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-241.8z"><title>51 St (6), Downtown, Aug-Dec 2025: 102.4</title></path>
 <text x="623.6" y="358.0">102.4</text>
-<text x="365.8" y="378.0" class="label" text-anchor="end">Times Sq-42 St (N,Q,R,W), Downtown</text>
-<path class="s0" d="M373.8,368.0h235.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-235.5z"><title>Times Sq-42 St (N,Q,R,W), Downtown, Aug-Dec 2025: 99.8</title></path>
-<text x="617.3" y="378.0">99.8</text>
-<text x="365.8" y="398.0" class="label" text-anchor="end">59 St (4,5,6), Downtown 4,5</text>
-<path class="s0" d="M373.8,388.0h235.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-235.5z"><title>59 St (4,5,6), Downtown 4,5, Aug-Dec 2025: 99.8</title></path>
+<text x="365.8" y="378.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown &amp; Downtown</text>
+<path class="s0" d="M373.8,368.0h237.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-237.2z"><title>34 St-Penn Station (1,2,3), Uptown &amp; Downtown, Aug-Dec 2025: 100.5</title></path>
+<text x="619.0" y="378.0">100.5</text>
+<text x="365.8" y="398.0" class="label" text-anchor="end">Times Sq-42 St (N,Q,R,W), Downtown</text>
+<path class="s0" d="M373.8,388.0h235.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-235.5z"><title>Times Sq-42 St (N,Q,R,W), Downtown, Aug-Dec 2025: 99.8</title></path>
 <text x="617.3" y="398.0">99.8</text>
-<text x="365.8" y="418.0" class="label" text-anchor="end">59 St (4,5,6), Uptown 4,5</text>
-<path class="s0" d="M373.8,408.0h234.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-234.6z"><title>59 St (4,5,6), Uptown 4,5, Aug-Dec 2025: 99.4</title></path>
-<text x="616.4" y="418.0">99.4</text>
-<text x="365.8" y="438.0" class="label" text-anchor="end">72 St (1,2,3), Downtown</text>
-<path class="s0" d="M373.8,428.0h234.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-234.1z"><title>72 St (1,2,3), Downtown, Aug-Dec 2025: 99.2</title></path>
-<text x="615.9" y="438.0">99.2</text>
-<text x="365.8" y="458.0" class="label" text-anchor="end">51 St (6), Uptown</text>
-<path class="s0" d="M373.8,448.0h233.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-233.1z"><title>51 St (6), Uptown, Aug-Dec 2025: 98.8</title></path>
-<text x="614.9" y="458.0">98.8</text>
-<text x="365.8" y="478.0" class="label" text-anchor="end">Lexington Av/59 St (N,R,W)</text>
-<path class="s0" d="M373.8,468.0h226.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-226.4z"><title>Lexington Av/59 St (N,R,W), Aug-Dec 2025: 96.0</title></path>
-<text x="608.2" y="478.0">96.0</text>
-<text x="365.8" y="498.0" class="label" text-anchor="end">Times Sq-42 St (7)</text>
-<path class="s0" d="M373.8,488.0h225.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-225.4z"><title>Times Sq-42 St (7), Aug-Dec 2025: 95.6</title></path>
-<text x="607.2" y="498.0">95.6</text>
-<text x="365.8" y="518.0" class="label" text-anchor="end">14 St (1,2,3), Uptown</text>
-<path class="s0" d="M373.8,508.0h223.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-223.8z"><title>14 St (1,2,3), Uptown, Aug-Dec 2025: 94.9</title></path>
-<text x="605.6" y="518.0">94.9</text>
-<text x="365.8" y="538.0" class="label" text-anchor="end">Grand Central-42 St (7)</text>
-<path class="s0" d="M373.8,528.0h209.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-209.1z"><title>Grand Central-42 St (7), Aug-Dec 2025: 88.8</title></path>
-<text x="590.9" y="538.0">88.8</text>
-<text x="365.8" y="558.0" class="label" text-anchor="end">125 St (4,5,6), Downtown</text>
-<path class="s0" d="M373.8,548.0h208.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-208.2z"><title>125 St (4,5,6), Downtown, Aug-Dec 2025: 88.4</title></path>
-<text x="590.0" y="558.0">88.4</text>
-<text x="365.8" y="578.0" class="label" text-anchor="end">14 St-Union Sq (N,Q,R,W), Downtown</text>
-<path class="s0" d="M373.8,568.0h207.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-207.9z"><title>14 St-Union Sq (N,Q,R,W), Downtown, Aug-Dec 2025: 88.3</title></path>
-<text x="589.7" y="578.0">88.3</text>
-<text x="365.8" y="598.0" class="label" text-anchor="end">Queensboro Plaza (7), Manhattan</text>
-<path class="s0" d="M373.8,588.0h205.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-205.3z"><title>Queensboro Plaza (7), Manhattan, Aug-Dec 2025: 87.2</title></path>
-<text x="587.1" y="598.0">87.2</text>
-<text x="365.8" y="618.0" class="label" text-anchor="end">8 Av (L)</text>
-<path class="s0" d="M373.8,608.0h202.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-202.9z"><title>8 Av (L), Aug-Dec 2025: 86.2</title></path>
-<text x="584.7" y="618.0">86.2</text>
-<text x="365.8" y="638.0" class="label" text-anchor="end">14 St-Union Sq (N,Q,R,W), Uptown</text>
-<path class="s0" d="M373.8,628.0h199.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-199.3z"><title>14 St-Union Sq (N,Q,R,W), Uptown, Aug-Dec 2025: 84.7</title></path>
-<text x="581.1" y="638.0">84.7</text>
-<text x="365.8" y="658.0" class="label" text-anchor="end">W 4 St-Wash Sq (B,D,F,M), Downtown</text>
-<path class="s0" d="M373.8,648.0h198.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-198.8z"><title>W 4 St-Wash Sq (B,D,F,M), Downtown, Aug-Dec 2025: 84.5</title></path>
-<text x="580.6" y="658.0">84.5</text>
-<text x="365.8" y="678.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown &amp; Downtown</text>
-<path class="s0" d="M373.8,668.0h197.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-197.1z"><title>34 St-Penn Station (1,2,3), Uptown &amp; Downtown, Aug-Dec 2025: 83.8</title></path>
-<text x="578.9" y="678.0">83.8</text>
+<text x="365.8" y="418.0" class="label" text-anchor="end">59 St (4,5,6), Downtown 4,5</text>
+<path class="s0" d="M373.8,408.0h235.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-235.5z"><title>59 St (4,5,6), Downtown 4,5, Aug-Dec 2025: 99.8</title></path>
+<text x="617.3" y="418.0">99.8</text>
+<text x="365.8" y="438.0" class="label" text-anchor="end">59 St (4,5,6), Uptown 4,5</text>
+<path class="s0" d="M373.8,428.0h234.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-234.6z"><title>59 St (4,5,6), Uptown 4,5, Aug-Dec 2025: 99.4</title></path>
+<text x="616.4" y="438.0">99.4</text>
+<text x="365.8" y="458.0" class="label" text-anchor="end">72 St (1,2,3), Downtown</text>
+<path class="s0" d="M373.8,448.0h234.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-234.1z"><title>72 St (1,2,3), Downtown, Aug-Dec 2025: 99.2</title></path>
+<text x="615.9" y="458.0">99.2</text>
+<text x="365.8" y="478.0" class="label" text-anchor="end">51 St (6), Uptown</text>
+<path class="s0" d="M373.8,468.0h233.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-233.1z"><title>51 St (6), Uptown, Aug-Dec 2025: 98.8</title></path>
+<text x="614.9" y="478.0">98.8</text>
+<text x="365.8" y="498.0" class="label" text-anchor="end">Lexington Av/59 St (N,R,W)</text>
+<path class="s0" d="M373.8,488.0h226.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-226.4z"><title>Lexington Av/59 St (N,R,W), Aug-Dec 2025: 96.0</title></path>
+<text x="608.2" y="498.0">96.0</text>
+<text x="365.8" y="518.0" class="label" text-anchor="end">Times Sq-42 St (7)</text>
+<path class="s0" d="M373.8,508.0h225.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-225.4z"><title>Times Sq-42 St (7), Aug-Dec 2025: 95.6</title></path>
+<text x="607.2" y="518.0">95.6</text>
+<text x="365.8" y="538.0" class="label" text-anchor="end">14 St (1,2,3), Uptown</text>
+<path class="s0" d="M373.8,528.0h223.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-223.8z"><title>14 St (1,2,3), Uptown, Aug-Dec 2025: 94.9</title></path>
+<text x="605.6" y="538.0">94.9</text>
+<text x="365.8" y="558.0" class="label" text-anchor="end">Grand Central-42 St (7)</text>
+<path class="s0" d="M373.8,548.0h209.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-209.1z"><title>Grand Central-42 St (7), Aug-Dec 2025: 88.8</title></path>
+<text x="590.9" y="558.0">88.8</text>
+<text x="365.8" y="578.0" class="label" text-anchor="end">125 St (4,5,6), Downtown</text>
+<path class="s0" d="M373.8,568.0h208.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-208.2z"><title>125 St (4,5,6), Downtown, Aug-Dec 2025: 88.4</title></path>
+<text x="590.0" y="578.0">88.4</text>
+<text x="365.8" y="598.0" class="label" text-anchor="end">14 St-Union Sq (N,Q,R,W), Downtown</text>
+<path class="s0" d="M373.8,588.0h207.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-207.9z"><title>14 St-Union Sq (N,Q,R,W), Downtown, Aug-Dec 2025: 88.3</title></path>
+<text x="589.7" y="598.0">88.3</text>
+<text x="365.8" y="618.0" class="label" text-anchor="end">Queensboro Plaza (7), Manhattan</text>
+<path class="s0" d="M373.8,608.0h205.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-205.3z"><title>Queensboro Plaza (7), Manhattan, Aug-Dec 2025: 87.2</title></path>
+<text x="587.1" y="618.0">87.2</text>
+<text x="365.8" y="638.0" class="label" text-anchor="end">8 Av (L)</text>
+<path class="s0" d="M373.8,628.0h202.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-202.9z"><title>8 Av (L), Aug-Dec 2025: 86.2</title></path>
+<text x="584.7" y="638.0">86.2</text>
+<text x="365.8" y="658.0" class="label" text-anchor="end">14 St-Union Sq (N,Q,R,W), Uptown</text>
+<path class="s0" d="M373.8,648.0h199.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-199.3z"><title>14 St-Union Sq (N,Q,R,W), Uptown, Aug-Dec 2025: 84.7</title></path>
+<text x="581.1" y="658.0">84.7</text>
+<text x="365.8" y="678.0" class="label" text-anchor="end">W 4 St-Wash Sq (B,D,F,M), Downtown</text>
+<path class="s0" d="M373.8,668.0h198.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-198.8z"><title>W 4 St-Wash Sq (B,D,F,M), Downtown, Aug-Dec 2025: 84.5</title></path>
+<text x="580.6" y="678.0">84.5</text>
 <text x="365.8" y="698.0" class="label" text-anchor="end">Times Sq-42 St (N,Q,R,W), Uptown</text>
 <path class="s0" d="M373.8,688.0h194.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-194.7z"><title>Times Sq-42 St (N,Q,R,W), Uptown, Aug-Dec 2025: 82.8</title></path>
 <text x="576.5" y="698.0">82.8</text>
@@ -163,198 +163,198 @@ text {
 <text x="365.8" y="958.0" class="label" text-anchor="end">Queensboro Plaza (7), Outbound &amp; Astoria</text>
 <path class="s0" d="M373.8,948.0h164.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.5z"><title>Queensboro Plaza (7), Outbound &amp; Astoria, Aug-Dec 2025: 70.2</title></path>
 <text x="546.3" y="958.0">70.2</text>
-<text x="365.8" y="978.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown</text>
-<path class="s0" d="M373.8,968.0h164.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.5z"><title>34 St-Penn Station (1,2,3), Uptown, Aug-Dec 2025: 70.2</title></path>
-<text x="546.3" y="978.0">70.2</text>
-<text x="365.8" y="998.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Manhattan &amp; Outbound</text>
-<path class="s0" d="M373.8,988.0h163.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-163.5z"><title>Atlantic Av (2,3,4,5), Manhattan &amp; Outbound, Aug-Dec 2025: 69.8</title></path>
-<text x="545.3" y="998.0">69.8</text>
-<text x="365.8" y="1018.0" class="label" text-anchor="end">96 St (1,2,3), Downtown</text>
-<path class="s0" d="M373.8,1008.0h161.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-161.6z"><title>96 St (1,2,3), Downtown, Aug-Dec 2025: 69.0</title></path>
-<text x="543.4" y="1018.0">69.0</text>
-<text x="365.8" y="1038.0" class="label" text-anchor="end">125 St (4,5,6), The Bronx</text>
-<path class="s0" d="M373.8,1028.0h160.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-160.6z"><title>125 St (4,5,6), The Bronx, Aug-Dec 2025: 68.6</title></path>
-<text x="542.4" y="1038.0">68.6</text>
-<text x="365.8" y="1058.0" class="label" text-anchor="end">42 St-PABT (A,C,E), Uptown</text>
-<path class="s0" d="M373.8,1048.0h159.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-159.4z"><title>42 St-PABT (A,C,E), Uptown, Aug-Dec 2025: 68.1</title></path>
-<text x="541.2" y="1058.0">68.1</text>
-<text x="365.8" y="1078.0" class="label" text-anchor="end">Bedford Av (L)</text>
-<path class="s0" d="M373.8,1068.0h158.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-158.5z"><title>Bedford Av (L), Aug-Dec 2025: 67.7</title></path>
-<text x="540.3" y="1078.0">67.7</text>
-<text x="365.8" y="1098.0" class="label" text-anchor="end">14 St (F,M), Uptown</text>
-<path class="s0" d="M373.8,1088.0h154.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-154.9z"><title>14 St (F,M), Uptown, Aug-Dec 2025: 66.2</title></path>
-<text x="536.7" y="1098.0">66.2</text>
-<text x="365.8" y="1118.0" class="label" text-anchor="end">74 St-Broadway (7), Outbound</text>
-<path class="s0" d="M373.8,1108.0h153.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-153.0z"><title>74 St-Broadway (7), Outbound, Aug-Dec 2025: 65.4</title></path>
-<text x="534.8" y="1118.0">65.4</text>
-<text x="365.8" y="1138.0" class="label" text-anchor="end">59 St-Columbus Circle (1), Downtown</text>
-<path class="s0" d="M373.8,1128.0h152.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-152.0z"><title>59 St-Columbus Circle (1), Downtown, Aug-Dec 2025: 65.0</title></path>
-<text x="533.8" y="1138.0">65.0</text>
-<text x="365.8" y="1158.0" class="label" text-anchor="end">Atlantic Av (D,N,R), Manhattan</text>
-<path class="s0" d="M373.8,1148.0h151.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-151.0z"><title>Atlantic Av (D,N,R), Manhattan, Aug-Dec 2025: 64.6</title></path>
-<text x="532.8" y="1158.0">64.6</text>
-<text x="365.8" y="1178.0" class="label" text-anchor="end">47-50 Sts-Rockefeller Ctr (B,D,F,M), Downtown</text>
-<path class="s0" d="M373.8,1168.0h150.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-150.3z"><title>47-50 Sts-Rockefeller Ctr (B,D,F,M), Downtown, Aug-Dec 2025: 64.3</title></path>
-<text x="532.1" y="1178.0">64.3</text>
-<text x="365.8" y="1198.0" class="label" text-anchor="end">Brooklyn Bridge-City Hall (4,5,6), Uptown</text>
-<path class="s0" d="M373.8,1188.0h149.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-149.1z"><title>Brooklyn Bridge-City Hall (4,5,6), Uptown, Aug-Dec 2025: 63.8</title></path>
-<text x="530.9" y="1198.0">63.8</text>
-<text x="365.8" y="1218.0" class="label" text-anchor="end">Atlantic Av (D,N,R), SB</text>
-<path class="s0" d="M373.8,1208.0h147.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-147.4z"><title>Atlantic Av (D,N,R), SB, Aug-Dec 2025: 63.1</title></path>
-<text x="529.2" y="1218.0">63.1</text>
-<text x="365.8" y="1238.0" class="label" text-anchor="end">Fulton St (A,C)</text>
-<path class="s0" d="M373.8,1228.0h147.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-147.2z"><title>Fulton St (A,C), Aug-Dec 2025: 63.0</title></path>
+<text x="365.8" y="978.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Manhattan &amp; Outbound</text>
+<path class="s0" d="M373.8,968.0h163.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-163.5z"><title>Atlantic Av (2,3,4,5), Manhattan &amp; Outbound, Aug-Dec 2025: 69.8</title></path>
+<text x="545.3" y="978.0">69.8</text>
+<text x="365.8" y="998.0" class="label" text-anchor="end">96 St (1,2,3), Downtown</text>
+<path class="s0" d="M373.8,988.0h161.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-161.6z"><title>96 St (1,2,3), Downtown, Aug-Dec 2025: 69.0</title></path>
+<text x="543.4" y="998.0">69.0</text>
+<text x="365.8" y="1018.0" class="label" text-anchor="end">125 St (4,5,6), The Bronx</text>
+<path class="s0" d="M373.8,1008.0h160.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-160.6z"><title>125 St (4,5,6), The Bronx, Aug-Dec 2025: 68.6</title></path>
+<text x="542.4" y="1018.0">68.6</text>
+<text x="365.8" y="1038.0" class="label" text-anchor="end">42 St-PABT (A,C,E), Uptown</text>
+<path class="s0" d="M373.8,1028.0h159.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-159.4z"><title>42 St-PABT (A,C,E), Uptown, Aug-Dec 2025: 68.1</title></path>
+<text x="541.2" y="1038.0">68.1</text>
+<text x="365.8" y="1058.0" class="label" text-anchor="end">Bedford Av (L)</text>
+<path class="s0" d="M373.8,1048.0h158.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-158.5z"><title>Bedford Av (L), Aug-Dec 2025: 67.7</title></path>
+<text x="540.3" y="1058.0">67.7</text>
+<text x="365.8" y="1078.0" class="label" text-anchor="end">14 St (F,M), Uptown</text>
+<path class="s0" d="M373.8,1068.0h154.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-154.9z"><title>14 St (F,M), Uptown, Aug-Dec 2025: 66.2</title></path>
+<text x="536.7" y="1078.0">66.2</text>
+<text x="365.8" y="1098.0" class="label" text-anchor="end">74 St-Broadway (7), Outbound</text>
+<path class="s0" d="M373.8,1088.0h153.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-153.0z"><title>74 St-Broadway (7), Outbound, Aug-Dec 2025: 65.4</title></path>
+<text x="534.8" y="1098.0">65.4</text>
+<text x="365.8" y="1118.0" class="label" text-anchor="end">59 St-Columbus Circle (1), Downtown</text>
+<path class="s0" d="M373.8,1108.0h152.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-152.0z"><title>59 St-Columbus Circle (1), Downtown, Aug-Dec 2025: 65.0</title></path>
+<text x="533.8" y="1118.0">65.0</text>
+<text x="365.8" y="1138.0" class="label" text-anchor="end">Atlantic Av (D,N,R), Manhattan</text>
+<path class="s0" d="M373.8,1128.0h151.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-151.0z"><title>Atlantic Av (D,N,R), Manhattan, Aug-Dec 2025: 64.6</title></path>
+<text x="532.8" y="1138.0">64.6</text>
+<text x="365.8" y="1158.0" class="label" text-anchor="end">47-50 Sts-Rockefeller Ctr (B,D,F,M), Downtown</text>
+<path class="s0" d="M373.8,1148.0h150.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-150.3z"><title>47-50 Sts-Rockefeller Ctr (B,D,F,M), Downtown, Aug-Dec 2025: 64.3</title></path>
+<text x="532.1" y="1158.0">64.3</text>
+<text x="365.8" y="1178.0" class="label" text-anchor="end">Brooklyn Bridge-City Hall (4,5,6), Uptown</text>
+<path class="s0" d="M373.8,1168.0h149.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-149.1z"><title>Brooklyn Bridge-City Hall (4,5,6), Uptown, Aug-Dec 2025: 63.8</title></path>
+<text x="530.9" y="1178.0">63.8</text>
+<text x="365.8" y="1198.0" class="label" text-anchor="end">Atlantic Av (D,N,R), SB</text>
+<path class="s0" d="M373.8,1188.0h147.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-147.4z"><title>Atlantic Av (D,N,R), SB, Aug-Dec 2025: 63.1</title></path>
+<text x="529.2" y="1198.0">63.1</text>
+<text x="365.8" y="1218.0" class="label" text-anchor="end">Fulton St (A,C)</text>
+<path class="s0" d="M373.8,1208.0h147.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-147.2z"><title>Fulton St (A,C), Aug-Dec 2025: 63.0</title></path>
+<text x="529.0" y="1218.0">63.0</text>
+<text x="365.8" y="1238.0" class="label" text-anchor="end">34 St-Herald Sq (N,Q,R,W), Uptown</text>
+<path class="s0" d="M373.8,1228.0h147.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-147.2z"><title>34 St-Herald Sq (N,Q,R,W), Uptown, Aug-Dec 2025: 63.0</title></path>
 <text x="529.0" y="1238.0">63.0</text>
-<text x="365.8" y="1258.0" class="label" text-anchor="end">34 St-Herald Sq (N,Q,R,W), Uptown</text>
-<path class="s0" d="M373.8,1248.0h147.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-147.2z"><title>34 St-Herald Sq (N,Q,R,W), Uptown, Aug-Dec 2025: 63.0</title></path>
-<text x="529.0" y="1258.0">63.0</text>
-<text x="365.8" y="1278.0" class="label" text-anchor="end">Forest Hills-71 Av (E,F,M,R), Outbound</text>
-<path class="s0" d="M373.8,1268.0h146.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-146.5z"><title>Forest Hills-71 Av (E,F,M,R), Outbound, Aug-Dec 2025: 62.7</title></path>
-<text x="528.3" y="1278.0">62.7</text>
-<text x="365.8" y="1298.0" class="label" text-anchor="end">47-50 Sts-Rockefeller Ctr (B,D,F,M), Uptown</text>
-<path class="s0" d="M373.8,1288.0h144.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-144.3z"><title>47-50 Sts-Rockefeller Ctr (B,D,F,M), Uptown, Aug-Dec 2025: 61.8</title></path>
-<text x="526.1" y="1298.0">61.8</text>
-<text x="365.8" y="1318.0" class="label" text-anchor="end">W 4 St-Wash Sq (B,D,F,M), Uptown</text>
-<path class="s0" d="M373.8,1308.0h144.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-144.1z"><title>W 4 St-Wash Sq (B,D,F,M), Uptown, Aug-Dec 2025: 61.7</title></path>
-<text x="525.9" y="1318.0">61.7</text>
-<text x="365.8" y="1338.0" class="label" text-anchor="end">14 St (F,M), Downtown</text>
-<path class="s0" d="M373.8,1328.0h142.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-142.4z"><title>14 St (F,M), Downtown, Aug-Dec 2025: 61.0</title></path>
-<text x="524.2" y="1338.0">61.0</text>
-<text x="365.8" y="1358.0" class="label" text-anchor="end">Forest Hills-71 Av (E,F,M,R), Manhattan</text>
-<path class="s0" d="M373.8,1348.0h142.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-142.2z"><title>Forest Hills-71 Av (E,F,M,R), Manhattan, Aug-Dec 2025: 60.9</title></path>
-<text x="524.0" y="1358.0">60.9</text>
-<text x="365.8" y="1378.0" class="label" text-anchor="end">34 St-Herald Sq (N,Q,R,W), Downtown</text>
-<path class="s0" d="M373.8,1368.0h141.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-141.2z"><title>34 St-Herald Sq (N,Q,R,W), Downtown, Aug-Dec 2025: 60.5</title></path>
-<text x="523.0" y="1378.0">60.5</text>
-<text x="365.8" y="1398.0" class="label" text-anchor="end">Fulton St (2,3)</text>
-<path class="s0" d="M373.8,1388.0h139.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.8z"><title>Fulton St (2,3), Aug-Dec 2025: 59.9</title></path>
-<text x="521.6" y="1398.0">59.9</text>
-<text x="365.8" y="1418.0" class="label" text-anchor="end">Lexington Av/63 St (M,Q), Downtown</text>
-<path class="s0" d="M373.8,1408.0h139.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.5z"><title>Lexington Av/63 St (M,Q), Downtown, Aug-Dec 2025: 59.8</title></path>
+<text x="365.8" y="1258.0" class="label" text-anchor="end">Forest Hills-71 Av (E,F,M,R), Outbound</text>
+<path class="s0" d="M373.8,1248.0h146.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-146.5z"><title>Forest Hills-71 Av (E,F,M,R), Outbound, Aug-Dec 2025: 62.7</title></path>
+<text x="528.3" y="1258.0">62.7</text>
+<text x="365.8" y="1278.0" class="label" text-anchor="end">47-50 Sts-Rockefeller Ctr (B,D,F,M), Uptown</text>
+<path class="s0" d="M373.8,1268.0h144.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-144.3z"><title>47-50 Sts-Rockefeller Ctr (B,D,F,M), Uptown, Aug-Dec 2025: 61.8</title></path>
+<text x="526.1" y="1278.0">61.8</text>
+<text x="365.8" y="1298.0" class="label" text-anchor="end">W 4 St-Wash Sq (B,D,F,M), Uptown</text>
+<path class="s0" d="M373.8,1288.0h144.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-144.1z"><title>W 4 St-Wash Sq (B,D,F,M), Uptown, Aug-Dec 2025: 61.7</title></path>
+<text x="525.9" y="1298.0">61.7</text>
+<text x="365.8" y="1318.0" class="label" text-anchor="end">14 St (F,M), Downtown</text>
+<path class="s0" d="M373.8,1308.0h142.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-142.4z"><title>14 St (F,M), Downtown, Aug-Dec 2025: 61.0</title></path>
+<text x="524.2" y="1318.0">61.0</text>
+<text x="365.8" y="1338.0" class="label" text-anchor="end">Forest Hills-71 Av (E,F,M,R), Manhattan</text>
+<path class="s0" d="M373.8,1328.0h142.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-142.2z"><title>Forest Hills-71 Av (E,F,M,R), Manhattan, Aug-Dec 2025: 60.9</title></path>
+<text x="524.0" y="1338.0">60.9</text>
+<text x="365.8" y="1358.0" class="label" text-anchor="end">34 St-Herald Sq (N,Q,R,W), Downtown</text>
+<path class="s0" d="M373.8,1348.0h141.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-141.2z"><title>34 St-Herald Sq (N,Q,R,W), Downtown, Aug-Dec 2025: 60.5</title></path>
+<text x="523.0" y="1358.0">60.5</text>
+<text x="365.8" y="1378.0" class="label" text-anchor="end">Fulton St (2,3)</text>
+<path class="s0" d="M373.8,1368.0h139.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.8z"><title>Fulton St (2,3), Aug-Dec 2025: 59.9</title></path>
+<text x="521.6" y="1378.0">59.9</text>
+<text x="365.8" y="1398.0" class="label" text-anchor="end">Lexington Av/63 St (M,Q), Downtown</text>
+<path class="s0" d="M373.8,1388.0h139.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.5z"><title>Lexington Av/63 St (M,Q), Downtown, Aug-Dec 2025: 59.8</title></path>
+<text x="521.3" y="1398.0">59.8</text>
+<text x="365.8" y="1418.0" class="label" text-anchor="end">Bleecker St (6), Uptown</text>
+<path class="s0" d="M373.8,1408.0h139.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.5z"><title>Bleecker St (6), Uptown, Aug-Dec 2025: 59.8</title></path>
 <text x="521.3" y="1418.0">59.8</text>
-<text x="365.8" y="1438.0" class="label" text-anchor="end">Bleecker St (6), Uptown</text>
-<path class="s0" d="M373.8,1428.0h139.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.5z"><title>Bleecker St (6), Uptown, Aug-Dec 2025: 59.8</title></path>
-<text x="521.3" y="1438.0">59.8</text>
-<text x="365.8" y="1458.0" class="label" text-anchor="end">Bleecker St (6), Downtown</text>
-<path class="s0" d="M373.8,1448.0h138.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-138.1z"><title>Bleecker St (6), Downtown, Aug-Dec 2025: 59.2</title></path>
-<text x="519.9" y="1458.0">59.2</text>
-<text x="365.8" y="1478.0" class="label" text-anchor="end">Atlantic Av (B,Q)</text>
-<path class="s0" d="M373.8,1468.0h136.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-136.6z"><title>Atlantic Av (B,Q), Aug-Dec 2025: 58.6</title></path>
+<text x="365.8" y="1438.0" class="label" text-anchor="end">Bleecker St (6), Downtown</text>
+<path class="s0" d="M373.8,1428.0h138.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-138.1z"><title>Bleecker St (6), Downtown, Aug-Dec 2025: 59.2</title></path>
+<text x="519.9" y="1438.0">59.2</text>
+<text x="365.8" y="1458.0" class="label" text-anchor="end">Atlantic Av (B,Q)</text>
+<path class="s0" d="M373.8,1448.0h136.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-136.6z"><title>Atlantic Av (B,Q), Aug-Dec 2025: 58.6</title></path>
+<text x="518.4" y="1458.0">58.6</text>
+<text x="365.8" y="1478.0" class="label" text-anchor="end">74 St-Broadway (7), Manhattan</text>
+<path class="s0" d="M373.8,1468.0h136.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-136.6z"><title>74 St-Broadway (7), Manhattan, Aug-Dec 2025: 58.6</title></path>
 <text x="518.4" y="1478.0">58.6</text>
-<text x="365.8" y="1498.0" class="label" text-anchor="end">74 St-Broadway (7), Manhattan</text>
-<path class="s0" d="M373.8,1488.0h136.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-136.6z"><title>74 St-Broadway (7), Manhattan, Aug-Dec 2025: 58.6</title></path>
-<text x="518.4" y="1498.0">58.6</text>
-<text x="365.8" y="1518.0" class="label" text-anchor="end">Franklin Av-Medgar Evers College (2,3,4,5), Manhattan</text>
-<path class="s0" d="M373.8,1508.0h135.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-135.7z"><title>Franklin Av-Medgar Evers College (2,3,4,5), Manhattan, Aug-Dec 2025: 58.2</title></path>
-<text x="517.5" y="1518.0">58.2</text>
-<text x="365.8" y="1538.0" class="label" text-anchor="end">34 St-Penn Station (A,C,E), Uptown</text>
-<path class="s0" d="M373.8,1528.0h133.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-133.3z"><title>34 St-Penn Station (A,C,E), Uptown, Aug-Dec 2025: 57.2</title></path>
-<text x="515.1" y="1538.0">57.2</text>
-<text x="365.8" y="1558.0" class="label" text-anchor="end">86 St (4,5,6), Downtown 4,5</text>
-<path class="s0" d="M373.8,1548.0h133.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-133.0z"><title>86 St (4,5,6), Downtown 4,5, Aug-Dec 2025: 57.1</title></path>
-<text x="514.8" y="1558.0">57.1</text>
-<text x="365.8" y="1578.0" class="label" text-anchor="end">59 St (4,5,6), Downtown 6</text>
-<path class="s0" d="M373.8,1568.0h131.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-131.6z"><title>59 St (4,5,6), Downtown 6, Aug-Dec 2025: 56.5</title></path>
-<text x="513.4" y="1578.0">56.5</text>
-<text x="365.8" y="1598.0" class="label" text-anchor="end">Lexington Av/63 St (M,Q), Uptown &amp; Queens</text>
-<path class="s0" d="M373.8,1588.0h131.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-131.4z"><title>Lexington Av/63 St (M,Q), Uptown &amp; Queens, Aug-Dec 2025: 56.4</title></path>
-<text x="513.2" y="1598.0">56.4</text>
-<text x="365.8" y="1618.0" class="label" text-anchor="end">59 St-Columbus Circle (1), Uptown</text>
-<path class="s0" d="M373.8,1608.0h130.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-130.6z"><title>59 St-Columbus Circle (1), Uptown, Aug-Dec 2025: 56.1</title></path>
-<text x="512.4" y="1618.0">56.1</text>
-<text x="365.8" y="1638.0" class="label" text-anchor="end">149 St-Hostos (2,5), NB</text>
-<path class="s0" d="M373.8,1628.0h128.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-128.7z"><title>149 St-Hostos (2,5), NB, Aug-Dec 2025: 55.3</title></path>
-<text x="510.5" y="1638.0">55.3</text>
-<text x="365.8" y="1658.0" class="label" text-anchor="end">86 St (4,5,6), Uptown 4,5</text>
-<path class="s0" d="M373.8,1648.0h127.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-127.3z"><title>86 St (4,5,6), Uptown 4,5, Aug-Dec 2025: 54.7</title></path>
-<text x="509.1" y="1658.0">54.7</text>
-<text x="365.8" y="1678.0" class="label" text-anchor="end">34 St-Herald Sq (B,D,F,M), Uptown</text>
-<path class="s0" d="M373.8,1668.0h126.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-126.3z"><title>34 St-Herald Sq (B,D,F,M), Uptown, Aug-Dec 2025: 54.3</title></path>
-<text x="508.1" y="1678.0">54.3</text>
-<text x="365.8" y="1698.0" class="label" text-anchor="end">14 St (A,C,E), Downtown</text>
-<path class="s0" d="M373.8,1688.0h125.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-125.8z"><title>14 St (A,C,E), Downtown, Aug-Dec 2025: 54.1</title></path>
+<text x="365.8" y="1498.0" class="label" text-anchor="end">Franklin Av-Medgar Evers College (2,3,4,5), Manhattan</text>
+<path class="s0" d="M373.8,1488.0h135.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-135.7z"><title>Franklin Av-Medgar Evers College (2,3,4,5), Manhattan, Aug-Dec 2025: 58.2</title></path>
+<text x="517.5" y="1498.0">58.2</text>
+<text x="365.8" y="1518.0" class="label" text-anchor="end">34 St-Penn Station (A,C,E), Uptown</text>
+<path class="s0" d="M373.8,1508.0h133.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-133.3z"><title>34 St-Penn Station (A,C,E), Uptown, Aug-Dec 2025: 57.2</title></path>
+<text x="515.1" y="1518.0">57.2</text>
+<text x="365.8" y="1538.0" class="label" text-anchor="end">86 St (4,5,6), Downtown 4,5</text>
+<path class="s0" d="M373.8,1528.0h133.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-133.0z"><title>86 St (4,5,6), Downtown 4,5, Aug-Dec 2025: 57.1</title></path>
+<text x="514.8" y="1538.0">57.1</text>
+<text x="365.8" y="1558.0" class="label" text-anchor="end">59 St (4,5,6), Downtown 6</text>
+<path class="s0" d="M373.8,1548.0h131.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-131.6z"><title>59 St (4,5,6), Downtown 6, Aug-Dec 2025: 56.5</title></path>
+<text x="513.4" y="1558.0">56.5</text>
+<text x="365.8" y="1578.0" class="label" text-anchor="end">Lexington Av/63 St (M,Q), Uptown &amp; Queens</text>
+<path class="s0" d="M373.8,1568.0h131.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-131.4z"><title>Lexington Av/63 St (M,Q), Uptown &amp; Queens, Aug-Dec 2025: 56.4</title></path>
+<text x="513.2" y="1578.0">56.4</text>
+<text x="365.8" y="1598.0" class="label" text-anchor="end">59 St-Columbus Circle (1), Uptown</text>
+<path class="s0" d="M373.8,1588.0h130.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-130.6z"><title>59 St-Columbus Circle (1), Uptown, Aug-Dec 2025: 56.1</title></path>
+<text x="512.4" y="1598.0">56.1</text>
+<text x="365.8" y="1618.0" class="label" text-anchor="end">149 St-Hostos (2,5), NB</text>
+<path class="s0" d="M373.8,1608.0h128.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-128.7z"><title>149 St-Hostos (2,5), NB, Aug-Dec 2025: 55.3</title></path>
+<text x="510.5" y="1618.0">55.3</text>
+<text x="365.8" y="1638.0" class="label" text-anchor="end">86 St (4,5,6), Uptown 4,5</text>
+<path class="s0" d="M373.8,1628.0h127.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-127.3z"><title>86 St (4,5,6), Uptown 4,5, Aug-Dec 2025: 54.7</title></path>
+<text x="509.1" y="1638.0">54.7</text>
+<text x="365.8" y="1658.0" class="label" text-anchor="end">34 St-Herald Sq (B,D,F,M), Uptown</text>
+<path class="s0" d="M373.8,1648.0h126.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-126.3z"><title>34 St-Herald Sq (B,D,F,M), Uptown, Aug-Dec 2025: 54.3</title></path>
+<text x="508.1" y="1658.0">54.3</text>
+<text x="365.8" y="1678.0" class="label" text-anchor="end">14 St (A,C,E), Downtown</text>
+<path class="s0" d="M373.8,1668.0h125.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-125.8z"><title>14 St (A,C,E), Downtown, Aug-Dec 2025: 54.1</title></path>
+<text x="507.6" y="1678.0">54.1</text>
+<text x="365.8" y="1698.0" class="label" text-anchor="end">34 St-Penn Station (A,C,E), Downtown</text>
+<path class="s0" d="M373.8,1688.0h125.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-125.8z"><title>34 St-Penn Station (A,C,E), Downtown, Aug-Dec 2025: 54.1</title></path>
 <text x="507.6" y="1698.0">54.1</text>
-<text x="365.8" y="1718.0" class="label" text-anchor="end">34 St-Penn Station (A,C,E), Downtown</text>
-<path class="s0" d="M373.8,1708.0h125.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-125.8z"><title>34 St-Penn Station (A,C,E), Downtown, Aug-Dec 2025: 54.1</title></path>
-<text x="507.6" y="1718.0">54.1</text>
-<text x="365.8" y="1738.0" class="label" text-anchor="end">Brooklyn Bridge-City Hall (4,5,6), Downtown</text>
-<path class="s0" d="M373.8,1728.0h125.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-125.4z"><title>Brooklyn Bridge-City Hall (4,5,6), Downtown, Aug-Dec 2025: 53.9</title></path>
-<text x="507.2" y="1738.0">53.9</text>
-<text x="365.8" y="1758.0" class="label" text-anchor="end">W 4 St-Wash Sq (A,C,E), Uptown</text>
-<path class="s0" d="M373.8,1748.0h123.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-123.2z"><title>W 4 St-Wash Sq (A,C,E), Uptown, Aug-Dec 2025: 53.0</title></path>
-<text x="505.0" y="1758.0">53.0</text>
-<text x="365.8" y="1778.0" class="label" text-anchor="end">42 St-PABT (A,C,E), Downtown</text>
-<path class="s0" d="M373.8,1768.0h123.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-123.0z"><title>42 St-PABT (A,C,E), Downtown, Aug-Dec 2025: 52.9</title></path>
-<text x="504.8" y="1778.0">52.9</text>
-<text x="365.8" y="1798.0" class="label" text-anchor="end">Myrtle-Wyckoff Avs (L)</text>
-<path class="s0" d="M373.8,1788.0h121.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.3z"><title>Myrtle-Wyckoff Avs (L), Aug-Dec 2025: 52.2</title></path>
+<text x="365.8" y="1718.0" class="label" text-anchor="end">Brooklyn Bridge-City Hall (4,5,6), Downtown</text>
+<path class="s0" d="M373.8,1708.0h125.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-125.4z"><title>Brooklyn Bridge-City Hall (4,5,6), Downtown, Aug-Dec 2025: 53.9</title></path>
+<text x="507.2" y="1718.0">53.9</text>
+<text x="365.8" y="1738.0" class="label" text-anchor="end">W 4 St-Wash Sq (A,C,E), Uptown</text>
+<path class="s0" d="M373.8,1728.0h123.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-123.2z"><title>W 4 St-Wash Sq (A,C,E), Uptown, Aug-Dec 2025: 53.0</title></path>
+<text x="505.0" y="1738.0">53.0</text>
+<text x="365.8" y="1758.0" class="label" text-anchor="end">42 St-PABT (A,C,E), Downtown</text>
+<path class="s0" d="M373.8,1748.0h123.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-123.0z"><title>42 St-PABT (A,C,E), Downtown, Aug-Dec 2025: 52.9</title></path>
+<text x="504.8" y="1758.0">52.9</text>
+<text x="365.8" y="1778.0" class="label" text-anchor="end">Myrtle-Wyckoff Avs (L)</text>
+<path class="s0" d="M373.8,1768.0h121.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.3z"><title>Myrtle-Wyckoff Avs (L), Aug-Dec 2025: 52.2</title></path>
+<text x="503.1" y="1778.0">52.2</text>
+<text x="365.8" y="1798.0" class="label" text-anchor="end">36 St (D,N,R), Manhattan</text>
+<path class="s0" d="M373.8,1788.0h121.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.3z"><title>36 St (D,N,R), Manhattan, Aug-Dec 2025: 52.2</title></path>
 <text x="503.1" y="1798.0">52.2</text>
-<text x="365.8" y="1818.0" class="label" text-anchor="end">36 St (D,N,R), Manhattan</text>
-<path class="s0" d="M373.8,1808.0h121.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.3z"><title>36 St (D,N,R), Manhattan, Aug-Dec 2025: 52.2</title></path>
-<text x="503.1" y="1818.0">52.2</text>
-<text x="365.8" y="1838.0" class="label" text-anchor="end">W 4 St-Wash Sq (A,C,E), Downtown</text>
-<path class="s0" d="M373.8,1828.0h120.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-120.3z"><title>W 4 St-Wash Sq (A,C,E), Downtown, Aug-Dec 2025: 51.8</title></path>
+<text x="365.8" y="1818.0" class="label" text-anchor="end">W 4 St-Wash Sq (A,C,E), Downtown</text>
+<path class="s0" d="M373.8,1808.0h120.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-120.3z"><title>W 4 St-Wash Sq (A,C,E), Downtown, Aug-Dec 2025: 51.8</title></path>
+<text x="502.1" y="1818.0">51.8</text>
+<text x="365.8" y="1838.0" class="label" text-anchor="end">96 St (1,2,3), Uptown</text>
+<path class="s0" d="M373.8,1828.0h120.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-120.3z"><title>96 St (1,2,3), Uptown, Aug-Dec 2025: 51.8</title></path>
 <text x="502.1" y="1838.0">51.8</text>
-<text x="365.8" y="1858.0" class="label" text-anchor="end">96 St (1,2,3), Uptown</text>
-<path class="s0" d="M373.8,1848.0h120.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-120.3z"><title>96 St (1,2,3), Uptown, Aug-Dec 2025: 51.8</title></path>
-<text x="502.1" y="1858.0">51.8</text>
-<text x="365.8" y="1878.0" class="label" text-anchor="end">14 St (A,C,E), Uptown</text>
-<path class="s0" d="M373.8,1868.0h116.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-116.2z"><title>14 St (A,C,E), Uptown, Aug-Dec 2025: 50.1</title></path>
+<text x="365.8" y="1858.0" class="label" text-anchor="end">14 St (A,C,E), Uptown</text>
+<path class="s0" d="M373.8,1848.0h116.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-116.2z"><title>14 St (A,C,E), Uptown, Aug-Dec 2025: 50.1</title></path>
+<text x="498.0" y="1858.0">50.1</text>
+<text x="365.8" y="1878.0" class="label" text-anchor="end">125 St (A,B,C,D), Downtown</text>
+<path class="s0" d="M373.8,1868.0h116.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-116.2z"><title>125 St (A,B,C,D), Downtown, Aug-Dec 2025: 50.1</title></path>
 <text x="498.0" y="1878.0">50.1</text>
-<text x="365.8" y="1898.0" class="label" text-anchor="end">125 St (A,B,C,D), Downtown</text>
-<path class="s0" d="M373.8,1888.0h116.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-116.2z"><title>125 St (A,B,C,D), Downtown, Aug-Dec 2025: 50.1</title></path>
-<text x="498.0" y="1898.0">50.1</text>
-<text x="365.8" y="1918.0" class="label" text-anchor="end">59 St (4,5,6), Uptown 6</text>
-<path class="s0" d="M373.8,1908.0h115.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-115.5z"><title>59 St (4,5,6), Uptown 6, Aug-Dec 2025: 49.8</title></path>
-<text x="497.3" y="1918.0">49.8</text>
-<text x="365.8" y="1938.0" class="label" text-anchor="end">Flushing-Main St (7), 7X</text>
-<path class="s0" d="M373.8,1928.0h115.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-115.0z"><title>Flushing-Main St (7), 7X, Aug-Dec 2025: 49.6</title></path>
-<text x="496.8" y="1938.0">49.6</text>
-<text x="365.8" y="1958.0" class="label" text-anchor="end">34 St-Herald Sq (B,D,F,M), Downtown</text>
-<path class="s0" d="M373.8,1948.0h114.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-114.3z"><title>34 St-Herald Sq (B,D,F,M), Downtown, Aug-Dec 2025: 49.3</title></path>
-<text x="496.1" y="1958.0">49.3</text>
-<text x="365.8" y="1978.0" class="label" text-anchor="end">Chambers St (A,C)</text>
-<path class="s0" d="M373.8,1968.0h112.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-112.4z"><title>Chambers St (A,C), Aug-Dec 2025: 48.5</title></path>
-<text x="494.2" y="1978.0">48.5</text>
-<text x="365.8" y="1998.0" class="label" text-anchor="end">Park Pl (2,3)</text>
-<path class="s0" d="M373.8,1988.0h111.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.9z"><title>Park Pl (2,3), Aug-Dec 2025: 48.3</title></path>
-<text x="493.7" y="1998.0">48.3</text>
-<text x="365.8" y="2018.0" class="label" text-anchor="end">125 St (A,B,C,D), Uptown</text>
-<path class="s0" d="M373.8,2008.0h111.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.7z"><title>125 St (A,B,C,D), Uptown, Aug-Dec 2025: 48.2</title></path>
+<text x="365.8" y="1898.0" class="label" text-anchor="end">59 St (4,5,6), Uptown 6</text>
+<path class="s0" d="M373.8,1888.0h115.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-115.5z"><title>59 St (4,5,6), Uptown 6, Aug-Dec 2025: 49.8</title></path>
+<text x="497.3" y="1898.0">49.8</text>
+<text x="365.8" y="1918.0" class="label" text-anchor="end">Flushing-Main St (7), 7X</text>
+<path class="s0" d="M373.8,1908.0h115.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-115.0z"><title>Flushing-Main St (7), 7X, Aug-Dec 2025: 49.6</title></path>
+<text x="496.8" y="1918.0">49.6</text>
+<text x="365.8" y="1938.0" class="label" text-anchor="end">34 St-Herald Sq (B,D,F,M), Downtown</text>
+<path class="s0" d="M373.8,1928.0h114.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-114.3z"><title>34 St-Herald Sq (B,D,F,M), Downtown, Aug-Dec 2025: 49.3</title></path>
+<text x="496.1" y="1938.0">49.3</text>
+<text x="365.8" y="1958.0" class="label" text-anchor="end">Chambers St (A,C)</text>
+<path class="s0" d="M373.8,1948.0h112.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-112.4z"><title>Chambers St (A,C), Aug-Dec 2025: 48.5</title></path>
+<text x="494.2" y="1958.0">48.5</text>
+<text x="365.8" y="1978.0" class="label" text-anchor="end">Park Pl (2,3)</text>
+<path class="s0" d="M373.8,1968.0h111.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.9z"><title>Park Pl (2,3), Aug-Dec 2025: 48.3</title></path>
+<text x="493.7" y="1978.0">48.3</text>
+<text x="365.8" y="1998.0" class="label" text-anchor="end">125 St (A,B,C,D), Uptown</text>
+<path class="s0" d="M373.8,1988.0h111.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.7z"><title>125 St (A,B,C,D), Uptown, Aug-Dec 2025: 48.2</title></path>
+<text x="493.5" y="1998.0">48.2</text>
+<text x="365.8" y="2018.0" class="label" text-anchor="end">Franklin Av-Medgar Evers College (2,3,4,5), Outbound</text>
+<path class="s0" d="M373.8,2008.0h111.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.7z"><title>Franklin Av-Medgar Evers College (2,3,4,5), Outbound, Aug-Dec 2025: 48.2</title></path>
 <text x="493.5" y="2018.0">48.2</text>
-<text x="365.8" y="2038.0" class="label" text-anchor="end">Franklin Av-Medgar Evers College (2,3,4,5), Outbound</text>
-<path class="s0" d="M373.8,2028.0h111.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.7z"><title>Franklin Av-Medgar Evers College (2,3,4,5), Outbound, Aug-Dec 2025: 48.2</title></path>
-<text x="493.5" y="2038.0">48.2</text>
-<text x="365.8" y="2058.0" class="label" text-anchor="end">Lorimer St (L), Manhattan</text>
-<path class="s0" d="M373.8,2048.0h110.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-110.7z"><title>Lorimer St (L), Manhattan, Aug-Dec 2025: 47.8</title></path>
-<text x="492.5" y="2058.0">47.8</text>
-<text x="365.8" y="2078.0" class="label" text-anchor="end">Jay St-MetroTech (R)</text>
-<path class="s0" d="M373.8,2068.0h108.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-108.8z"><title>Jay St-MetroTech (R), Aug-Dec 2025: 47.0</title></path>
-<text x="490.6" y="2078.0">47.0</text>
-<text x="365.8" y="2098.0" class="label" text-anchor="end">1 Av (L), Brooklyn</text>
-<path class="s0" d="M373.8,2088.0h106.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-106.2z"><title>1 Av (L), Brooklyn, Aug-Dec 2025: 45.9</title></path>
-<text x="488.0" y="2098.0">45.9</text>
-<text x="365.8" y="2118.0" class="label" text-anchor="end">Court Sq (G)</text>
-<path class="s0" d="M373.8,2108.0h105.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-105.2z"><title>Court Sq (G), Aug-Dec 2025: 45.5</title></path>
+<text x="365.8" y="2038.0" class="label" text-anchor="end">Lorimer St (L), Manhattan</text>
+<path class="s0" d="M373.8,2028.0h110.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-110.7z"><title>Lorimer St (L), Manhattan, Aug-Dec 2025: 47.8</title></path>
+<text x="492.5" y="2038.0">47.8</text>
+<text x="365.8" y="2058.0" class="label" text-anchor="end">Jay St-MetroTech (R)</text>
+<path class="s0" d="M373.8,2048.0h108.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-108.8z"><title>Jay St-MetroTech (R), Aug-Dec 2025: 47.0</title></path>
+<text x="490.6" y="2058.0">47.0</text>
+<text x="365.8" y="2078.0" class="label" text-anchor="end">1 Av (L), Brooklyn</text>
+<path class="s0" d="M373.8,2068.0h106.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-106.2z"><title>1 Av (L), Brooklyn, Aug-Dec 2025: 45.9</title></path>
+<text x="488.0" y="2078.0">45.9</text>
+<text x="365.8" y="2098.0" class="label" text-anchor="end">Court Sq (G)</text>
+<path class="s0" d="M373.8,2088.0h105.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-105.2z"><title>Court Sq (G), Aug-Dec 2025: 45.5</title></path>
+<text x="487.0" y="2098.0">45.5</text>
+<text x="365.8" y="2118.0" class="label" text-anchor="end">Broadway-Lafayette St (B,D,F,M), Downtown</text>
+<path class="s0" d="M373.8,2108.0h105.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-105.2z"><title>Broadway-Lafayette St (B,D,F,M), Downtown, Aug-Dec 2025: 45.5</title></path>
 <text x="487.0" y="2118.0">45.5</text>
-<text x="365.8" y="2138.0" class="label" text-anchor="end">Broadway-Lafayette St (B,D,F,M), Downtown</text>
-<path class="s0" d="M373.8,2128.0h105.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-105.2z"><title>Broadway-Lafayette St (B,D,F,M), Downtown, Aug-Dec 2025: 45.5</title></path>
-<text x="487.0" y="2138.0">45.5</text>
-<text x="365.8" y="2158.0" class="label" text-anchor="end">49 St (N,R,W), Downtown</text>
-<path class="s0" d="M373.8,2148.0h105.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-105.0z"><title>49 St (N,R,W), Downtown, Aug-Dec 2025: 45.4</title></path>
-<text x="486.8" y="2158.0">45.4</text>
-<text x="365.8" y="2178.0" class="label" text-anchor="end">135 St (2,3), Downtown</text>
-<path class="s0" d="M373.8,2168.0h104.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-104.7z"><title>135 St (2,3), Downtown, Aug-Dec 2025: 45.3</title></path>
-<text x="486.5" y="2178.0">45.3</text>
-<text x="365.8" y="2198.0" class="label" text-anchor="end">Franklin Av (S)</text>
-<path class="s0" d="M373.8,2188.0h104.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-104.2z"><title>Franklin Av (S), Aug-Dec 2025: 45.1</title></path>
-<text x="486.0" y="2198.0">45.1</text>
-<text x="365.8" y="2218.0" class="label" text-anchor="end">149 St-Hostos (2,5), Manhattan</text>
-<path class="s0" d="M373.8,2208.0h103.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-103.3z"><title>149 St-Hostos (2,5), Manhattan, Aug-Dec 2025: 44.7</title></path>
-<text x="485.1" y="2218.0">44.7</text>
-<text x="365.8" y="2238.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Downtown</text>
-<path class="s0" d="M373.8,2228.0h102.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-102.6z"><title>34 St-Penn Station (1,2,3), Downtown, Aug-Dec 2025: 44.4</title></path>
-<text x="484.4" y="2238.0">44.4</text>
+<text x="365.8" y="2138.0" class="label" text-anchor="end">49 St (N,R,W), Downtown</text>
+<path class="s0" d="M373.8,2128.0h105.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-105.0z"><title>49 St (N,R,W), Downtown, Aug-Dec 2025: 45.4</title></path>
+<text x="486.8" y="2138.0">45.4</text>
+<text x="365.8" y="2158.0" class="label" text-anchor="end">135 St (2,3), Downtown</text>
+<path class="s0" d="M373.8,2148.0h104.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-104.7z"><title>135 St (2,3), Downtown, Aug-Dec 2025: 45.3</title></path>
+<text x="486.5" y="2158.0">45.3</text>
+<text x="365.8" y="2178.0" class="label" text-anchor="end">Franklin Av (S)</text>
+<path class="s0" d="M373.8,2168.0h104.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-104.2z"><title>Franklin Av (S), Aug-Dec 2025: 45.1</title></path>
+<text x="486.0" y="2178.0">45.1</text>
+<text x="365.8" y="2198.0" class="label" text-anchor="end">149 St-Hostos (2,5), Manhattan</text>
+<path class="s0" d="M373.8,2188.0h103.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-103.3z"><title>149 St-Hostos (2,5), Manhattan, Aug-Dec 2025: 44.7</title></path>
+<text x="485.1" y="2198.0">44.7</text>
+<text x="365.8" y="2218.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Downtown</text>
+<path class="s0" d="M373.8,2208.0h102.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-102.6z"><title>34 St-Penn Station (1,2,3), Downtown, Aug-Dec 2025: 44.4</title></path>
+<text x="484.4" y="2218.0">44.4</text>
+<text x="365.8" y="2238.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown</text>
+<path class="s0" d="M373.8,2228.0h101.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-101.8z"><title>34 St-Penn Station (1,2,3), Uptown, Aug-Dec 2025: 44.1</title></path>
+<text x="483.6" y="2238.0">44.1</text>
 <text x="365.8" y="2258.0" class="label" text-anchor="end">Sutphin Blvd-Archer Av-JFK Airport (E,J,Z), E</text>
 <path class="s0" d="M373.8,2248.0h101.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-101.6z"><title>Sutphin Blvd-Archer Av-JFK Airport (E,J,Z), E, Aug-Dec 2025: 44.0</title></path>
 <text x="483.4" y="2258.0">44.0</text>

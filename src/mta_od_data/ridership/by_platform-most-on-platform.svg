@@ -242,38 +242,38 @@ text {
 <text x="426.6" y="1118.0" class="label" text-anchor="end">5:59 PM</text>
 <path class="s0" d="M434.6,1108.0h167.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-167.3z"><title>Hoyt-Schermerhorn Sts (A,C,G), NB G &amp; Queens 5:59 PM, Aug-Dec 2025: 446</title></path>
 <text x="609.9" y="1118.0">446</text>
-<text x="365.8" y="1138.0" class="label" text-anchor="end">Times Sq-42 St (S)</text>
-<text x="426.6" y="1138.0" class="label" text-anchor="end">5:56 PM</text>
-<path class="s0" d="M434.6,1128.0h164.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.6z"><title>Times Sq-42 St (S) 5:56 PM, Aug-Dec 2025: 439</title></path>
-<text x="607.2" y="1138.0">439</text>
-<text x="365.8" y="1158.0" class="label" text-anchor="end">47-50 Sts-Rockefeller Ctr (B,D,F,M), Uptown</text>
-<text x="426.6" y="1158.0" class="label" text-anchor="end">9:02 AM</text>
-<path class="s0" d="M434.6,1148.0h164.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.6z"><title>47-50 Sts-Rockefeller Ctr (B,D,F,M), Uptown 9:02 AM, Aug-Dec 2025: 439</title></path>
+<text x="365.8" y="1138.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown &amp; Downtown</text>
+<text x="426.6" y="1138.0" class="label" text-anchor="end">4:26 PM</text>
+<path class="s0" d="M434.6,1128.0h165.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-165.0z"><title>34 St-Penn Station (1,2,3), Uptown &amp; Downtown 4:26 PM, Aug-Dec 2025: 440</title></path>
+<text x="607.6" y="1138.0">440</text>
+<text x="365.8" y="1158.0" class="label" text-anchor="end">Times Sq-42 St (S)</text>
+<text x="426.6" y="1158.0" class="label" text-anchor="end">5:56 PM</text>
+<path class="s0" d="M434.6,1148.0h164.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.6z"><title>Times Sq-42 St (S) 5:56 PM, Aug-Dec 2025: 439</title></path>
 <text x="607.2" y="1158.0">439</text>
-<text x="365.8" y="1178.0" class="label" text-anchor="end">42 St-Bryant Pk (B,D,F,M), Downtown</text>
-<text x="426.6" y="1178.0" class="label" text-anchor="end">5:13 PM</text>
-<path class="s0" d="M434.6,1168.0h163.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-163.4z"><title>42 St-Bryant Pk (B,D,F,M), Downtown 5:13 PM, Aug-Dec 2025: 436</title></path>
-<text x="606.0" y="1178.0">436</text>
-<text x="365.8" y="1198.0" class="label" text-anchor="end">Grand Central-42 St (S)</text>
-<text x="426.6" y="1198.0" class="label" text-anchor="end">4:58 PM</text>
-<path class="s0" d="M434.6,1188.0h163.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-163.0z"><title>Grand Central-42 St (S) 4:58 PM, Aug-Dec 2025: 435</title></path>
-<text x="605.6" y="1198.0">435</text>
-<text x="365.8" y="1218.0" class="label" text-anchor="end">34 St-Herald Sq (N,Q,R,W), Downtown</text>
-<text x="426.6" y="1218.0" class="label" text-anchor="end">5:58 PM</text>
-<path class="s0" d="M434.6,1208.0h160.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-160.0z"><title>34 St-Herald Sq (N,Q,R,W), Downtown 5:58 PM, Aug-Dec 2025: 427</title></path>
-<text x="602.6" y="1218.0">427</text>
-<text x="365.8" y="1238.0" class="label" text-anchor="end">Myrtle Av (J,M,Z), Manhattan</text>
-<text x="426.6" y="1238.0" class="label" text-anchor="end">9:10 AM</text>
-<path class="s0" d="M434.6,1228.0h158.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-158.4z"><title>Myrtle Av (J,M,Z), Manhattan 9:10 AM, Aug-Dec 2025: 423</title></path>
-<text x="601.0" y="1238.0">423</text>
-<text x="365.8" y="1258.0" class="label" text-anchor="end">Grand Central-42 St (7)</text>
-<text x="426.6" y="1258.0" class="label" text-anchor="end">6:09 PM</text>
-<path class="s0" d="M434.6,1248.0h156.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-156.5z"><title>Grand Central-42 St (7) 6:09 PM, Aug-Dec 2025: 418</title></path>
-<text x="599.1" y="1258.0">418</text>
-<text x="365.8" y="1278.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown &amp; Downtown</text>
-<text x="426.6" y="1278.0" class="label" text-anchor="end">4:26 PM</text>
-<path class="s0" d="M434.6,1268.0h153.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-153.8z"><title>34 St-Penn Station (1,2,3), Uptown &amp; Downtown 4:26 PM, Aug-Dec 2025: 411</title></path>
-<text x="596.4" y="1278.0">411</text>
+<text x="365.8" y="1178.0" class="label" text-anchor="end">47-50 Sts-Rockefeller Ctr (B,D,F,M), Uptown</text>
+<text x="426.6" y="1178.0" class="label" text-anchor="end">9:02 AM</text>
+<path class="s0" d="M434.6,1168.0h164.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.6z"><title>47-50 Sts-Rockefeller Ctr (B,D,F,M), Uptown 9:02 AM, Aug-Dec 2025: 439</title></path>
+<text x="607.2" y="1178.0">439</text>
+<text x="365.8" y="1198.0" class="label" text-anchor="end">42 St-Bryant Pk (B,D,F,M), Downtown</text>
+<text x="426.6" y="1198.0" class="label" text-anchor="end">5:13 PM</text>
+<path class="s0" d="M434.6,1188.0h163.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-163.4z"><title>42 St-Bryant Pk (B,D,F,M), Downtown 5:13 PM, Aug-Dec 2025: 436</title></path>
+<text x="606.0" y="1198.0">436</text>
+<text x="365.8" y="1218.0" class="label" text-anchor="end">Grand Central-42 St (S)</text>
+<text x="426.6" y="1218.0" class="label" text-anchor="end">4:58 PM</text>
+<path class="s0" d="M434.6,1208.0h163.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-163.0z"><title>Grand Central-42 St (S) 4:58 PM, Aug-Dec 2025: 435</title></path>
+<text x="605.6" y="1218.0">435</text>
+<text x="365.8" y="1238.0" class="label" text-anchor="end">34 St-Herald Sq (N,Q,R,W), Downtown</text>
+<text x="426.6" y="1238.0" class="label" text-anchor="end">5:58 PM</text>
+<path class="s0" d="M434.6,1228.0h160.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-160.0z"><title>34 St-Herald Sq (N,Q,R,W), Downtown 5:58 PM, Aug-Dec 2025: 427</title></path>
+<text x="602.6" y="1238.0">427</text>
+<text x="365.8" y="1258.0" class="label" text-anchor="end">Myrtle Av (J,M,Z), Manhattan</text>
+<text x="426.6" y="1258.0" class="label" text-anchor="end">9:10 AM</text>
+<path class="s0" d="M434.6,1248.0h158.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-158.4z"><title>Myrtle Av (J,M,Z), Manhattan 9:10 AM, Aug-Dec 2025: 423</title></path>
+<text x="601.0" y="1258.0">423</text>
+<text x="365.8" y="1278.0" class="label" text-anchor="end">Grand Central-42 St (7)</text>
+<text x="426.6" y="1278.0" class="label" text-anchor="end">6:09 PM</text>
+<path class="s0" d="M434.6,1268.0h156.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-156.5z"><title>Grand Central-42 St (7) 6:09 PM, Aug-Dec 2025: 418</title></path>
+<text x="599.1" y="1278.0">418</text>
 <text x="365.8" y="1298.0" class="label" text-anchor="end">34 St-Herald Sq (B,D,F,M), Downtown</text>
 <text x="426.6" y="1298.0" class="label" text-anchor="end">5:14 PM</text>
 <path class="s0" d="M434.6,1288.0h153.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-153.1z"><title>34 St-Herald Sq (B,D,F,M), Downtown 5:14 PM, Aug-Dec 2025: 409</title></path>
@@ -510,422 +510,422 @@ text {
 <text x="426.6" y="2458.0" class="label" text-anchor="end">4:03 PM</text>
 <path class="s0" d="M434.6,2448.0h102.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-102.0z"><title>59 St-Columbus Circle (1), Downtown 4:03 PM, Aug-Dec 2025: 276</title></path>
 <text x="544.6" y="2458.0">276</text>
-<text x="365.8" y="2478.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown</text>
-<text x="426.6" y="2478.0" class="label" text-anchor="end">4:46 PM</text>
-<path class="s0" d="M434.6,2468.0h101.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-101.6z"><title>34 St-Penn Station (1,2,3), Uptown 4:46 PM, Aug-Dec 2025: 275</title></path>
-<text x="544.2" y="2478.0">275</text>
-<text x="365.8" y="2498.0" class="label" text-anchor="end">Chambers St (1,2,3), Uptown</text>
-<text x="426.6" y="2498.0" class="label" text-anchor="end">5:32 PM</text>
-<path class="s0" d="M434.6,2488.0h100.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-100.4z"><title>Chambers St (1,2,3), Uptown 5:32 PM, Aug-Dec 2025: 272</title></path>
+<text x="365.8" y="2478.0" class="label" text-anchor="end">Chambers St (1,2,3), Uptown</text>
+<text x="426.6" y="2478.0" class="label" text-anchor="end">5:32 PM</text>
+<path class="s0" d="M434.6,2468.0h100.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-100.4z"><title>Chambers St (1,2,3), Uptown 5:32 PM, Aug-Dec 2025: 272</title></path>
+<text x="543.0" y="2478.0">272</text>
+<text x="365.8" y="2498.0" class="label" text-anchor="end">Canal St (N,Q), Downtown</text>
+<text x="426.6" y="2498.0" class="label" text-anchor="end">4:10 PM</text>
+<path class="s0" d="M434.6,2488.0h100.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-100.4z"><title>Canal St (N,Q), Downtown 4:10 PM, Aug-Dec 2025: 272</title></path>
 <text x="543.0" y="2498.0">272</text>
-<text x="365.8" y="2518.0" class="label" text-anchor="end">Canal St (N,Q), Downtown</text>
-<text x="426.6" y="2518.0" class="label" text-anchor="end">4:10 PM</text>
-<path class="s0" d="M434.6,2508.0h100.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-100.4z"><title>Canal St (N,Q), Downtown 4:10 PM, Aug-Dec 2025: 272</title></path>
-<text x="543.0" y="2518.0">272</text>
-<text x="365.8" y="2538.0" class="label" text-anchor="end">Parkchester (6), Manhattan</text>
-<text x="426.6" y="2538.0" class="label" text-anchor="end">8:56 AM</text>
-<path class="s0" d="M434.6,2528.0h99.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-99.3z"><title>Parkchester (6), Manhattan 8:56 AM, Aug-Dec 2025: 269</title></path>
-<text x="541.9" y="2538.0">269</text>
-<text x="365.8" y="2558.0" class="label" text-anchor="end">34 St-Penn Station (A,C,E), Uptown</text>
-<text x="426.6" y="2558.0" class="label" text-anchor="end">6:01 PM</text>
-<path class="s0" d="M434.6,2548.0h98.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-98.5z"><title>34 St-Penn Station (A,C,E), Uptown 6:01 PM, Aug-Dec 2025: 267</title></path>
+<text x="365.8" y="2518.0" class="label" text-anchor="end">Parkchester (6), Manhattan</text>
+<text x="426.6" y="2518.0" class="label" text-anchor="end">8:56 AM</text>
+<path class="s0" d="M434.6,2508.0h99.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-99.3z"><title>Parkchester (6), Manhattan 8:56 AM, Aug-Dec 2025: 269</title></path>
+<text x="541.9" y="2518.0">269</text>
+<text x="365.8" y="2538.0" class="label" text-anchor="end">34 St-Penn Station (A,C,E), Uptown</text>
+<text x="426.6" y="2538.0" class="label" text-anchor="end">6:01 PM</text>
+<path class="s0" d="M434.6,2528.0h98.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-98.5z"><title>34 St-Penn Station (A,C,E), Uptown 6:01 PM, Aug-Dec 2025: 267</title></path>
+<text x="541.1" y="2538.0">267</text>
+<text x="365.8" y="2558.0" class="label" text-anchor="end">Court Sq-23 St (E,F), Outbound</text>
+<text x="426.6" y="2558.0" class="label" text-anchor="end">6:05 PM</text>
+<path class="s0" d="M434.6,2548.0h98.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-98.5z"><title>Court Sq-23 St (E,F), Outbound 6:05 PM, Aug-Dec 2025: 267</title></path>
 <text x="541.1" y="2558.0">267</text>
-<text x="365.8" y="2578.0" class="label" text-anchor="end">Court Sq-23 St (E,F), Outbound</text>
-<text x="426.6" y="2578.0" class="label" text-anchor="end">6:05 PM</text>
-<path class="s0" d="M434.6,2568.0h98.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-98.5z"><title>Court Sq-23 St (E,F), Outbound 6:05 PM, Aug-Dec 2025: 267</title></path>
-<text x="541.1" y="2578.0">267</text>
-<text x="365.8" y="2598.0" class="label" text-anchor="end">86 St (4,5,6), Uptown 4,5</text>
-<text x="426.6" y="2598.0" class="label" text-anchor="end">5:43 PM</text>
-<path class="s0" d="M434.6,2588.0h98.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-98.1z"><title>86 St (4,5,6), Uptown 4,5 5:43 PM, Aug-Dec 2025: 266</title></path>
-<text x="540.7" y="2598.0">266</text>
-<text x="365.8" y="2618.0" class="label" text-anchor="end">Nevins St (2,3,4,5), Outbound</text>
-<text x="426.6" y="2618.0" class="label" text-anchor="end">6:28 PM</text>
-<path class="s0" d="M434.6,2608.0h97.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-97.4z"><title>Nevins St (2,3,4,5), Outbound 6:28 PM, Aug-Dec 2025: 264</title></path>
-<text x="540.0" y="2618.0">264</text>
-<text x="365.8" y="2638.0" class="label" text-anchor="end">161 St-Yankee Stadium (B,D), Manhattan</text>
-<text x="426.6" y="2638.0" class="label" text-anchor="end">7:57 AM</text>
-<path class="s0" d="M434.6,2628.0h95.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-95.8z"><title>161 St-Yankee Stadium (B,D), Manhattan 7:57 AM, Aug-Dec 2025: 260</title></path>
-<text x="538.4" y="2638.0">260</text>
-<text x="365.8" y="2658.0" class="label" text-anchor="end">145 St (A,C), Downtown</text>
-<text x="426.6" y="2658.0" class="label" text-anchor="end">8:41 AM</text>
-<path class="s0" d="M434.6,2648.0h95.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-95.1z"><title>145 St (A,C), Downtown 8:41 AM, Aug-Dec 2025: 258</title></path>
-<text x="537.7" y="2658.0">258</text>
-<text x="365.8" y="2678.0" class="label" text-anchor="end">W 4 St-Wash Sq (B,D,F,M), Uptown</text>
-<text x="426.6" y="2678.0" class="label" text-anchor="end">8:46 AM</text>
-<path class="s0" d="M434.6,2668.0h94.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-94.7z"><title>W 4 St-Wash Sq (B,D,F,M), Uptown 8:46 AM, Aug-Dec 2025: 257</title></path>
+<text x="365.8" y="2578.0" class="label" text-anchor="end">86 St (4,5,6), Uptown 4,5</text>
+<text x="426.6" y="2578.0" class="label" text-anchor="end">5:43 PM</text>
+<path class="s0" d="M434.6,2568.0h98.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-98.1z"><title>86 St (4,5,6), Uptown 4,5 5:43 PM, Aug-Dec 2025: 266</title></path>
+<text x="540.7" y="2578.0">266</text>
+<text x="365.8" y="2598.0" class="label" text-anchor="end">Nevins St (2,3,4,5), Outbound</text>
+<text x="426.6" y="2598.0" class="label" text-anchor="end">6:28 PM</text>
+<path class="s0" d="M434.6,2588.0h97.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-97.4z"><title>Nevins St (2,3,4,5), Outbound 6:28 PM, Aug-Dec 2025: 264</title></path>
+<text x="540.0" y="2598.0">264</text>
+<text x="365.8" y="2618.0" class="label" text-anchor="end">161 St-Yankee Stadium (B,D), Manhattan</text>
+<text x="426.6" y="2618.0" class="label" text-anchor="end">7:57 AM</text>
+<path class="s0" d="M434.6,2608.0h95.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-95.8z"><title>161 St-Yankee Stadium (B,D), Manhattan 7:57 AM, Aug-Dec 2025: 260</title></path>
+<text x="538.4" y="2618.0">260</text>
+<text x="365.8" y="2638.0" class="label" text-anchor="end">145 St (A,C), Downtown</text>
+<text x="426.6" y="2638.0" class="label" text-anchor="end">8:41 AM</text>
+<path class="s0" d="M434.6,2628.0h95.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-95.1z"><title>145 St (A,C), Downtown 8:41 AM, Aug-Dec 2025: 258</title></path>
+<text x="537.7" y="2638.0">258</text>
+<text x="365.8" y="2658.0" class="label" text-anchor="end">W 4 St-Wash Sq (B,D,F,M), Uptown</text>
+<text x="426.6" y="2658.0" class="label" text-anchor="end">8:46 AM</text>
+<path class="s0" d="M434.6,2648.0h94.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-94.7z"><title>W 4 St-Wash Sq (B,D,F,M), Uptown 8:46 AM, Aug-Dec 2025: 257</title></path>
+<text x="537.3" y="2658.0">257</text>
+<text x="365.8" y="2678.0" class="label" text-anchor="end">Kew Gardens-Union Tpke (E,F), Jamaica</text>
+<text x="426.6" y="2678.0" class="label" text-anchor="end">4:11 PM</text>
+<path class="s0" d="M434.6,2668.0h94.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-94.7z"><title>Kew Gardens-Union Tpke (E,F), Jamaica 4:11 PM, Aug-Dec 2025: 257</title></path>
 <text x="537.3" y="2678.0">257</text>
-<text x="365.8" y="2698.0" class="label" text-anchor="end">Kew Gardens-Union Tpke (E,F), Jamaica</text>
-<text x="426.6" y="2698.0" class="label" text-anchor="end">4:11 PM</text>
-<path class="s0" d="M434.6,2688.0h94.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-94.7z"><title>Kew Gardens-Union Tpke (E,F), Jamaica 4:11 PM, Aug-Dec 2025: 257</title></path>
-<text x="537.3" y="2698.0">257</text>
-<text x="365.8" y="2718.0" class="label" text-anchor="end">86 St (R)</text>
-<text x="426.6" y="2718.0" class="label" text-anchor="end">5:00 PM</text>
-<path class="s0" d="M434.6,2708.0h93.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-93.5z"><title>86 St (R) 5:00 PM, Aug-Dec 2025: 254</title></path>
-<text x="536.1" y="2718.0">254</text>
-<text x="365.8" y="2738.0" class="label" text-anchor="end">Delancey St-Essex St (J,M,Z), Brooklyn</text>
-<text x="426.6" y="2738.0" class="label" text-anchor="end">4:50 PM</text>
-<path class="s0" d="M434.6,2728.0h92.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-92.8z"><title>Delancey St-Essex St (J,M,Z), Brooklyn 4:50 PM, Aug-Dec 2025: 252</title></path>
-<text x="535.4" y="2738.0">252</text>
-<text x="365.8" y="2758.0" class="label" text-anchor="end">103 St-Corona Plaza (7), Manhattan</text>
-<text x="426.6" y="2758.0" class="label" text-anchor="end">5:14 AM</text>
-<path class="s0" d="M434.6,2748.0h92.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-92.4z"><title>103 St-Corona Plaza (7), Manhattan 5:14 AM, Aug-Dec 2025: 251</title></path>
+<text x="365.8" y="2698.0" class="label" text-anchor="end">86 St (R)</text>
+<text x="426.6" y="2698.0" class="label" text-anchor="end">5:00 PM</text>
+<path class="s0" d="M434.6,2688.0h93.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-93.5z"><title>86 St (R) 5:00 PM, Aug-Dec 2025: 254</title></path>
+<text x="536.1" y="2698.0">254</text>
+<text x="365.8" y="2718.0" class="label" text-anchor="end">Delancey St-Essex St (J,M,Z), Brooklyn</text>
+<text x="426.6" y="2718.0" class="label" text-anchor="end">4:50 PM</text>
+<path class="s0" d="M434.6,2708.0h92.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-92.8z"><title>Delancey St-Essex St (J,M,Z), Brooklyn 4:50 PM, Aug-Dec 2025: 252</title></path>
+<text x="535.4" y="2718.0">252</text>
+<text x="365.8" y="2738.0" class="label" text-anchor="end">103 St-Corona Plaza (7), Manhattan</text>
+<text x="426.6" y="2738.0" class="label" text-anchor="end">5:14 AM</text>
+<path class="s0" d="M434.6,2728.0h92.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-92.4z"><title>103 St-Corona Plaza (7), Manhattan 5:14 AM, Aug-Dec 2025: 251</title></path>
+<text x="535.0" y="2738.0">251</text>
+<text x="365.8" y="2758.0" class="label" text-anchor="end">Marcy Av (J,M,Z), Outbound</text>
+<text x="426.6" y="2758.0" class="label" text-anchor="end">4:59 PM</text>
+<path class="s0" d="M434.6,2748.0h92.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-92.4z"><title>Marcy Av (J,M,Z), Outbound 4:59 PM, Aug-Dec 2025: 251</title></path>
 <text x="535.0" y="2758.0">251</text>
-<text x="365.8" y="2778.0" class="label" text-anchor="end">Marcy Av (J,M,Z), Outbound</text>
-<text x="426.6" y="2778.0" class="label" text-anchor="end">4:59 PM</text>
-<path class="s0" d="M434.6,2768.0h92.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-92.4z"><title>Marcy Av (J,M,Z), Outbound 4:59 PM, Aug-Dec 2025: 251</title></path>
-<text x="535.0" y="2778.0">251</text>
-<text x="365.8" y="2798.0" class="label" text-anchor="end">Astoria-Ditmars Blvd (N,W)</text>
-<text x="426.6" y="2798.0" class="label" text-anchor="end">5:39 PM</text>
-<path class="s0" d="M434.6,2788.0h92.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-92.0z"><title>Astoria-Ditmars Blvd (N,W) 5:39 PM, Aug-Dec 2025: 250</title></path>
-<text x="534.6" y="2798.0">250</text>
-<text x="365.8" y="2818.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Manhattan &amp; Outbound</text>
-<text x="426.6" y="2818.0" class="label" text-anchor="end">7:32 AM</text>
-<path class="s0" d="M434.6,2808.0h91.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-91.6z"><title>Atlantic Av (2,3,4,5), Manhattan &amp; Outbound 7:32 AM, Aug-Dec 2025: 249</title></path>
-<text x="534.2" y="2818.0">249</text>
-<text x="365.8" y="2838.0" class="label" text-anchor="end">Bedford Av (L)</text>
-<text x="426.6" y="2838.0" class="label" text-anchor="end">5:36 PM</text>
-<path class="s0" d="M434.6,2828.0h90.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.8z"><title>Bedford Av (L) 5:36 PM, Aug-Dec 2025: 247</title></path>
-<text x="533.4" y="2838.0">247</text>
-<text x="365.8" y="2858.0" class="label" text-anchor="end">Junction Blvd (7), Outbound</text>
-<text x="426.6" y="2858.0" class="label" text-anchor="end">5:19 PM</text>
-<path class="s0" d="M434.6,2848.0h89.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-89.3z"><title>Junction Blvd (7), Outbound 5:19 PM, Aug-Dec 2025: 243</title></path>
-<text x="531.9" y="2858.0">243</text>
-<text x="365.8" y="2878.0" class="label" text-anchor="end">57 St-7 Av (N,Q,R,W), Downtown</text>
-<text x="426.6" y="2878.0" class="label" text-anchor="end">8:18 AM</text>
-<path class="s0" d="M434.6,2868.0h88.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-88.2z"><title>57 St-7 Av (N,Q,R,W), Downtown 8:18 AM, Aug-Dec 2025: 240</title></path>
-<text x="530.8" y="2878.0">240</text>
-<text x="365.8" y="2898.0" class="label" text-anchor="end">5 Av/53 St (E,F), Queens</text>
-<text x="426.6" y="2898.0" class="label" text-anchor="end">8:24 AM</text>
-<path class="s0" d="M434.6,2888.0h87.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-87.4z"><title>5 Av/53 St (E,F), Queens 8:24 AM, Aug-Dec 2025: 238</title></path>
-<text x="530.0" y="2898.0">238</text>
-<text x="365.8" y="2918.0" class="label" text-anchor="end">Park Pl (2,3)</text>
-<text x="426.6" y="2918.0" class="label" text-anchor="end">6:02 PM</text>
-<path class="s0" d="M434.6,2908.0h87.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-87.0z"><title>Park Pl (2,3) 6:02 PM, Aug-Dec 2025: 237</title></path>
+<text x="365.8" y="2778.0" class="label" text-anchor="end">Astoria-Ditmars Blvd (N,W)</text>
+<text x="426.6" y="2778.0" class="label" text-anchor="end">5:39 PM</text>
+<path class="s0" d="M434.6,2768.0h92.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-92.0z"><title>Astoria-Ditmars Blvd (N,W) 5:39 PM, Aug-Dec 2025: 250</title></path>
+<text x="534.6" y="2778.0">250</text>
+<text x="365.8" y="2798.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Manhattan &amp; Outbound</text>
+<text x="426.6" y="2798.0" class="label" text-anchor="end">7:32 AM</text>
+<path class="s0" d="M434.6,2788.0h91.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-91.6z"><title>Atlantic Av (2,3,4,5), Manhattan &amp; Outbound 7:32 AM, Aug-Dec 2025: 249</title></path>
+<text x="534.2" y="2798.0">249</text>
+<text x="365.8" y="2818.0" class="label" text-anchor="end">Bedford Av (L)</text>
+<text x="426.6" y="2818.0" class="label" text-anchor="end">5:36 PM</text>
+<path class="s0" d="M434.6,2808.0h90.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.8z"><title>Bedford Av (L) 5:36 PM, Aug-Dec 2025: 247</title></path>
+<text x="533.4" y="2818.0">247</text>
+<text x="365.8" y="2838.0" class="label" text-anchor="end">Junction Blvd (7), Outbound</text>
+<text x="426.6" y="2838.0" class="label" text-anchor="end">5:19 PM</text>
+<path class="s0" d="M434.6,2828.0h89.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-89.3z"><title>Junction Blvd (7), Outbound 5:19 PM, Aug-Dec 2025: 243</title></path>
+<text x="531.9" y="2838.0">243</text>
+<text x="365.8" y="2858.0" class="label" text-anchor="end">57 St-7 Av (N,Q,R,W), Downtown</text>
+<text x="426.6" y="2858.0" class="label" text-anchor="end">8:18 AM</text>
+<path class="s0" d="M434.6,2848.0h88.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-88.2z"><title>57 St-7 Av (N,Q,R,W), Downtown 8:18 AM, Aug-Dec 2025: 240</title></path>
+<text x="530.8" y="2858.0">240</text>
+<text x="365.8" y="2878.0" class="label" text-anchor="end">5 Av/53 St (E,F), Queens</text>
+<text x="426.6" y="2878.0" class="label" text-anchor="end">8:24 AM</text>
+<path class="s0" d="M434.6,2868.0h87.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-87.4z"><title>5 Av/53 St (E,F), Queens 8:24 AM, Aug-Dec 2025: 238</title></path>
+<text x="530.0" y="2878.0">238</text>
+<text x="365.8" y="2898.0" class="label" text-anchor="end">Park Pl (2,3)</text>
+<text x="426.6" y="2898.0" class="label" text-anchor="end">6:02 PM</text>
+<path class="s0" d="M434.6,2888.0h87.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-87.0z"><title>Park Pl (2,3) 6:02 PM, Aug-Dec 2025: 237</title></path>
+<text x="529.6" y="2898.0">237</text>
+<text x="365.8" y="2918.0" class="label" text-anchor="end">E 180 St (2,5), NB</text>
+<text x="426.6" y="2918.0" class="label" text-anchor="end">6:19 PM</text>
+<path class="s0" d="M434.6,2908.0h87.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-87.0z"><title>E 180 St (2,5), NB 6:19 PM, Aug-Dec 2025: 237</title></path>
 <text x="529.6" y="2918.0">237</text>
-<text x="365.8" y="2938.0" class="label" text-anchor="end">E 180 St (2,5), NB</text>
-<text x="426.6" y="2938.0" class="label" text-anchor="end">6:19 PM</text>
-<path class="s0" d="M434.6,2928.0h87.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-87.0z"><title>E 180 St (2,5), NB 6:19 PM, Aug-Dec 2025: 237</title></path>
-<text x="529.6" y="2938.0">237</text>
-<text x="365.8" y="2958.0" class="label" text-anchor="end">Lorimer St (L), Outbound</text>
-<text x="426.6" y="2958.0" class="label" text-anchor="end">5:18 PM</text>
-<path class="s0" d="M434.6,2948.0h85.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-85.5z"><title>Lorimer St (L), Outbound 5:18 PM, Aug-Dec 2025: 233</title></path>
-<text x="528.1" y="2958.0">233</text>
-<text x="365.8" y="2978.0" class="label" text-anchor="end">3 Av-149 St (2,5), Manhattan</text>
-<text x="426.6" y="2978.0" class="label" text-anchor="end">7:56 AM</text>
-<path class="s0" d="M434.6,2968.0h85.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-85.1z"><title>3 Av-149 St (2,5), Manhattan 7:56 AM, Aug-Dec 2025: 232</title></path>
-<text x="527.7" y="2978.0">232</text>
-<text x="365.8" y="2998.0" class="label" text-anchor="end">W 4 St-Wash Sq (A,C,E), Uptown</text>
-<text x="426.6" y="2998.0" class="label" text-anchor="end">5:17 PM</text>
-<path class="s0" d="M434.6,2988.0h84.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-84.7z"><title>W 4 St-Wash Sq (A,C,E), Uptown 5:17 PM, Aug-Dec 2025: 231</title></path>
+<text x="365.8" y="2938.0" class="label" text-anchor="end">Lorimer St (L), Outbound</text>
+<text x="426.6" y="2938.0" class="label" text-anchor="end">5:18 PM</text>
+<path class="s0" d="M434.6,2928.0h85.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-85.5z"><title>Lorimer St (L), Outbound 5:18 PM, Aug-Dec 2025: 233</title></path>
+<text x="528.1" y="2938.0">233</text>
+<text x="365.8" y="2958.0" class="label" text-anchor="end">3 Av-149 St (2,5), Manhattan</text>
+<text x="426.6" y="2958.0" class="label" text-anchor="end">7:56 AM</text>
+<path class="s0" d="M434.6,2948.0h85.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-85.1z"><title>3 Av-149 St (2,5), Manhattan 7:56 AM, Aug-Dec 2025: 232</title></path>
+<text x="527.7" y="2958.0">232</text>
+<text x="365.8" y="2978.0" class="label" text-anchor="end">W 4 St-Wash Sq (A,C,E), Uptown</text>
+<text x="426.6" y="2978.0" class="label" text-anchor="end">5:17 PM</text>
+<path class="s0" d="M434.6,2968.0h84.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-84.7z"><title>W 4 St-Wash Sq (A,C,E), Uptown 5:17 PM, Aug-Dec 2025: 231</title></path>
+<text x="527.3" y="2978.0">231</text>
+<text x="365.8" y="2998.0" class="label" text-anchor="end">Lorimer St (L), Manhattan</text>
+<text x="426.6" y="2998.0" class="label" text-anchor="end">8:19 AM</text>
+<path class="s0" d="M434.6,2988.0h84.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-84.7z"><title>Lorimer St (L), Manhattan 8:19 AM, Aug-Dec 2025: 231</title></path>
 <text x="527.3" y="2998.0">231</text>
-<text x="365.8" y="3018.0" class="label" text-anchor="end">Lorimer St (L), Manhattan</text>
-<text x="426.6" y="3018.0" class="label" text-anchor="end">8:19 AM</text>
-<path class="s0" d="M434.6,3008.0h84.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-84.7z"><title>Lorimer St (L), Manhattan 8:19 AM, Aug-Dec 2025: 231</title></path>
-<text x="527.3" y="3018.0">231</text>
-<text x="365.8" y="3038.0" class="label" text-anchor="end">51 St (6), Downtown</text>
-<text x="426.6" y="3038.0" class="label" text-anchor="end">3:16 PM</text>
-<path class="s0" d="M434.6,3028.0h84.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-84.3z"><title>51 St (6), Downtown 3:16 PM, Aug-Dec 2025: 230</title></path>
+<text x="365.8" y="3018.0" class="label" text-anchor="end">51 St (6), Downtown</text>
+<text x="426.6" y="3018.0" class="label" text-anchor="end">3:16 PM</text>
+<path class="s0" d="M434.6,3008.0h84.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-84.3z"><title>51 St (6), Downtown 3:16 PM, Aug-Dec 2025: 230</title></path>
+<text x="526.9" y="3018.0">230</text>
+<text x="365.8" y="3038.0" class="label" text-anchor="end">Bleecker St (6), Downtown</text>
+<text x="426.6" y="3038.0" class="label" text-anchor="end">5:42 PM</text>
+<path class="s0" d="M434.6,3028.0h84.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-84.3z"><title>Bleecker St (6), Downtown 5:42 PM, Aug-Dec 2025: 230</title></path>
 <text x="526.9" y="3038.0">230</text>
-<text x="365.8" y="3058.0" class="label" text-anchor="end">Bleecker St (6), Downtown</text>
-<text x="426.6" y="3058.0" class="label" text-anchor="end">5:42 PM</text>
-<path class="s0" d="M434.6,3048.0h84.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-84.3z"><title>Bleecker St (6), Downtown 5:42 PM, Aug-Dec 2025: 230</title></path>
-<text x="526.9" y="3058.0">230</text>
-<text x="365.8" y="3078.0" class="label" text-anchor="end">Kew Gardens-Union Tpke (E,F), Manhattan</text>
-<text x="426.6" y="3078.0" class="label" text-anchor="end">8:51 AM</text>
-<path class="s0" d="M434.6,3068.0h83.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-83.6z"><title>Kew Gardens-Union Tpke (E,F), Manhattan 8:51 AM, Aug-Dec 2025: 228</title></path>
-<text x="526.2" y="3078.0">228</text>
-<text x="365.8" y="3098.0" class="label" text-anchor="end">Canarsie-Rockaway Pkwy (L)</text>
-<text x="426.6" y="3098.0" class="label" text-anchor="end">7:13 AM</text>
-<path class="s0" d="M434.6,3088.0h83.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-83.2z"><title>Canarsie-Rockaway Pkwy (L) 7:13 AM, Aug-Dec 2025: 227</title></path>
+<text x="365.8" y="3058.0" class="label" text-anchor="end">Kew Gardens-Union Tpke (E,F), Manhattan</text>
+<text x="426.6" y="3058.0" class="label" text-anchor="end">8:51 AM</text>
+<path class="s0" d="M434.6,3048.0h83.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-83.6z"><title>Kew Gardens-Union Tpke (E,F), Manhattan 8:51 AM, Aug-Dec 2025: 228</title></path>
+<text x="526.2" y="3058.0">228</text>
+<text x="365.8" y="3078.0" class="label" text-anchor="end">Canarsie-Rockaway Pkwy (L)</text>
+<text x="426.6" y="3078.0" class="label" text-anchor="end">7:13 AM</text>
+<path class="s0" d="M434.6,3068.0h83.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-83.2z"><title>Canarsie-Rockaway Pkwy (L) 7:13 AM, Aug-Dec 2025: 227</title></path>
+<text x="525.8" y="3078.0">227</text>
+<text x="365.8" y="3098.0" class="label" text-anchor="end">Broadway Junction (J,Z), Outbound</text>
+<text x="426.6" y="3098.0" class="label" text-anchor="end">5:03 PM</text>
+<path class="s0" d="M434.6,3088.0h83.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-83.2z"><title>Broadway Junction (J,Z), Outbound 5:03 PM, Aug-Dec 2025: 227</title></path>
 <text x="525.8" y="3098.0">227</text>
-<text x="365.8" y="3118.0" class="label" text-anchor="end">Broadway Junction (J,Z), Outbound</text>
-<text x="426.6" y="3118.0" class="label" text-anchor="end">5:03 PM</text>
-<path class="s0" d="M434.6,3108.0h83.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-83.2z"><title>Broadway Junction (J,Z), Outbound 5:03 PM, Aug-Dec 2025: 227</title></path>
-<text x="525.8" y="3118.0">227</text>
-<text x="365.8" y="3138.0" class="label" text-anchor="end">149 St-Hostos (2,5), Manhattan</text>
-<text x="426.6" y="3138.0" class="label" text-anchor="end">2:57 PM</text>
-<path class="s0" d="M434.6,3128.0h82.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.8z"><title>149 St-Hostos (2,5), Manhattan 2:57 PM, Aug-Dec 2025: 226</title></path>
-<text x="525.4" y="3138.0">226</text>
-<text x="365.8" y="3158.0" class="label" text-anchor="end">Delancey St-Essex St (J,M,Z), Inbound</text>
-<text x="426.6" y="3158.0" class="label" text-anchor="end">9:38 AM</text>
-<path class="s0" d="M434.6,3148.0h82.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.4z"><title>Delancey St-Essex St (J,M,Z), Inbound 9:38 AM, Aug-Dec 2025: 225</title></path>
-<text x="525.0" y="3158.0">225</text>
-<text x="365.8" y="3178.0" class="label" text-anchor="end">168 St (A,C), Uptown</text>
-<text x="426.6" y="3178.0" class="label" text-anchor="end">5:42 PM</text>
-<path class="s0" d="M434.6,3168.0h82.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.0z"><title>168 St (A,C), Uptown 5:42 PM, Aug-Dec 2025: 224</title></path>
+<text x="365.8" y="3118.0" class="label" text-anchor="end">149 St-Hostos (2,5), Manhattan</text>
+<text x="426.6" y="3118.0" class="label" text-anchor="end">2:57 PM</text>
+<path class="s0" d="M434.6,3108.0h82.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.8z"><title>149 St-Hostos (2,5), Manhattan 2:57 PM, Aug-Dec 2025: 226</title></path>
+<text x="525.4" y="3118.0">226</text>
+<text x="365.8" y="3138.0" class="label" text-anchor="end">Delancey St-Essex St (J,M,Z), Inbound</text>
+<text x="426.6" y="3138.0" class="label" text-anchor="end">9:38 AM</text>
+<path class="s0" d="M434.6,3128.0h82.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.4z"><title>Delancey St-Essex St (J,M,Z), Inbound 9:38 AM, Aug-Dec 2025: 225</title></path>
+<text x="525.0" y="3138.0">225</text>
+<text x="365.8" y="3158.0" class="label" text-anchor="end">168 St (A,C), Uptown</text>
+<text x="426.6" y="3158.0" class="label" text-anchor="end">5:42 PM</text>
+<path class="s0" d="M434.6,3148.0h82.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.0z"><title>168 St (A,C), Uptown 5:42 PM, Aug-Dec 2025: 224</title></path>
+<text x="524.6" y="3158.0">224</text>
+<text x="365.8" y="3178.0" class="label" text-anchor="end">Queens Plaza (E,F,R), Manhattan</text>
+<text x="426.6" y="3178.0" class="label" text-anchor="end">9:05 AM</text>
+<path class="s0" d="M434.6,3168.0h82.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.0z"><title>Queens Plaza (E,F,R), Manhattan 9:05 AM, Aug-Dec 2025: 224</title></path>
 <text x="524.6" y="3178.0">224</text>
-<text x="365.8" y="3198.0" class="label" text-anchor="end">Queens Plaza (E,F,R), Manhattan</text>
-<text x="426.6" y="3198.0" class="label" text-anchor="end">9:05 AM</text>
-<path class="s0" d="M434.6,3188.0h82.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.0z"><title>Queens Plaza (E,F,R), Manhattan 9:05 AM, Aug-Dec 2025: 224</title></path>
+<text x="365.8" y="3198.0" class="label" text-anchor="end">Ozone Park-Lefferts Blvd (A)</text>
+<text x="426.6" y="3198.0" class="label" text-anchor="end">5:16 PM</text>
+<path class="s0" d="M434.6,3188.0h82.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.0z"><title>Ozone Park-Lefferts Blvd (A) 5:16 PM, Aug-Dec 2025: 224</title></path>
 <text x="524.6" y="3198.0">224</text>
-<text x="365.8" y="3218.0" class="label" text-anchor="end">Ozone Park-Lefferts Blvd (A)</text>
-<text x="426.6" y="3218.0" class="label" text-anchor="end">5:16 PM</text>
-<path class="s0" d="M434.6,3208.0h82.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.0z"><title>Ozone Park-Lefferts Blvd (A) 5:16 PM, Aug-Dec 2025: 224</title></path>
-<text x="524.6" y="3218.0">224</text>
-<text x="365.8" y="3238.0" class="label" text-anchor="end">14 St (F,M), Downtown</text>
-<text x="426.6" y="3238.0" class="label" text-anchor="end">5:28 PM</text>
-<path class="s0" d="M434.6,3228.0h81.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.6z"><title>14 St (F,M), Downtown 5:28 PM, Aug-Dec 2025: 223</title></path>
+<text x="365.8" y="3218.0" class="label" text-anchor="end">14 St (F,M), Downtown</text>
+<text x="426.6" y="3218.0" class="label" text-anchor="end">5:28 PM</text>
+<path class="s0" d="M434.6,3208.0h81.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.6z"><title>14 St (F,M), Downtown 5:28 PM, Aug-Dec 2025: 223</title></path>
+<text x="524.2" y="3218.0">223</text>
+<text x="365.8" y="3238.0" class="label" text-anchor="end">Jamaica-179 St (F)</text>
+<text x="426.6" y="3238.0" class="label" text-anchor="end">5:20 PM</text>
+<path class="s0" d="M434.6,3228.0h81.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.6z"><title>Jamaica-179 St (F) 5:20 PM, Aug-Dec 2025: 223</title></path>
 <text x="524.2" y="3238.0">223</text>
-<text x="365.8" y="3258.0" class="label" text-anchor="end">Jamaica-179 St (F)</text>
-<text x="426.6" y="3258.0" class="label" text-anchor="end">5:20 PM</text>
-<path class="s0" d="M434.6,3248.0h81.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.6z"><title>Jamaica-179 St (F) 5:20 PM, Aug-Dec 2025: 223</title></path>
-<text x="524.2" y="3258.0">223</text>
-<text x="365.8" y="3278.0" class="label" text-anchor="end">59 St-Columbus Circle (1), Uptown</text>
-<text x="426.6" y="3278.0" class="label" text-anchor="end">5:13 PM</text>
-<path class="s0" d="M434.6,3268.0h81.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.2z"><title>59 St-Columbus Circle (1), Uptown 5:13 PM, Aug-Dec 2025: 222</title></path>
+<text x="365.8" y="3258.0" class="label" text-anchor="end">59 St-Columbus Circle (1), Uptown</text>
+<text x="426.6" y="3258.0" class="label" text-anchor="end">5:13 PM</text>
+<path class="s0" d="M434.6,3248.0h81.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.2z"><title>59 St-Columbus Circle (1), Uptown 5:13 PM, Aug-Dec 2025: 222</title></path>
+<text x="523.8" y="3258.0">222</text>
+<text x="365.8" y="3278.0" class="label" text-anchor="end">4 Av-9 St (R), Manhattan</text>
+<text x="426.6" y="3278.0" class="label" text-anchor="end">7:54 AM</text>
+<path class="s0" d="M434.6,3268.0h81.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.2z"><title>4 Av-9 St (R), Manhattan 7:54 AM, Aug-Dec 2025: 222</title></path>
 <text x="523.8" y="3278.0">222</text>
-<text x="365.8" y="3298.0" class="label" text-anchor="end">4 Av-9 St (R), Manhattan</text>
-<text x="426.6" y="3298.0" class="label" text-anchor="end">7:54 AM</text>
-<path class="s0" d="M434.6,3288.0h81.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.2z"><title>4 Av-9 St (R), Manhattan 7:54 AM, Aug-Dec 2025: 222</title></path>
-<text x="523.8" y="3298.0">222</text>
-<text x="365.8" y="3318.0" class="label" text-anchor="end">168 St-Washington Hts (1), Downtown</text>
-<text x="426.6" y="3318.0" class="label" text-anchor="end">9:04 AM</text>
-<path class="s0" d="M434.6,3308.0h80.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.9z"><title>168 St-Washington Hts (1), Downtown 9:04 AM, Aug-Dec 2025: 221</title></path>
-<text x="523.5" y="3318.0">221</text>
-<text x="365.8" y="3338.0" class="label" text-anchor="end">Broadway Junction (J,Z), Manhattan</text>
-<text x="426.6" y="3338.0" class="label" text-anchor="end">6:46 AM</text>
-<path class="s0" d="M434.6,3328.0h80.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.5z"><title>Broadway Junction (J,Z), Manhattan 6:46 AM, Aug-Dec 2025: 220</title></path>
+<text x="365.8" y="3298.0" class="label" text-anchor="end">168 St-Washington Hts (1), Downtown</text>
+<text x="426.6" y="3298.0" class="label" text-anchor="end">9:04 AM</text>
+<path class="s0" d="M434.6,3288.0h80.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.9z"><title>168 St-Washington Hts (1), Downtown 9:04 AM, Aug-Dec 2025: 221</title></path>
+<text x="523.5" y="3298.0">221</text>
+<text x="365.8" y="3318.0" class="label" text-anchor="end">Broadway Junction (J,Z), Manhattan</text>
+<text x="426.6" y="3318.0" class="label" text-anchor="end">6:46 AM</text>
+<path class="s0" d="M434.6,3308.0h80.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.5z"><title>Broadway Junction (J,Z), Manhattan 6:46 AM, Aug-Dec 2025: 220</title></path>
+<text x="523.1" y="3318.0">220</text>
+<text x="365.8" y="3338.0" class="label" text-anchor="end">Nevins St (2,3,4,5), Manhattan</text>
+<text x="426.6" y="3338.0" class="label" text-anchor="end">7:20 AM</text>
+<path class="s0" d="M434.6,3328.0h80.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.5z"><title>Nevins St (2,3,4,5), Manhattan 7:20 AM, Aug-Dec 2025: 220</title></path>
 <text x="523.1" y="3338.0">220</text>
-<text x="365.8" y="3358.0" class="label" text-anchor="end">Nevins St (2,3,4,5), Manhattan</text>
-<text x="426.6" y="3358.0" class="label" text-anchor="end">7:20 AM</text>
-<path class="s0" d="M434.6,3348.0h80.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.5z"><title>Nevins St (2,3,4,5), Manhattan 7:20 AM, Aug-Dec 2025: 220</title></path>
+<text x="365.8" y="3358.0" class="label" text-anchor="end">Jamaica-179 St (F), Manhattan</text>
+<text x="426.6" y="3358.0" class="label" text-anchor="end">5:15 AM</text>
+<path class="s0" d="M434.6,3348.0h80.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.5z"><title>Jamaica-179 St (F), Manhattan 5:15 AM, Aug-Dec 2025: 220</title></path>
 <text x="523.1" y="3358.0">220</text>
-<text x="365.8" y="3378.0" class="label" text-anchor="end">Jamaica-179 St (F), Manhattan</text>
-<text x="426.6" y="3378.0" class="label" text-anchor="end">5:15 AM</text>
-<path class="s0" d="M434.6,3368.0h80.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.5z"><title>Jamaica-179 St (F), Manhattan 5:15 AM, Aug-Dec 2025: 220</title></path>
-<text x="523.1" y="3378.0">220</text>
-<text x="365.8" y="3398.0" class="label" text-anchor="end">Parkchester (6), NB</text>
-<text x="426.6" y="3398.0" class="label" text-anchor="end">4:04 PM</text>
-<path class="s0" d="M434.6,3388.0h79.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-79.7z"><title>Parkchester (6), NB 4:04 PM, Aug-Dec 2025: 218</title></path>
-<text x="522.3" y="3398.0">218</text>
-<text x="365.8" y="3418.0" class="label" text-anchor="end">W 4 St-Wash Sq (A,C,E), Downtown</text>
-<text x="426.6" y="3418.0" class="label" text-anchor="end">6:37 PM</text>
-<path class="s0" d="M434.6,3408.0h79.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-79.3z"><title>W 4 St-Wash Sq (A,C,E), Downtown 6:37 PM, Aug-Dec 2025: 217</title></path>
+<text x="365.8" y="3378.0" class="label" text-anchor="end">Parkchester (6), NB</text>
+<text x="426.6" y="3378.0" class="label" text-anchor="end">4:04 PM</text>
+<path class="s0" d="M434.6,3368.0h79.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-79.7z"><title>Parkchester (6), NB 4:04 PM, Aug-Dec 2025: 218</title></path>
+<text x="522.3" y="3378.0">218</text>
+<text x="365.8" y="3398.0" class="label" text-anchor="end">W 4 St-Wash Sq (A,C,E), Downtown</text>
+<text x="426.6" y="3398.0" class="label" text-anchor="end">6:37 PM</text>
+<path class="s0" d="M434.6,3388.0h79.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-79.3z"><title>W 4 St-Wash Sq (A,C,E), Downtown 6:37 PM, Aug-Dec 2025: 217</title></path>
+<text x="521.9" y="3398.0">217</text>
+<text x="365.8" y="3418.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Downtown</text>
+<text x="426.6" y="3418.0" class="label" text-anchor="end">5:33 PM</text>
+<path class="s0" d="M434.6,3408.0h79.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-79.3z"><title>34 St-Penn Station (1,2,3), Downtown 5:33 PM, Aug-Dec 2025: 217</title></path>
 <text x="521.9" y="3418.0">217</text>
-<text x="365.8" y="3438.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Downtown</text>
-<text x="426.6" y="3438.0" class="label" text-anchor="end">5:33 PM</text>
-<path class="s0" d="M434.6,3428.0h79.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-79.3z"><title>34 St-Penn Station (1,2,3), Downtown 5:33 PM, Aug-Dec 2025: 217</title></path>
-<text x="521.9" y="3438.0">217</text>
-<text x="365.8" y="3458.0" class="label" text-anchor="end">168 St (A,C), Downtown</text>
-<text x="426.6" y="3458.0" class="label" text-anchor="end">7:22 AM</text>
-<path class="s0" d="M434.6,3448.0h78.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.9z"><title>168 St (A,C), Downtown 7:22 AM, Aug-Dec 2025: 216</title></path>
-<text x="521.5" y="3458.0">216</text>
-<text x="365.8" y="3478.0" class="label" text-anchor="end">14 St (A,C,E), Uptown</text>
-<text x="426.6" y="3478.0" class="label" text-anchor="end">3:06 PM</text>
-<path class="s0" d="M434.6,3468.0h78.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.2z"><title>14 St (A,C,E), Uptown 3:06 PM, Aug-Dec 2025: 214</title></path>
-<text x="520.8" y="3478.0">214</text>
-<text x="365.8" y="3498.0" class="label" text-anchor="end">59 St (4,5,6), Downtown 6</text>
-<text x="426.6" y="3498.0" class="label" text-anchor="end">3:46 PM</text>
-<path class="s0" d="M434.6,3488.0h77.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.8z"><title>59 St (4,5,6), Downtown 6 3:46 PM, Aug-Dec 2025: 213</title></path>
-<text x="520.4" y="3498.0">213</text>
-<text x="365.8" y="3518.0" class="label" text-anchor="end">Canal St (J,Z), Downtown, platform unknown</text>
-<text x="426.6" y="3518.0" class="label" text-anchor="end">9:10 AM</text>
-<path class="s0" d="M434.6,3508.0h77.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.4z"><title>Canal St (J,Z), Downtown, platform unknown 9:10 AM, Aug-Dec 2025: 212</title></path>
-<text x="520.0" y="3518.0">212</text>
-<text x="365.8" y="3538.0" class="label" text-anchor="end">7 Av (F,G), NB</text>
-<text x="426.6" y="3538.0" class="label" text-anchor="end">7:30 AM</text>
-<path class="s0" d="M434.6,3528.0h77.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.0z"><title>7 Av (F,G), NB 7:30 AM, Aug-Dec 2025: 211</title></path>
-<text x="519.6" y="3538.0">211</text>
-<text x="365.8" y="3558.0" class="label" text-anchor="end">Grand St (B,D), Brooklyn</text>
-<text x="426.6" y="3558.0" class="label" text-anchor="end">5:56 PM</text>
-<path class="s0" d="M434.6,3548.0h76.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.6z"><title>Grand St (B,D), Brooklyn 5:56 PM, Aug-Dec 2025: 210</title></path>
+<text x="365.8" y="3438.0" class="label" text-anchor="end">168 St (A,C), Downtown</text>
+<text x="426.6" y="3438.0" class="label" text-anchor="end">7:22 AM</text>
+<path class="s0" d="M434.6,3428.0h78.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.9z"><title>168 St (A,C), Downtown 7:22 AM, Aug-Dec 2025: 216</title></path>
+<text x="521.5" y="3438.0">216</text>
+<text x="365.8" y="3458.0" class="label" text-anchor="end">14 St (A,C,E), Uptown</text>
+<text x="426.6" y="3458.0" class="label" text-anchor="end">3:06 PM</text>
+<path class="s0" d="M434.6,3448.0h78.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.2z"><title>14 St (A,C,E), Uptown 3:06 PM, Aug-Dec 2025: 214</title></path>
+<text x="520.8" y="3458.0">214</text>
+<text x="365.8" y="3478.0" class="label" text-anchor="end">59 St (4,5,6), Downtown 6</text>
+<text x="426.6" y="3478.0" class="label" text-anchor="end">3:46 PM</text>
+<path class="s0" d="M434.6,3468.0h77.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.8z"><title>59 St (4,5,6), Downtown 6 3:46 PM, Aug-Dec 2025: 213</title></path>
+<text x="520.4" y="3478.0">213</text>
+<text x="365.8" y="3498.0" class="label" text-anchor="end">Canal St (J,Z), Downtown, platform unknown</text>
+<text x="426.6" y="3498.0" class="label" text-anchor="end">9:10 AM</text>
+<path class="s0" d="M434.6,3488.0h77.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.4z"><title>Canal St (J,Z), Downtown, platform unknown 9:10 AM, Aug-Dec 2025: 212</title></path>
+<text x="520.0" y="3498.0">212</text>
+<text x="365.8" y="3518.0" class="label" text-anchor="end">7 Av (F,G), NB</text>
+<text x="426.6" y="3518.0" class="label" text-anchor="end">7:30 AM</text>
+<path class="s0" d="M434.6,3508.0h77.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.0z"><title>7 Av (F,G), NB 7:30 AM, Aug-Dec 2025: 211</title></path>
+<text x="519.6" y="3518.0">211</text>
+<text x="365.8" y="3538.0" class="label" text-anchor="end">Grand St (B,D), Brooklyn</text>
+<text x="426.6" y="3538.0" class="label" text-anchor="end">5:56 PM</text>
+<path class="s0" d="M434.6,3528.0h76.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.6z"><title>Grand St (B,D), Brooklyn 5:56 PM, Aug-Dec 2025: 210</title></path>
+<text x="519.2" y="3538.0">210</text>
+<text x="365.8" y="3558.0" class="label" text-anchor="end">Newkirk Plaza (B,Q), SB</text>
+<text x="426.6" y="3558.0" class="label" text-anchor="end">6:38 PM</text>
+<path class="s0" d="M434.6,3548.0h76.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.6z"><title>Newkirk Plaza (B,Q), SB 6:38 PM, Aug-Dec 2025: 210</title></path>
 <text x="519.2" y="3558.0">210</text>
-<text x="365.8" y="3578.0" class="label" text-anchor="end">Newkirk Plaza (B,Q), SB</text>
-<text x="426.6" y="3578.0" class="label" text-anchor="end">6:38 PM</text>
-<path class="s0" d="M434.6,3568.0h76.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.6z"><title>Newkirk Plaza (B,Q), SB 6:38 PM, Aug-Dec 2025: 210</title></path>
-<text x="519.2" y="3578.0">210</text>
-<text x="365.8" y="3598.0" class="label" text-anchor="end">Flatbush Av-Brooklyn College (2,5)</text>
-<text x="426.6" y="3598.0" class="label" text-anchor="end">6:13 PM</text>
-<path class="s0" d="M434.6,3588.0h76.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.3z"><title>Flatbush Av-Brooklyn College (2,5) 6:13 PM, Aug-Dec 2025: 209</title></path>
+<text x="365.8" y="3578.0" class="label" text-anchor="end">Flatbush Av-Brooklyn College (2,5)</text>
+<text x="426.6" y="3578.0" class="label" text-anchor="end">6:13 PM</text>
+<path class="s0" d="M434.6,3568.0h76.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.3z"><title>Flatbush Av-Brooklyn College (2,5) 6:13 PM, Aug-Dec 2025: 209</title></path>
+<text x="518.9" y="3578.0">209</text>
+<text x="365.8" y="3598.0" class="label" text-anchor="end">Fulton St (J,Z), Downtown</text>
+<text x="426.6" y="3598.0" class="label" text-anchor="end">9:12 AM</text>
+<path class="s0" d="M434.6,3588.0h76.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.3z"><title>Fulton St (J,Z), Downtown 9:12 AM, Aug-Dec 2025: 209</title></path>
 <text x="518.9" y="3598.0">209</text>
-<text x="365.8" y="3618.0" class="label" text-anchor="end">Fulton St (J,Z), Downtown</text>
-<text x="426.6" y="3618.0" class="label" text-anchor="end">9:12 AM</text>
-<path class="s0" d="M434.6,3608.0h76.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.3z"><title>Fulton St (J,Z), Downtown 9:12 AM, Aug-Dec 2025: 209</title></path>
-<text x="518.9" y="3618.0">209</text>
-<text x="365.8" y="3638.0" class="label" text-anchor="end">Canal St (N,Q), Uptown</text>
-<text x="426.6" y="3638.0" class="label" text-anchor="end">9:50 AM</text>
-<path class="s0" d="M434.6,3628.0h75.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.9z"><title>Canal St (N,Q), Uptown 9:50 AM, Aug-Dec 2025: 208</title></path>
+<text x="365.8" y="3618.0" class="label" text-anchor="end">Canal St (N,Q), Uptown</text>
+<text x="426.6" y="3618.0" class="label" text-anchor="end">9:50 AM</text>
+<path class="s0" d="M434.6,3608.0h75.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.9z"><title>Canal St (N,Q), Uptown 9:50 AM, Aug-Dec 2025: 208</title></path>
+<text x="518.5" y="3618.0">208</text>
+<text x="365.8" y="3638.0" class="label" text-anchor="end">Coney Island-Stillwell Av (D,F,N,Q), Q</text>
+<text x="426.6" y="3638.0" class="label" text-anchor="end">5:36 PM</text>
+<path class="s0" d="M434.6,3628.0h75.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.9z"><title>Coney Island-Stillwell Av (D,F,N,Q), Q 5:36 PM, Aug-Dec 2025: 208</title></path>
 <text x="518.5" y="3638.0">208</text>
-<text x="365.8" y="3658.0" class="label" text-anchor="end">Coney Island-Stillwell Av (D,F,N,Q), Q</text>
-<text x="426.6" y="3658.0" class="label" text-anchor="end">5:36 PM</text>
-<path class="s0" d="M434.6,3648.0h75.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.9z"><title>Coney Island-Stillwell Av (D,F,N,Q), Q 5:36 PM, Aug-Dec 2025: 208</title></path>
+<text x="365.8" y="3658.0" class="label" text-anchor="end">Grand Av-Newtown (M,R), Outbound</text>
+<text x="426.6" y="3658.0" class="label" text-anchor="end">5:46 PM</text>
+<path class="s0" d="M434.6,3648.0h75.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.9z"><title>Grand Av-Newtown (M,R), Outbound 5:46 PM, Aug-Dec 2025: 208</title></path>
 <text x="518.5" y="3658.0">208</text>
-<text x="365.8" y="3678.0" class="label" text-anchor="end">Grand Av-Newtown (M,R), Outbound</text>
-<text x="426.6" y="3678.0" class="label" text-anchor="end">5:46 PM</text>
-<path class="s0" d="M434.6,3668.0h75.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.9z"><title>Grand Av-Newtown (M,R), Outbound 5:46 PM, Aug-Dec 2025: 208</title></path>
+<text x="365.8" y="3678.0" class="label" text-anchor="end">90 St-Elmhurst Av (7), Outbound</text>
+<text x="426.6" y="3678.0" class="label" text-anchor="end">4:41 PM</text>
+<path class="s0" d="M434.6,3668.0h75.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.9z"><title>90 St-Elmhurst Av (7), Outbound 4:41 PM, Aug-Dec 2025: 208</title></path>
 <text x="518.5" y="3678.0">208</text>
-<text x="365.8" y="3698.0" class="label" text-anchor="end">90 St-Elmhurst Av (7), Outbound</text>
-<text x="426.6" y="3698.0" class="label" text-anchor="end">4:41 PM</text>
-<path class="s0" d="M434.6,3688.0h75.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.9z"><title>90 St-Elmhurst Av (7), Outbound 4:41 PM, Aug-Dec 2025: 208</title></path>
-<text x="518.5" y="3698.0">208</text>
-<text x="365.8" y="3718.0" class="label" text-anchor="end">77 St (6), Uptown</text>
-<text x="426.6" y="3718.0" class="label" text-anchor="end">7:23 AM</text>
-<path class="s0" d="M434.6,3708.0h75.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.5z"><title>77 St (6), Uptown 7:23 AM, Aug-Dec 2025: 207</title></path>
+<text x="365.8" y="3698.0" class="label" text-anchor="end">77 St (6), Uptown</text>
+<text x="426.6" y="3698.0" class="label" text-anchor="end">7:23 AM</text>
+<path class="s0" d="M434.6,3688.0h75.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.5z"><title>77 St (6), Uptown 7:23 AM, Aug-Dec 2025: 207</title></path>
+<text x="518.1" y="3698.0">207</text>
+<text x="365.8" y="3718.0" class="label" text-anchor="end">Court Sq (7), Manhattan</text>
+<text x="426.6" y="3718.0" class="label" text-anchor="end">6:32 AM</text>
+<path class="s0" d="M434.6,3708.0h75.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.5z"><title>Court Sq (7), Manhattan 6:32 AM, Aug-Dec 2025: 207</title></path>
 <text x="518.1" y="3718.0">207</text>
-<text x="365.8" y="3738.0" class="label" text-anchor="end">Court Sq (7), Manhattan</text>
-<text x="426.6" y="3738.0" class="label" text-anchor="end">6:32 AM</text>
-<path class="s0" d="M434.6,3728.0h75.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.5z"><title>Court Sq (7), Manhattan 6:32 AM, Aug-Dec 2025: 207</title></path>
+<text x="365.8" y="3738.0" class="label" text-anchor="end">Myrtle Av (J,M,Z), Outbound</text>
+<text x="426.6" y="3738.0" class="label" text-anchor="end">12:13 AM</text>
+<path class="s0" d="M434.6,3728.0h75.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.5z"><title>Myrtle Av (J,M,Z), Outbound 12:13 AM, Aug-Dec 2025: 207</title></path>
 <text x="518.1" y="3738.0">207</text>
-<text x="365.8" y="3758.0" class="label" text-anchor="end">Myrtle Av (J,M,Z), Outbound</text>
-<text x="426.6" y="3758.0" class="label" text-anchor="end">12:13 AM</text>
-<path class="s0" d="M434.6,3748.0h75.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.5z"><title>Myrtle Av (J,M,Z), Outbound 12:13 AM, Aug-Dec 2025: 207</title></path>
-<text x="518.1" y="3758.0">207</text>
-<text x="365.8" y="3778.0" class="label" text-anchor="end">Fulton St (2,3)</text>
-<text x="426.6" y="3778.0" class="label" text-anchor="end">8:44 AM</text>
-<path class="s0" d="M434.6,3768.0h74.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.7z"><title>Fulton St (2,3) 8:44 AM, Aug-Dec 2025: 205</title></path>
-<text x="517.3" y="3778.0">205</text>
-<text x="365.8" y="3798.0" class="label" text-anchor="end">Metropolitan Av (G), SB</text>
-<text x="426.6" y="3798.0" class="label" text-anchor="end">5:38 PM</text>
-<path class="s0" d="M434.6,3788.0h74.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.3z"><title>Metropolitan Av (G), SB 5:38 PM, Aug-Dec 2025: 204</title></path>
-<text x="516.9" y="3798.0">204</text>
-<text x="365.8" y="3818.0" class="label" text-anchor="end">Sheepshead Bay (B,Q), Manhattan</text>
-<text x="426.6" y="3818.0" class="label" text-anchor="end">7:46 AM</text>
-<path class="s0" d="M434.6,3808.0h74.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.0z"><title>Sheepshead Bay (B,Q), Manhattan 7:46 AM, Aug-Dec 2025: 203</title></path>
-<text x="516.6" y="3818.0">203</text>
-<text x="365.8" y="3838.0" class="label" text-anchor="end">23 St (F,M), Uptown</text>
-<text x="426.6" y="3838.0" class="label" text-anchor="end">8:50 AM</text>
-<path class="s0" d="M434.6,3828.0h73.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.6z"><title>23 St (F,M), Uptown 8:50 AM, Aug-Dec 2025: 202</title></path>
-<text x="516.2" y="3838.0">202</text>
-<text x="365.8" y="3858.0" class="label" text-anchor="end">57 St-7 Av (N,Q,R,W), Uptown</text>
-<text x="426.6" y="3858.0" class="label" text-anchor="end">5:44 PM</text>
-<path class="s0" d="M434.6,3848.0h73.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.2z"><title>57 St-7 Av (N,Q,R,W), Uptown 5:44 PM, Aug-Dec 2025: 201</title></path>
+<text x="365.8" y="3758.0" class="label" text-anchor="end">Fulton St (2,3)</text>
+<text x="426.6" y="3758.0" class="label" text-anchor="end">8:44 AM</text>
+<path class="s0" d="M434.6,3748.0h74.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.7z"><title>Fulton St (2,3) 8:44 AM, Aug-Dec 2025: 205</title></path>
+<text x="517.3" y="3758.0">205</text>
+<text x="365.8" y="3778.0" class="label" text-anchor="end">Metropolitan Av (G), SB</text>
+<text x="426.6" y="3778.0" class="label" text-anchor="end">5:38 PM</text>
+<path class="s0" d="M434.6,3768.0h74.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.3z"><title>Metropolitan Av (G), SB 5:38 PM, Aug-Dec 2025: 204</title></path>
+<text x="516.9" y="3778.0">204</text>
+<text x="365.8" y="3798.0" class="label" text-anchor="end">Sheepshead Bay (B,Q), Manhattan</text>
+<text x="426.6" y="3798.0" class="label" text-anchor="end">7:46 AM</text>
+<path class="s0" d="M434.6,3788.0h74.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.0z"><title>Sheepshead Bay (B,Q), Manhattan 7:46 AM, Aug-Dec 2025: 203</title></path>
+<text x="516.6" y="3798.0">203</text>
+<text x="365.8" y="3818.0" class="label" text-anchor="end">23 St (F,M), Uptown</text>
+<text x="426.6" y="3818.0" class="label" text-anchor="end">8:50 AM</text>
+<path class="s0" d="M434.6,3808.0h73.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.6z"><title>23 St (F,M), Uptown 8:50 AM, Aug-Dec 2025: 202</title></path>
+<text x="516.2" y="3818.0">202</text>
+<text x="365.8" y="3838.0" class="label" text-anchor="end">57 St-7 Av (N,Q,R,W), Uptown</text>
+<text x="426.6" y="3838.0" class="label" text-anchor="end">5:44 PM</text>
+<path class="s0" d="M434.6,3828.0h73.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.2z"><title>57 St-7 Av (N,Q,R,W), Uptown 5:44 PM, Aug-Dec 2025: 201</title></path>
+<text x="515.8" y="3838.0">201</text>
+<text x="365.8" y="3858.0" class="label" text-anchor="end">Flatbush Av-Brooklyn College (2,5), Manhattan</text>
+<text x="426.6" y="3858.0" class="label" text-anchor="end">7:59 AM</text>
+<path class="s0" d="M434.6,3848.0h73.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.2z"><title>Flatbush Av-Brooklyn College (2,5), Manhattan 7:59 AM, Aug-Dec 2025: 201</title></path>
 <text x="515.8" y="3858.0">201</text>
-<text x="365.8" y="3878.0" class="label" text-anchor="end">Flatbush Av-Brooklyn College (2,5), Manhattan</text>
-<text x="426.6" y="3878.0" class="label" text-anchor="end">7:59 AM</text>
-<path class="s0" d="M434.6,3868.0h73.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.2z"><title>Flatbush Av-Brooklyn College (2,5), Manhattan 7:59 AM, Aug-Dec 2025: 201</title></path>
+<text x="365.8" y="3878.0" class="label" text-anchor="end">Hunts Point Av (6), Manhattan</text>
+<text x="426.6" y="3878.0" class="label" text-anchor="end">9:04 AM</text>
+<path class="s0" d="M434.6,3868.0h73.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.2z"><title>Hunts Point Av (6), Manhattan 9:04 AM, Aug-Dec 2025: 201</title></path>
 <text x="515.8" y="3878.0">201</text>
-<text x="365.8" y="3898.0" class="label" text-anchor="end">Hunts Point Av (6), Manhattan</text>
-<text x="426.6" y="3898.0" class="label" text-anchor="end">9:04 AM</text>
-<path class="s0" d="M434.6,3888.0h73.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.2z"><title>Hunts Point Av (6), Manhattan 9:04 AM, Aug-Dec 2025: 201</title></path>
-<text x="515.8" y="3898.0">201</text>
-<text x="365.8" y="3918.0" class="label" text-anchor="end">23 St (F,M), Downtown</text>
-<text x="426.6" y="3918.0" class="label" text-anchor="end">5:37 PM</text>
-<path class="s0" d="M434.6,3908.0h72.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-72.4z"><title>23 St (F,M), Downtown 5:37 PM, Aug-Dec 2025: 199</title></path>
-<text x="515.0" y="3918.0">199</text>
-<text x="365.8" y="3938.0" class="label" text-anchor="end">Church Av (B,Q), SB</text>
-<text x="426.6" y="3938.0" class="label" text-anchor="end">6:34 PM</text>
-<path class="s0" d="M434.6,3928.0h71.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.3z"><title>Church Av (B,Q), SB 6:34 PM, Aug-Dec 2025: 196</title></path>
-<text x="513.9" y="3938.0">196</text>
-<text x="365.8" y="3958.0" class="label" text-anchor="end">30 Av (N,W), Manhattan</text>
-<text x="426.6" y="3958.0" class="label" text-anchor="end">8:52 AM</text>
-<path class="s0" d="M434.6,3948.0h70.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-70.9z"><title>30 Av (N,W), Manhattan 8:52 AM, Aug-Dec 2025: 195</title></path>
-<text x="513.5" y="3958.0">195</text>
-<text x="365.8" y="3978.0" class="label" text-anchor="end">Prospect Park (B,Q,S), NB &amp; SB</text>
-<text x="426.6" y="3978.0" class="label" text-anchor="end">8:48 AM</text>
-<path class="s0" d="M434.6,3968.0h70.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-70.5z"><title>Prospect Park (B,Q,S), NB &amp; SB 8:48 AM, Aug-Dec 2025: 194</title></path>
-<text x="513.1" y="3978.0">194</text>
-<text x="365.8" y="3998.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Manhattan</text>
-<text x="426.6" y="3998.0" class="label" text-anchor="end">8:20 AM</text>
-<path class="s0" d="M434.6,3988.0h70.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-70.1z"><title>Atlantic Av (2,3,4,5), Manhattan 8:20 AM, Aug-Dec 2025: 193</title></path>
+<text x="365.8" y="3898.0" class="label" text-anchor="end">23 St (F,M), Downtown</text>
+<text x="426.6" y="3898.0" class="label" text-anchor="end">5:37 PM</text>
+<path class="s0" d="M434.6,3888.0h72.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-72.4z"><title>23 St (F,M), Downtown 5:37 PM, Aug-Dec 2025: 199</title></path>
+<text x="515.0" y="3898.0">199</text>
+<text x="365.8" y="3918.0" class="label" text-anchor="end">Church Av (B,Q), SB</text>
+<text x="426.6" y="3918.0" class="label" text-anchor="end">6:34 PM</text>
+<path class="s0" d="M434.6,3908.0h71.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.3z"><title>Church Av (B,Q), SB 6:34 PM, Aug-Dec 2025: 196</title></path>
+<text x="513.9" y="3918.0">196</text>
+<text x="365.8" y="3938.0" class="label" text-anchor="end">30 Av (N,W), Manhattan</text>
+<text x="426.6" y="3938.0" class="label" text-anchor="end">8:52 AM</text>
+<path class="s0" d="M434.6,3928.0h70.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-70.9z"><title>30 Av (N,W), Manhattan 8:52 AM, Aug-Dec 2025: 195</title></path>
+<text x="513.5" y="3938.0">195</text>
+<text x="365.8" y="3958.0" class="label" text-anchor="end">Prospect Park (B,Q,S), NB &amp; SB</text>
+<text x="426.6" y="3958.0" class="label" text-anchor="end">8:48 AM</text>
+<path class="s0" d="M434.6,3948.0h70.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-70.5z"><title>Prospect Park (B,Q,S), NB &amp; SB 8:48 AM, Aug-Dec 2025: 194</title></path>
+<text x="513.1" y="3958.0">194</text>
+<text x="365.8" y="3978.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Manhattan</text>
+<text x="426.6" y="3978.0" class="label" text-anchor="end">8:20 AM</text>
+<path class="s0" d="M434.6,3968.0h70.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-70.1z"><title>Atlantic Av (2,3,4,5), Manhattan 8:20 AM, Aug-Dec 2025: 193</title></path>
+<text x="512.7" y="3978.0">193</text>
+<text x="365.8" y="3998.0" class="label" text-anchor="end">111 St (7), Outbound</text>
+<text x="426.6" y="3998.0" class="label" text-anchor="end">5:16 PM</text>
+<path class="s0" d="M434.6,3988.0h70.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-70.1z"><title>111 St (7), Outbound 5:16 PM, Aug-Dec 2025: 193</title></path>
 <text x="512.7" y="3998.0">193</text>
-<text x="365.8" y="4018.0" class="label" text-anchor="end">111 St (7), Outbound</text>
-<text x="426.6" y="4018.0" class="label" text-anchor="end">5:16 PM</text>
-<path class="s0" d="M434.6,4008.0h70.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-70.1z"><title>111 St (7), Outbound 5:16 PM, Aug-Dec 2025: 193</title></path>
-<text x="512.7" y="4018.0">193</text>
-<text x="365.8" y="4038.0" class="label" text-anchor="end">149 St-Hostos (4), Manhattan</text>
-<text x="426.6" y="4038.0" class="label" text-anchor="end">8:57 AM</text>
-<path class="s0" d="M434.6,4028.0h69.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-69.3z"><title>149 St-Hostos (4), Manhattan 8:57 AM, Aug-Dec 2025: 191</title></path>
+<text x="365.8" y="4018.0" class="label" text-anchor="end">149 St-Hostos (4), Manhattan</text>
+<text x="426.6" y="4018.0" class="label" text-anchor="end">8:57 AM</text>
+<path class="s0" d="M434.6,4008.0h69.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-69.3z"><title>149 St-Hostos (4), Manhattan 8:57 AM, Aug-Dec 2025: 191</title></path>
+<text x="511.9" y="4018.0">191</text>
+<text x="365.8" y="4038.0" class="label" text-anchor="end">Grand Av-Newtown (M,R), Manhattan</text>
+<text x="426.6" y="4038.0" class="label" text-anchor="end">8:53 AM</text>
+<path class="s0" d="M434.6,4028.0h69.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-69.3z"><title>Grand Av-Newtown (M,R), Manhattan 8:53 AM, Aug-Dec 2025: 191</title></path>
 <text x="511.9" y="4038.0">191</text>
-<text x="365.8" y="4058.0" class="label" text-anchor="end">Grand Av-Newtown (M,R), Manhattan</text>
-<text x="426.6" y="4058.0" class="label" text-anchor="end">8:53 AM</text>
-<path class="s0" d="M434.6,4048.0h69.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-69.3z"><title>Grand Av-Newtown (M,R), Manhattan 8:53 AM, Aug-Dec 2025: 191</title></path>
-<text x="511.9" y="4058.0">191</text>
-<text x="365.8" y="4078.0" class="label" text-anchor="end">5 Av/53 St (E,F), Downtown</text>
-<text x="426.6" y="4078.0" class="label" text-anchor="end">5:45 PM</text>
-<path class="s0" d="M434.6,4068.0h68.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.6z"><title>5 Av/53 St (E,F), Downtown 5:45 PM, Aug-Dec 2025: 189</title></path>
+<text x="365.8" y="4058.0" class="label" text-anchor="end">5 Av/53 St (E,F), Downtown</text>
+<text x="426.6" y="4058.0" class="label" text-anchor="end">5:45 PM</text>
+<path class="s0" d="M434.6,4048.0h68.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.6z"><title>5 Av/53 St (E,F), Downtown 5:45 PM, Aug-Dec 2025: 189</title></path>
+<text x="511.2" y="4058.0">189</text>
+<text x="365.8" y="4078.0" class="label" text-anchor="end">Canal St (J,Z)</text>
+<text x="426.6" y="4078.0" class="label" text-anchor="end">12:11 AM</text>
+<path class="s0" d="M434.6,4068.0h68.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.6z"><title>Canal St (J,Z) 12:11 AM, Aug-Dec 2025: 189</title></path>
 <text x="511.2" y="4078.0">189</text>
-<text x="365.8" y="4098.0" class="label" text-anchor="end">Canal St (J,Z)</text>
-<text x="426.6" y="4098.0" class="label" text-anchor="end">12:11 AM</text>
-<path class="s0" d="M434.6,4088.0h68.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.6z"><title>Canal St (J,Z) 12:11 AM, Aug-Dec 2025: 189</title></path>
-<text x="511.2" y="4098.0">189</text>
-<text x="365.8" y="4118.0" class="label" text-anchor="end">14 St (F,M), Uptown</text>
-<text x="426.6" y="4118.0" class="label" text-anchor="end">4:18 PM</text>
-<path class="s0" d="M434.6,4108.0h68.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.2z"><title>14 St (F,M), Uptown 4:18 PM, Aug-Dec 2025: 188</title></path>
-<text x="510.8" y="4118.0">188</text>
-<text x="365.8" y="4138.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Outbound</text>
-<text x="426.6" y="4138.0" class="label" text-anchor="end">5:57 PM</text>
-<path class="s0" d="M434.6,4128.0h67.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.8z"><title>Atlantic Av (2,3,4,5), Outbound 5:57 PM, Aug-Dec 2025: 187</title></path>
+<text x="365.8" y="4098.0" class="label" text-anchor="end">14 St (F,M), Uptown</text>
+<text x="426.6" y="4098.0" class="label" text-anchor="end">4:18 PM</text>
+<path class="s0" d="M434.6,4088.0h68.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.2z"><title>14 St (F,M), Uptown 4:18 PM, Aug-Dec 2025: 188</title></path>
+<text x="510.8" y="4098.0">188</text>
+<text x="365.8" y="4118.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Outbound</text>
+<text x="426.6" y="4118.0" class="label" text-anchor="end">5:57 PM</text>
+<path class="s0" d="M434.6,4108.0h67.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.8z"><title>Atlantic Av (2,3,4,5), Outbound 5:57 PM, Aug-Dec 2025: 187</title></path>
+<text x="510.4" y="4118.0">187</text>
+<text x="365.8" y="4138.0" class="label" text-anchor="end">Sheepshead Bay (B,Q), SB</text>
+<text x="426.6" y="4138.0" class="label" text-anchor="end">5:36 PM</text>
+<path class="s0" d="M434.6,4128.0h67.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.8z"><title>Sheepshead Bay (B,Q), SB 5:36 PM, Aug-Dec 2025: 187</title></path>
 <text x="510.4" y="4138.0">187</text>
-<text x="365.8" y="4158.0" class="label" text-anchor="end">Sheepshead Bay (B,Q), SB</text>
-<text x="426.6" y="4158.0" class="label" text-anchor="end">5:36 PM</text>
-<path class="s0" d="M434.6,4148.0h67.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.8z"><title>Sheepshead Bay (B,Q), SB 5:36 PM, Aug-Dec 2025: 187</title></path>
-<text x="510.4" y="4158.0">187</text>
-<text x="365.8" y="4178.0" class="label" text-anchor="end">Mets-Willets Point (7), Manhattan</text>
-<text x="426.6" y="4178.0" class="label" text-anchor="end">11:01 PM</text>
-<path class="s0" d="M434.6,4168.0h67.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.4z"><title>Mets-Willets Point (7), Manhattan 11:01 PM, Aug-Dec 2025: 186</title></path>
-<text x="510.0" y="4178.0">186</text>
-<text x="365.8" y="4198.0" class="label" text-anchor="end">86 St (4,5,6), Downtown 6</text>
-<text x="426.6" y="4198.0" class="label" text-anchor="end">8:46 AM</text>
-<path class="s0" d="M434.6,4188.0h67.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.0z"><title>86 St (4,5,6), Downtown 6 8:46 AM, Aug-Dec 2025: 185</title></path>
+<text x="365.8" y="4158.0" class="label" text-anchor="end">Mets-Willets Point (7), Manhattan</text>
+<text x="426.6" y="4158.0" class="label" text-anchor="end">11:01 PM</text>
+<path class="s0" d="M434.6,4148.0h67.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.4z"><title>Mets-Willets Point (7), Manhattan 11:01 PM, Aug-Dec 2025: 186</title></path>
+<text x="510.0" y="4158.0">186</text>
+<text x="365.8" y="4178.0" class="label" text-anchor="end">86 St (4,5,6), Downtown 6</text>
+<text x="426.6" y="4178.0" class="label" text-anchor="end">8:46 AM</text>
+<path class="s0" d="M434.6,4168.0h67.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.0z"><title>86 St (4,5,6), Downtown 6 8:46 AM, Aug-Dec 2025: 185</title></path>
+<text x="509.6" y="4178.0">185</text>
+<text x="365.8" y="4198.0" class="label" text-anchor="end">8 St-NYU (R,W), Downtown</text>
+<text x="426.6" y="4198.0" class="label" text-anchor="end">5:29 PM</text>
+<path class="s0" d="M434.6,4188.0h67.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.0z"><title>8 St-NYU (R,W), Downtown 5:29 PM, Aug-Dec 2025: 185</title></path>
 <text x="509.6" y="4198.0">185</text>
-<text x="365.8" y="4218.0" class="label" text-anchor="end">8 St-NYU (R,W), Downtown</text>
-<text x="426.6" y="4218.0" class="label" text-anchor="end">5:29 PM</text>
-<path class="s0" d="M434.6,4208.0h67.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.0z"><title>8 St-NYU (R,W), Downtown 5:29 PM, Aug-Dec 2025: 185</title></path>
+<text x="365.8" y="4218.0" class="label" text-anchor="end">Whitehall St-South Ferry (R,W), Downtown</text>
+<text x="426.6" y="4218.0" class="label" text-anchor="end">4:42 PM</text>
+<path class="s0" d="M434.6,4208.0h67.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.0z"><title>Whitehall St-South Ferry (R,W), Downtown 4:42 PM, Aug-Dec 2025: 185</title></path>
 <text x="509.6" y="4218.0">185</text>
-<text x="365.8" y="4238.0" class="label" text-anchor="end">Whitehall St-South Ferry (R,W), Downtown</text>
-<text x="426.6" y="4238.0" class="label" text-anchor="end">4:42 PM</text>
-<path class="s0" d="M434.6,4228.0h67.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.0z"><title>Whitehall St-South Ferry (R,W), Downtown 4:42 PM, Aug-Dec 2025: 185</title></path>
-<text x="509.6" y="4238.0">185</text>
-<text x="365.8" y="4258.0" class="label" text-anchor="end">Metropolitan Av (G), Queens</text>
-<text x="426.6" y="4258.0" class="label" text-anchor="end">8:17 AM</text>
-<path class="s0" d="M434.6,4248.0h66.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-66.7z"><title>Metropolitan Av (G), Queens 8:17 AM, Aug-Dec 2025: 184</title></path>
-<text x="509.3" y="4258.0">184</text>
-<text x="365.8" y="4278.0" class="label" text-anchor="end">68 St-Hunter College (6), Uptown</text>
-<text x="426.6" y="4278.0" class="label" text-anchor="end">8:31 AM</text>
-<path class="s0" d="M434.6,4268.0h65.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-65.1z"><title>68 St-Hunter College (6), Uptown 8:31 AM, Aug-Dec 2025: 180</title></path>
-<text x="507.7" y="4278.0">180</text>
-<text x="365.8" y="4298.0" class="label" text-anchor="end">Houston St (1), Downtown</text>
-<text x="426.6" y="4298.0" class="label" text-anchor="end">8:29 AM</text>
-<path class="s0" d="M434.6,4288.0h64.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.7z"><title>Houston St (1), Downtown 8:29 AM, Aug-Dec 2025: 179</title></path>
+<text x="365.8" y="4238.0" class="label" text-anchor="end">Metropolitan Av (G), Queens</text>
+<text x="426.6" y="4238.0" class="label" text-anchor="end">8:17 AM</text>
+<path class="s0" d="M434.6,4228.0h66.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-66.7z"><title>Metropolitan Av (G), Queens 8:17 AM, Aug-Dec 2025: 184</title></path>
+<text x="509.3" y="4238.0">184</text>
+<text x="365.8" y="4258.0" class="label" text-anchor="end">68 St-Hunter College (6), Uptown</text>
+<text x="426.6" y="4258.0" class="label" text-anchor="end">8:31 AM</text>
+<path class="s0" d="M434.6,4248.0h65.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-65.1z"><title>68 St-Hunter College (6), Uptown 8:31 AM, Aug-Dec 2025: 180</title></path>
+<text x="507.7" y="4258.0">180</text>
+<text x="365.8" y="4278.0" class="label" text-anchor="end">Houston St (1), Downtown</text>
+<text x="426.6" y="4278.0" class="label" text-anchor="end">8:29 AM</text>
+<path class="s0" d="M434.6,4268.0h64.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.7z"><title>Houston St (1), Downtown 8:29 AM, Aug-Dec 2025: 179</title></path>
+<text x="507.3" y="4278.0">179</text>
+<text x="365.8" y="4298.0" class="label" text-anchor="end">7 Av (F,G), SB</text>
+<text x="426.6" y="4298.0" class="label" text-anchor="end">5:29 PM</text>
+<path class="s0" d="M434.6,4288.0h64.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.7z"><title>7 Av (F,G), SB 5:29 PM, Aug-Dec 2025: 179</title></path>
 <text x="507.3" y="4298.0">179</text>
-<text x="365.8" y="4318.0" class="label" text-anchor="end">7 Av (F,G), SB</text>
-<text x="426.6" y="4318.0" class="label" text-anchor="end">5:29 PM</text>
-<path class="s0" d="M434.6,4308.0h64.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.7z"><title>7 Av (F,G), SB 5:29 PM, Aug-Dec 2025: 179</title></path>
-<text x="507.3" y="4318.0">179</text>
-<text x="365.8" y="4338.0" class="label" text-anchor="end">Church Av (B,Q), Manhattan</text>
-<text x="426.6" y="4338.0" class="label" text-anchor="end">8:54 AM</text>
-<path class="s0" d="M434.6,4328.0h64.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.4z"><title>Church Av (B,Q), Manhattan 8:54 AM, Aug-Dec 2025: 178</title></path>
-<text x="507.0" y="4338.0">178</text>
-<text x="365.8" y="4358.0" class="label" text-anchor="end">57 St (M)</text>
-<text x="426.6" y="4358.0" class="label" text-anchor="end">8:30 AM</text>
-<path class="s0" d="M434.6,4348.0h64.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.0z"><title>57 St (M) 8:30 AM, Aug-Dec 2025: 177</title></path>
+<text x="365.8" y="4318.0" class="label" text-anchor="end">Church Av (B,Q), Manhattan</text>
+<text x="426.6" y="4318.0" class="label" text-anchor="end">8:54 AM</text>
+<path class="s0" d="M434.6,4308.0h64.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.4z"><title>Church Av (B,Q), Manhattan 8:54 AM, Aug-Dec 2025: 178</title></path>
+<text x="507.0" y="4318.0">178</text>
+<text x="365.8" y="4338.0" class="label" text-anchor="end">57 St (M)</text>
+<text x="426.6" y="4338.0" class="label" text-anchor="end">8:30 AM</text>
+<path class="s0" d="M434.6,4328.0h64.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.0z"><title>57 St (M) 8:30 AM, Aug-Dec 2025: 177</title></path>
+<text x="506.6" y="4338.0">177</text>
+<text x="365.8" y="4358.0" class="label" text-anchor="end">York St (F)</text>
+<text x="426.6" y="4358.0" class="label" text-anchor="end">5:52 PM</text>
+<path class="s0" d="M434.6,4348.0h64.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.0z"><title>York St (F) 5:52 PM, Aug-Dec 2025: 177</title></path>
 <text x="506.6" y="4358.0">177</text>
-<text x="365.8" y="4378.0" class="label" text-anchor="end">York St (F)</text>
-<text x="426.6" y="4378.0" class="label" text-anchor="end">5:52 PM</text>
-<path class="s0" d="M434.6,4368.0h64.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.0z"><title>York St (F) 5:52 PM, Aug-Dec 2025: 177</title></path>
+<text x="365.8" y="4378.0" class="label" text-anchor="end">Broadway (N,W), Manhattan</text>
+<text x="426.6" y="4378.0" class="label" text-anchor="end">8:54 AM</text>
+<path class="s0" d="M434.6,4368.0h64.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.0z"><title>Broadway (N,W), Manhattan 8:54 AM, Aug-Dec 2025: 177</title></path>
 <text x="506.6" y="4378.0">177</text>
-<text x="365.8" y="4398.0" class="label" text-anchor="end">Broadway (N,W), Manhattan</text>
-<text x="426.6" y="4398.0" class="label" text-anchor="end">8:54 AM</text>
-<path class="s0" d="M434.6,4388.0h64.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.0z"><title>Broadway (N,W), Manhattan 8:54 AM, Aug-Dec 2025: 177</title></path>
-<text x="506.6" y="4398.0">177</text>
-<text x="365.8" y="4418.0" class="label" text-anchor="end">49 St (N,R,W), Downtown</text>
-<text x="426.6" y="4418.0" class="label" text-anchor="end">5:16 PM</text>
-<path class="s0" d="M434.6,4408.0h62.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.4z"><title>49 St (N,R,W), Downtown 5:16 PM, Aug-Dec 2025: 173</title></path>
+<text x="365.8" y="4398.0" class="label" text-anchor="end">49 St (N,R,W), Downtown</text>
+<text x="426.6" y="4398.0" class="label" text-anchor="end">5:16 PM</text>
+<path class="s0" d="M434.6,4388.0h62.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.4z"><title>49 St (N,R,W), Downtown 5:16 PM, Aug-Dec 2025: 173</title></path>
+<text x="505.0" y="4398.0">173</text>
+<text x="365.8" y="4418.0" class="label" text-anchor="end">Tremont Av (B,D), NB</text>
+<text x="426.6" y="4418.0" class="label" text-anchor="end">4:33 PM</text>
+<path class="s0" d="M434.6,4408.0h62.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.4z"><title>Tremont Av (B,D), NB 4:33 PM, Aug-Dec 2025: 173</title></path>
 <text x="505.0" y="4418.0">173</text>
-<text x="365.8" y="4438.0" class="label" text-anchor="end">Tremont Av (B,D), NB</text>
-<text x="426.6" y="4438.0" class="label" text-anchor="end">4:33 PM</text>
-<path class="s0" d="M434.6,4428.0h62.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.4z"><title>Tremont Av (B,D), NB 4:33 PM, Aug-Dec 2025: 173</title></path>
-<text x="505.0" y="4438.0">173</text>
-<text x="365.8" y="4458.0" class="label" text-anchor="end">Bleecker St (6), Uptown</text>
-<text x="426.6" y="4458.0" class="label" text-anchor="end">7:37 AM</text>
-<path class="s0" d="M434.6,4448.0h62.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.0z"><title>Bleecker St (6), Uptown 7:37 AM, Aug-Dec 2025: 172</title></path>
-<text x="504.6" y="4458.0">172</text>
-<text x="365.8" y="4478.0" class="label" text-anchor="end">Broadway Junction (L), Manhattan</text>
-<text x="426.6" y="4478.0" class="label" text-anchor="end">7:27 AM</text>
-<path class="s0" d="M434.6,4468.0h61.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.3z"><title>Broadway Junction (L), Manhattan 7:27 AM, Aug-Dec 2025: 170</title></path>
-<text x="503.9" y="4478.0">170</text>
-<text x="365.8" y="4498.0" class="label" text-anchor="end">50 St (1), Uptown</text>
-<text x="426.6" y="4498.0" class="label" text-anchor="end">8:24 AM</text>
-<path class="s0" d="M434.6,4488.0h60.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.9z"><title>50 St (1), Uptown 8:24 AM, Aug-Dec 2025: 169</title></path>
+<text x="365.8" y="4438.0" class="label" text-anchor="end">Bleecker St (6), Uptown</text>
+<text x="426.6" y="4438.0" class="label" text-anchor="end">7:37 AM</text>
+<path class="s0" d="M434.6,4428.0h62.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.0z"><title>Bleecker St (6), Uptown 7:37 AM, Aug-Dec 2025: 172</title></path>
+<text x="504.6" y="4438.0">172</text>
+<text x="365.8" y="4458.0" class="label" text-anchor="end">Broadway Junction (L), Manhattan</text>
+<text x="426.6" y="4458.0" class="label" text-anchor="end">7:27 AM</text>
+<path class="s0" d="M434.6,4448.0h61.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.3z"><title>Broadway Junction (L), Manhattan 7:27 AM, Aug-Dec 2025: 170</title></path>
+<text x="503.9" y="4458.0">170</text>
+<text x="365.8" y="4478.0" class="label" text-anchor="end">50 St (1), Uptown</text>
+<text x="426.6" y="4478.0" class="label" text-anchor="end">8:24 AM</text>
+<path class="s0" d="M434.6,4468.0h60.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.9z"><title>50 St (1), Uptown 8:24 AM, Aug-Dec 2025: 169</title></path>
+<text x="503.5" y="4478.0">169</text>
+<text x="365.8" y="4498.0" class="label" text-anchor="end">World Trade Center (E)</text>
+<text x="426.6" y="4498.0" class="label" text-anchor="end">5:50 PM</text>
+<path class="s0" d="M434.6,4488.0h60.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.9z"><title>World Trade Center (E) 5:50 PM, Aug-Dec 2025: 169</title></path>
 <text x="503.5" y="4498.0">169</text>
-<text x="365.8" y="4518.0" class="label" text-anchor="end">World Trade Center (E)</text>
-<text x="426.6" y="4518.0" class="label" text-anchor="end">5:50 PM</text>
-<path class="s0" d="M434.6,4508.0h60.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.9z"><title>World Trade Center (E) 5:50 PM, Aug-Dec 2025: 169</title></path>
+<text x="365.8" y="4518.0" class="label" text-anchor="end">Utica Av (A,C), Manhattan</text>
+<text x="426.6" y="4518.0" class="label" text-anchor="end">8:08 AM</text>
+<path class="s0" d="M434.6,4508.0h60.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.9z"><title>Utica Av (A,C), Manhattan 8:08 AM, Aug-Dec 2025: 169</title></path>
 <text x="503.5" y="4518.0">169</text>
-<text x="365.8" y="4538.0" class="label" text-anchor="end">Utica Av (A,C), Manhattan</text>
-<text x="426.6" y="4538.0" class="label" text-anchor="end">8:08 AM</text>
-<path class="s0" d="M434.6,4528.0h60.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.9z"><title>Utica Av (A,C), Manhattan 8:08 AM, Aug-Dec 2025: 169</title></path>
-<text x="503.5" y="4538.0">169</text>
+<text x="365.8" y="4538.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown</text>
+<text x="426.6" y="4538.0" class="label" text-anchor="end">7:09 AM</text>
+<path class="s0" d="M434.6,4528.0h60.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.5z"><title>34 St-Penn Station (1,2,3), Uptown 7:09 AM, Aug-Dec 2025: 168</title></path>
+<text x="503.1" y="4538.0">168</text>
 <text x="365.8" y="4558.0" class="label" text-anchor="end">Utica Av (A,C), Outbound</text>
 <text x="426.6" y="4558.0" class="label" text-anchor="end">6:58 PM</text>
 <path class="s0" d="M434.6,4548.0h60.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.5z"><title>Utica Av (A,C), Outbound 6:58 PM, Aug-Dec 2025: 168</title></path>

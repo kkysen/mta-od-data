@@ -8,12 +8,17 @@ a direction.
 OSM maps each platform, and each route's relation (one a direction and service pattern,
 in the PTv2 scheme) lists its stops in order, each followed by its platform.
 Each relation's stops are matched to the nearest GTFS stop its route serves,
-so each pair of consecutive stops a route makes maps to the platforms it stops at:
-which also tells express from local platforms of the same route and direction.
+so each stop a route makes, with the stops before and after it,
+maps to the platform it stops at:
+which also tells express from local platforms of the same route and direction,
+and a route's trains that stop at different platforms by how they run,
+like the 2 uptown at 34 St-Penn Station, express by day and local late at night.
+Where relations differ, the one the feeds have more trains like wins.
 
 Where a feed's route and OSM's relations disagree on its stops
 (a station closed, or a reroute OSM doesn't have),
-a stop's platform falls back to its route's at that stop in that direction,
+a stop's platform falls back to its route's there with the same next stop,
+then the same previous stop, then its route's at that stop in that direction,
 then to the stop's in that direction if one platform serves it.
 
 Each platform's area is its OSM outline's, for how crowded it is (`platform_areas.csv`):
@@ -43,7 +48,7 @@ from typer import Option, Typer
 
 from mta_od_data import DATA
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR
-from mta_od_data.ridership.service import load_feed
+from mta_od_data.ridership.service import Feed, load_feed
 
 app = Typer()
 
@@ -130,6 +135,15 @@ def square_metres(ring: list[tuple[float, float]]) -> float:
     return abs(sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in pairwise(xy))) / 2
 
 
+def direction(feed: Feed, route: str, prev: str, stop: str, next_: str) -> str | None:
+    """The direction `route`'s trains stopping at `stop` between those go there."""
+    if (d := feed.directions.get((route, stop, next_))) is not None:
+        return d[0]
+    if (d := feed.directions.get((route, prev, stop))) is not None:
+        return d[1]
+    return None
+
+
 def stop_coords(feed_zip: Path) -> dict[str, tuple[float, float]]:
     """Each GTFS parent stop's location."""
     from io import TextIOWrapper
@@ -173,21 +187,37 @@ def fetch_platforms(
     locations.apply_file(str(extract), locations=True)
     print(f"{len(relations.relations)} route relations")
 
-    # (route, stop, next stop) -> (stop's platform, next stop's), over every feed.
-    pairs: dict[tuple[str, str, str], tuple[str, str]] = {}
-    # (route, stop, direction) and (stop, direction) -> platform -> times seen.
+    # (route, previous stop, stop, next stop) -> platform -> trains, over every feed,
+    # "" for no previous or next stop.
+    exact: defaultdict[tuple[str, str, str, str], Counter[str]] = defaultdict(Counter)
+    # The same without the previous stop, and without the next.
+    by_next: defaultdict[tuple[str, str, str], Counter[str]] = defaultdict(Counter)
+    by_previous: defaultdict[tuple[str, str, str], Counter[str]] = defaultdict(Counter)
+    # (route, stop, direction) and (stop, direction) -> platform -> trains.
     by_route_dir: defaultdict[tuple[str, str, str], Counter[str]] = defaultdict(Counter)
     by_dir: defaultdict[tuple[str, str], Counter[str]] = defaultdict(Counter)
     # Each platform's pieces, by its first: itself, and those listed right after it.
     pieces: defaultdict[str, set[str]] = defaultdict(set)
-    directions: dict[tuple[str, str, str], tuple[str, str]] = {}
+    # The feeds' trains stopping at each (route, previous stop, stop, next stop),
+    # and each one's direction there.
+    trains: Counter[tuple[str, str, str, str]] = Counter()
+    directions: dict[tuple[str, str, str, str], str] = {}
     for feed_zip in sorted(gtfs_dir.glob("*.zip")):
         feed = load_feed(feed_zip)
-        directions |= feed.directions
         coords = stop_coords(feed_zip)
         served: defaultdict[str, set[str]] = defaultdict(set)
-        for p in feed.patterns:
+        # This feed's trains stopping at each (route, previous stop, stop, next stop).
+        feed_trains: Counter[tuple[str, str, str, str]] = Counter()
+
+        for p, n in feed.patterns.items():
             served[p.route].update(s for s in p.stops if s in coords)
+            padded = ("", *p.stops, "")
+            for key in zip(padded, padded[1:], padded[2:], strict=False):
+                feed_trains[p.route, *key] += n
+                if (d := direction(feed, p.route, *key)) is not None:
+                    directions[p.route, *key] = d
+        trains += feed_trains
+
         for route, ms in relations.relations:
             # Each matched stop, and its platform: the platform member after it.
             stops: list[tuple[str, str]] = []
@@ -208,56 +238,64 @@ def fetch_platforms(
                     stops.append((stop, key))
                     stop, first = None, key
                     pieces[key].add(key)
-            for (a, pa), (b, pb) in zip(stops, stops[1:], strict=False):
-                pairs.setdefault((route, a, b), (pa, pb))
-                if (route, a, b) in feed.directions:
-                    da, db = feed.directions[route, a, b]
-                    by_route_dir[route, a, da][pa] += 1
-                    by_route_dir[route, b, db][pb] += 1
-                    by_dir[a, da][pa] += 1
-                    by_dir[b, db][pb] += 1
+            padded = [("", ""), *stops, ("", "")]
+            for (prev, _), (stop, platform), (next_, _) in zip(
+                padded, padded[1:], padded[2:], strict=False
+            ):
+                key = (route, prev, stop, next_)
+                # The feed's trains stopping as the relation does there,
+                # so where two relations of a route differ, as the 2 express by day
+                # and local by night, uptown at Penn, the busier one's platform wins.
+                # At least 1, so a relation the feed has no trains like still counts.
+                n = max(1, feed_trains[key])
+                exact[key][platform] += n
+                by_next[route, stop, next_][platform] += n
+                by_previous[route, prev, stop][platform] += n
+                # From the stop before or after alone,
+                # as a relation may skip a stop the feed has.
+                if (d := direction(feed, *key)) is not None:
+                    by_route_dir[route, stop, d][platform] += n
+                    by_dir[stop, d][platform] += n
 
-    def platform(route: str, stop: str, direction: str) -> str:
-        """A stop's platform when its pair isn't in any relation."""
-        if seen := by_route_dir.get((route, stop, direction)):
-            return seen.most_common(1)[0][0]
-        if seen := by_dir.get((stop, direction)):
-            return seen.most_common(1)[0][0]
+    def platform(route: str, prev: str, stop: str, next_: str, d: str) -> str:
+        """The platform trains stop at, from the relations stopping most like them."""
+        for seen in (
+            exact.get((route, prev, stop, next_)),
+            by_next.get((route, stop, next_)) if next_ else None,
+            by_previous.get((route, prev, stop)) if prev else None,
+            by_route_dir.get((route, stop, d)),
+            by_dir.get((stop, d)),
+        ):
+            if seen:
+                return seen.most_common(1)[0][0]
         return ""
 
-    rows = []
-    for (route, a, b), (da, db) in sorted(directions.items()):
-        pa, pb = pairs.get((route, a, b), ("", ""))
-        rows.append(
-            (
-                route,
-                a,
-                b,
-                da,
-                pa or platform(route, a, da),
-                pb or platform(route, b, db),
-            )
-        )
+    rows = sorted(
+        (*key, d, platform(*key, d), n)
+        for key, n in trains.items()
+        if (d := directions.get(key)) is not None
+    )
     with out.open("w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(
             [
                 "route",
+                "prev_stop",
                 "stop",
                 "next_stop",
                 "direction",
-                "stop_platform",
-                "next_platform",
+                "platform",
+                "trains",
             ]
         )
         writer.writerows(rows)
-    direct = sum((r[0], r[1], r[2]) in pairs for r in rows)
-    unknown = sum(not r[4] or not r[5] for r in rows)
+    direct = sum(r[:4] in exact for r in rows)
+    unknown = sum(not r[5] for r in rows)
     print(
-        f"wrote {out}: {len(rows)} pairs of stops, {direct} from a relation directly, "
-        f"{unknown} with a platform unknown"
+        f"wrote {out}: {len(rows)} stops with the stops before and after, "
+        f"{direct} from a relation directly, {unknown} with a platform unknown"
     )
-    platforms = sorted({p for r in rows for p in (r[4], r[5]) if p})
+    platforms = sorted({r[5] for r in rows if r[5]})
 
     def area(p: str) -> float | None:
         parts = pieces.get(p) or {p}

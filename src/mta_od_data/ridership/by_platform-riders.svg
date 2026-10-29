@@ -169,96 +169,96 @@ text {
 <text x="539.8" y="986.0">84,359</text>
 <path class="s1" d="M373.8,990.0h186.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-186.6z"><title>6 Av (L), 2019: 99,264</title></path>
 <text x="568.4" y="1000.0">99,264</text>
-<text x="365.8" y="1027.0" class="label" text-anchor="end">14 St (1,2,3), Uptown</text>
-<path class="s0" d="M373.8,1010.0h145.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-145.2z"><title>14 St (1,2,3), Uptown, Aug-Dec 2025: 77,704</title></path>
-<text x="527.0" y="1020.0">77,704</text>
-<path class="s1" d="M373.8,1024.0h190.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-190.5z"><title>14 St (1,2,3), Uptown, 2019: 101,298</title></path>
-<text x="572.3" y="1034.0">101,298</text>
-<text x="365.8" y="1061.0" class="label" text-anchor="end">Jay St-MetroTech (A,C,F), Manhattan</text>
-<path class="s0" d="M373.8,1044.0h140.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-140.4z"><title>Jay St-MetroTech (A,C,F), Manhattan, Aug-Dec 2025: 75,212</title></path>
-<text x="522.2" y="1054.0">75,212</text>
-<path class="s1" d="M373.8,1058.0h189.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-189.8z"><title>Jay St-MetroTech (A,C,F), Manhattan, 2019: 100,931</title></path>
-<text x="571.6" y="1068.0">100,931</text>
-<text x="365.8" y="1095.0" class="label" text-anchor="end">W 4 St-Wash Sq (B,D,F,M), Downtown</text>
-<path class="s0" d="M373.8,1078.0h139.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.3z"><title>W 4 St-Wash Sq (B,D,F,M), Downtown, Aug-Dec 2025: 74,642</title></path>
-<text x="521.1" y="1088.0">74,642</text>
-<path class="s1" d="M373.8,1092.0h177.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-177.1z"><title>W 4 St-Wash Sq (B,D,F,M), Downtown, 2019: 94,306</title></path>
-<text x="558.9" y="1102.0">94,306</text>
-<text x="365.8" y="1129.0" class="label" text-anchor="end">72 St (1,2,3), Downtown</text>
-<path class="s0" d="M373.8,1112.0h136.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-136.1z"><title>72 St (1,2,3), Downtown, Aug-Dec 2025: 72,950</title></path>
-<text x="517.9" y="1122.0">72,950</text>
-<path class="s1" d="M373.8,1126.0h179.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-179.8z"><title>72 St (1,2,3), Downtown, 2019: 95,739</title></path>
-<text x="561.6" y="1136.0">95,739</text>
-<text x="365.8" y="1163.0" class="label" text-anchor="end">72 St (1,2,3), Uptown</text>
-<path class="s0" d="M373.8,1146.0h135.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-135.1z"><title>72 St (1,2,3), Uptown, Aug-Dec 2025: 72,462</title></path>
-<text x="516.9" y="1156.0">72,462</text>
-<path class="s1" d="M373.8,1160.0h177.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-177.6z"><title>72 St (1,2,3), Uptown, 2019: 94,585</title></path>
-<text x="559.4" y="1170.0">94,585</text>
-<text x="365.8" y="1197.0" class="label" text-anchor="end">34 St-Herald Sq (B,D,F,M), Downtown</text>
-<path class="s0" d="M373.8,1180.0h134.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-134.4z"><title>34 St-Herald Sq (B,D,F,M), Downtown, Aug-Dec 2025: 72,070</title></path>
-<text x="516.2" y="1190.0">72,070</text>
-<path class="s1" d="M373.8,1194.0h195.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-195.9z"><title>34 St-Herald Sq (B,D,F,M), Downtown, 2019: 104,139</title></path>
-<text x="577.7" y="1204.0">104,139</text>
-<text x="365.8" y="1231.0" class="label" text-anchor="end">Queensboro Plaza (7), Outbound &amp; Astoria</text>
-<path class="s0" d="M373.8,1214.0h133.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-133.9z"><title>Queensboro Plaza (7), Outbound &amp; Astoria, Aug-Dec 2025: 71,823</title></path>
-<text x="515.7" y="1224.0">71,823</text>
-<path class="s1" d="M373.8,1228.0h159.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-159.2z"><title>Queensboro Plaza (7), Outbound &amp; Astoria, 2019: 85,006</title></path>
-<text x="541.0" y="1238.0">85,006</text>
-<text x="365.8" y="1265.0" class="label" text-anchor="end">Atlantic Av (D,N,R), Manhattan</text>
-<path class="s0" d="M373.8,1248.0h133.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-133.6z"><title>Atlantic Av (D,N,R), Manhattan, Aug-Dec 2025: 71,648</title></path>
-<text x="515.4" y="1258.0">71,648</text>
-<path class="s1" d="M373.8,1262.0h167.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-167.5z"><title>Atlantic Av (D,N,R), Manhattan, 2019: 89,320</title></path>
-<text x="549.3" y="1272.0">89,320</text>
-<text x="365.8" y="1299.0" class="label" text-anchor="end">34 St-Herald Sq (N,Q,R,W), Uptown</text>
-<path class="s0" d="M373.8,1282.0h132.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-132.5z"><title>34 St-Herald Sq (N,Q,R,W), Uptown, Aug-Dec 2025: 71,073</title></path>
-<text x="514.3" y="1292.0">71,073</text>
-<path class="s1" d="M373.8,1296.0h189.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-189.1z"><title>34 St-Herald Sq (N,Q,R,W), Uptown, 2019: 100,553</title></path>
-<text x="570.9" y="1306.0">100,553</text>
-<text x="365.8" y="1333.0" class="label" text-anchor="end">Flushing-Main St (7), 7</text>
-<path class="s0" d="M373.8,1316.0h132.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-132.1z"><title>Flushing-Main St (7), 7, Aug-Dec 2025: 70,887</title></path>
-<text x="513.9" y="1326.0">70,887</text>
-<path class="s1" d="M373.8,1330.0h154.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-154.7z"><title>Flushing-Main St (7), 7, 2019: 82,662</title></path>
-<text x="536.5" y="1340.0">82,662</text>
-<text x="365.8" y="1367.0" class="label" text-anchor="end">34 St-Herald Sq (N,Q,R,W), Downtown</text>
-<path class="s0" d="M373.8,1350.0h131.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-131.7z"><title>34 St-Herald Sq (N,Q,R,W), Downtown, Aug-Dec 2025: 70,656</title></path>
-<text x="513.5" y="1360.0">70,656</text>
-<path class="s1" d="M373.8,1364.0h189.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-189.7z"><title>34 St-Herald Sq (N,Q,R,W), Downtown, 2019: 100,901</title></path>
-<text x="571.5" y="1374.0">100,901</text>
-<text x="365.8" y="1401.0" class="label" text-anchor="end">Atlantic Av (D,N,R), SB</text>
-<path class="s0" d="M373.8,1384.0h131.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-131.6z"><title>Atlantic Av (D,N,R), SB, Aug-Dec 2025: 70,618</title></path>
-<text x="513.4" y="1394.0">70,618</text>
-<path class="s1" d="M373.8,1398.0h164.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.2z"><title>Atlantic Av (D,N,R), SB, 2019: 87,621</title></path>
-<text x="546.0" y="1408.0">87,621</text>
-<text x="365.8" y="1435.0" class="label" text-anchor="end">125 St (4,5,6), Downtown</text>
-<path class="s0" d="M373.8,1418.0h130.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-130.4z"><title>125 St (4,5,6), Downtown, Aug-Dec 2025: 70,001</title></path>
-<text x="512.2" y="1428.0">70,001</text>
-<path class="s1" d="M373.8,1432.0h190.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-190.8z"><title>125 St (4,5,6), Downtown, 2019: 101,475</title></path>
-<text x="572.6" y="1442.0">101,475</text>
-<text x="365.8" y="1469.0" class="label" text-anchor="end">5 Av (7)</text>
-<path class="s0" d="M373.8,1452.0h129.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.6z"><title>5 Av (7), Aug-Dec 2025: 69,595</title></path>
-<text x="511.4" y="1462.0">69,595</text>
-<path class="s1" d="M373.8,1466.0h164.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.0z"><title>5 Av (7), 2019: 87,486</title></path>
-<text x="545.8" y="1476.0">87,486</text>
-<text x="365.8" y="1503.0" class="label" text-anchor="end">8 Av (L)</text>
-<path class="s0" d="M373.8,1486.0h129.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.4z"><title>8 Av (L), Aug-Dec 2025: 69,501</title></path>
-<text x="511.2" y="1496.0">69,501</text>
-<path class="s1" d="M373.8,1500.0h149.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-149.0z"><title>8 Av (L), 2019: 79,664</title></path>
-<text x="530.8" y="1510.0">79,664</text>
-<text x="365.8" y="1537.0" class="label" text-anchor="end">14 St (1,2,3), Downtown</text>
-<path class="s0" d="M373.8,1520.0h125.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-125.4z"><title>14 St (1,2,3), Downtown, Aug-Dec 2025: 67,382</title></path>
-<text x="507.2" y="1530.0">67,382</text>
-<path class="s1" d="M373.8,1534.0h164.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.5z"><title>14 St (1,2,3), Downtown, 2019: 87,746</title></path>
-<text x="546.3" y="1544.0">87,746</text>
-<text x="365.8" y="1571.0" class="label" text-anchor="end">Jay St-MetroTech (A,C,F), Outbound</text>
-<path class="s0" d="M373.8,1554.0h121.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.3z"><title>Jay St-MetroTech (A,C,F), Outbound, Aug-Dec 2025: 65,263</title></path>
-<text x="503.1" y="1564.0">65,263</text>
-<path class="s1" d="M373.8,1568.0h165.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-165.1z"><title>Jay St-MetroTech (A,C,F), Outbound, 2019: 88,049</title></path>
-<text x="546.9" y="1578.0">88,049</text>
-<text x="365.8" y="1605.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown &amp; Downtown</text>
-<path class="s0" d="M373.8,1588.0h120.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-120.7z"><title>34 St-Penn Station (1,2,3), Uptown &amp; Downtown, Aug-Dec 2025: 64,952</title></path>
-<text x="502.5" y="1598.0">64,952</text>
-<path class="s1" d="M373.8,1602.0h182.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-182.4z"><title>34 St-Penn Station (1,2,3), Uptown &amp; Downtown, 2019: 97,096</title></path>
-<text x="564.2" y="1612.0">97,096</text>
+<text x="365.8" y="1027.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown &amp; Downtown</text>
+<path class="s0" d="M373.8,1010.0h145.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-145.6z"><title>34 St-Penn Station (1,2,3), Uptown &amp; Downtown, Aug-Dec 2025: 77,892</title></path>
+<text x="527.4" y="1020.0">77,892</text>
+<path class="s1" d="M373.8,1024.0h219.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-219.1z"><title>34 St-Penn Station (1,2,3), Uptown &amp; Downtown, 2019: 116,212</title></path>
+<text x="600.9" y="1034.0">116,212</text>
+<text x="365.8" y="1061.0" class="label" text-anchor="end">14 St (1,2,3), Uptown</text>
+<path class="s0" d="M373.8,1044.0h145.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-145.2z"><title>14 St (1,2,3), Uptown, Aug-Dec 2025: 77,704</title></path>
+<text x="527.0" y="1054.0">77,704</text>
+<path class="s1" d="M373.8,1058.0h190.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-190.5z"><title>14 St (1,2,3), Uptown, 2019: 101,298</title></path>
+<text x="572.3" y="1068.0">101,298</text>
+<text x="365.8" y="1095.0" class="label" text-anchor="end">Jay St-MetroTech (A,C,F), Manhattan</text>
+<path class="s0" d="M373.8,1078.0h140.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-140.4z"><title>Jay St-MetroTech (A,C,F), Manhattan, Aug-Dec 2025: 75,212</title></path>
+<text x="522.2" y="1088.0">75,212</text>
+<path class="s1" d="M373.8,1092.0h189.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-189.8z"><title>Jay St-MetroTech (A,C,F), Manhattan, 2019: 100,931</title></path>
+<text x="571.6" y="1102.0">100,931</text>
+<text x="365.8" y="1129.0" class="label" text-anchor="end">W 4 St-Wash Sq (B,D,F,M), Downtown</text>
+<path class="s0" d="M373.8,1112.0h139.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.3z"><title>W 4 St-Wash Sq (B,D,F,M), Downtown, Aug-Dec 2025: 74,642</title></path>
+<text x="521.1" y="1122.0">74,642</text>
+<path class="s1" d="M373.8,1126.0h177.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-177.1z"><title>W 4 St-Wash Sq (B,D,F,M), Downtown, 2019: 94,306</title></path>
+<text x="558.9" y="1136.0">94,306</text>
+<text x="365.8" y="1163.0" class="label" text-anchor="end">72 St (1,2,3), Downtown</text>
+<path class="s0" d="M373.8,1146.0h136.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-136.1z"><title>72 St (1,2,3), Downtown, Aug-Dec 2025: 72,950</title></path>
+<text x="517.9" y="1156.0">72,950</text>
+<path class="s1" d="M373.8,1160.0h179.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-179.8z"><title>72 St (1,2,3), Downtown, 2019: 95,739</title></path>
+<text x="561.6" y="1170.0">95,739</text>
+<text x="365.8" y="1197.0" class="label" text-anchor="end">72 St (1,2,3), Uptown</text>
+<path class="s0" d="M373.8,1180.0h135.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-135.1z"><title>72 St (1,2,3), Uptown, Aug-Dec 2025: 72,462</title></path>
+<text x="516.9" y="1190.0">72,462</text>
+<path class="s1" d="M373.8,1194.0h177.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-177.6z"><title>72 St (1,2,3), Uptown, 2019: 94,585</title></path>
+<text x="559.4" y="1204.0">94,585</text>
+<text x="365.8" y="1231.0" class="label" text-anchor="end">34 St-Herald Sq (B,D,F,M), Downtown</text>
+<path class="s0" d="M373.8,1214.0h134.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-134.4z"><title>34 St-Herald Sq (B,D,F,M), Downtown, Aug-Dec 2025: 72,070</title></path>
+<text x="516.2" y="1224.0">72,070</text>
+<path class="s1" d="M373.8,1228.0h195.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-195.9z"><title>34 St-Herald Sq (B,D,F,M), Downtown, 2019: 104,139</title></path>
+<text x="577.7" y="1238.0">104,139</text>
+<text x="365.8" y="1265.0" class="label" text-anchor="end">Queensboro Plaza (7), Outbound &amp; Astoria</text>
+<path class="s0" d="M373.8,1248.0h133.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-133.9z"><title>Queensboro Plaza (7), Outbound &amp; Astoria, Aug-Dec 2025: 71,823</title></path>
+<text x="515.7" y="1258.0">71,823</text>
+<path class="s1" d="M373.8,1262.0h159.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-159.2z"><title>Queensboro Plaza (7), Outbound &amp; Astoria, 2019: 85,006</title></path>
+<text x="541.0" y="1272.0">85,006</text>
+<text x="365.8" y="1299.0" class="label" text-anchor="end">Atlantic Av (D,N,R), Manhattan</text>
+<path class="s0" d="M373.8,1282.0h133.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-133.6z"><title>Atlantic Av (D,N,R), Manhattan, Aug-Dec 2025: 71,648</title></path>
+<text x="515.4" y="1292.0">71,648</text>
+<path class="s1" d="M373.8,1296.0h167.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-167.5z"><title>Atlantic Av (D,N,R), Manhattan, 2019: 89,320</title></path>
+<text x="549.3" y="1306.0">89,320</text>
+<text x="365.8" y="1333.0" class="label" text-anchor="end">34 St-Herald Sq (N,Q,R,W), Uptown</text>
+<path class="s0" d="M373.8,1316.0h132.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-132.5z"><title>34 St-Herald Sq (N,Q,R,W), Uptown, Aug-Dec 2025: 71,073</title></path>
+<text x="514.3" y="1326.0">71,073</text>
+<path class="s1" d="M373.8,1330.0h189.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-189.1z"><title>34 St-Herald Sq (N,Q,R,W), Uptown, 2019: 100,553</title></path>
+<text x="570.9" y="1340.0">100,553</text>
+<text x="365.8" y="1367.0" class="label" text-anchor="end">Flushing-Main St (7), 7</text>
+<path class="s0" d="M373.8,1350.0h132.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-132.1z"><title>Flushing-Main St (7), 7, Aug-Dec 2025: 70,887</title></path>
+<text x="513.9" y="1360.0">70,887</text>
+<path class="s1" d="M373.8,1364.0h154.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-154.7z"><title>Flushing-Main St (7), 7, 2019: 82,662</title></path>
+<text x="536.5" y="1374.0">82,662</text>
+<text x="365.8" y="1401.0" class="label" text-anchor="end">34 St-Herald Sq (N,Q,R,W), Downtown</text>
+<path class="s0" d="M373.8,1384.0h131.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-131.7z"><title>34 St-Herald Sq (N,Q,R,W), Downtown, Aug-Dec 2025: 70,656</title></path>
+<text x="513.5" y="1394.0">70,656</text>
+<path class="s1" d="M373.8,1398.0h189.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-189.7z"><title>34 St-Herald Sq (N,Q,R,W), Downtown, 2019: 100,901</title></path>
+<text x="571.5" y="1408.0">100,901</text>
+<text x="365.8" y="1435.0" class="label" text-anchor="end">Atlantic Av (D,N,R), SB</text>
+<path class="s0" d="M373.8,1418.0h131.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-131.6z"><title>Atlantic Av (D,N,R), SB, Aug-Dec 2025: 70,618</title></path>
+<text x="513.4" y="1428.0">70,618</text>
+<path class="s1" d="M373.8,1432.0h164.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.2z"><title>Atlantic Av (D,N,R), SB, 2019: 87,621</title></path>
+<text x="546.0" y="1442.0">87,621</text>
+<text x="365.8" y="1469.0" class="label" text-anchor="end">125 St (4,5,6), Downtown</text>
+<path class="s0" d="M373.8,1452.0h130.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-130.4z"><title>125 St (4,5,6), Downtown, Aug-Dec 2025: 70,001</title></path>
+<text x="512.2" y="1462.0">70,001</text>
+<path class="s1" d="M373.8,1466.0h190.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-190.8z"><title>125 St (4,5,6), Downtown, 2019: 101,475</title></path>
+<text x="572.6" y="1476.0">101,475</text>
+<text x="365.8" y="1503.0" class="label" text-anchor="end">5 Av (7)</text>
+<path class="s0" d="M373.8,1486.0h129.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.6z"><title>5 Av (7), Aug-Dec 2025: 69,595</title></path>
+<text x="511.4" y="1496.0">69,595</text>
+<path class="s1" d="M373.8,1500.0h164.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.0z"><title>5 Av (7), 2019: 87,486</title></path>
+<text x="545.8" y="1510.0">87,486</text>
+<text x="365.8" y="1537.0" class="label" text-anchor="end">8 Av (L)</text>
+<path class="s0" d="M373.8,1520.0h129.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.4z"><title>8 Av (L), Aug-Dec 2025: 69,501</title></path>
+<text x="511.2" y="1530.0">69,501</text>
+<path class="s1" d="M373.8,1534.0h149.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-149.0z"><title>8 Av (L), 2019: 79,664</title></path>
+<text x="530.8" y="1544.0">79,664</text>
+<text x="365.8" y="1571.0" class="label" text-anchor="end">14 St (1,2,3), Downtown</text>
+<path class="s0" d="M373.8,1554.0h125.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-125.4z"><title>14 St (1,2,3), Downtown, Aug-Dec 2025: 67,382</title></path>
+<text x="507.2" y="1564.0">67,382</text>
+<path class="s1" d="M373.8,1568.0h164.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-164.5z"><title>14 St (1,2,3), Downtown, 2019: 87,746</title></path>
+<text x="546.3" y="1578.0">87,746</text>
+<text x="365.8" y="1605.0" class="label" text-anchor="end">Jay St-MetroTech (A,C,F), Outbound</text>
+<path class="s0" d="M373.8,1588.0h121.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.3z"><title>Jay St-MetroTech (A,C,F), Outbound, Aug-Dec 2025: 65,263</title></path>
+<text x="503.1" y="1598.0">65,263</text>
+<path class="s1" d="M373.8,1602.0h165.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-165.1z"><title>Jay St-MetroTech (A,C,F), Outbound, 2019: 88,049</title></path>
+<text x="546.9" y="1612.0">88,049</text>
 <text x="365.8" y="1639.0" class="label" text-anchor="end">Grand Central-42 St (S)</text>
 <path class="s0" d="M373.8,1622.0h117.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-117.2z"><title>Grand Central-42 St (S), Aug-Dec 2025: 63,151</title></path>
 <text x="499.0" y="1632.0">63,151</text>
@@ -549,361 +549,361 @@ text {
 <text x="444.8" y="3570.0">34,905</text>
 <path class="s1" d="M373.8,3574.0h78.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.1z"><title>86 St (4,5,6), Downtown 4,5, 2019: 42,751</title></path>
 <text x="459.9" y="3584.0">42,751</text>
-<text x="365.8" y="3611.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown</text>
-<path class="s0" d="M373.8,3594.0h63.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.0z"><title>34 St-Penn Station (1,2,3), Uptown, Aug-Dec 2025: 34,899</title></path>
-<text x="444.8" y="3604.0">34,899</text>
-<path class="s1" d="M373.8,3608.0h93.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-93.4z"><title>34 St-Penn Station (1,2,3), Uptown, 2019: 50,754</title></path>
-<text x="475.2" y="3618.0">50,754</text>
-<text x="365.8" y="3645.0" class="label" text-anchor="end">Bleecker St (6), Downtown</text>
-<path class="s0" d="M373.8,3628.0h61.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.7z"><title>Bleecker St (6), Downtown, Aug-Dec 2025: 34,234</title></path>
-<text x="443.5" y="3638.0">34,234</text>
-<path class="s1" d="M373.8,3642.0h77.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.5z"><title>Bleecker St (6), Downtown, 2019: 42,455</title></path>
-<text x="459.3" y="3652.0">42,455</text>
-<text x="365.8" y="3679.0" class="label" text-anchor="end">59 St (4,5,6), Downtown 6</text>
-<path class="s0" d="M373.8,3662.0h61.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.7z"><title>59 St (4,5,6), Downtown 6, Aug-Dec 2025: 34,214</title></path>
-<text x="443.5" y="3672.0">34,214</text>
-<path class="s1" d="M373.8,3676.0h81.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.3z"><title>59 St (4,5,6), Downtown 6, 2019: 44,451</title></path>
-<text x="463.1" y="3686.0">44,451</text>
-<text x="365.8" y="3713.0" class="label" text-anchor="end">Kew Gardens-Union Tpke (E,F), Manhattan</text>
-<path class="s0" d="M373.8,3696.0h61.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.4z"><title>Kew Gardens-Union Tpke (E,F), Manhattan, Aug-Dec 2025: 34,050</title></path>
-<text x="443.2" y="3706.0">34,050</text>
-<path class="s1" d="M373.8,3710.0h86.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-86.0z"><title>Kew Gardens-Union Tpke (E,F), Manhattan, 2019: 46,850</title></path>
-<text x="467.8" y="3720.0">46,850</text>
-<text x="365.8" y="3747.0" class="label" text-anchor="end">57 St-7 Av (N,Q,R,W), Uptown</text>
-<path class="s0" d="M373.8,3730.0h61.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.2z"><title>57 St-7 Av (N,Q,R,W), Uptown, Aug-Dec 2025: 33,936</title></path>
-<text x="443.0" y="3740.0">33,936</text>
-<path class="s1" d="M373.8,3744.0h80.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.1z"><title>57 St-7 Av (N,Q,R,W), Uptown, 2019: 43,805</title></path>
-<text x="461.9" y="3754.0">43,805</text>
-<text x="365.8" y="3781.0" class="label" text-anchor="end">DeKalb Av (B,Q,R), SB</text>
-<path class="s0" d="M373.8,3764.0h60.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.5z"><title>DeKalb Av (B,Q,R), SB, Aug-Dec 2025: 33,612</title></path>
-<text x="442.3" y="3774.0">33,612</text>
-<path class="s1" d="M373.8,3778.0h78.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.2z"><title>DeKalb Av (B,Q,R), SB, 2019: 42,826</title></path>
-<text x="460.0" y="3788.0">42,826</text>
-<text x="365.8" y="3815.0" class="label" text-anchor="end">57 St-7 Av (N,Q,R,W), Downtown</text>
-<path class="s0" d="M373.8,3798.0h60.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.1z"><title>57 St-7 Av (N,Q,R,W), Downtown, Aug-Dec 2025: 33,383</title></path>
-<text x="441.9" y="3808.0">33,383</text>
-<path class="s1" d="M373.8,3812.0h78.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.4z"><title>57 St-7 Av (N,Q,R,W), Downtown, 2019: 42,918</title></path>
-<text x="460.2" y="3822.0">42,918</text>
-<text x="365.8" y="3849.0" class="label" text-anchor="end">Franklin Av-Medgar Evers College (2,3,4,5), Outbound</text>
-<path class="s0" d="M373.8,3832.0h59.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.8z"><title>Franklin Av-Medgar Evers College (2,3,4,5), Outbound, Aug-Dec 2025: 33,241</title></path>
-<text x="441.6" y="3842.0">33,241</text>
-<path class="s1" d="M373.8,3846.0h82.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.1z"><title>Franklin Av-Medgar Evers College (2,3,4,5), Outbound, 2019: 44,832</title></path>
-<text x="463.9" y="3856.0">44,832</text>
-<text x="365.8" y="3883.0" class="label" text-anchor="end">86 St (4,5,6), Uptown 4,5</text>
-<path class="s0" d="M373.8,3866.0h59.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.8z"><title>86 St (4,5,6), Uptown 4,5, Aug-Dec 2025: 33,225</title></path>
-<text x="441.6" y="3876.0">33,225</text>
-<path class="s1" d="M373.8,3880.0h73.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.2z"><title>86 St (4,5,6), Uptown 4,5, 2019: 40,204</title></path>
-<text x="455.0" y="3890.0">40,204</text>
-<text x="365.8" y="3917.0" class="label" text-anchor="end">Chambers St (1,2,3), Uptown</text>
-<path class="s0" d="M373.8,3900.0h59.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.0z"><title>Chambers St (1,2,3), Uptown, Aug-Dec 2025: 32,791</title></path>
-<text x="440.8" y="3910.0">32,791</text>
-<path class="s1" d="M373.8,3914.0h80.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.2z"><title>Chambers St (1,2,3), Uptown, 2019: 43,865</title></path>
-<text x="462.0" y="3924.0">43,865</text>
-<text x="365.8" y="3951.0" class="label" text-anchor="end">Wall St (2,3)</text>
-<path class="s0" d="M373.8,3934.0h57.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.9z"><title>Wall St (2,3), Aug-Dec 2025: 32,261</title></path>
-<text x="439.7" y="3944.0">32,261</text>
-<path class="s1" d="M373.8,3948.0h97.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-97.6z"><title>Wall St (2,3), 2019: 52,937</title></path>
-<text x="479.4" y="3958.0">52,937</text>
-<text x="365.8" y="3985.0" class="label" text-anchor="end">36 St (D,N,R), SB</text>
-<path class="s0" d="M373.8,3968.0h56.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-56.9z"><title>36 St (D,N,R), SB, Aug-Dec 2025: 31,706</title></path>
-<text x="438.7" y="3978.0">31,706</text>
-<path class="s1" d="M373.8,3982.0h66.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-66.8z"><title>36 St (D,N,R), SB, 2019: 36,865</title></path>
-<text x="448.6" y="3992.0">36,865</text>
-<text x="365.8" y="4019.0" class="label" text-anchor="end">Canal St (N,Q), Uptown</text>
-<path class="s0" d="M373.8,4002.0h55.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.8z"><title>Canal St (N,Q), Uptown, Aug-Dec 2025: 31,170</title></path>
-<text x="437.6" y="4012.0">31,170</text>
-<path class="s1" d="M373.8,4016.0h73.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.6z"><title>Canal St (N,Q), Uptown, 2019: 40,392</title></path>
-<text x="455.4" y="4026.0">40,392</text>
-<text x="365.8" y="4053.0" class="label" text-anchor="end">Broadway Junction (A,C), Manhattan</text>
-<path class="s0" d="M373.8,4036.0h55.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.0z"><title>Broadway Junction (A,C), Manhattan, Aug-Dec 2025: 30,708</title></path>
-<text x="436.8" y="4046.0">30,708</text>
-<path class="s1" d="M373.8,4050.0h77.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.3z"><title>Broadway Junction (A,C), Manhattan, 2019: 42,330</title></path>
-<text x="459.1" y="4060.0">42,330</text>
-<text x="365.8" y="4087.0" class="label" text-anchor="end">96 St (Q)</text>
-<path class="s0" d="M373.8,4070.0h54.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.5z"><title>96 St (Q), Aug-Dec 2025: 30,473</title></path>
-<text x="436.3" y="4080.0">30,473</text>
-<path class="s1" d="M373.8,4084.0h75.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.1z"><title>96 St (Q), 2019: 41,212</title></path>
-<text x="456.9" y="4094.0">41,212</text>
-<text x="365.8" y="4121.0" class="label" text-anchor="end">59 St (4,5,6), Uptown 6</text>
-<path class="s0" d="M373.8,4104.0h54.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.4z"><title>59 St (4,5,6), Uptown 6, Aug-Dec 2025: 30,400</title></path>
-<text x="436.2" y="4114.0">30,400</text>
-<path class="s1" d="M373.8,4118.0h72.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-72.4z"><title>59 St (4,5,6), Uptown 6, 2019: 39,809</title></path>
-<text x="454.2" y="4128.0">39,809</text>
-<text x="365.8" y="4155.0" class="label" text-anchor="end">Broadway Junction (A,C), Outbound</text>
-<path class="s0" d="M373.8,4138.0h53.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.9z"><title>Broadway Junction (A,C), Outbound, Aug-Dec 2025: 30,159</title></path>
-<text x="435.7" y="4148.0">30,159</text>
-<path class="s1" d="M373.8,4152.0h75.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.2z"><title>Broadway Junction (A,C), Outbound, 2019: 41,255</title></path>
-<text x="457.0" y="4162.0">41,255</text>
-<text x="365.8" y="4189.0" class="label" text-anchor="end">Canal St (N,Q), Downtown</text>
-<path class="s0" d="M373.8,4172.0h53.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.9z"><title>Canal St (N,Q), Downtown, Aug-Dec 2025: 30,152</title></path>
-<text x="435.7" y="4182.0">30,152</text>
-<path class="s1" d="M373.8,4186.0h71.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.5z"><title>Canal St (N,Q), Downtown, 2019: 39,316</title></path>
-<text x="453.3" y="4196.0">39,316</text>
-<text x="365.8" y="4223.0" class="label" text-anchor="end">DeKalb Av (B,Q,R), Manhattan</text>
-<path class="s0" d="M373.8,4206.0h53.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.6z"><title>DeKalb Av (B,Q,R), Manhattan, Aug-Dec 2025: 29,989</title></path>
-<text x="435.4" y="4216.0">29,989</text>
-<path class="s1" d="M373.8,4220.0h68.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.8z"><title>DeKalb Av (B,Q,R), Manhattan, 2019: 37,920</title></path>
-<text x="450.6" y="4230.0">37,920</text>
-<text x="365.8" y="4257.0" class="label" text-anchor="end">Brooklyn Bridge-City Hall (4,5,6), Downtown</text>
-<path class="s0" d="M373.8,4240.0h53.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.4z"><title>Brooklyn Bridge-City Hall (4,5,6), Downtown, Aug-Dec 2025: 29,919</title></path>
-<text x="435.2" y="4250.0">29,919</text>
-<path class="s1" d="M373.8,4254.0h77.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.4z"><title>Brooklyn Bridge-City Hall (4,5,6), Downtown, 2019: 42,397</title></path>
-<text x="459.2" y="4264.0">42,397</text>
-<text x="365.8" y="4291.0" class="label" text-anchor="end">59 St (N,R), Manhattan</text>
-<path class="s0" d="M373.8,4274.0h53.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.2z"><title>59 St (N,R), Manhattan, Aug-Dec 2025: 29,804</title></path>
-<text x="435.0" y="4284.0">29,804</text>
-<path class="s1" d="M373.8,4288.0h62.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.7z"><title>59 St (N,R), Manhattan, 2019: 34,756</title></path>
-<text x="444.5" y="4298.0">34,756</text>
-<text x="365.8" y="4325.0" class="label" text-anchor="end">Lorimer St (L), Manhattan</text>
-<path class="s0" d="M373.8,4308.0h52.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.1z"><title>Lorimer St (L), Manhattan, Aug-Dec 2025: 29,208</title></path>
-<text x="433.9" y="4318.0">29,208</text>
-<path class="s1" d="M373.8,4322.0h57.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.4z"><title>Lorimer St (L), Manhattan, 2019: 32,003</title></path>
-<text x="439.2" y="4332.0">32,003</text>
-<text x="365.8" y="4359.0" class="label" text-anchor="end">Crown Hts-Utica Av (3,4), Manhattan</text>
-<path class="s0" d="M373.8,4342.0h51.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.8z"><title>Crown Hts-Utica Av (3,4), Manhattan, Aug-Dec 2025: 29,078</title></path>
-<text x="433.6" y="4352.0">29,078</text>
-<path class="s1" d="M373.8,4356.0h74.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.5z"><title>Crown Hts-Utica Av (3,4), Manhattan, 2019: 40,864</title></path>
-<text x="456.3" y="4366.0">40,864</text>
-<text x="365.8" y="4393.0" class="label" text-anchor="end">Lorimer St (L), Outbound</text>
-<path class="s0" d="M373.8,4376.0h51.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.6z"><title>Lorimer St (L), Outbound, Aug-Dec 2025: 28,934</title></path>
-<text x="433.4" y="4386.0">28,934</text>
-<path class="s1" d="M373.8,4390.0h56.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-56.9z"><title>Lorimer St (L), Outbound, 2019: 31,725</title></path>
-<text x="438.7" y="4400.0">31,725</text>
-<text x="365.8" y="4427.0" class="label" text-anchor="end">Court Sq-23 St (E,F), Manhattan</text>
-<path class="s0" d="M373.8,4410.0h51.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.5z"><title>Court Sq-23 St (E,F), Manhattan, Aug-Dec 2025: 28,905</title></path>
-<text x="433.3" y="4420.0">28,905</text>
-<path class="s1" d="M373.8,4424.0h62.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.8z"><title>Court Sq-23 St (E,F), Manhattan, 2019: 34,785</title></path>
-<text x="444.6" y="4434.0">34,785</text>
-<text x="365.8" y="4461.0" class="label" text-anchor="end">Court Sq-23 St (E,F), Outbound</text>
-<path class="s0" d="M373.8,4444.0h51.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.2z"><title>Court Sq-23 St (E,F), Outbound, Aug-Dec 2025: 28,733</title></path>
-<text x="433.0" y="4454.0">28,733</text>
-<path class="s1" d="M373.8,4458.0h62.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.9z"><title>Court Sq-23 St (E,F), Outbound, 2019: 34,820</title></path>
-<text x="444.7" y="4468.0">34,820</text>
-<text x="365.8" y="4495.0" class="label" text-anchor="end">Flushing-Main St (7), 7X</text>
-<path class="s0" d="M373.8,4478.0h49.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-49.0z"><title>Flushing-Main St (7), 7X, Aug-Dec 2025: 27,584</title></path>
-<text x="430.8" y="4488.0">27,584</text>
-<path class="s1" d="M373.8,4492.0h60.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.3z"><title>Flushing-Main St (7), 7X, 2019: 33,490</title></path>
-<text x="442.1" y="4502.0">33,490</text>
-<text x="365.8" y="4529.0" class="label" text-anchor="end">57 St (M)</text>
-<path class="s0" d="M373.8,4512.0h48.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.8z"><title>57 St (M), Aug-Dec 2025: 27,521</title></path>
-<text x="430.6" y="4522.0">27,521</text>
-<path class="s1" d="M373.8,4526.0h59.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.6z"><title>57 St (M), 2019: 33,146</title></path>
-<text x="441.4" y="4536.0">33,146</text>
-<text x="365.8" y="4563.0" class="label" text-anchor="end">Myrtle Av (J,M,Z), Manhattan</text>
-<path class="s0" d="M373.8,4546.0h48.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.8z"><title>Myrtle Av (J,M,Z), Manhattan, Aug-Dec 2025: 27,493</title></path>
-<text x="430.6" y="4556.0">27,493</text>
-<path class="s1" d="M373.8,4560.0h66.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-66.1z"><title>Myrtle Av (J,M,Z), Manhattan, 2019: 36,506</title></path>
-<text x="447.9" y="4570.0">36,506</text>
-<text x="365.8" y="4597.0" class="label" text-anchor="end">149 St-Hostos (2,5), NB</text>
-<path class="s0" d="M373.8,4580.0h47.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.7z"><title>149 St-Hostos (2,5), NB, Aug-Dec 2025: 26,948</title></path>
-<text x="429.5" y="4590.0">26,948</text>
-<path class="s1" d="M373.8,4594.0h73.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.3z"><title>149 St-Hostos (2,5), NB, 2019: 40,279</title></path>
-<text x="455.1" y="4604.0">40,279</text>
-<text x="365.8" y="4631.0" class="label" text-anchor="end">168 St (A,C), Downtown</text>
-<path class="s0" d="M373.8,4614.0h47.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.0z"><title>168 St (A,C), Downtown, Aug-Dec 2025: 26,554</title></path>
-<text x="428.8" y="4624.0">26,554</text>
-<path class="s1" d="M373.8,4628.0h60.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.6z"><title>168 St (A,C), Downtown, 2019: 33,659</title></path>
-<text x="442.4" y="4638.0">33,659</text>
-<text x="365.8" y="4665.0" class="label" text-anchor="end">Chambers St (1,2,3), Downtown</text>
-<path class="s0" d="M373.8,4648.0h46.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.7z"><title>Chambers St (1,2,3), Downtown, Aug-Dec 2025: 26,393</title></path>
-<text x="428.5" y="4658.0">26,393</text>
-<path class="s1" d="M373.8,4662.0h64.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.6z"><title>Chambers St (1,2,3), Downtown, 2019: 35,746</title></path>
-<text x="446.4" y="4672.0">35,746</text>
-<text x="365.8" y="4699.0" class="label" text-anchor="end">Delancey St-Essex St (J,M,Z), Brooklyn</text>
-<path class="s0" d="M373.8,4682.0h46.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.0z"><title>Delancey St-Essex St (J,M,Z), Brooklyn, Aug-Dec 2025: 26,041</title></path>
-<text x="427.8" y="4692.0">26,041</text>
-<path class="s1" d="M373.8,4696.0h58.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.5z"><title>Delancey St-Essex St (J,M,Z), Brooklyn, 2019: 32,560</title></path>
-<text x="440.3" y="4706.0">32,560</text>
-<text x="365.8" y="4733.0" class="label" text-anchor="end">East Broadway (F)</text>
-<path class="s0" d="M373.8,4716.0h45.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.6z"><title>East Broadway (F), Aug-Dec 2025: 25,812</title></path>
-<text x="427.4" y="4726.0">25,812</text>
-<path class="s1" d="M373.8,4730.0h54.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.9z"><title>East Broadway (F), 2019: 30,701</title></path>
-<text x="436.7" y="4740.0">30,701</text>
-<text x="365.8" y="4767.0" class="label" text-anchor="end">York St (F)</text>
-<path class="s0" d="M373.8,4750.0h45.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.5z"><title>York St (F), Aug-Dec 2025: 25,801</title></path>
-<text x="427.3" y="4760.0">25,801</text>
-<path class="s1" d="M373.8,4764.0h50.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-50.7z"><title>York St (F), 2019: 28,470</title></path>
-<text x="432.5" y="4774.0">28,470</text>
-<text x="365.8" y="4801.0" class="label" text-anchor="end">Junction Blvd (7), Manhattan</text>
-<path class="s0" d="M373.8,4784.0h45.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.1z"><title>Junction Blvd (7), Manhattan, Aug-Dec 2025: 25,547</title></path>
-<text x="426.9" y="4794.0">25,547</text>
-<path class="s1" d="M373.8,4798.0h46.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.0z"><title>Junction Blvd (7), Manhattan, 2019: 26,065</title></path>
-<text x="427.8" y="4808.0">26,065</text>
-<text x="365.8" y="4835.0" class="label" text-anchor="end">49 St (N,R,W), Downtown</text>
-<path class="s0" d="M373.8,4818.0h45.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.0z"><title>49 St (N,R,W), Downtown, Aug-Dec 2025: 25,530</title></path>
-<text x="426.8" y="4828.0">25,530</text>
-<path class="s1" d="M373.8,4832.0h48.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.8z"><title>49 St (N,R,W), Downtown, 2019: 27,495</title></path>
-<text x="430.6" y="4842.0">27,495</text>
-<text x="365.8" y="4869.0" class="label" text-anchor="end">49 St (N,R,W), Uptown</text>
-<path class="s0" d="M373.8,4852.0h44.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-44.2z"><title>49 St (N,R,W), Uptown, Aug-Dec 2025: 25,085</title></path>
-<text x="426.0" y="4862.0">25,085</text>
-<path class="s1" d="M373.8,4866.0h47.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.8z"><title>49 St (N,R,W), Uptown, 2019: 27,001</title></path>
-<text x="429.6" y="4876.0">27,001</text>
-<text x="365.8" y="4903.0" class="label" text-anchor="end">Astoria-Ditmars Blvd (N,W)</text>
-<path class="s0" d="M373.8,4886.0h43.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.8z"><title>Astoria-Ditmars Blvd (N,W), Aug-Dec 2025: 24,921</title></path>
-<text x="425.6" y="4896.0">24,921</text>
-<path class="s1" d="M373.8,4900.0h69.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-69.1z"><title>Astoria-Ditmars Blvd (N,W), 2019: 38,082</title></path>
-<text x="450.9" y="4910.0">38,082</text>
-<text x="365.8" y="4937.0" class="label" text-anchor="end">23 St (F,M), Uptown</text>
-<path class="s0" d="M373.8,4920.0h43.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.8z"><title>23 St (F,M), Uptown, Aug-Dec 2025: 24,904</title></path>
-<text x="425.6" y="4930.0">24,904</text>
-<path class="s1" d="M373.8,4934.0h59.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.8z"><title>23 St (F,M), Uptown, 2019: 33,239</title></path>
-<text x="441.6" y="4944.0">33,239</text>
-<text x="365.8" y="4971.0" class="label" text-anchor="end">1 Av (L), Brooklyn</text>
-<path class="s0" d="M373.8,4954.0h43.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.8z"><title>1 Av (L), Brooklyn, Aug-Dec 2025: 24,901</title></path>
-<text x="425.6" y="4964.0">24,901</text>
-<path class="s1" d="M373.8,4968.0h36.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-36.0z"><title>1 Av (L), Brooklyn, 2019: 20,858</title></path>
-<text x="417.8" y="4978.0">20,858</text>
-<text x="365.8" y="5005.0" class="label" text-anchor="end">161 St-Yankee Stadium (4), NB</text>
-<path class="s0" d="M373.8,4988.0h43.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.7z"><title>161 St-Yankee Stadium (4), NB, Aug-Dec 2025: 24,847</title></path>
-<text x="425.5" y="4998.0">24,847</text>
-<path class="s1" d="M373.8,5002.0h64.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.1z"><title>161 St-Yankee Stadium (4), NB, 2019: 35,493</title></path>
-<text x="445.9" y="5012.0">35,493</text>
-<text x="365.8" y="5039.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Manhattan</text>
-<path class="s0" d="M373.8,5022.0h43.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.6z"><title>Atlantic Av (2,3,4,5), Manhattan, Aug-Dec 2025: 24,809</title></path>
-<text x="425.4" y="5032.0">24,809</text>
-<path class="s1" d="M373.8,5036.0h58.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.4z"><title>Atlantic Av (2,3,4,5), Manhattan, 2019: 32,519</title></path>
-<text x="440.2" y="5046.0">32,519</text>
-<text x="365.8" y="5073.0" class="label" text-anchor="end">Junction Blvd (7), Outbound</text>
-<path class="s0" d="M373.8,5056.0h42.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.5z"><title>Junction Blvd (7), Outbound, Aug-Dec 2025: 24,238</title></path>
-<text x="424.3" y="5066.0">24,238</text>
-<path class="s1" d="M373.8,5070.0h42.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.8z"><title>Junction Blvd (7), Outbound, 2019: 24,360</title></path>
-<text x="424.6" y="5080.0">24,360</text>
-<text x="365.8" y="5107.0" class="label" text-anchor="end">77 St (6), Downtown</text>
-<path class="s0" d="M373.8,5090.0h42.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.4z"><title>77 St (6), Downtown, Aug-Dec 2025: 24,191</title></path>
-<text x="424.2" y="5100.0">24,191</text>
-<path class="s1" d="M373.8,5104.0h50.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-50.3z"><title>77 St (6), Downtown, 2019: 28,256</title></path>
-<text x="432.1" y="5114.0">28,256</text>
-<text x="365.8" y="5141.0" class="label" text-anchor="end">168 St (A,C), Uptown</text>
-<path class="s0" d="M373.8,5124.0h42.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.4z"><title>168 St (A,C), Uptown, Aug-Dec 2025: 24,176</title></path>
-<text x="424.2" y="5134.0">24,176</text>
-<path class="s1" d="M373.8,5138.0h54.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.6z"><title>168 St (A,C), Uptown, 2019: 30,515</title></path>
-<text x="436.4" y="5148.0">30,515</text>
-<text x="365.8" y="5175.0" class="label" text-anchor="end">Court Sq (7), Outbound</text>
-<path class="s0" d="M373.8,5158.0h42.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.4z"><title>Court Sq (7), Outbound, Aug-Dec 2025: 24,147</title></path>
-<text x="424.2" y="5168.0">24,147</text>
-<path class="s1" d="M373.8,5172.0h48.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.4z"><title>Court Sq (7), Outbound, 2019: 27,305</title></path>
-<text x="430.2" y="5182.0">27,305</text>
-<text x="365.8" y="5209.0" class="label" text-anchor="end">23 St-Baruch College (6), Uptown</text>
-<path class="s0" d="M373.8,5192.0h41.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.8z"><title>23 St-Baruch College (6), Uptown, Aug-Dec 2025: 23,848</title></path>
-<text x="423.6" y="5202.0">23,848</text>
-<path class="s1" d="M373.8,5206.0h61.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.3z"><title>23 St-Baruch College (6), Uptown, 2019: 34,012</title></path>
-<text x="443.1" y="5216.0">34,012</text>
-<text x="365.8" y="5243.0" class="label" text-anchor="end">77 St (6), Uptown</text>
-<path class="s0" d="M373.8,5226.0h41.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.6z"><title>77 St (6), Uptown, Aug-Dec 2025: 23,743</title></path>
-<text x="423.4" y="5236.0">23,743</text>
-<path class="s1" d="M373.8,5240.0h49.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-49.2z"><title>77 St (6), Uptown, 2019: 27,701</title></path>
-<text x="431.0" y="5250.0">27,701</text>
-<text x="365.8" y="5277.0" class="label" text-anchor="end">Kings Hwy (B,Q), Manhattan</text>
-<path class="s0" d="M373.8,5260.0h41.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.5z"><title>Kings Hwy (B,Q), Manhattan, Aug-Dec 2025: 23,683</title></path>
-<text x="423.3" y="5270.0">23,683</text>
-<path class="s1" d="M373.8,5274.0h55.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.1z"><title>Kings Hwy (B,Q), Manhattan, 2019: 30,796</title></path>
-<text x="436.9" y="5284.0">30,796</text>
-<text x="365.8" y="5311.0" class="label" text-anchor="end">Nevins St (2,3,4,5), Outbound</text>
-<path class="s0" d="M373.8,5294.0h41.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.1z"><title>Nevins St (2,3,4,5), Outbound, Aug-Dec 2025: 23,489</title></path>
-<text x="422.9" y="5304.0">23,489</text>
-<path class="s1" d="M373.8,5308.0h56.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-56.7z"><title>Nevins St (2,3,4,5), Outbound, 2019: 31,607</title></path>
-<text x="438.5" y="5318.0">31,607</text>
-<text x="365.8" y="5345.0" class="label" text-anchor="end">23 St (F,M), Downtown</text>
-<path class="s0" d="M373.8,5328.0h41.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.0z"><title>23 St (F,M), Downtown, Aug-Dec 2025: 23,439</title></path>
-<text x="422.8" y="5338.0">23,439</text>
-<path class="s1" d="M373.8,5342.0h55.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.8z"><title>23 St (F,M), Downtown, 2019: 31,142</title></path>
-<text x="437.6" y="5352.0">31,142</text>
-<text x="365.8" y="5379.0" class="label" text-anchor="end">149 St-Hostos (2,5), Manhattan</text>
-<path class="s0" d="M373.8,5362.0h41.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.0z"><title>149 St-Hostos (2,5), Manhattan, Aug-Dec 2025: 23,429</title></path>
-<text x="422.8" y="5372.0">23,429</text>
-<path class="s1" d="M373.8,5376.0h63.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.3z"><title>149 St-Hostos (2,5), Manhattan, 2019: 35,058</title></path>
-<text x="445.1" y="5386.0">35,058</text>
-<text x="365.8" y="5413.0" class="label" text-anchor="end">50 St (1), Uptown</text>
-<path class="s0" d="M373.8,5396.0h40.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.9z"><title>50 St (1), Uptown, Aug-Dec 2025: 23,381</title></path>
-<text x="422.7" y="5406.0">23,381</text>
-<path class="s1" d="M373.8,5410.0h55.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.3z"><title>50 St (1), Uptown, 2019: 30,904</title></path>
-<text x="437.1" y="5420.0">30,904</text>
-<text x="365.8" y="5447.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Outbound</text>
-<path class="s0" d="M373.8,5430.0h40.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.8z"><title>Atlantic Av (2,3,4,5), Outbound, Aug-Dec 2025: 23,347</title></path>
-<text x="422.6" y="5440.0">23,347</text>
-<path class="s1" d="M373.8,5444.0h54.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.9z"><title>Atlantic Av (2,3,4,5), Outbound, 2019: 30,655</title></path>
-<text x="436.7" y="5454.0">30,655</text>
-<text x="365.8" y="5481.0" class="label" text-anchor="end">33 St (6), Downtown</text>
-<path class="s0" d="M373.8,5464.0h40.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.7z"><title>33 St (6), Downtown, Aug-Dec 2025: 23,258</title></path>
-<text x="422.5" y="5474.0">23,258</text>
-<path class="s1" d="M373.8,5478.0h58.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.7z"><title>33 St (6), Downtown, 2019: 32,644</title></path>
-<text x="440.5" y="5488.0">32,644</text>
-<text x="365.8" y="5515.0" class="label" text-anchor="end">Metropolitan Av (G), SB</text>
-<path class="s0" d="M373.8,5498.0h40.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.5z"><title>Metropolitan Av (G), SB, Aug-Dec 2025: 23,186</title></path>
-<text x="422.3" y="5508.0">23,186</text>
-<path class="s1" d="M373.8,5512.0h45.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.3z"><title>Metropolitan Av (G), SB, 2019: 25,673</title></path>
-<text x="427.1" y="5522.0">25,673</text>
-<text x="365.8" y="5549.0" class="label" text-anchor="end">Court Sq (7), Manhattan</text>
-<path class="s0" d="M373.8,5532.0h40.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.4z"><title>Court Sq (7), Manhattan, Aug-Dec 2025: 23,105</title></path>
-<text x="422.2" y="5542.0">23,105</text>
-<path class="s1" d="M373.8,5546.0h45.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.8z"><title>Court Sq (7), Manhattan, 2019: 25,919</title></path>
-<text x="427.6" y="5556.0">25,919</text>
-<text x="365.8" y="5583.0" class="label" text-anchor="end">Metropolitan Av (G), Queens</text>
-<path class="s0" d="M373.8,5566.0h40.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.2z"><title>Metropolitan Av (G), Queens, Aug-Dec 2025: 23,038</title></path>
-<text x="422.0" y="5576.0">23,038</text>
-<path class="s1" d="M373.8,5580.0h45.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.0z"><title>Metropolitan Av (G), Queens, 2019: 25,501</title></path>
-<text x="426.8" y="5590.0">25,501</text>
-<text x="365.8" y="5617.0" class="label" text-anchor="end">23 St-Baruch College (6), Downtown</text>
-<path class="s0" d="M373.8,5600.0h40.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.0z"><title>23 St-Baruch College (6), Downtown, Aug-Dec 2025: 22,907</title></path>
-<text x="421.8" y="5610.0">22,907</text>
-<path class="s1" d="M373.8,5614.0h58.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.8z"><title>23 St-Baruch College (6), Downtown, 2019: 32,703</title></path>
-<text x="440.6" y="5624.0">32,703</text>
-<text x="365.8" y="5651.0" class="label" text-anchor="end">Broadway Junction (L), Manhattan</text>
-<path class="s0" d="M373.8,5634.0h39.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-39.9z"><title>Broadway Junction (L), Manhattan, Aug-Dec 2025: 22,869</title></path>
-<text x="421.7" y="5644.0">22,869</text>
-<path class="s1" d="M373.8,5648.0h53.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.8z"><title>Broadway Junction (L), Manhattan, 2019: 30,121</title></path>
-<text x="435.6" y="5658.0">30,121</text>
-<text x="365.8" y="5685.0" class="label" text-anchor="end">33 St (6), Uptown</text>
-<path class="s0" d="M373.8,5668.0h39.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-39.9z"><title>33 St (6), Uptown, Aug-Dec 2025: 22,863</title></path>
-<text x="421.7" y="5678.0">22,863</text>
-<path class="s1" d="M373.8,5682.0h57.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.7z"><title>33 St (6), Uptown, 2019: 32,146</title></path>
-<text x="439.5" y="5692.0">32,146</text>
-<text x="365.8" y="5719.0" class="label" text-anchor="end">1 Av (L), West Side</text>
-<path class="s0" d="M373.8,5702.0h39.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-39.7z"><title>1 Av (L), West Side, Aug-Dec 2025: 22,781</title></path>
-<text x="421.5" y="5712.0">22,781</text>
-<path class="s1" d="M373.8,5716.0h32.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-32.8z"><title>1 Av (L), West Side, 2019: 19,153</title></path>
-<text x="414.6" y="5726.0">19,153</text>
-<text x="365.8" y="5753.0" class="label" text-anchor="end">Delancey St-Essex St (F), Brooklyn</text>
-<path class="s0" d="M373.8,5736.0h39.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-39.2z"><title>Delancey St-Essex St (F), Brooklyn, Aug-Dec 2025: 22,499</title></path>
-<text x="421.0" y="5746.0">22,499</text>
-<path class="s1" d="M373.8,5750.0h47.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.5z"><title>Delancey St-Essex St (F), Brooklyn, 2019: 26,841</title></path>
-<text x="429.3" y="5760.0">26,841</text>
-<text x="365.8" y="5787.0" class="label" text-anchor="end">68 St-Hunter College (6), Downtown</text>
-<path class="s0" d="M373.8,5770.0h38.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.9z"><title>68 St-Hunter College (6), Downtown, Aug-Dec 2025: 22,363</title></path>
-<text x="420.7" y="5780.0">22,363</text>
-<path class="s1" d="M373.8,5784.0h48.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.5z"><title>68 St-Hunter College (6), Downtown, 2019: 27,336</title></path>
-<text x="430.3" y="5794.0">27,336</text>
-<text x="365.8" y="5821.0" class="label" text-anchor="end">Broadway Junction (J,Z), Manhattan</text>
-<path class="s0" d="M373.8,5804.0h38.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.7z"><title>Broadway Junction (J,Z), Manhattan, Aug-Dec 2025: 22,247</title></path>
-<text x="420.5" y="5814.0">22,247</text>
-<path class="s1" d="M373.8,5818.0h54.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.0z"><title>Broadway Junction (J,Z), Manhattan, 2019: 30,198</title></path>
-<text x="435.8" y="5828.0">30,198</text>
-<text x="365.8" y="5855.0" class="label" text-anchor="end">Canarsie-Rockaway Pkwy (L)</text>
-<path class="s0" d="M373.8,5838.0h38.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.6z"><title>Canarsie-Rockaway Pkwy (L), Aug-Dec 2025: 22,212</title></path>
+<text x="365.8" y="3611.0" class="label" text-anchor="end">Bleecker St (6), Downtown</text>
+<path class="s0" d="M373.8,3594.0h61.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.7z"><title>Bleecker St (6), Downtown, Aug-Dec 2025: 34,234</title></path>
+<text x="443.5" y="3604.0">34,234</text>
+<path class="s1" d="M373.8,3608.0h77.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.5z"><title>Bleecker St (6), Downtown, 2019: 42,455</title></path>
+<text x="459.3" y="3618.0">42,455</text>
+<text x="365.8" y="3645.0" class="label" text-anchor="end">59 St (4,5,6), Downtown 6</text>
+<path class="s0" d="M373.8,3628.0h61.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.7z"><title>59 St (4,5,6), Downtown 6, Aug-Dec 2025: 34,214</title></path>
+<text x="443.5" y="3638.0">34,214</text>
+<path class="s1" d="M373.8,3642.0h81.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.3z"><title>59 St (4,5,6), Downtown 6, 2019: 44,451</title></path>
+<text x="463.1" y="3652.0">44,451</text>
+<text x="365.8" y="3679.0" class="label" text-anchor="end">Kew Gardens-Union Tpke (E,F), Manhattan</text>
+<path class="s0" d="M373.8,3662.0h61.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.4z"><title>Kew Gardens-Union Tpke (E,F), Manhattan, Aug-Dec 2025: 34,050</title></path>
+<text x="443.2" y="3672.0">34,050</text>
+<path class="s1" d="M373.8,3676.0h86.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-86.0z"><title>Kew Gardens-Union Tpke (E,F), Manhattan, 2019: 46,850</title></path>
+<text x="467.8" y="3686.0">46,850</text>
+<text x="365.8" y="3713.0" class="label" text-anchor="end">57 St-7 Av (N,Q,R,W), Uptown</text>
+<path class="s0" d="M373.8,3696.0h61.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.2z"><title>57 St-7 Av (N,Q,R,W), Uptown, Aug-Dec 2025: 33,936</title></path>
+<text x="443.0" y="3706.0">33,936</text>
+<path class="s1" d="M373.8,3710.0h80.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.1z"><title>57 St-7 Av (N,Q,R,W), Uptown, 2019: 43,805</title></path>
+<text x="461.9" y="3720.0">43,805</text>
+<text x="365.8" y="3747.0" class="label" text-anchor="end">DeKalb Av (B,Q,R), SB</text>
+<path class="s0" d="M373.8,3730.0h60.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.5z"><title>DeKalb Av (B,Q,R), SB, Aug-Dec 2025: 33,612</title></path>
+<text x="442.3" y="3740.0">33,612</text>
+<path class="s1" d="M373.8,3744.0h78.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.2z"><title>DeKalb Av (B,Q,R), SB, 2019: 42,826</title></path>
+<text x="460.0" y="3754.0">42,826</text>
+<text x="365.8" y="3781.0" class="label" text-anchor="end">57 St-7 Av (N,Q,R,W), Downtown</text>
+<path class="s0" d="M373.8,3764.0h60.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.1z"><title>57 St-7 Av (N,Q,R,W), Downtown, Aug-Dec 2025: 33,383</title></path>
+<text x="441.9" y="3774.0">33,383</text>
+<path class="s1" d="M373.8,3778.0h78.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.4z"><title>57 St-7 Av (N,Q,R,W), Downtown, 2019: 42,918</title></path>
+<text x="460.2" y="3788.0">42,918</text>
+<text x="365.8" y="3815.0" class="label" text-anchor="end">Franklin Av-Medgar Evers College (2,3,4,5), Outbound</text>
+<path class="s0" d="M373.8,3798.0h59.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.8z"><title>Franklin Av-Medgar Evers College (2,3,4,5), Outbound, Aug-Dec 2025: 33,241</title></path>
+<text x="441.6" y="3808.0">33,241</text>
+<path class="s1" d="M373.8,3812.0h82.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.1z"><title>Franklin Av-Medgar Evers College (2,3,4,5), Outbound, 2019: 44,832</title></path>
+<text x="463.9" y="3822.0">44,832</text>
+<text x="365.8" y="3849.0" class="label" text-anchor="end">86 St (4,5,6), Uptown 4,5</text>
+<path class="s0" d="M373.8,3832.0h59.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.8z"><title>86 St (4,5,6), Uptown 4,5, Aug-Dec 2025: 33,225</title></path>
+<text x="441.6" y="3842.0">33,225</text>
+<path class="s1" d="M373.8,3846.0h73.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.2z"><title>86 St (4,5,6), Uptown 4,5, 2019: 40,204</title></path>
+<text x="455.0" y="3856.0">40,204</text>
+<text x="365.8" y="3883.0" class="label" text-anchor="end">Chambers St (1,2,3), Uptown</text>
+<path class="s0" d="M373.8,3866.0h59.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.0z"><title>Chambers St (1,2,3), Uptown, Aug-Dec 2025: 32,791</title></path>
+<text x="440.8" y="3876.0">32,791</text>
+<path class="s1" d="M373.8,3880.0h80.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.2z"><title>Chambers St (1,2,3), Uptown, 2019: 43,865</title></path>
+<text x="462.0" y="3890.0">43,865</text>
+<text x="365.8" y="3917.0" class="label" text-anchor="end">Wall St (2,3)</text>
+<path class="s0" d="M373.8,3900.0h57.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.9z"><title>Wall St (2,3), Aug-Dec 2025: 32,261</title></path>
+<text x="439.7" y="3910.0">32,261</text>
+<path class="s1" d="M373.8,3914.0h97.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-97.6z"><title>Wall St (2,3), 2019: 52,937</title></path>
+<text x="479.4" y="3924.0">52,937</text>
+<text x="365.8" y="3951.0" class="label" text-anchor="end">36 St (D,N,R), SB</text>
+<path class="s0" d="M373.8,3934.0h56.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-56.9z"><title>36 St (D,N,R), SB, Aug-Dec 2025: 31,706</title></path>
+<text x="438.7" y="3944.0">31,706</text>
+<path class="s1" d="M373.8,3948.0h66.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-66.8z"><title>36 St (D,N,R), SB, 2019: 36,865</title></path>
+<text x="448.6" y="3958.0">36,865</text>
+<text x="365.8" y="3985.0" class="label" text-anchor="end">Canal St (N,Q), Uptown</text>
+<path class="s0" d="M373.8,3968.0h55.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.8z"><title>Canal St (N,Q), Uptown, Aug-Dec 2025: 31,170</title></path>
+<text x="437.6" y="3978.0">31,170</text>
+<path class="s1" d="M373.8,3982.0h73.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.6z"><title>Canal St (N,Q), Uptown, 2019: 40,392</title></path>
+<text x="455.4" y="3992.0">40,392</text>
+<text x="365.8" y="4019.0" class="label" text-anchor="end">Broadway Junction (A,C), Manhattan</text>
+<path class="s0" d="M373.8,4002.0h55.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.0z"><title>Broadway Junction (A,C), Manhattan, Aug-Dec 2025: 30,708</title></path>
+<text x="436.8" y="4012.0">30,708</text>
+<path class="s1" d="M373.8,4016.0h77.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.3z"><title>Broadway Junction (A,C), Manhattan, 2019: 42,330</title></path>
+<text x="459.1" y="4026.0">42,330</text>
+<text x="365.8" y="4053.0" class="label" text-anchor="end">96 St (Q)</text>
+<path class="s0" d="M373.8,4036.0h54.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.5z"><title>96 St (Q), Aug-Dec 2025: 30,473</title></path>
+<text x="436.3" y="4046.0">30,473</text>
+<path class="s1" d="M373.8,4050.0h75.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.1z"><title>96 St (Q), 2019: 41,212</title></path>
+<text x="456.9" y="4060.0">41,212</text>
+<text x="365.8" y="4087.0" class="label" text-anchor="end">59 St (4,5,6), Uptown 6</text>
+<path class="s0" d="M373.8,4070.0h54.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.4z"><title>59 St (4,5,6), Uptown 6, Aug-Dec 2025: 30,400</title></path>
+<text x="436.2" y="4080.0">30,400</text>
+<path class="s1" d="M373.8,4084.0h72.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-72.4z"><title>59 St (4,5,6), Uptown 6, 2019: 39,809</title></path>
+<text x="454.2" y="4094.0">39,809</text>
+<text x="365.8" y="4121.0" class="label" text-anchor="end">Broadway Junction (A,C), Outbound</text>
+<path class="s0" d="M373.8,4104.0h53.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.9z"><title>Broadway Junction (A,C), Outbound, Aug-Dec 2025: 30,159</title></path>
+<text x="435.7" y="4114.0">30,159</text>
+<path class="s1" d="M373.8,4118.0h75.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.2z"><title>Broadway Junction (A,C), Outbound, 2019: 41,255</title></path>
+<text x="457.0" y="4128.0">41,255</text>
+<text x="365.8" y="4155.0" class="label" text-anchor="end">Canal St (N,Q), Downtown</text>
+<path class="s0" d="M373.8,4138.0h53.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.9z"><title>Canal St (N,Q), Downtown, Aug-Dec 2025: 30,152</title></path>
+<text x="435.7" y="4148.0">30,152</text>
+<path class="s1" d="M373.8,4152.0h71.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.5z"><title>Canal St (N,Q), Downtown, 2019: 39,316</title></path>
+<text x="453.3" y="4162.0">39,316</text>
+<text x="365.8" y="4189.0" class="label" text-anchor="end">DeKalb Av (B,Q,R), Manhattan</text>
+<path class="s0" d="M373.8,4172.0h53.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.6z"><title>DeKalb Av (B,Q,R), Manhattan, Aug-Dec 2025: 29,989</title></path>
+<text x="435.4" y="4182.0">29,989</text>
+<path class="s1" d="M373.8,4186.0h68.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.8z"><title>DeKalb Av (B,Q,R), Manhattan, 2019: 37,920</title></path>
+<text x="450.6" y="4196.0">37,920</text>
+<text x="365.8" y="4223.0" class="label" text-anchor="end">Brooklyn Bridge-City Hall (4,5,6), Downtown</text>
+<path class="s0" d="M373.8,4206.0h53.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.4z"><title>Brooklyn Bridge-City Hall (4,5,6), Downtown, Aug-Dec 2025: 29,919</title></path>
+<text x="435.2" y="4216.0">29,919</text>
+<path class="s1" d="M373.8,4220.0h77.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.4z"><title>Brooklyn Bridge-City Hall (4,5,6), Downtown, 2019: 42,397</title></path>
+<text x="459.2" y="4230.0">42,397</text>
+<text x="365.8" y="4257.0" class="label" text-anchor="end">59 St (N,R), Manhattan</text>
+<path class="s0" d="M373.8,4240.0h53.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.2z"><title>59 St (N,R), Manhattan, Aug-Dec 2025: 29,804</title></path>
+<text x="435.0" y="4250.0">29,804</text>
+<path class="s1" d="M373.8,4254.0h62.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.7z"><title>59 St (N,R), Manhattan, 2019: 34,756</title></path>
+<text x="444.5" y="4264.0">34,756</text>
+<text x="365.8" y="4291.0" class="label" text-anchor="end">Lorimer St (L), Manhattan</text>
+<path class="s0" d="M373.8,4274.0h52.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.1z"><title>Lorimer St (L), Manhattan, Aug-Dec 2025: 29,208</title></path>
+<text x="433.9" y="4284.0">29,208</text>
+<path class="s1" d="M373.8,4288.0h57.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.4z"><title>Lorimer St (L), Manhattan, 2019: 32,003</title></path>
+<text x="439.2" y="4298.0">32,003</text>
+<text x="365.8" y="4325.0" class="label" text-anchor="end">Crown Hts-Utica Av (3,4), Manhattan</text>
+<path class="s0" d="M373.8,4308.0h51.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.8z"><title>Crown Hts-Utica Av (3,4), Manhattan, Aug-Dec 2025: 29,078</title></path>
+<text x="433.6" y="4318.0">29,078</text>
+<path class="s1" d="M373.8,4322.0h74.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.5z"><title>Crown Hts-Utica Av (3,4), Manhattan, 2019: 40,864</title></path>
+<text x="456.3" y="4332.0">40,864</text>
+<text x="365.8" y="4359.0" class="label" text-anchor="end">Lorimer St (L), Outbound</text>
+<path class="s0" d="M373.8,4342.0h51.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.6z"><title>Lorimer St (L), Outbound, Aug-Dec 2025: 28,934</title></path>
+<text x="433.4" y="4352.0">28,934</text>
+<path class="s1" d="M373.8,4356.0h56.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-56.9z"><title>Lorimer St (L), Outbound, 2019: 31,725</title></path>
+<text x="438.7" y="4366.0">31,725</text>
+<text x="365.8" y="4393.0" class="label" text-anchor="end">Court Sq-23 St (E,F), Manhattan</text>
+<path class="s0" d="M373.8,4376.0h51.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.5z"><title>Court Sq-23 St (E,F), Manhattan, Aug-Dec 2025: 28,905</title></path>
+<text x="433.3" y="4386.0">28,905</text>
+<path class="s1" d="M373.8,4390.0h62.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.8z"><title>Court Sq-23 St (E,F), Manhattan, 2019: 34,785</title></path>
+<text x="444.6" y="4400.0">34,785</text>
+<text x="365.8" y="4427.0" class="label" text-anchor="end">Court Sq-23 St (E,F), Outbound</text>
+<path class="s0" d="M373.8,4410.0h51.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.2z"><title>Court Sq-23 St (E,F), Outbound, Aug-Dec 2025: 28,733</title></path>
+<text x="433.0" y="4420.0">28,733</text>
+<path class="s1" d="M373.8,4424.0h62.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.9z"><title>Court Sq-23 St (E,F), Outbound, 2019: 34,820</title></path>
+<text x="444.7" y="4434.0">34,820</text>
+<text x="365.8" y="4461.0" class="label" text-anchor="end">Flushing-Main St (7), 7X</text>
+<path class="s0" d="M373.8,4444.0h49.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-49.0z"><title>Flushing-Main St (7), 7X, Aug-Dec 2025: 27,584</title></path>
+<text x="430.8" y="4454.0">27,584</text>
+<path class="s1" d="M373.8,4458.0h60.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.3z"><title>Flushing-Main St (7), 7X, 2019: 33,490</title></path>
+<text x="442.1" y="4468.0">33,490</text>
+<text x="365.8" y="4495.0" class="label" text-anchor="end">57 St (M)</text>
+<path class="s0" d="M373.8,4478.0h48.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.8z"><title>57 St (M), Aug-Dec 2025: 27,521</title></path>
+<text x="430.6" y="4488.0">27,521</text>
+<path class="s1" d="M373.8,4492.0h59.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.6z"><title>57 St (M), 2019: 33,146</title></path>
+<text x="441.4" y="4502.0">33,146</text>
+<text x="365.8" y="4529.0" class="label" text-anchor="end">Myrtle Av (J,M,Z), Manhattan</text>
+<path class="s0" d="M373.8,4512.0h48.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.8z"><title>Myrtle Av (J,M,Z), Manhattan, Aug-Dec 2025: 27,493</title></path>
+<text x="430.6" y="4522.0">27,493</text>
+<path class="s1" d="M373.8,4526.0h66.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-66.1z"><title>Myrtle Av (J,M,Z), Manhattan, 2019: 36,506</title></path>
+<text x="447.9" y="4536.0">36,506</text>
+<text x="365.8" y="4563.0" class="label" text-anchor="end">149 St-Hostos (2,5), NB</text>
+<path class="s0" d="M373.8,4546.0h47.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.7z"><title>149 St-Hostos (2,5), NB, Aug-Dec 2025: 26,948</title></path>
+<text x="429.5" y="4556.0">26,948</text>
+<path class="s1" d="M373.8,4560.0h73.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.3z"><title>149 St-Hostos (2,5), NB, 2019: 40,279</title></path>
+<text x="455.1" y="4570.0">40,279</text>
+<text x="365.8" y="4597.0" class="label" text-anchor="end">168 St (A,C), Downtown</text>
+<path class="s0" d="M373.8,4580.0h47.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.0z"><title>168 St (A,C), Downtown, Aug-Dec 2025: 26,554</title></path>
+<text x="428.8" y="4590.0">26,554</text>
+<path class="s1" d="M373.8,4594.0h60.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.6z"><title>168 St (A,C), Downtown, 2019: 33,659</title></path>
+<text x="442.4" y="4604.0">33,659</text>
+<text x="365.8" y="4631.0" class="label" text-anchor="end">Chambers St (1,2,3), Downtown</text>
+<path class="s0" d="M373.8,4614.0h46.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.7z"><title>Chambers St (1,2,3), Downtown, Aug-Dec 2025: 26,393</title></path>
+<text x="428.5" y="4624.0">26,393</text>
+<path class="s1" d="M373.8,4628.0h64.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.6z"><title>Chambers St (1,2,3), Downtown, 2019: 35,746</title></path>
+<text x="446.4" y="4638.0">35,746</text>
+<text x="365.8" y="4665.0" class="label" text-anchor="end">Delancey St-Essex St (J,M,Z), Brooklyn</text>
+<path class="s0" d="M373.8,4648.0h46.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.0z"><title>Delancey St-Essex St (J,M,Z), Brooklyn, Aug-Dec 2025: 26,041</title></path>
+<text x="427.8" y="4658.0">26,041</text>
+<path class="s1" d="M373.8,4662.0h58.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.5z"><title>Delancey St-Essex St (J,M,Z), Brooklyn, 2019: 32,560</title></path>
+<text x="440.3" y="4672.0">32,560</text>
+<text x="365.8" y="4699.0" class="label" text-anchor="end">East Broadway (F)</text>
+<path class="s0" d="M373.8,4682.0h45.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.6z"><title>East Broadway (F), Aug-Dec 2025: 25,812</title></path>
+<text x="427.4" y="4692.0">25,812</text>
+<path class="s1" d="M373.8,4696.0h54.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.9z"><title>East Broadway (F), 2019: 30,701</title></path>
+<text x="436.7" y="4706.0">30,701</text>
+<text x="365.8" y="4733.0" class="label" text-anchor="end">York St (F)</text>
+<path class="s0" d="M373.8,4716.0h45.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.5z"><title>York St (F), Aug-Dec 2025: 25,801</title></path>
+<text x="427.3" y="4726.0">25,801</text>
+<path class="s1" d="M373.8,4730.0h50.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-50.7z"><title>York St (F), 2019: 28,470</title></path>
+<text x="432.5" y="4740.0">28,470</text>
+<text x="365.8" y="4767.0" class="label" text-anchor="end">Junction Blvd (7), Manhattan</text>
+<path class="s0" d="M373.8,4750.0h45.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.1z"><title>Junction Blvd (7), Manhattan, Aug-Dec 2025: 25,547</title></path>
+<text x="426.9" y="4760.0">25,547</text>
+<path class="s1" d="M373.8,4764.0h46.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.0z"><title>Junction Blvd (7), Manhattan, 2019: 26,065</title></path>
+<text x="427.8" y="4774.0">26,065</text>
+<text x="365.8" y="4801.0" class="label" text-anchor="end">49 St (N,R,W), Downtown</text>
+<path class="s0" d="M373.8,4784.0h45.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.0z"><title>49 St (N,R,W), Downtown, Aug-Dec 2025: 25,530</title></path>
+<text x="426.8" y="4794.0">25,530</text>
+<path class="s1" d="M373.8,4798.0h48.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.8z"><title>49 St (N,R,W), Downtown, 2019: 27,495</title></path>
+<text x="430.6" y="4808.0">27,495</text>
+<text x="365.8" y="4835.0" class="label" text-anchor="end">49 St (N,R,W), Uptown</text>
+<path class="s0" d="M373.8,4818.0h44.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-44.2z"><title>49 St (N,R,W), Uptown, Aug-Dec 2025: 25,085</title></path>
+<text x="426.0" y="4828.0">25,085</text>
+<path class="s1" d="M373.8,4832.0h47.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.8z"><title>49 St (N,R,W), Uptown, 2019: 27,001</title></path>
+<text x="429.6" y="4842.0">27,001</text>
+<text x="365.8" y="4869.0" class="label" text-anchor="end">Astoria-Ditmars Blvd (N,W)</text>
+<path class="s0" d="M373.8,4852.0h43.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.8z"><title>Astoria-Ditmars Blvd (N,W), Aug-Dec 2025: 24,921</title></path>
+<text x="425.6" y="4862.0">24,921</text>
+<path class="s1" d="M373.8,4866.0h69.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-69.1z"><title>Astoria-Ditmars Blvd (N,W), 2019: 38,082</title></path>
+<text x="450.9" y="4876.0">38,082</text>
+<text x="365.8" y="4903.0" class="label" text-anchor="end">23 St (F,M), Uptown</text>
+<path class="s0" d="M373.8,4886.0h43.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.8z"><title>23 St (F,M), Uptown, Aug-Dec 2025: 24,904</title></path>
+<text x="425.6" y="4896.0">24,904</text>
+<path class="s1" d="M373.8,4900.0h59.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.8z"><title>23 St (F,M), Uptown, 2019: 33,239</title></path>
+<text x="441.6" y="4910.0">33,239</text>
+<text x="365.8" y="4937.0" class="label" text-anchor="end">1 Av (L), Brooklyn</text>
+<path class="s0" d="M373.8,4920.0h43.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.8z"><title>1 Av (L), Brooklyn, Aug-Dec 2025: 24,901</title></path>
+<text x="425.6" y="4930.0">24,901</text>
+<path class="s1" d="M373.8,4934.0h36.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-36.0z"><title>1 Av (L), Brooklyn, 2019: 20,858</title></path>
+<text x="417.8" y="4944.0">20,858</text>
+<text x="365.8" y="4971.0" class="label" text-anchor="end">161 St-Yankee Stadium (4), NB</text>
+<path class="s0" d="M373.8,4954.0h43.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.7z"><title>161 St-Yankee Stadium (4), NB, Aug-Dec 2025: 24,847</title></path>
+<text x="425.5" y="4964.0">24,847</text>
+<path class="s1" d="M373.8,4968.0h64.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.1z"><title>161 St-Yankee Stadium (4), NB, 2019: 35,493</title></path>
+<text x="445.9" y="4978.0">35,493</text>
+<text x="365.8" y="5005.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Manhattan</text>
+<path class="s0" d="M373.8,4988.0h43.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.6z"><title>Atlantic Av (2,3,4,5), Manhattan, Aug-Dec 2025: 24,809</title></path>
+<text x="425.4" y="4998.0">24,809</text>
+<path class="s1" d="M373.8,5002.0h58.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.4z"><title>Atlantic Av (2,3,4,5), Manhattan, 2019: 32,519</title></path>
+<text x="440.2" y="5012.0">32,519</text>
+<text x="365.8" y="5039.0" class="label" text-anchor="end">Junction Blvd (7), Outbound</text>
+<path class="s0" d="M373.8,5022.0h42.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.5z"><title>Junction Blvd (7), Outbound, Aug-Dec 2025: 24,238</title></path>
+<text x="424.3" y="5032.0">24,238</text>
+<path class="s1" d="M373.8,5036.0h42.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.8z"><title>Junction Blvd (7), Outbound, 2019: 24,360</title></path>
+<text x="424.6" y="5046.0">24,360</text>
+<text x="365.8" y="5073.0" class="label" text-anchor="end">77 St (6), Downtown</text>
+<path class="s0" d="M373.8,5056.0h42.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.4z"><title>77 St (6), Downtown, Aug-Dec 2025: 24,191</title></path>
+<text x="424.2" y="5066.0">24,191</text>
+<path class="s1" d="M373.8,5070.0h50.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-50.3z"><title>77 St (6), Downtown, 2019: 28,256</title></path>
+<text x="432.1" y="5080.0">28,256</text>
+<text x="365.8" y="5107.0" class="label" text-anchor="end">168 St (A,C), Uptown</text>
+<path class="s0" d="M373.8,5090.0h42.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.4z"><title>168 St (A,C), Uptown, Aug-Dec 2025: 24,176</title></path>
+<text x="424.2" y="5100.0">24,176</text>
+<path class="s1" d="M373.8,5104.0h54.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.6z"><title>168 St (A,C), Uptown, 2019: 30,515</title></path>
+<text x="436.4" y="5114.0">30,515</text>
+<text x="365.8" y="5141.0" class="label" text-anchor="end">Court Sq (7), Outbound</text>
+<path class="s0" d="M373.8,5124.0h42.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.4z"><title>Court Sq (7), Outbound, Aug-Dec 2025: 24,147</title></path>
+<text x="424.2" y="5134.0">24,147</text>
+<path class="s1" d="M373.8,5138.0h48.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.4z"><title>Court Sq (7), Outbound, 2019: 27,305</title></path>
+<text x="430.2" y="5148.0">27,305</text>
+<text x="365.8" y="5175.0" class="label" text-anchor="end">23 St-Baruch College (6), Uptown</text>
+<path class="s0" d="M373.8,5158.0h41.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.8z"><title>23 St-Baruch College (6), Uptown, Aug-Dec 2025: 23,848</title></path>
+<text x="423.6" y="5168.0">23,848</text>
+<path class="s1" d="M373.8,5172.0h61.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.3z"><title>23 St-Baruch College (6), Uptown, 2019: 34,012</title></path>
+<text x="443.1" y="5182.0">34,012</text>
+<text x="365.8" y="5209.0" class="label" text-anchor="end">77 St (6), Uptown</text>
+<path class="s0" d="M373.8,5192.0h41.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.6z"><title>77 St (6), Uptown, Aug-Dec 2025: 23,743</title></path>
+<text x="423.4" y="5202.0">23,743</text>
+<path class="s1" d="M373.8,5206.0h49.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-49.2z"><title>77 St (6), Uptown, 2019: 27,701</title></path>
+<text x="431.0" y="5216.0">27,701</text>
+<text x="365.8" y="5243.0" class="label" text-anchor="end">Kings Hwy (B,Q), Manhattan</text>
+<path class="s0" d="M373.8,5226.0h41.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.5z"><title>Kings Hwy (B,Q), Manhattan, Aug-Dec 2025: 23,683</title></path>
+<text x="423.3" y="5236.0">23,683</text>
+<path class="s1" d="M373.8,5240.0h55.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.1z"><title>Kings Hwy (B,Q), Manhattan, 2019: 30,796</title></path>
+<text x="436.9" y="5250.0">30,796</text>
+<text x="365.8" y="5277.0" class="label" text-anchor="end">Nevins St (2,3,4,5), Outbound</text>
+<path class="s0" d="M373.8,5260.0h41.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.1z"><title>Nevins St (2,3,4,5), Outbound, Aug-Dec 2025: 23,489</title></path>
+<text x="422.9" y="5270.0">23,489</text>
+<path class="s1" d="M373.8,5274.0h56.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-56.7z"><title>Nevins St (2,3,4,5), Outbound, 2019: 31,607</title></path>
+<text x="438.5" y="5284.0">31,607</text>
+<text x="365.8" y="5311.0" class="label" text-anchor="end">23 St (F,M), Downtown</text>
+<path class="s0" d="M373.8,5294.0h41.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.0z"><title>23 St (F,M), Downtown, Aug-Dec 2025: 23,439</title></path>
+<text x="422.8" y="5304.0">23,439</text>
+<path class="s1" d="M373.8,5308.0h55.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.8z"><title>23 St (F,M), Downtown, 2019: 31,142</title></path>
+<text x="437.6" y="5318.0">31,142</text>
+<text x="365.8" y="5345.0" class="label" text-anchor="end">149 St-Hostos (2,5), Manhattan</text>
+<path class="s0" d="M373.8,5328.0h41.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.0z"><title>149 St-Hostos (2,5), Manhattan, Aug-Dec 2025: 23,429</title></path>
+<text x="422.8" y="5338.0">23,429</text>
+<path class="s1" d="M373.8,5342.0h63.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.3z"><title>149 St-Hostos (2,5), Manhattan, 2019: 35,058</title></path>
+<text x="445.1" y="5352.0">35,058</text>
+<text x="365.8" y="5379.0" class="label" text-anchor="end">50 St (1), Uptown</text>
+<path class="s0" d="M373.8,5362.0h40.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.9z"><title>50 St (1), Uptown, Aug-Dec 2025: 23,381</title></path>
+<text x="422.7" y="5372.0">23,381</text>
+<path class="s1" d="M373.8,5376.0h55.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.3z"><title>50 St (1), Uptown, 2019: 30,904</title></path>
+<text x="437.1" y="5386.0">30,904</text>
+<text x="365.8" y="5413.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Outbound</text>
+<path class="s0" d="M373.8,5396.0h40.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.8z"><title>Atlantic Av (2,3,4,5), Outbound, Aug-Dec 2025: 23,347</title></path>
+<text x="422.6" y="5406.0">23,347</text>
+<path class="s1" d="M373.8,5410.0h54.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.9z"><title>Atlantic Av (2,3,4,5), Outbound, 2019: 30,655</title></path>
+<text x="436.7" y="5420.0">30,655</text>
+<text x="365.8" y="5447.0" class="label" text-anchor="end">33 St (6), Downtown</text>
+<path class="s0" d="M373.8,5430.0h40.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.7z"><title>33 St (6), Downtown, Aug-Dec 2025: 23,258</title></path>
+<text x="422.5" y="5440.0">23,258</text>
+<path class="s1" d="M373.8,5444.0h58.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.7z"><title>33 St (6), Downtown, 2019: 32,644</title></path>
+<text x="440.5" y="5454.0">32,644</text>
+<text x="365.8" y="5481.0" class="label" text-anchor="end">Metropolitan Av (G), SB</text>
+<path class="s0" d="M373.8,5464.0h40.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.5z"><title>Metropolitan Av (G), SB, Aug-Dec 2025: 23,186</title></path>
+<text x="422.3" y="5474.0">23,186</text>
+<path class="s1" d="M373.8,5478.0h45.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.3z"><title>Metropolitan Av (G), SB, 2019: 25,673</title></path>
+<text x="427.1" y="5488.0">25,673</text>
+<text x="365.8" y="5515.0" class="label" text-anchor="end">Court Sq (7), Manhattan</text>
+<path class="s0" d="M373.8,5498.0h40.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.4z"><title>Court Sq (7), Manhattan, Aug-Dec 2025: 23,105</title></path>
+<text x="422.2" y="5508.0">23,105</text>
+<path class="s1" d="M373.8,5512.0h45.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.8z"><title>Court Sq (7), Manhattan, 2019: 25,919</title></path>
+<text x="427.6" y="5522.0">25,919</text>
+<text x="365.8" y="5549.0" class="label" text-anchor="end">Metropolitan Av (G), Queens</text>
+<path class="s0" d="M373.8,5532.0h40.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.2z"><title>Metropolitan Av (G), Queens, Aug-Dec 2025: 23,038</title></path>
+<text x="422.0" y="5542.0">23,038</text>
+<path class="s1" d="M373.8,5546.0h45.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.0z"><title>Metropolitan Av (G), Queens, 2019: 25,501</title></path>
+<text x="426.8" y="5556.0">25,501</text>
+<text x="365.8" y="5583.0" class="label" text-anchor="end">23 St-Baruch College (6), Downtown</text>
+<path class="s0" d="M373.8,5566.0h40.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.0z"><title>23 St-Baruch College (6), Downtown, Aug-Dec 2025: 22,907</title></path>
+<text x="421.8" y="5576.0">22,907</text>
+<path class="s1" d="M373.8,5580.0h58.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.8z"><title>23 St-Baruch College (6), Downtown, 2019: 32,703</title></path>
+<text x="440.6" y="5590.0">32,703</text>
+<text x="365.8" y="5617.0" class="label" text-anchor="end">Broadway Junction (L), Manhattan</text>
+<path class="s0" d="M373.8,5600.0h39.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-39.9z"><title>Broadway Junction (L), Manhattan, Aug-Dec 2025: 22,869</title></path>
+<text x="421.7" y="5610.0">22,869</text>
+<path class="s1" d="M373.8,5614.0h53.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.8z"><title>Broadway Junction (L), Manhattan, 2019: 30,121</title></path>
+<text x="435.6" y="5624.0">30,121</text>
+<text x="365.8" y="5651.0" class="label" text-anchor="end">33 St (6), Uptown</text>
+<path class="s0" d="M373.8,5634.0h39.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-39.9z"><title>33 St (6), Uptown, Aug-Dec 2025: 22,863</title></path>
+<text x="421.7" y="5644.0">22,863</text>
+<path class="s1" d="M373.8,5648.0h57.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.7z"><title>33 St (6), Uptown, 2019: 32,146</title></path>
+<text x="439.5" y="5658.0">32,146</text>
+<text x="365.8" y="5685.0" class="label" text-anchor="end">1 Av (L), West Side</text>
+<path class="s0" d="M373.8,5668.0h39.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-39.7z"><title>1 Av (L), West Side, Aug-Dec 2025: 22,781</title></path>
+<text x="421.5" y="5678.0">22,781</text>
+<path class="s1" d="M373.8,5682.0h32.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-32.8z"><title>1 Av (L), West Side, 2019: 19,153</title></path>
+<text x="414.6" y="5692.0">19,153</text>
+<text x="365.8" y="5719.0" class="label" text-anchor="end">Delancey St-Essex St (F), Brooklyn</text>
+<path class="s0" d="M373.8,5702.0h39.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-39.2z"><title>Delancey St-Essex St (F), Brooklyn, Aug-Dec 2025: 22,499</title></path>
+<text x="421.0" y="5712.0">22,499</text>
+<path class="s1" d="M373.8,5716.0h47.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.5z"><title>Delancey St-Essex St (F), Brooklyn, 2019: 26,841</title></path>
+<text x="429.3" y="5726.0">26,841</text>
+<text x="365.8" y="5753.0" class="label" text-anchor="end">68 St-Hunter College (6), Downtown</text>
+<path class="s0" d="M373.8,5736.0h38.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.9z"><title>68 St-Hunter College (6), Downtown, Aug-Dec 2025: 22,363</title></path>
+<text x="420.7" y="5746.0">22,363</text>
+<path class="s1" d="M373.8,5750.0h48.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.5z"><title>68 St-Hunter College (6), Downtown, 2019: 27,336</title></path>
+<text x="430.3" y="5760.0">27,336</text>
+<text x="365.8" y="5787.0" class="label" text-anchor="end">Broadway Junction (J,Z), Manhattan</text>
+<path class="s0" d="M373.8,5770.0h38.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.7z"><title>Broadway Junction (J,Z), Manhattan, Aug-Dec 2025: 22,247</title></path>
+<text x="420.5" y="5780.0">22,247</text>
+<path class="s1" d="M373.8,5784.0h54.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.0z"><title>Broadway Junction (J,Z), Manhattan, 2019: 30,198</title></path>
+<text x="435.8" y="5794.0">30,198</text>
+<text x="365.8" y="5821.0" class="label" text-anchor="end">Canarsie-Rockaway Pkwy (L)</text>
+<path class="s0" d="M373.8,5804.0h38.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.6z"><title>Canarsie-Rockaway Pkwy (L), Aug-Dec 2025: 22,212</title></path>
+<text x="420.4" y="5814.0">22,212</text>
+<path class="s1" d="M373.8,5818.0h57.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.0z"><title>Canarsie-Rockaway Pkwy (L), 2019: 31,796</title></path>
+<text x="438.8" y="5828.0">31,796</text>
+<text x="365.8" y="5855.0" class="label" text-anchor="end">Queens Plaza (E,F,R), Manhattan</text>
+<path class="s0" d="M373.8,5838.0h38.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.6z"><title>Queens Plaza (E,F,R), Manhattan, Aug-Dec 2025: 22,212</title></path>
 <text x="420.4" y="5848.0">22,212</text>
-<path class="s1" d="M373.8,5852.0h57.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.0z"><title>Canarsie-Rockaway Pkwy (L), 2019: 31,796</title></path>
-<text x="438.8" y="5862.0">31,796</text>
-<text x="365.8" y="5889.0" class="label" text-anchor="end">Queens Plaza (E,F,R), Manhattan</text>
-<path class="s0" d="M373.8,5872.0h38.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.6z"><title>Queens Plaza (E,F,R), Manhattan, Aug-Dec 2025: 22,212</title></path>
-<text x="420.4" y="5882.0">22,212</text>
-<path class="s1" d="M373.8,5886.0h43.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.9z"><title>Queens Plaza (E,F,R), Manhattan, 2019: 24,972</title></path>
-<text x="425.7" y="5896.0">24,972</text>
-<text x="365.8" y="5923.0" class="label" text-anchor="end">161 St-Yankee Stadium (4), Manhattan</text>
-<path class="s0" d="M373.8,5906.0h38.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.5z"><title>161 St-Yankee Stadium (4), Manhattan, Aug-Dec 2025: 22,140</title></path>
-<text x="420.3" y="5916.0">22,140</text>
-<path class="s1" d="M373.8,5920.0h56.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-56.2z"><title>161 St-Yankee Stadium (4), Manhattan, 2019: 31,367</title></path>
-<text x="438.0" y="5930.0">31,367</text>
-<text x="365.8" y="5957.0" class="label" text-anchor="end">Crown Hts-Utica Av (3,4), Outbound</text>
-<path class="s0" d="M373.8,5940.0h38.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.4z"><title>Crown Hts-Utica Av (3,4), Outbound, Aug-Dec 2025: 22,108</title></path>
-<text x="420.2" y="5950.0">22,108</text>
-<path class="s1" d="M373.8,5954.0h55.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.5z"><title>Crown Hts-Utica Av (3,4), Outbound, 2019: 30,990</title></path>
-<text x="437.3" y="5964.0">30,990</text>
-<text x="365.8" y="5991.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Downtown</text>
-<path class="s0" d="M373.8,5974.0h38.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.3z"><title>34 St-Penn Station (1,2,3), Downtown, Aug-Dec 2025: 22,042</title></path>
-<text x="420.1" y="5984.0">22,042</text>
-<path class="s1" d="M373.8,5988.0h57.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.1z"><title>34 St-Penn Station (1,2,3), Downtown, 2019: 31,840</title></path>
-<text x="438.9" y="5998.0">31,840</text>
+<path class="s1" d="M373.8,5852.0h43.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.9z"><title>Queens Plaza (E,F,R), Manhattan, 2019: 24,972</title></path>
+<text x="425.7" y="5862.0">24,972</text>
+<text x="365.8" y="5889.0" class="label" text-anchor="end">161 St-Yankee Stadium (4), Manhattan</text>
+<path class="s0" d="M373.8,5872.0h38.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.5z"><title>161 St-Yankee Stadium (4), Manhattan, Aug-Dec 2025: 22,140</title></path>
+<text x="420.3" y="5882.0">22,140</text>
+<path class="s1" d="M373.8,5886.0h56.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-56.2z"><title>161 St-Yankee Stadium (4), Manhattan, 2019: 31,367</title></path>
+<text x="438.0" y="5896.0">31,367</text>
+<text x="365.8" y="5923.0" class="label" text-anchor="end">Crown Hts-Utica Av (3,4), Outbound</text>
+<path class="s0" d="M373.8,5906.0h38.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.4z"><title>Crown Hts-Utica Av (3,4), Outbound, Aug-Dec 2025: 22,108</title></path>
+<text x="420.2" y="5916.0">22,108</text>
+<path class="s1" d="M373.8,5920.0h55.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.5z"><title>Crown Hts-Utica Av (3,4), Outbound, 2019: 30,990</title></path>
+<text x="437.3" y="5930.0">30,990</text>
+<text x="365.8" y="5957.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Downtown</text>
+<path class="s0" d="M373.8,5940.0h38.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.3z"><title>34 St-Penn Station (1,2,3), Downtown, Aug-Dec 2025: 22,042</title></path>
+<text x="420.1" y="5950.0">22,042</text>
+<path class="s1" d="M373.8,5954.0h57.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.1z"><title>34 St-Penn Station (1,2,3), Downtown, 2019: 31,840</title></path>
+<text x="438.9" y="5964.0">31,840</text>
+<text x="365.8" y="5991.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown</text>
+<path class="s0" d="M373.8,5974.0h38.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.2z"><title>34 St-Penn Station (1,2,3), Uptown, Aug-Dec 2025: 21,960</title></path>
+<text x="420.0" y="5984.0">21,960</text>
+<path class="s1" d="M373.8,5988.0h56.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-56.7z"><title>34 St-Penn Station (1,2,3), Uptown, 2019: 31,638</title></path>
+<text x="438.5" y="5998.0">31,638</text>
 <text x="365.8" y="6025.0" class="label" text-anchor="end">68 St-Hunter College (6), Uptown</text>
 <path class="s0" d="M373.8,6008.0h38.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.0z"><title>68 St-Hunter College (6), Uptown, Aug-Dec 2025: 21,878</title></path>
 <text x="419.8" y="6018.0">21,878</text>

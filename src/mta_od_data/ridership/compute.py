@@ -6,7 +6,7 @@ cached rows on this module's source, and `trips.py`'s and `service.py`'s:
 a report's wording, or its places' names, can change without recomputing them.
 """
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import date
@@ -27,6 +27,7 @@ from mta_od_data.analyze.path_riders import (
 )
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR
 from mta_od_data.ridership.service import (
+    Feed,
     Pattern,
     load_feed,
     route_length,
@@ -215,24 +216,71 @@ def route_groups_table(groups: dict[str, list[str]]) -> None:
 def directions_table(manifest: Path) -> None:
     """Each route's consecutive stops' platform directions, from every date's feed,
     and their physical platforms (`platforms.csv`, `mta-od-data fetch-platforms`'s),
-    as a temp table `directions`: `route`, `a`, `b`, `da`, `db`, `pa`, `pb`."""
+    as a temp table `directions`: `route`, `a`, `b`, `da`, `db`, `pa`, `pb`.
+    A ride's text lists no stop before its first or after its last,
+    so each of `pa` and `pb` is the known platform
+    most of the routed dates' trains stopping at `a` then `b` stop at,
+    like the M through trains, not the ones ending there, at Delancey St-Essex St
+    on a weekday."""
     if built.get("directions") == manifest:
         return
     directions: dict[tuple[str, str, str], tuple[str, str]] = {}
+    # Trains on the routed dates at each (route, previous stop, stop, next stop),
+    # each date's counted for the days it stands for, "" for no previous or next stop.
+    trains: Counter[tuple[str, str, str, str]] = Counter()
+    feeds: dict[str, Feed] = {}
     for row in read_manifest(manifest):
-        directions |= load_feed(DEFAULT_GTFS_DIR / Path(row["feed"]).name).directions
+        name = Path(row["feed"]).name
+        if name not in feeds:
+            feeds[name] = load_feed(DEFAULT_GTFS_DIR / name)
+        feed = feeds[name]
+        directions |= feed.directions
+        days = int(row["days"])
+        for p, n in feed.patterns_on(date.fromisoformat(row["date"])).items():
+            padded = ("", *p.stops, "")
+            for key in zip(padded, padded[1:], padded[2:], strict=False):
+                trains[p.route, *key] += n * days
     keys = list(directions)
-    connection().execute(
+    db = connection()
+    db.execute(
+        "CREATE OR REPLACE TEMP TABLE routed_trains AS "
+        "SELECT unnest($route) AS route, unnest($prev) AS prev_stop, "
+        "unnest($stop) AS stop, unnest($next) AS next_stop, unnest($n) AS n",
+        {
+            "route": [k[0] for k in trains],
+            "prev": [k[1] for k in trains],
+            "stop": [k[2] for k in trains],
+            "next": [k[3] for k in trains],
+            "n": list(trains.values()),
+        },
+    )
+    db.execute(
         f"""
         CREATE OR REPLACE TEMP TABLE directions AS
+        WITH platforms AS (
+            SELECT p.route, p.prev_stop, p.stop, p.next_stop,
+                coalesce(p.platform, '') AS platform, coalesce(t.n, 0) AS n
+            FROM read_csv('{PLATFORMS}', all_varchar = true) p
+            LEFT JOIN routed_trains t USING (route, prev_stop, stop, next_stop)
+        )
         SELECT d.*,
-            coalesce(p.stop_platform, '') AS pa, coalesce(p.next_platform, '') AS pb
+            coalesce(p.stop_platform, '') AS pa, coalesce(n.next_platform, '') AS pb
         FROM (
             SELECT unnest($route) AS route, unnest($a) AS a, unnest($b) AS b,
                 unnest($da) AS da, unnest($db) AS db
         ) d
-        LEFT JOIN read_csv('{PLATFORMS}', all_varchar = true) p
-            ON p.route = d.route AND p.stop = d.a AND p.next_stop = d.b
+        LEFT JOIN (
+            SELECT route, stop AS a, next_stop AS b,
+                first(platform ORDER BY platform = '', n DESC, platform)
+                    AS stop_platform
+            FROM platforms GROUP BY ALL
+        ) p USING (route, a, b)
+        LEFT JOIN (
+            SELECT route, prev_stop AS a, stop AS b,
+                first(platform ORDER BY platform = '', n DESC, platform)
+                    AS next_platform
+            FROM platforms GROUP BY ALL
+        ) n USING (route, a, b)
         """,
         {
             "route": [k[0] for k in keys],
