@@ -123,6 +123,26 @@ pub struct Transfer {
     pub min_transfer_time: Option<Secs>,
 }
 
+/// A step of walking within a station, between two of its locations.
+#[derive(Debug, Deserialize)]
+pub struct Pathway {
+    pub from_stop_id: String,
+    pub to_stop_id: String,
+    /// 1 walkway, 2 stairs, 3 moving walkway, 4 escalator, 5 elevator,
+    /// 6 fare gate into the paid area, 7 exit gate out of it.
+    pub pathway_mode: u8,
+    /// 1 if it goes from `to_stop_id` to `from_stop_id` too.
+    pub is_bidirectional: u8,
+    /// Meters.
+    #[serde(default)]
+    pub length: Option<f64>,
+    #[serde(default)]
+    pub traversal_time: Option<Secs>,
+    /// Steps up from `from_stop_id` to `to_stop_id`, negative for down.
+    #[serde(default)]
+    pub stair_count: Option<i32>,
+}
+
 /// A trip running every `headway_secs` from `start_time` until before `end_time`,
 /// its `stop_times.txt` times giving only the times between stops.
 #[derive(Debug, Deserialize)]
@@ -150,6 +170,7 @@ pub struct Feed {
     pub calendar_dates: Vec<CalendarDate>,
     pub transfers: Vec<Transfer>,
     pub frequencies: Vec<Frequency>,
+    pub pathways: Vec<Pathway>,
 }
 
 impl Feed {
@@ -162,6 +183,7 @@ impl Feed {
             calendar_dates: optional(source, "calendar_dates.txt")?,
             transfers: optional(source, "transfers.txt")?,
             frequencies: optional(source, "frequencies.txt")?,
+            pathways: optional(source, "pathways.txt")?,
         };
         feed.expand_frequencies()?;
         Ok(feed)
