@@ -1,6 +1,6 @@
 //! One service date's timetable: stops, FIFO trip patterns, and transfers.
 //!
-//! Phase 2 of `raptor_design.md`: stops are parent stations,
+//! Stops are where trains stop, a station's directions (`127N`, `127S`), not stations,
 //! and `transfers.txt` is taken at its word.
 
 use std::collections::{BTreeMap, HashMap, HashSet};
@@ -29,6 +29,9 @@ type PatternKey<'a> = (&'a str, Option<u8>, Vec<StopIdx>);
 #[derive(Debug)]
 pub struct Stop {
     pub id: String,
+    /// Its parent station's ID, or its own if it has none:
+    /// what outputs name it by.
+    pub station: String,
     pub name: String,
     /// `(latitude, longitude)`, if `stops.txt` has them.
     pub coords: Option<(f64, f64)>,
@@ -58,6 +61,8 @@ pub struct Pattern {
 pub struct Timetable {
     pub date: Date,
     pub stops: Vec<Stop>,
+    /// The stops at each station, and each stop on its own, by ID.
+    pub places: HashMap<String, Vec<StopIdx>>,
     pub patterns: Vec<Pattern>,
     /// Minimum time between alighting and boarding at the same stop.
     pub min_change: Vec<Secs>,
@@ -135,33 +140,46 @@ impl Timetable {
             .map(|i| i as StopIdx)
     }
 
+    /// The stops at the station `id`, or the stop `id` alone.
+    pub fn stops_at(&self, id: &str) -> &[StopIdx] {
+        self.places.get(id).map_or(&[], Vec::as_slice)
+    }
+
+    /// Whether `a` and `b` are at one station.
+    pub fn same_station(&self, a: StopIdx, b: StopIdx) -> bool {
+        self.stops[a as usize].station == self.stops[b as usize].station
+    }
+
     pub fn build(feed: &Feed, date: Date) -> Result<Self> {
         let mut report = Report::default();
 
-        // Parent stations, and every other stop mapped to its parent.
+        // Every stop, platform, or station no other stop is in,
+        // under its own ID and its station's;
+        // not entrances, pathway nodes, or boarding areas (2 to 4).
+        let parents: HashSet<&str> = feed.stops.iter().filter_map(parent_of).collect();
         let mut stops = Vec::new();
-        let mut index: HashMap<&str, StopIdx> = HashMap::new();
-        for stop in feed.stops.iter().filter(|s| parent_of(s).is_none()) {
-            index.insert(&stop.stop_id, stops.len() as StopIdx);
+        let mut places: HashMap<String, Vec<StopIdx>> = HashMap::new();
+        for stop in &feed.stops {
+            if stop.location_type.unwrap_or(0) > 1 || parents.contains(stop.stop_id.as_str()) {
+                continue;
+            }
+            let i = stops.len() as StopIdx;
+            let station = parent_of(stop).unwrap_or(&stop.stop_id);
+            places.entry(stop.stop_id.clone()).or_default().push(i);
+            if station != stop.stop_id {
+                places.entry(station.to_string()).or_default().push(i);
+            }
             stops.push(Stop {
                 id: stop.stop_id.clone(),
+                station: station.to_string(),
                 name: stop.stop_name.clone(),
                 coords: stop.stop_lat.zip(stop.stop_lon),
             });
         }
-        for stop in &feed.stops {
-            if let Some(parent) = parent_of(stop) {
-                let &i = index.get(parent).with_context(|| {
-                    format!("stop {} has unknown parent {parent}", stop.stop_id)
-                })?;
-                index.insert(&stop.stop_id, i);
-            }
-        }
-        let stop_idx = |id: &str| {
-            index
-                .get(id)
-                .copied()
-                .with_context(|| format!("unknown stop {id}"))
+        let stop_idx = |id: &str| match places.get(id).map(Vec::as_slice) {
+            Some(&[i]) if stops[i as usize].id == id => Ok(i),
+            Some(_) => bail!("trips stop at station {id}, not one of its stops"),
+            None => bail!("unknown stop {id}"),
         };
 
         let today = active_services(feed, date)?;
@@ -254,20 +272,32 @@ impl Timetable {
         }
 
         // 3: transfers between these stops aren't possible.
+        // A row is between stations or stops, or within a station when from and to are one.
+        let place = |id: &str| {
+            places
+                .get(id)
+                .map(Vec::as_slice)
+                .with_context(|| format!("unknown stop {id}"))
+        };
         let mut transfers = Vec::new();
         for t in &feed.transfers {
             *report.transfer_types.entry(t.transfer_type).or_default() += 1;
             if t.transfer_type != 3 {
-                let (from, to) = (stop_idx(&t.from_stop_id)?, stop_idx(&t.to_stop_id)?);
-                transfers.push((from, to, t.min_transfer_time));
+                let (from, to) = (place(&t.from_stop_id)?, place(&t.to_stop_id)?);
+                transfers.push((
+                    from,
+                    to,
+                    t.from_stop_id == t.to_stop_id,
+                    t.min_transfer_time,
+                ));
             }
         }
         let time_mode = |same_stop: bool| {
             mode(
                 transfers
                     .iter()
-                    .filter(|&&(from, to, _)| (from == to) == same_stop)
-                    .filter_map(|&(_, _, time)| time),
+                    .filter(|&&(_, _, same, _)| same == same_stop)
+                    .filter_map(|&(_, _, _, time)| time),
             )
         };
         report.default_change = time_mode(true);
@@ -275,23 +305,25 @@ impl Timetable {
 
         let mut min_change: Vec<Option<Secs>> = vec![None; stops.len()];
         let mut footpaths: Vec<Vec<(StopIdx, Secs)>> = vec![Vec::new(); stops.len()];
-        for (from, to, time) in transfers {
+        for (from, to, same, time) in transfers {
             let time = time.unwrap_or_else(|| {
                 report.transfers_without_time += 1;
-                if from == to {
+                if same {
                     report.default_change
                 } else {
                     report.default_footpath
                 }
             });
-            if from == to {
-                let change = &mut min_change[from as usize];
-                *change = Some(change.map_or(time, |c| c.max(time)));
-            } else {
-                let paths = &mut footpaths[from as usize];
-                match paths.iter_mut().find(|(s, _)| *s == to) {
-                    Some((_, t)) => *t = (*t).max(time),
-                    None => paths.push((to, time)),
+            if same {
+                for &s in from {
+                    let change = &mut min_change[s as usize];
+                    *change = Some(change.map_or(time, |c| c.max(time)));
+                }
+                continue;
+            }
+            for &a in from {
+                for &b in to.iter().filter(|&&b| b != a) {
+                    add_footpath(&mut footpaths[a as usize], b, time);
                 }
             }
         }
@@ -303,10 +335,20 @@ impl Timetable {
             .iter()
             .filter(|&&s| min_change[s as usize].is_none())
             .count();
-        let min_change = min_change
+        let min_change: Vec<Secs> = min_change
             .into_iter()
             .map(|c| c.unwrap_or(report.default_change))
             .collect();
+
+        // Changing to another of a station's stops takes as long as changing at one,
+        // as when the station was one stop.
+        for i in 0..stops.len() {
+            for &b in &places[&stops[i].station] {
+                if b as usize != i {
+                    add_footpath(&mut footpaths[i], b, min_change[i]);
+                }
+            }
+        }
 
         let name = |s: StopIdx| stops[s as usize].id.clone();
         let has_path = |a: StopIdx, b: StopIdx| footpaths[a as usize].iter().any(|&(s, _)| s == b);
@@ -327,6 +369,7 @@ impl Timetable {
         Ok(Self {
             date,
             stops,
+            places,
             patterns,
             min_change,
             footpaths,
@@ -343,7 +386,7 @@ pub const WALK_SPEED: f64 = 1.2;
 
 impl Timetable {
     /// Anita's transfer rules instead of `transfers.txt`'s at its word:
-    /// changing trains at one stop is free,
+    /// changing trains at one station is free,
     /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
     /// of `BASE_WALK` plus the straight-line distance at `WALK_SPEED`.
     pub fn use_walk_distance_transfers<'a>(
@@ -351,6 +394,13 @@ impl Timetable {
         complexes: impl Iterator<Item = &'a [StopIdx]>,
     ) {
         self.min_change.fill(0);
+        for (a, paths) in self.footpaths.iter_mut().enumerate() {
+            for (b, walk) in paths {
+                if self.stops[a].station == self.stops[*b as usize].station {
+                    *walk = 0;
+                }
+            }
+        }
         for stops in complexes {
             for &a in stops {
                 for &b in stops {
@@ -368,6 +418,14 @@ impl Timetable {
                 }
             }
         }
+    }
+}
+
+/// A footpath to `to` taking `time`, or the longer of it and the one there is.
+fn add_footpath(paths: &mut Vec<(StopIdx, Secs)>, to: StopIdx, time: Secs) {
+    match paths.iter_mut().find(|(s, _)| *s == to) {
+        Some((_, t)) => *t = (*t).max(time),
+        None => paths.push((to, time)),
     }
 }
 
@@ -480,12 +538,32 @@ mod tests {
     }
 
     #[test]
-    fn stops_are_parents() {
+    fn stops_are_directions() {
         let tt = build(TRIPS, STOP_TIMES, TRANSFERS, wednesday());
         let ids: Vec<_> = tt.stops.iter().map(|s| s.id.as_str()).collect();
-        assert_eq!(ids, ["A", "B", "C"]);
-        let p = &tt.patterns[0];
-        assert_eq!(p.stops, [0, 1]);
+        assert_eq!(ids, ["AN", "AS", "BN", "BS", "C"]);
+        let stations: Vec<_> = tt.stops.iter().map(|s| s.station.as_str()).collect();
+        assert_eq!(stations, ["A", "A", "B", "B", "C"]);
+        assert_eq!(tt.stops_at("A"), [0, 1]);
+        assert_eq!(tt.stops_at("AS"), [1]);
+        assert_eq!(tt.stops_at("C"), [4]);
+        assert_eq!(tt.patterns[0].stops, [0, 2]);
+    }
+
+    #[test]
+    fn changing_within_a_station() {
+        let transfers = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n\
+            A,A,2,90\nA,B,2,120\nB,A,2,120\n";
+        let mut tt = build(TRIPS, STOP_TIMES, transfers, wednesday());
+        // A station's same-stop time is each of its stops',
+        // and the walk between them, as when it was one stop.
+        assert_eq!(tt.min_change[..2], [90, 90]);
+        assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 90)]);
+        assert_eq!(tt.footpaths[2], [(0, 120), (1, 120), (3, 90)]);
+        assert!(tt.report.unclosed_footpaths.is_empty());
+        // Anita's rules make it free.
+        tt.use_walk_distance_transfers(std::iter::empty());
+        assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 0)]);
     }
 
     #[test]
@@ -660,14 +738,20 @@ mod tests {
     fn transfers_at_their_word() {
         let tt = build(TRIPS, STOP_TIMES, TRANSFERS, wednesday());
         // `B` and `C` have no same-stop row, so get `A`'s, the only one.
-        assert_eq!(tt.min_change, [0, 0, 0]);
-        // `B` is served and has no same-stop row.
+        assert_eq!(tt.min_change, [0; 5]);
+        // `BN` is served and has no same-stop row.
         assert_eq!(tt.report.default_change_stops, 1);
-        assert_eq!(tt.footpaths[0], [(1, 120)]);
-        assert_eq!(tt.report.asymmetric_footpaths, [("A".into(), "B".into())]);
+        assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 0)]);
+        // `A` to `B` has no way back, from either of `A`'s stops to either of `B`'s.
+        assert_eq!(tt.report.asymmetric_footpaths.len(), 4);
         assert_eq!(
-            tt.report.unclosed_footpaths,
-            [("A".into(), "B".into(), "C".into())]
+            tt.report.asymmetric_footpaths[0],
+            ("AN".into(), "BN".into())
+        );
+        assert_eq!(tt.report.unclosed_footpaths.len(), 4);
+        assert_eq!(
+            tt.report.unclosed_footpaths[0],
+            ("AN".into(), "BN".into(), "C".into())
         );
     }
 

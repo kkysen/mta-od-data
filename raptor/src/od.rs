@@ -254,7 +254,7 @@ struct StationRow {
     complex_id: ComplexId,
 }
 
-/// Each complex's stops in a timetable,
+/// Each complex's served stops in a timetable,
 /// from the station reference CSV (`data/stations.csv`).
 pub struct Complexes {
     pub stops: BTreeMap<ComplexId, Vec<StopIdx>>,
@@ -281,10 +281,13 @@ impl Complexes {
         for row in reader.deserialize() {
             let row: StationRow = row?;
             let stops = complexes.stops.entry(row.complex_id).or_default();
-            match tt.stop(&row.gtfs_stop_id) {
-                None => complexes.unknown_stops.push(row.gtfs_stop_id),
-                Some(s) if !served.contains(&s) => complexes.unserved_stops.push(row.gtfs_stop_id),
-                Some(s) => stops.push(s),
+            let at = tt.stops_at(&row.gtfs_stop_id);
+            let len = stops.len();
+            stops.extend(at.iter().filter(|s| served.contains(s)));
+            if at.is_empty() {
+                complexes.unknown_stops.push(row.gtfs_stop_id);
+            } else if stops.len() == len {
+                complexes.unserved_stops.push(row.gtfs_stop_id);
             }
         }
         Ok(complexes)

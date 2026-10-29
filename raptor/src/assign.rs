@@ -370,6 +370,8 @@ impl<'a> TripLoads<'a> {
                     }
                     ready = Some(times[usize::from(alight_pos)].0);
                 }
+                // Changing within a station isn't waiting time, as when it was one stop.
+                LegKey::Walk { from, to } if self.tt.same_station(from, to) => {}
                 LegKey::Walk { from, to } => {
                     let duration = self.tt.footpaths[from as usize]
                         .iter()
@@ -837,9 +839,11 @@ impl Paths {
     }
 }
 
+/// A path's text, by station: a change within one is no leg, as when it was one stop.
 fn path(tt: &Timetable, legs: &[Leg]) -> String {
-    let id = |s: u32| tt.stops[s as usize].id.as_str();
+    let id = |s: u32| tt.stops[s as usize].station.as_str();
     legs.iter()
+        .filter(|leg| !matches!(**leg, Leg::Walk { from, to, .. } if tt.same_station(from, to)))
         .map(|leg| match *leg {
             Leg::Ride(r) => {
                 let pattern = &tt.patterns[r.pattern as usize];
@@ -1153,7 +1157,7 @@ pub fn write_trips(
                 direction.append_option(pattern.direction_id);
                 day.append_value(times.day);
                 seq.append_value(u16::try_from(k)?);
-                stop.append_value(&tt.stops[s as usize].id);
+                stop.append_value(&tt.stops[s as usize].station);
                 arrival.append_value(arrive);
                 departure.append_value(depart);
                 on.append_value(boarded as f64 / NANO);
@@ -1225,7 +1229,7 @@ pub fn write_platform_waits(
     );
     let (mut minute, mut riders) = (UInt16Builder::new(), Float64Builder::new());
     for (p, k, m, nano) in loads.waits() {
-        let id = |k: usize| &tt.stops[p.stops[k] as usize].id;
+        let id = |k: usize| &tt.stops[p.stops[k] as usize].station;
         anyhow::ensure!(nano > 0, "{nano} billionths waiting at {}", id(k));
         route.append_value(&p.route_id);
         direction.append_option(p.direction_id);
@@ -1374,7 +1378,7 @@ mod tests {
         );
         loads
             .waits()
-            .filter(|&(p, k, ..)| tt.stops[p.stops[k] as usize].id == stop)
+            .filter(|&(p, k, ..)| tt.stops[p.stops[k] as usize].station == stop)
             .map(|(_, _, m, n)| (m, n as f64 / NANO))
             .collect()
     }

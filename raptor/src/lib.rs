@@ -318,10 +318,15 @@ fn join<T>(handle: std::thread::ScopedJoinHandle<'_, T>) -> T {
         .unwrap_or_else(|panic| std::panic::resume_unwind(panic))
 }
 
+/// The stops at each station or stop of `ids`.
 fn stops(tt: &Timetable, ids: &[String]) -> Result<Vec<u32>> {
-    ids.iter()
-        .map(|id| tt.stop(id).with_context(|| format!("no stop {id}")))
-        .collect()
+    let mut stops = Vec::new();
+    for id in ids {
+        let at = tt.stops_at(id);
+        anyhow::ensure!(!at.is_empty(), "no stop {id}");
+        stops.extend(at);
+    }
+    Ok(stops)
 }
 
 fn secs(s: &str) -> Result<Secs> {

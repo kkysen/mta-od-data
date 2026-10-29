@@ -64,6 +64,10 @@ pub struct Stop {
     pub stop_lon: Option<f64>,
     #[serde(default)]
     pub parent_station: Option<String>,
+    /// 0 or missing for a stop or platform, 1 a station, 2 an entrance,
+    /// 3 a pathway node, 4 a boarding area.
+    #[serde(default)]
+    pub location_type: Option<u8>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
