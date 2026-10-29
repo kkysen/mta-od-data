@@ -72,7 +72,7 @@ August to December 2025 is 25 dates, Monday to Friday.
 - **`assign-range.log`**: the run's log.
 
 `data/raptor-walk/` is the same run with `transfers: "walk_distance"`,
-`nycriders`' rules for transfer times, kept to compare against.
+Anita's rules for transfer times, kept to compare against.
 
 ## The reports, in [`src/mta_od_data/ridership/`](../src/mta_od_data/ridership/)
 

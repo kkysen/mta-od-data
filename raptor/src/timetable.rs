@@ -336,13 +336,13 @@ impl Timetable {
 }
 
 /// Fixed time to walk between a complex's stops, on top of the distance:
-/// stairs, doors, overhead (`nycriders`' `BASE_TRANSFER_TIME`).
+/// stairs, doors, overhead (Anita's `BASE_TRANSFER_TIME`).
 pub const BASE_WALK: Secs = 60;
-/// Walking speed in a station, in meters a second (`nycriders`' `WALK_SPEED`).
+/// Walking speed in a station, in meters a second (Anita's `WALK_SPEED`).
 pub const WALK_SPEED: f64 = 1.2;
 
 impl Timetable {
-    /// `nycriders`' transfer rules instead of `transfers.txt`'s at its word:
+    /// Anita's transfer rules instead of `transfers.txt`'s at its word:
     /// changing trains at one stop is free,
     /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
     /// of `BASE_WALK` plus the straight-line distance at `WALK_SPEED`.

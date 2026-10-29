@@ -52,7 +52,7 @@ pub enum Transfers {
     /// `transfers.txt` at its word (`Timetable::build`).
     #[default]
     Gtfs,
-    /// `nycriders`' rules (`Timetable::use_walk_distance_transfers`).
+    /// Anita's rules (`Timetable::use_walk_distance_transfers`).
     WalkDistance,
 }
 

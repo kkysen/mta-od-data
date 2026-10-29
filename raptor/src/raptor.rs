@@ -13,7 +13,7 @@ use crate::gtfs::Secs;
 use crate::timetable::{Pattern, StopIdx, Timetable};
 
 /// Most rides in a journey by default: 5, one more than the 4-ride trips riders take
-/// (`nycriders`' cap of 3 cut those off),
+/// (Anita's cap of 3 cut those off),
 /// for the rare fastest trip that takes 5.
 pub const DEFAULT_MAX_RIDES: usize = 5;
 

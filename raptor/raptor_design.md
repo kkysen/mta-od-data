@@ -39,7 +39,7 @@ so most analyses never touch legs.
 
 ## Prior art
 
-### `nycriders` (`circularsquare/maps`, `riders/nycriders/build.py`)
+### Anita's model (`nycriders`, `circularsquare/maps`, `riders/nycriders/build.py`)
 
 The visualization at `https://anita.garden/nycriders/`.
 No license on the repo, so reference only, no code reuse.
@@ -172,7 +172,7 @@ keyed on parent stops as the feed does:
 - a same-stop row (`127,127,2,0`) is the minimum time
   between alighting and boarding at that stop,
   kept separate from footpaths so RAPTOR charges it
-  (`nycriders` makes every same-stop change free);
+  (Anita's model makes every same-stop change free);
 - a stop with no same-stop row gets the feed's most common same-stop time,
   180s on the 2026-08 version
   (33 served stops on the 2025-10-18 version, single-line stops);
@@ -187,7 +187,7 @@ since RAPTOR relaxes footpaths once a round and assumes closure.
 Every version so far has none of either.
 
 `transfers: "walk_distance"` in `raptor/assign.json5`
-switches to `nycriders`' rules instead, for comparing with it:
+switches to Anita's rules instead, for comparing with it:
 every same-stop change is free,
 `transfers.txt`'s footpaths between different stops are kept,
 and every other pair of a complex's stops gets a footpath
@@ -215,7 +215,7 @@ Rules:
 - **Opposite direction at the same parent**: real walk time
   (stairs/mezzanine), default from GTFS's 180s until curated.
 - **Between parents in a complex**: GTFS value, else
-  base + distance / walk speed (as `nycriders` does),
+  base + distance / walk speed (as Anita's model does),
   until curated.
 - **Curated overrides**: `raptor/data/transfer_times.csv`,
   keyed on directional stop IDs,
@@ -250,7 +250,7 @@ What's left per (OD, hour) is the set of
 non-dominated journeys over the hour.
 
 Departure times within the hour are uniform for now
-(`nycriders` skews toward the busier neighboring hour;
+(Anita's model skews toward the busier neighboring hour;
 cheap to add later, as a weight per departure second).
 
 ### Splitting ridership across the trade-off set
@@ -311,7 +311,7 @@ Complexity is added only once the simple version works end to end.
    transfers straight from `transfers.txt`.
    `mta-od-data raptor timetable --feed <zip> --date <date>` prints what it found.
 3. **RAPTOR**: plain round-based earliest arrival, per-round labels,
-   max 4 rides (3 at first, as `nycriders`), unit-tested on tiny hand-built feeds.
+   max 4 rides (3 at first, as Anita's model), unit-tested on tiny hand-built feeds.
    Round `k` keeps a label only if it beats every round before it,
    so the rounds reaching a target are its Pareto set over (arrival, rides).
    Each round has two labels per stop:
@@ -477,7 +477,7 @@ Complexity is added only once the simple version works end to end.
 ## Implementation
 
 Rust, for the core:
-`nycriders` needs 8 worker processes for pure Python,
+Anita's model needs 8 worker processes for pure Python,
 and we want full-year, all-hours runs.
 Parallelize across origin complexes with `rayon`.
 Read/write Parquet with `arrow`/`parquet` crates
