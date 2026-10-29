@@ -28,6 +28,12 @@ A few are mapped in pieces, which a relation lists one after another after its s
 like Newkirk Plaza's southbound, in four:
 such a platform is its first piece, with all its pieces' area.
 
+Platforms stacked one right over another, one level apart (by OSM's `level`)
+and overlapping by at least half the smaller one,
+are a flight of stairs apart, for Anita's transfers (`stacked_platforms.csv`):
+7 Av's on 53 St, say, but not 59 St-Columbus Circle's 1 over the A/B/C/D,
+two levels up, nor 74 St-Broadway's 7, on the el.
+
 Read from Geofabrik's New York extract, not the Overpass API,
 whose public servers were too busy to answer.
 """
@@ -35,6 +41,7 @@ whose public servers were too busy to answer.
 import csv
 import math
 from collections import Counter, defaultdict
+from contextlib import suppress
 from dataclasses import dataclass
 from itertools import pairwise
 from pathlib import Path
@@ -44,6 +51,9 @@ from zipfile import ZipFile
 
 import osmium
 from osmium.osm import Node, Relation, Way
+from shapely import STRtree, union_all
+from shapely.geometry import Polygon
+from shapely.geometry.base import BaseGeometry
 from typer import Option, Typer
 
 from mta_od_data import DATA
@@ -56,6 +66,12 @@ EXTRACT_URL = "https://download.geofabrik.de/north-america/us/new-york-latest.os
 DEFAULT_EXTRACT = DATA / "osm" / "new-york-latest.osm.pbf"
 DEFAULT_OUT = Path(__file__).parent / "ridership" / "platforms.csv"
 DEFAULT_AREAS_OUT = Path(__file__).parent / "ridership" / "platform_areas.csv"
+# Beside `platforms.csv`, where RAPTOR looks for it.
+DEFAULT_STACKED_OUT = Path(__file__).parent / "ridership" / "stacked_platforms.csv"
+
+# Two platforms one level apart overlapping by at least this much of the smaller
+# are stacked: on OSM's, 68% or more, or 28% or less.
+STACKED_OVERLAP = 0.5
 
 # A relation's stop more than this far from every GTFS stop of its route
 # is one the feed doesn't have (or a mapping error), and is skipped.
@@ -105,6 +121,9 @@ class Locations(osmium.SimpleHandler):
         self.wanted_nodes, self.wanted_ways = nodes, ways
         self.at: dict[str, tuple[float, float]] = {}
         self.areas: dict[str, float] = {}
+        # Each closed way's outline, in `(lat, lon)`, and its `level`, if a number.
+        self.rings: dict[str, list[tuple[float, float]]] = {}
+        self.levels: dict[str, float] = {}
 
     def node(self, n: Node) -> None:
         if n.id in self.wanted_nodes:
@@ -120,6 +139,9 @@ class Locations(osmium.SimpleHandler):
                 )
             if w.is_closed() and len(points) == len(w.nodes) > 3:
                 self.areas[f"w{w.id}"] = square_metres(points)
+                self.rings[f"w{w.id}"] = points
+            with suppress(ValueError):
+                self.levels[f"w{w.id}"] = float(w.tags.get("level") or "")
 
 
 def metres(a: tuple[float, float], b: tuple[float, float]) -> float:
@@ -133,6 +155,36 @@ def square_metres(ring: list[tuple[float, float]]) -> float:
     lat0 = math.radians(ring[0][0])
     xy = [(lon * 111_320 * math.cos(lat0), lat * 111_320) for lat, lon in ring]
     return abs(sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in pairwise(xy))) / 2
+
+
+def plane(ring: list[tuple[float, float]]) -> BaseGeometry:
+    """A ring as a polygon in metres, on a plane through New York."""
+    k = 111_320 * math.cos(math.radians(40.7))
+    return Polygon([(lon * k, lat * 111_320) for lat, lon in ring]).buffer(0)
+
+
+def stacked(
+    platforms: list[str], pieces: dict[str, set[str]], locations: Locations
+) -> list[tuple[str, str, float]]:
+    """Each pair of `platforms` stacked one level apart, and how much they overlap."""
+    shapes: dict[str, BaseGeometry] = {}
+    for p in platforms:
+        parts = pieces.get(p) or {p}
+        if p in locations.levels and all(q in locations.rings for q in parts):
+            shapes[p] = union_all([plane(locations.rings[q]) for q in parts])
+    names = sorted(shapes)
+    tree = STRtree([shapes[p] for p in names])
+    pairs = []
+    for i, j in zip(*tree.query([shapes[p] for p in names], "intersects"), strict=True):
+        a, b = names[i], names[j]
+        if a >= b or abs(locations.levels[a] - locations.levels[b]) != 1:
+            continue
+        overlap = shapes[a].intersection(shapes[b]).area / min(
+            shapes[a].area, shapes[b].area
+        )
+        if overlap >= STACKED_OVERLAP:
+            pairs.append((a, b, overlap))
+    return pairs
 
 
 def direction(feed: Feed, route: str, prev: str, stop: str, next_: str) -> str | None:
@@ -170,6 +222,9 @@ def fetch_platforms(
     areas_out: Annotated[
         Path, Option(help="Each of those platforms' area")
     ] = DEFAULT_AREAS_OUT,
+    stacked_out: Annotated[
+        Path, Option(help="Those platforms stacked one right over another")
+    ] = DEFAULT_STACKED_OUT,
 ) -> None:
     """Map each route's consecutive stops, in every feed version,
     to the OSM platforms its trains stop at there."""
@@ -321,3 +376,10 @@ def fetch_platforms(
         f"wrote {areas_out}: {len(platforms) - len(missing)} platforms' areas, "
         f"{len(missing)} not closed ways: {', '.join(missing)}"
     )
+
+    pairs = stacked(platforms, pieces, locations)
+    with stacked_out.open("w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["platform", "other", "overlap"])
+        writer.writerows((a, b, f"{o:.2f}") for a, b, o in pairs)
+    print(f"wrote {stacked_out}: {len(pairs)} pairs of platforms stacked")

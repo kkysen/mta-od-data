@@ -25,6 +25,7 @@ data/*
 # so checked in rather than built by `mta-od-data fetch-platforms` on every checkout.
 !src/mta_od_data/ridership/platforms.csv
 !src/mta_od_data/ridership/platform_areas.csv
+!src/mta_od_data/ridership/stacked_platforms.csv
 
 # Contains useful settings for JSON schemas.
 !.vscode/
