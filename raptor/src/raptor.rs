@@ -12,9 +12,10 @@ use std::ops::Range;
 use crate::gtfs::Secs;
 use crate::timetable::{Pattern, StopIdx, Timetable};
 
-/// Most rides in a journey by default: 4, as riders take 4-ride trips;
-/// `nycriders`' cap of 3 cut them off.
-pub const DEFAULT_MAX_RIDES: usize = 4;
+/// Most rides in a journey by default: 5, one more than the 4-ride trips riders take
+/// (`nycriders`' cap of 3 cut those off),
+/// for the rare fastest trip that takes 5.
+pub const DEFAULT_MAX_RIDES: usize = 5;
 
 const NEVER: Secs = Secs::MAX;
 
