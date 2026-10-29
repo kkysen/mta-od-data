@@ -130,6 +130,8 @@ pub struct Labels<'a> {
     /// `ride_arrival[(k, s)]`: arriving at `s` on the `k`th ride.
     ride_arrival: Rounds<Secs>,
     ride_from: Rounds<Option<Ride>>,
+    /// The departure of the run that set each `ride_arrival`.
+    ride_run: Rounds<Secs>,
     /// `ready[(k, s)]`: able to board at `s` after `k` rides.
     ready: Rounds<Secs>,
     ready_from: Rounds<Option<Ready>>,
@@ -225,6 +227,7 @@ impl<'a> Router<'a> {
             depart: NEVER,
             ride_arrival: Rounds::new(rounds, n, NEVER),
             ride_from: Rounds::new(rounds, n, None),
+            ride_run: Rounds::new(rounds, n, NEVER),
             ready: Rounds::new(rounds, n, NEVER),
             ready_from: Rounds::new(rounds, n, None),
             scan_from: vec![UNMARKED; self.tt.patterns.len()],
@@ -406,13 +409,31 @@ impl Labels<'_> {
 
     /// Lowers `ride_arrival[(k, s)]` if `arrive` beats it
     /// and every arrival there with fewer rides.
+    /// Of rides arriving at once in one run, keeps the one boarded first:
+    /// changing trains at the first chance, not riding on to change later,
+    /// like from a 1 to a 2 at 96 St rather than at 72 St, going downtown.
+    /// Only true if `arrive` is earlier: an equal one changes no later label's time.
     fn lower_ride(&mut self, k: usize, s: StopIdx, arrive: Secs, ride: Ride) -> bool {
+        let tt = self.router.tt;
         let s = s as usize;
+        if self.ride_arrival.up_to(k, s).any(|&a| a < arrive) {
+            return false;
+        }
+        let current = self.ride_arrival[(k, s)];
+        if current == arrive {
+            let boards_first =
+                self.ride_from[(k, s)].is_some_and(|r| ride.depart(tt) < r.depart(tt));
+            if self.ride_run[(k, s)] == self.depart && boards_first {
+                self.ride_from[(k, s)] = Some(ride);
+            }
+            return false;
+        }
         if self.ride_arrival.up_to(k, s).any(|&a| a <= arrive) {
             return false;
         }
         self.ride_arrival[(k, s)] = arrive;
         self.ride_from[(k, s)] = Some(ride);
+        self.ride_run[(k, s)] = self.depart;
         true
     }
 
@@ -427,13 +448,18 @@ impl Labels<'_> {
         true
     }
 
-    /// The earliest arrival at any of `targets` on the `k`th ride, and where.
+    /// The earliest arrival at any of `targets` on the `k`th ride, and where:
+    /// of those arriving at once, the one whose last ride boarded first, as `lower_ride`.
     fn earliest(&self, k: usize, targets: &[StopIdx]) -> (Secs, StopIdx) {
+        let tt = self.router.tt;
         targets
             .iter()
-            .map(|&t| (self.ride_arrival[(k, t as usize)], t))
+            .map(|&t| {
+                let boarded = self.ride_from[(k, t as usize)].map_or(NEVER, |r| r.depart(tt));
+                (self.ride_arrival[(k, t as usize)], boarded, t)
+            })
             .min()
-            .unwrap_or((NEVER, 0))
+            .map_or((NEVER, 0), |(arrive, _, t)| (arrive, t))
     }
 
     /// The Pareto set of journeys to any of `targets`, fewest rides first:
@@ -843,5 +869,86 @@ mod tests {
             t("08:12:00"),
         );
         assert_eq!(times, [t("08:11:00"), t("08:10:00"), t("08:00:00")]);
+    }
+
+    /// A timetable on `stops`, every same-stop change cross-platform.
+    fn timetable_at(stops: &str, trips: &str, stop_times: &str) -> Timetable {
+        let changes: String = stops
+            .lines()
+            .skip(1)
+            .map(|l| {
+                let id = l.split(',').next().unwrap();
+                format!("{id},{id},2,0\n")
+            })
+            .collect();
+        let transfers =
+            format!("from_stop_id,to_stop_id,transfer_type,min_transfer_time\n{changes}");
+        let files = HashMap::from([
+            ("stops.txt", stops),
+            ("trips.txt", trips),
+            ("stop_times.txt", stop_times),
+            ("calendar.txt", CALENDAR),
+            ("transfers.txt", transfers.as_str()),
+        ]);
+        let feed = Feed::load(&mut { files }).unwrap();
+        Timetable::build(&feed, Date::new(2025, 9, 3).unwrap()).unwrap()
+    }
+
+    #[test]
+    fn local_to_express_at_the_first_chance() {
+        // Downtown from 103 St: the 1 stops everywhere, the 2 at 96 St and 72 St.
+        // Changing at 96 St or 72 St catches the same 2, so arrives at once;
+        // changing at 96 St is the one to take.
+        let stops = "stop_id,stop_name\n\
+            S103,103 St\nS96,96 St\nS86,86 St\nS79,79 St\nS72,72 St\nTS,Times Sq\n";
+        let trips = "route_id,trip_id,service_id\n1,one,W\n2,two,W\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            one,S103,08:00:00,08:00:00,1\none,S96,08:02:00,08:02:00,2\n\
+            one,S86,08:04:00,08:04:00,3\none,S79,08:06:00,08:06:00,4\n\
+            one,S72,08:08:00,08:08:00,5\none,TS,08:20:00,08:20:00,6\n\
+            two,S96,08:05:00,08:05:00,1\ntwo,S72,08:09:00,08:09:00,2\n\
+            two,TS,08:14:00,08:14:00,3\n";
+        let tt = timetable_at(stops, trips, stop_times);
+        let (legs, js) = Router::new(&tt)
+            .query(&[stop(&tt, "S103")], t("08:00:00"))
+            .journeys(&[stop(&tt, "TS")]);
+        let got: Vec<_> = js.iter().map(|j| summary(&tt, legs.of(j))).collect();
+        assert_eq!(
+            got,
+            [vec!["one S103-TS"], vec!["one S103-S96", "two S96-TS"]]
+        );
+    }
+
+    /// Fulton St to Bleecker St, arriving at once either way:
+    /// the uptown 5 to Brooklyn Bridge and the uptown 6 there,
+    /// or the 5 on to 14 St and a downtown 6 back.
+    fn fulton_to_bleecker(uptown_at: &str, downtown_at: &str) -> Vec<String> {
+        // 14 St first, so its downtown 6 is scanned and found first.
+        let stops = "stop_id,stop_name\n\
+            US,14 St-Union Sq\nFU,Fulton St\nBB,Brooklyn Bridge-City Hall\n\
+            BLN,Bleecker St\nBLS,Bleecker St\n";
+        let trips = "route_id,trip_id,service_id\n5,five,W\n6,up,W\n6,down,W\n";
+        let stop_times = format!(
+            "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+             five,FU,08:00:00,08:00:00,1\nfive,BB,08:02:00,08:02:00,2\n\
+             five,US,08:06:00,08:06:00,3\n\
+             up,BB,08:04:00,08:04:00,1\nup,{uptown_at},08:10:00,08:10:00,2\n\
+             down,US,08:07:00,08:07:00,1\ndown,{downtown_at},08:10:00,08:10:00,2\n"
+        );
+        let tt = timetable_at(stops, trips, &stop_times);
+        let (legs, js) = Router::new(&tt)
+            .query(&[stop(&tt, "FU")], t("08:00:00"))
+            .journeys(&[stop(&tt, "BLN"), stop(&tt, "BLS")]);
+        assert_eq!(js.len(), 1);
+        summary(&tt, legs.of(&js[0]))
+    }
+
+    #[test]
+    fn change_at_the_first_chance_not_after_riding_past() {
+        let want = ["five FU-BB", "up BB-BLN"];
+        // Arriving at one stop: the tie is between its labels.
+        assert_eq!(fulton_to_bleecker("BLN", "BLN"), want);
+        // Arriving at each direction's stop: the tie is between the destination's stops.
+        assert_eq!(fulton_to_bleecker("BLN", "BLS"), want);
     }
 }
