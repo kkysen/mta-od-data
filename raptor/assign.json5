@@ -31,6 +31,10 @@
   // Under "walk_distance", up the stairs, over, and down to another platform,
   // or down, under, and up.
   up_and_over_secs: 90,
+  // Under "walk_distance", between platforms stacked one right over another,
+  // one level apart (OSM's, `stacked_platforms.csv`): one flight of stairs,
+  // as at 7 Av on 53 St or 81 St.
+  stacked_secs: 30,
   // Under "pathways", minutes added per walk out through the fare gates and back in,
   // on top of its walk.
   // A placeholder, like `logit_scale_per_min`: no source gives one.

@@ -65,7 +65,10 @@ Stations = Annotated[Path, Option(help="The station reference CSV")]
 Config = Annotated[Path, Option(help="Generalized cost weights")]
 Platforms = Annotated[
     Path,
-    Option(help="Each route's stops' platforms, for Anita's transfers"),
+    Option(
+        help="Each route's stops' platforms, for Anita's transfers, "
+        "with `stacked_platforms.csv` beside it"
+    ),
 ]
 ZSTD_LEVELS = {"fast": 1, "medium": 6, "slow": 9}
 

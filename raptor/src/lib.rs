@@ -144,7 +144,9 @@ pub fn assign_dates(
                 Transfers::Gtfs => {}
                 Transfers::WalkDistance => tt.use_walk_distance_transfers(
                     complexes.stops.values().map(Vec::as_slice),
+                    platforms.as_ref().expect("loaded for walk_distance"),
                     config.up_and_over_secs,
+                    config.stacked_secs,
                 ),
                 Transfers::Pathways => {
                     let gate_penalty = (config.fare_gate_penalty_min * 60.0).round() as Secs;

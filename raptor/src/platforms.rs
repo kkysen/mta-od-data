@@ -1,7 +1,8 @@
 //! Each route's stops' physical platforms, from OpenStreetMap
-//! (`platforms.csv`, `mta-od-data fetch-platforms`'s).
+//! (`platforms.csv`, `mta-od-data fetch-platforms`'s),
+//! and which are stacked one right over another (`stacked_platforms.csv`, beside it).
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
 use anyhow::{Context, Result};
@@ -12,7 +13,11 @@ use serde::Deserialize;
 type Key = (String, String, String, String);
 
 #[derive(Debug, Default)]
-pub struct Platforms(HashMap<Key, String>);
+pub struct Platforms {
+    platforms: HashMap<Key, String>,
+    /// Pairs of platforms one level apart, one over the other, each way round.
+    stacked: HashSet<(String, String)>,
+}
 
 #[derive(Deserialize)]
 struct Row {
@@ -21,6 +26,12 @@ struct Row {
     stop: String,
     next_stop: String,
     platform: String,
+}
+
+#[derive(Deserialize)]
+struct StackedRow {
+    platform: String,
+    other: String,
 }
 
 impl Platforms {
@@ -37,19 +48,49 @@ impl Platforms {
                 );
             }
         }
-        Ok(Self(platforms))
+        let stacked_path = path.with_file_name("stacked_platforms.csv");
+        let mut reader = csv::Reader::from_path(&stacked_path)
+            .with_context(|| format!("opening {}", stacked_path.display()))?;
+        let mut stacked = HashSet::new();
+        for row in reader.deserialize() {
+            let row: StackedRow =
+                row.with_context(|| format!("reading {}", stacked_path.display()))?;
+            stacked.insert((row.other.clone(), row.platform.clone()));
+            stacked.insert((row.platform, row.other));
+        }
+        Ok(Self { platforms, stacked })
     }
 
     /// The platform `route`'s trains from `prev` to `next` stop at at `stop`, if known.
     pub fn get(&self, route: &str, prev: &str, stop: &str, next: &str) -> Option<&str> {
         let key = (route.into(), prev.into(), stop.into(), next.into());
-        self.0.get(&key).map(String::as_str)
+        self.platforms.get(&key).map(String::as_str)
+    }
+
+    /// Whether platforms `a` and `b` are stacked, a flight of stairs apart.
+    pub fn stacked(&self, a: &str, b: &str) -> bool {
+        self.stacked.contains(&(a.into(), b.into()))
+    }
+}
+
+#[cfg(test)]
+impl Platforms {
+    /// These platforms, with these pairs stacked.
+    pub fn with_stacked(mut self, pairs: &[(&str, &str)]) -> Self {
+        for &(a, b) in pairs {
+            self.stacked.insert((a.into(), b.into()));
+            self.stacked.insert((b.into(), a.into()));
+        }
+        self
     }
 }
 
 #[cfg(test)]
 impl FromIterator<(Key, String)> for Platforms {
     fn from_iter<I: IntoIterator<Item = (Key, String)>>(iter: I) -> Self {
-        Self(iter.into_iter().collect())
+        Self {
+            platforms: iter.into_iter().collect(),
+            stacked: HashSet::new(),
+        }
     }
 }

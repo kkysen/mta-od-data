@@ -202,6 +202,12 @@ Platforms are OSM's, from `platforms.csv` by each train's stops before and after
 and a stop whose trains use several is split into one for each,
 as Penn's uptown 2, on the 3's express island by day and the 1's local platform late at night.
 Two stops whose platforms aren't both known are up and over.
+Platforms stacked one right over another take `stacked_secs`, 30s, instead,
+one flight of stairs, whether in one station or a complex:
+OSM's one level apart and overlapping by at least half the smaller one,
+as 7 Av's on 53 St, 81 St's, or Jamaica Center's E over its J/Z,
+but not 59 St-Columbus Circle's 1, two levels over the A/B/C/D,
+nor 74 St-Broadway's 7, on the el over Jackson Hts-Roosevelt Av.
 `transfers.txt`'s footpaths between different stations are kept,
 and every other pair of a complex's stops gets a footpath
 of 60s plus their straight-line distance at 1.2 m/s.

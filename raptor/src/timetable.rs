@@ -471,12 +471,16 @@ impl Timetable {
     /// changing to another of the station's platforms takes `up_and_over`,
     /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
     /// of `BASE_WALK` plus the straight-line distance at `WALK_SPEED`.
+    /// Between `platforms` stacked one right over another, a flight of stairs,
+    /// any change takes `stacked` instead, within a station or a complex.
     /// A stop's platform is from `split_platforms`;
     /// two stops whose platforms aren't both known are up and over.
     pub fn use_walk_distance_transfers<'a>(
         &mut self,
         complexes: impl Iterator<Item = &'a [StopIdx]>,
+        platforms: &Platforms,
         up_and_over: Secs,
+        stacked: Secs,
     ) {
         self.min_change.fill(0);
         for (a, paths) in self.footpaths.iter_mut().enumerate() {
@@ -503,6 +507,18 @@ impl Timetable {
                     };
                     let walk = BASE_WALK + (distance_m(from, to) / WALK_SPEED) as Secs;
                     self.footpaths[a as usize].push((b, walk));
+                }
+            }
+        }
+        for (a, paths) in self.footpaths.iter_mut().enumerate() {
+            let Some(a) = &self.stops[a].platform else {
+                continue;
+            };
+            for (b, walk) in paths {
+                if let Some(b) = &self.stops[*b as usize].platform
+                    && platforms.stacked(a, b)
+                {
+                    *walk = stacked;
                 }
             }
         }
@@ -679,14 +695,13 @@ mod tests {
         assert!(tt.report.unclosed_footpaths.is_empty());
         // Anita's rules make changing at one stop free,
         // and to the other direction's, on a platform not known to be the same, up and over.
-        tt.use_walk_distance_transfers(std::iter::empty(), 90);
+        tt.use_walk_distance_transfers(std::iter::empty(), &Platforms::default(), 90, 30);
         assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 90)]);
     }
 
-    #[test]
-    fn platforms_split_stops_and_islands_join_them() {
-        // At Beta, uptown 1s stop at the local platform, uptown 2s at the island,
-        // and downtown 1s at the island's other side.
+    /// Beta, where uptown 1s stop at the local platform, uptown 2s at the island,
+    /// and downtown 1s at the island's other side, split by platform.
+    fn beta_split(platforms: &Platforms) -> Timetable {
         let trips = "route_id,trip_id,service_id,direction_id\n\
             1,up1,Weekday,0\n2,up2,Weekday,0\n1,down1,Weekday,1\n";
         let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
@@ -696,17 +711,31 @@ mod tests {
         let transfers = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n\
             B,B,2,180\n";
         let mut tt = build(trips, stop_times, transfers, wednesday());
+        tt.split_platforms(platforms);
+        tt
+    }
+
+    fn beta_platforms() -> Platforms {
         let key = |route: &str, prev: &str, next: &str| {
             (route.into(), prev.into(), "B".into(), next.into())
         };
-        let platforms: Platforms = [
+        [
             (key("1", "A", ""), "local".to_string()),
             (key("2", "A", ""), "island".to_string()),
             (key("1", "", "A"), "island".to_string()),
         ]
         .into_iter()
-        .collect();
-        tt.split_platforms(&platforms);
+        .collect()
+    }
+
+    fn walk(tt: &Timetable, a: usize, b: StopIdx) -> Secs {
+        tt.footpaths[a].iter().find(|p| p.0 == b).unwrap().1
+    }
+
+    #[test]
+    fn platforms_split_stops_and_islands_join_them() {
+        let platforms = beta_platforms();
+        let mut tt = beta_split(&platforms);
 
         // The uptown 2s' stop is a copy of Beta's uptown stop,
         // reached from it as from another of the station's stops.
@@ -716,19 +745,28 @@ mod tests {
         assert_eq!(tt.stops_at("B"), [2, 3, 5]);
         let up2 = tt.patterns.iter().find(|p| p.route_id == "2").unwrap();
         assert_eq!(up2.stops, [0, 5]);
-        let walk = |tt: &Timetable, a: usize, b: StopIdx| {
-            tt.footpaths[a].iter().find(|p| p.0 == b).unwrap().1
-        };
         assert_eq!(
             (walk(&tt, 2, 5), walk(&tt, 5, 2), walk(&tt, 5, 3)),
             (180, 180, 180)
         );
 
-        tt.use_walk_distance_transfers(std::iter::empty(), 90);
+        tt.use_walk_distance_transfers(std::iter::empty(), &platforms, 90, 30);
         // Across the island is free, whichever direction; up and over isn't.
         assert_eq!((walk(&tt, 5, 3), walk(&tt, 3, 5)), (0, 0));
         assert_eq!((walk(&tt, 2, 5), walk(&tt, 2, 3)), (90, 90));
         assert_eq!(tt.min_change[2], 0);
+    }
+
+    #[test]
+    fn stacked_platforms_are_a_flight_apart() {
+        // Beta's local platform right over its island, as at 7 Av on 53 St.
+        let platforms = beta_platforms().with_stacked(&[("local", "island")]);
+        let mut tt = beta_split(&platforms);
+        tt.use_walk_distance_transfers(std::iter::empty(), &platforms, 90, 30);
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (30, 30));
+        assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (30, 30));
+        // Across the island is still free.
+        assert_eq!((walk(&tt, 5, 3), walk(&tt, 3, 5)), (0, 0));
     }
 
     #[test]
@@ -851,7 +889,12 @@ mod tests {
         ]);
         let feed = Feed::load(&mut { files }).unwrap();
         let mut tt = Timetable::build(&feed, wednesday()).unwrap();
-        tt.use_walk_distance_transfers([[0, 1, 2].as_slice()].into_iter(), 90);
+        tt.use_walk_distance_transfers(
+            [[0, 1, 2].as_slice()].into_iter(),
+            &Platforms::default(),
+            90,
+            30,
+        );
 
         assert_eq!(tt.min_change, [0, 0, 0]);
         let walk = |a: usize, b: StopIdx| tt.footpaths[a].iter().find(|p| p.0 == b).unwrap().1;
@@ -925,7 +968,7 @@ mod tests {
         // `A`'s same-stop row is 0 in `transfers.txt`: a cross-platform change.
         let mut tt = build(TRIPS, STOP_TIMES, TRANSFERS, wednesday());
         assert_eq!(tt.min_change[0], 0);
-        tt.use_walk_distance_transfers(std::iter::empty(), 90);
+        tt.use_walk_distance_transfers(std::iter::empty(), &Platforms::default(), 90, 30);
         assert_eq!(tt.min_change[0], 0);
     }
 
