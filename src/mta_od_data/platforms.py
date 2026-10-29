@@ -229,6 +229,10 @@ def fetch_platforms(
                 if not role.startswith("platform"):
                     first = None
                 if role.startswith("stop") and key in locations.at and served[route]:
+                    # A stop listed without its platform, as 66 St on the uptown 1,
+                    # still counts as the stop before and after its neighbours.
+                    if stop is not None:
+                        stops.append((stop, ""))
                     at = locations.at[key]
                     d, s = min((metres(at, coords[s]), s) for s in served[route])
                     stop = s if d <= MAX_MATCH_METRES else None
@@ -238,10 +242,14 @@ def fetch_platforms(
                     stops.append((stop, key))
                     stop, first = None, key
                     pieces[key].add(key)
+            if stop is not None:
+                stops.append((stop, ""))
             padded = [("", ""), *stops, ("", "")]
             for (prev, _), (stop, platform), (next_, _) in zip(
                 padded, padded[1:], padded[2:], strict=False
             ):
+                if not platform:
+                    continue
                 key = (route, prev, stop, next_)
                 # The feed's trains stopping as the relation does there,
                 # so where two relations of a route differ, as the 2 express by day
