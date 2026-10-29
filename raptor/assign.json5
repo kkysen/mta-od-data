@@ -24,6 +24,7 @@
   // and a complex's stops without a `transfers.txt` footpath are
   // 60s plus their straight-line distance at 1.2 m/s apart.
   transfers: "gtfs",
-  // Most rides in a journey: riders take up to 4-ride trips.
-  max_rides: 4,
+  // Most rides in a journey: riders take up to 4-ride trips,
+  // and one more allows the rare fastest trip that takes 5.
+  max_rides: 5,
 }

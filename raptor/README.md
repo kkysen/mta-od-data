@@ -41,7 +41,7 @@ August to December 2025 is 25 dates, Monday to Friday.
   - `riders_in`, `riders_assigned`: the OD riders, and those routed onto a journey.
   - `unassigned_no_stops`, `unassigned_unreachable`, `unassigned_no_departure`:
     the rest, by why, normally a few riders a date:
-    no stop served, not reachable within 4 rides, or entering after the last train.
+    no stop served, not reachable within `assign.json5`'s `max_rides` rides, or entering after the last train.
 - **`paths-<date>.parquet`**: the date's riders on each path,
   by (`hour`, `origin`, `destination`, `path_id`).
   - `hour`: the hour riders enter, 4 to 27 on the service day's clock (27 is 3 AM the next morning).

@@ -239,7 +239,7 @@ Range RAPTOR per (origin complex, hour):
 run RAPTOR for every departure in the hour, latest first,
 reusing labels across departures (standard rRAPTOR),
 from all directional stops of the origin complex.
-Labels are per round `k` (at most `max_rides` rides: `assign.json5`'s 4, or `DEFAULT_MAX_RIDES`, 5),
+Labels are per round `k` (at most `max_rides` rides, 5 by default and in `assign.json5`),
 with a backpointer per (round, stop),
 so every Pareto-optimal (arrival, rides) journey per departure
 is extractable without ambiguity.
