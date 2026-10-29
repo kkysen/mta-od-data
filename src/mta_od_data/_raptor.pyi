@@ -42,6 +42,7 @@ def assign_date(
     date: date,
     od: StrPath,
     stations: StrPath,
+    platforms: StrPath,
     config: StrPath,
     out: StrPath,
     zstd_level: int,
@@ -50,6 +51,7 @@ def assign_dates(
     jobs: list[tuple[Version, date, StrPath]],
     od: StrPath,
     stations: StrPath,
+    platforms: StrPath,
     config: StrPath,
     zstd_level: int,
 ) -> list[AssignSummary]: ...

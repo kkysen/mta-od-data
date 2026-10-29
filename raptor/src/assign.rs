@@ -39,7 +39,18 @@ pub struct Config {
     /// Most rides in a journey.
     #[serde(default = "default_max_rides")]
     pub max_rides: usize,
+    /// Under Anita's rules, changing to another of a station's platforms:
+    /// up the stairs, over, and down, or down, under, and up.
+    #[serde(default = "default_up_and_over_secs")]
+    pub up_and_over_secs: Secs,
 }
+
+fn default_up_and_over_secs() -> Secs {
+    DEFAULT_UP_AND_OVER_SECS
+}
+
+/// Anita's model has no such time; this one is a guess the user agreed to.
+pub const DEFAULT_UP_AND_OVER_SECS: Secs = 90;
 
 fn default_max_rides() -> usize {
     DEFAULT_MAX_RIDES
@@ -1309,6 +1320,7 @@ mod tests {
         logit_scale_per_min: 0.2,
         transfers: Transfers::Gtfs,
         max_rides: DEFAULT_MAX_RIDES,
+        up_and_over_secs: DEFAULT_UP_AND_OVER_SECS,
     };
 
     fn timetable(trips: &str, stop_times: &str, transfers: &str) -> Timetable {

@@ -26,6 +26,7 @@ from mta_od_data._raptor import (
     timetable_report,
 )
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR
+from mta_od_data.platforms import DEFAULT_OUT as DEFAULT_PLATFORMS
 from mta_od_data.prepare import DEFAULT_PARQUET
 
 app = Typer()
@@ -62,6 +63,10 @@ MaxRides = Annotated[int, Option(min=1, max=255, help="Most rides in a journey")
 Od = Annotated[Path, Option(help="The OD Parquet, from `mta-od-data prepare`")]
 Stations = Annotated[Path, Option(help="The station reference CSV")]
 Config = Annotated[Path, Option(help="Generalized cost weights")]
+Platforms = Annotated[
+    Path,
+    Option(help="Each route's stops' platforms, for Anita's transfers"),
+]
 ZSTD_LEVELS = {"fast": 1, "medium": 6, "slow": 9}
 
 
@@ -156,6 +161,7 @@ def assign(
     date: Day,
     od: Od = DEFAULT_PARQUET,
     stations: Stations = DEFAULT_STATIONS,
+    platforms: Platforms = DEFAULT_PLATFORMS,
     config: Config = DEFAULT_CONFIG,
     out: Annotated[
         Path | None,
@@ -171,6 +177,7 @@ def assign(
         date,
         od,
         stations,
+        platforms,
         config,
         out,
         parse_zstd_level(zstd_level),
@@ -192,6 +199,7 @@ def assign_range(
     ] = DEFAULT_GTFS_DIR,
     od: Od = DEFAULT_PARQUET,
     stations: Stations = DEFAULT_STATIONS,
+    platforms: Platforms = DEFAULT_PLATFORMS,
     config: Config = DEFAULT_CONFIG,
     out_dir: Annotated[
         Path, Option(help="Where the path Parquets and manifest.csv go")
@@ -217,6 +225,7 @@ def assign_range(
         ],
         od,
         stations,
+        platforms,
         config,
         parse_zstd_level(zstd_level),
     )

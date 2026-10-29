@@ -20,10 +20,15 @@
   logit_scale_per_min: 0.2,
   // Where transfer times come from:
   // "gtfs", `transfers.txt` at its word,
-  // or "walk_distance", Anita's rules: changing trains at one stop is free,
+  // or "walk_distance", Anita's rules: changing trains on one platform is free,
+  // changing to another of a station's platforms takes `up_and_over_secs`
+  // (platforms from OSM, `platforms.csv`),
   // and a complex's stops without a `transfers.txt` footpath are
   // 60s plus their straight-line distance at 1.2 m/s apart.
   transfers: "gtfs",
+  // Under "walk_distance", up the stairs, over, and down to another platform,
+  // or down, under, and up.
+  up_and_over_secs: 90,
   // Most rides in a journey: riders take up to 4-ride trips,
   // and one more allows the rare fastest trip that takes 5.
   max_rides: 5,

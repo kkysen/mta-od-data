@@ -6,6 +6,7 @@ pub mod batch;
 pub mod calendar;
 pub mod gtfs;
 pub mod od;
+pub mod platforms;
 pub mod raptor;
 pub mod report;
 pub mod timetable;
@@ -28,6 +29,7 @@ use crate::assign::{
 use crate::batch::{Version, load_versions, pick_dates};
 use crate::gtfs::{Feed, Secs, parse_time};
 use crate::od::{Complexes, load_service_day, load_service_days};
+use crate::platforms::Platforms;
 use crate::raptor::Router;
 use crate::report::Timings;
 use crate::timetable::Timetable;
@@ -69,11 +71,13 @@ pub struct Job<'a> {
 
 /// Assigns `date`'s OD rows on `version`'s timetable for it,
 /// with the config at `config`, and writes the paths to `out`, zstd at `zstd_level`.
+#[allow(clippy::too_many_arguments)]
 pub fn assign_date(
     version: &Version,
     date: Date,
     od: &Path,
     stations: &Path,
+    platforms: &Path,
     config: &Path,
     out: &Path,
     zstd_level: i32,
@@ -83,7 +87,7 @@ pub fn assign_date(
         date,
         out: out.to_owned(),
     };
-    let mut summaries = assign_dates(&[job], od, stations, config, zstd_level)?;
+    let mut summaries = assign_dates(&[job], od, stations, platforms, config, zstd_level)?;
     Ok(summaries.pop().expect("one summary per job"))
 }
 
@@ -112,6 +116,7 @@ pub fn assign_dates(
     jobs: &[Job],
     od: &Path,
     stations: &Path,
+    platforms: &Path,
     config: &Path,
     zstd_level: i32,
 ) -> Result<Vec<AssignSummary>> {
@@ -120,14 +125,25 @@ pub fn assign_dates(
     let _profiler = dhat::Profiler::new_heap();
     let (config, config_text) = Config::load(config)?;
 
+    let platforms = match config.transfers {
+        Transfers::WalkDistance => Some(Platforms::load(platforms)?),
+        Transfers::Gtfs => None,
+    };
+
     let start = Instant::now();
     let timetables: Vec<(Timetable, Complexes)> = jobs
         .par_iter()
         .map(|job| -> Result<_> {
             let mut tt = Timetable::build(&job.version.feed, job.date)?;
+            if let Some(platforms) = &platforms {
+                tt.split_platforms(platforms);
+            }
             let complexes = Complexes::load(stations, &tt)?;
             if config.transfers == Transfers::WalkDistance {
-                tt.use_walk_distance_transfers(complexes.stops.values().map(Vec::as_slice));
+                tt.use_walk_distance_transfers(
+                    complexes.stops.values().map(Vec::as_slice),
+                    config.up_and_over_secs,
+                );
             }
             Ok((tt, complexes))
         })
@@ -399,12 +415,17 @@ fn py_assign_date(
     date: Date,
     od: PathBuf,
     stations: PathBuf,
+    platforms: PathBuf,
     config: PathBuf,
     out: PathBuf,
     zstd_level: i32,
 ) -> Result<AssignSummary> {
     let version = version.get();
-    py.detach(|| assign_date(version, date, &od, &stations, &config, &out, zstd_level))
+    py.detach(|| {
+        assign_date(
+            version, date, &od, &stations, &platforms, &config, &out, zstd_level,
+        )
+    })
 }
 
 /// `assign_dates` on `(version, date, out)` jobs, without holding the GIL.
@@ -414,6 +435,7 @@ fn py_assign_dates(
     jobs: Vec<(Bound<'_, Version>, Date, PathBuf)>,
     od: PathBuf,
     stations: PathBuf,
+    platforms: PathBuf,
     config: PathBuf,
     zstd_level: i32,
 ) -> Result<Vec<AssignSummary>> {
@@ -425,7 +447,7 @@ fn py_assign_dates(
             out: out.clone(),
         })
         .collect();
-    py.detach(|| assign_dates(&jobs, &od, &stations, &config, zstd_level))
+    py.detach(|| assign_dates(&jobs, &od, &stations, &platforms, &config, zstd_level))
 }
 
 /// A summary of the feed zip at `feed`.

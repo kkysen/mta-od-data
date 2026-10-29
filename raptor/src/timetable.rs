@@ -11,6 +11,7 @@ use jiff::civil::Date;
 
 use crate::calendar::{active_services, span};
 use crate::gtfs::{DAY, Feed, Secs};
+use crate::platforms::Platforms;
 
 /// A date's service day runs from 04:00 to 04:00 the next morning,
 /// around when the subway is quietest, so a night counts with the evening before it.
@@ -26,7 +27,7 @@ pub type StopIdx = u32;
 /// Trips sharing one of these share a pattern, before FIFO splitting.
 type PatternKey<'a> = (&'a str, Option<u8>, Vec<StopIdx>);
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Stop {
     pub id: String,
     /// Its parent station's ID, or its own if it has none:
@@ -35,6 +36,8 @@ pub struct Stop {
     pub name: String,
     /// `(latitude, longitude)`, if `stops.txt` has them.
     pub coords: Option<(f64, f64)>,
+    /// Its physical platform, once `split_platforms` knows it.
+    pub platform: Option<String>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -174,6 +177,7 @@ impl Timetable {
                 station: station.to_string(),
                 name: stop.stop_name.clone(),
                 coords: stop.stop_lat.zip(stop.stop_lon),
+                platform: None,
             });
         }
         let stop_idx = |id: &str| match places.get(id).map(Vec::as_slice) {
@@ -385,19 +389,97 @@ pub const BASE_WALK: Secs = 60;
 pub const WALK_SPEED: f64 = 1.2;
 
 impl Timetable {
+    /// Splits each stop whose trains stop at more than one of `platforms`
+    /// into a stop for each, as Penn's uptown 1 and 2 at night, and 2 and 3 by day,
+    /// and gives each stop its platform.
+    /// A copy has its stop's ID, station, footpaths, and same-stop time,
+    /// and walking between them takes that same-stop time, as within a station.
+    /// A train whose platform there is unknown stays at the stop.
+    pub fn split_platforms(&mut self, platforms: &Platforms) {
+        let station = |stops: &[Stop], s: StopIdx| stops[s as usize].station.clone();
+        let mut copies: HashMap<(StopIdx, String), StopIdx> = HashMap::new();
+        // Each copy's original.
+        let mut originals: Vec<(StopIdx, StopIdx)> = Vec::new();
+        for p in &mut self.patterns {
+            let n = p.stops.len();
+            for k in 0..n {
+                let s = p.stops[k];
+                let prev = if k > 0 {
+                    station(&self.stops, p.stops[k - 1])
+                } else {
+                    String::new()
+                };
+                let next = if k + 1 < n {
+                    station(&self.stops, p.stops[k + 1])
+                } else {
+                    String::new()
+                };
+                let here = station(&self.stops, s);
+                let Some(platform) = platforms.get(&p.route_id, &prev, &here, &next) else {
+                    continue;
+                };
+                let stop = &mut self.stops[s as usize];
+                match &stop.platform {
+                    None => stop.platform = Some(platform.to_string()),
+                    Some(q) if q == platform => {}
+                    Some(_) => {
+                        p.stops[k] =
+                            *copies.entry((s, platform.to_string())).or_insert_with(|| {
+                                let c = self.stops.len() as StopIdx;
+                                let mut copy = self.stops[s as usize].clone();
+                                copy.platform = Some(platform.to_string());
+                                self.places.entry(copy.id.clone()).or_default().push(c);
+                                if copy.station != copy.id {
+                                    self.places.entry(copy.station.clone()).or_default().push(c);
+                                }
+                                self.stops.push(copy);
+                                self.min_change.push(self.min_change[s as usize]);
+                                self.footpaths.push(self.footpaths[s as usize].clone());
+                                originals.push((c, s));
+                                c
+                            });
+                    }
+                }
+            }
+        }
+        for &(c, s) in &originals {
+            for paths in &mut self.footpaths {
+                if let Some(&(_, walk)) = paths.iter().find(|&&(t, _)| t == s) {
+                    paths.push((c, walk));
+                }
+            }
+        }
+        // Between a stop and its copies, and its copies one another.
+        for &(c, s) in &originals {
+            let change = self.min_change[s as usize];
+            for &(d, _) in originals.iter().filter(|&&(d, t)| t == s && d != c) {
+                add_footpath(&mut self.footpaths[c as usize], d, change);
+            }
+            add_footpath(&mut self.footpaths[c as usize], s, change);
+            add_footpath(&mut self.footpaths[s as usize], c, change);
+        }
+    }
+
     /// Anita's transfer rules instead of `transfers.txt`'s at its word:
-    /// changing trains at one station is free,
+    /// changing trains on one platform is free, at one stop or across an island,
+    /// changing to another of the station's platforms takes `up_and_over`,
     /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
     /// of `BASE_WALK` plus the straight-line distance at `WALK_SPEED`.
+    /// A stop's platform is from `split_platforms`;
+    /// two stops whose platforms aren't both known are up and over.
     pub fn use_walk_distance_transfers<'a>(
         &mut self,
         complexes: impl Iterator<Item = &'a [StopIdx]>,
+        up_and_over: Secs,
     ) {
         self.min_change.fill(0);
         for (a, paths) in self.footpaths.iter_mut().enumerate() {
+            let a = &self.stops[a];
             for (b, walk) in paths {
-                if self.stops[a].station == self.stops[*b as usize].station {
-                    *walk = 0;
+                let b = &self.stops[*b as usize];
+                if a.station == b.station {
+                    let same_platform = a.platform.is_some() && a.platform == b.platform;
+                    *walk = if same_platform { 0 } else { up_and_over };
                 }
             }
         }
@@ -561,9 +643,58 @@ mod tests {
         assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 90)]);
         assert_eq!(tt.footpaths[2], [(0, 120), (1, 120), (3, 90)]);
         assert!(tt.report.unclosed_footpaths.is_empty());
-        // Anita's rules make it free.
-        tt.use_walk_distance_transfers(std::iter::empty());
-        assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 0)]);
+        // Anita's rules make changing at one stop free,
+        // and to the other direction's, on a platform not known to be the same, up and over.
+        tt.use_walk_distance_transfers(std::iter::empty(), 90);
+        assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 90)]);
+    }
+
+    #[test]
+    fn platforms_split_stops_and_islands_join_them() {
+        // At Beta, uptown 1s stop at the local platform, uptown 2s at the island,
+        // and downtown 1s at the island's other side.
+        let trips = "route_id,trip_id,service_id,direction_id\n\
+            1,up1,Weekday,0\n2,up2,Weekday,0\n1,down1,Weekday,1\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            up1,AN,08:00:00,08:00:00,1\nup1,BN,08:10:00,08:10:00,2\n\
+            up2,AN,08:01:00,08:01:00,1\nup2,BN,08:09:00,08:09:00,2\n\
+            down1,BS,08:00:00,08:00:00,1\ndown1,AS,08:10:00,08:10:00,2\n";
+        let transfers = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n\
+            B,B,2,180\n";
+        let mut tt = build(trips, stop_times, transfers, wednesday());
+        let key = |route: &str, prev: &str, next: &str| {
+            (route.into(), prev.into(), "B".into(), next.into())
+        };
+        let platforms: Platforms = [
+            (key("1", "A", ""), "local".to_string()),
+            (key("2", "A", ""), "island".to_string()),
+            (key("1", "", "A"), "island".to_string()),
+        ]
+        .into_iter()
+        .collect();
+        tt.split_platforms(&platforms);
+
+        // The uptown 2s' stop is a copy of Beta's uptown stop,
+        // reached from it as from another of the station's stops.
+        assert_eq!(tt.stops.len(), 6);
+        assert_eq!(tt.stops[5].id, "BN");
+        assert_eq!(tt.stops_at("BN"), [2, 5]);
+        assert_eq!(tt.stops_at("B"), [2, 3, 5]);
+        let up2 = tt.patterns.iter().find(|p| p.route_id == "2").unwrap();
+        assert_eq!(up2.stops, [0, 5]);
+        let walk = |tt: &Timetable, a: usize, b: StopIdx| {
+            tt.footpaths[a].iter().find(|p| p.0 == b).unwrap().1
+        };
+        assert_eq!(
+            (walk(&tt, 2, 5), walk(&tt, 5, 2), walk(&tt, 5, 3)),
+            (180, 180, 180)
+        );
+
+        tt.use_walk_distance_transfers(std::iter::empty(), 90);
+        // Across the island is free, whichever direction; up and over isn't.
+        assert_eq!((walk(&tt, 5, 3), walk(&tt, 3, 5)), (0, 0));
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 2, 3)), (90, 90));
+        assert_eq!(tt.min_change[2], 0);
     }
 
     #[test]
@@ -686,7 +817,7 @@ mod tests {
         ]);
         let feed = Feed::load(&mut { files }).unwrap();
         let mut tt = Timetable::build(&feed, wednesday()).unwrap();
-        tt.use_walk_distance_transfers([[0, 1, 2].as_slice()].into_iter());
+        tt.use_walk_distance_transfers([[0, 1, 2].as_slice()].into_iter(), 90);
 
         assert_eq!(tt.min_change, [0, 0, 0]);
         let walk = |a: usize, b: StopIdx| tt.footpaths[a].iter().find(|p| p.0 == b).unwrap().1;
@@ -760,7 +891,7 @@ mod tests {
         // `A`'s same-stop row is 0 in `transfers.txt`: a cross-platform change.
         let mut tt = build(TRIPS, STOP_TIMES, TRANSFERS, wednesday());
         assert_eq!(tt.min_change[0], 0);
-        tt.use_walk_distance_transfers(std::iter::empty());
+        tt.use_walk_distance_transfers(std::iter::empty(), 90);
         assert_eq!(tt.min_change[0], 0);
     }
 

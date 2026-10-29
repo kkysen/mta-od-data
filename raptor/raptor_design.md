@@ -188,8 +188,15 @@ Every version so far has none of either.
 
 `transfers: "walk_distance"` in `raptor/assign.json5`
 switches to Anita's rules instead, for comparing with it:
-every same-stop change is free,
-`transfers.txt`'s footpaths between different stops are kept,
+changing trains on one platform is free,
+at one stop or across an island to the other direction's;
+changing to another of the station's platforms, up and over, takes `up_and_over_secs`, 90s,
+which Anita's model doesn't have (it makes every change within a station free).
+Platforms are OSM's, from `platforms.csv` by each train's stops before and after,
+and a stop whose trains use several is split into one for each,
+as Penn's uptown 2, on the 3's express island by day and the 1's local platform late at night.
+Two stops whose platforms aren't both known are up and over.
+`transfers.txt`'s footpaths between different stations are kept,
 and every other pair of a complex's stops gets a footpath
 of 60s plus their straight-line distance at 1.2 m/s.
 Cross-platform changes are free under both.
