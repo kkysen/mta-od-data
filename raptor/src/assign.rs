@@ -44,9 +44,9 @@ pub struct Config {
     #[serde(default = "default_up_and_over_secs")]
     pub up_and_over_secs: Secs,
     /// Under Anita's rules, changing between platforms stacked one right over another:
-    /// one flight of stairs.
-    #[serde(default = "default_stacked_secs")]
-    pub stacked_secs: Secs,
+    /// one flight of stairs a level apart.
+    #[serde(default = "default_stacked_secs_per_level")]
+    pub stacked_secs_per_level: Secs,
     /// Under `pathways`, minutes added per walk out through the fare gates and back in,
     /// on top of its walk: paying again, or the bother of it.
     #[serde(default = "default_fare_gate_penalty_min")]
@@ -60,11 +60,11 @@ fn default_fare_gate_penalty_min() -> f64 {
 /// A placeholder, as `logit_scale_per_min`: no source gives one.
 pub const DEFAULT_FARE_GATE_PENALTY_MIN: f64 = 10.0;
 
-fn default_stacked_secs() -> Secs {
-    DEFAULT_STACKED_SECS
+fn default_stacked_secs_per_level() -> Secs {
+    DEFAULT_STACKED_SECS_PER_LEVEL
 }
 
-pub const DEFAULT_STACKED_SECS: Secs = 30;
+pub const DEFAULT_STACKED_SECS_PER_LEVEL: Secs = 30;
 
 fn default_up_and_over_secs() -> Secs {
     DEFAULT_UP_AND_OVER_SECS
@@ -1357,7 +1357,7 @@ mod tests {
         transfers: Transfers::Gtfs,
         max_rides: DEFAULT_MAX_RIDES,
         up_and_over_secs: DEFAULT_UP_AND_OVER_SECS,
-        stacked_secs: DEFAULT_STACKED_SECS,
+        stacked_secs_per_level: DEFAULT_STACKED_SECS_PER_LEVEL,
         fare_gate_penalty_min: DEFAULT_FARE_GATE_PENALTY_MIN,
     };
 

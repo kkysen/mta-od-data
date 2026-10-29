@@ -28,11 +28,12 @@ A few are mapped in pieces, which a relation lists one after another after its s
 like Newkirk Plaza's southbound, in four:
 such a platform is its first piece, with all its pieces' area.
 
-Platforms stacked one right over another, one level apart (by OSM's `level`)
+Platforms stacked one right over another, on different levels (by OSM's `level`)
 and overlapping by at least half the smaller one,
-are a flight of stairs apart, for Anita's transfers (`stacked_platforms.csv`):
-7 Av's on 53 St, say, but not 59 St-Columbus Circle's 1 over the A/B/C/D,
-two levels up, nor 74 St-Broadway's 7, on the el.
+are a flight of stairs a level apart, for Anita's transfers (`stacked_platforms.csv`):
+7 Av's on 53 St, say, one level apart, or W 4 St's, two,
+but not 59 St-Columbus Circle's 1 and A/B/C/D, crossing at an angle,
+nor 74 St-Broadway's 7, on the el.
 
 Read from Geofabrik's New York extract, not the Overpass API,
 whose public servers were too busy to answer.
@@ -69,8 +70,8 @@ DEFAULT_AREAS_OUT = Path(__file__).parent / "ridership" / "platform_areas.csv"
 # Beside `platforms.csv`, where RAPTOR looks for it.
 DEFAULT_STACKED_OUT = Path(__file__).parent / "ridership" / "stacked_platforms.csv"
 
-# Two platforms one level apart overlapping by at least this much of the smaller
-# are stacked: on OSM's, 68% or more, or 28% or less.
+# Two platforms on different levels overlapping by at least this much of the smaller
+# are stacked: on OSM's, those a level apart overlap 68% or more, or 28% or less.
 STACKED_OVERLAP = 0.5
 
 # A relation's stop more than this far from every GTFS stop of its route
@@ -165,8 +166,9 @@ def plane(ring: list[tuple[float, float]]) -> BaseGeometry:
 
 def stacked(
     platforms: list[str], pieces: dict[str, set[str]], locations: Locations
-) -> list[tuple[str, str, float]]:
-    """Each pair of `platforms` stacked one level apart, and how much they overlap."""
+) -> list[tuple[str, str, int, float]]:
+    """Each pair of `platforms` stacked one over another,
+    how many levels apart, and how much they overlap."""
     shapes: dict[str, BaseGeometry] = {}
     for p in platforms:
         parts = pieces.get(p) or {p}
@@ -177,13 +179,14 @@ def stacked(
     pairs = []
     for i, j in zip(*tree.query([shapes[p] for p in names], "intersects"), strict=True):
         a, b = names[i], names[j]
-        if a >= b or abs(locations.levels[a] - locations.levels[b]) != 1:
+        levels = abs(locations.levels[a] - locations.levels[b])
+        if a >= b or levels < 1:
             continue
         overlap = shapes[a].intersection(shapes[b]).area / min(
             shapes[a].area, shapes[b].area
         )
         if overlap >= STACKED_OVERLAP:
-            pairs.append((a, b, overlap))
+            pairs.append((a, b, round(levels), overlap))
     return pairs
 
 
@@ -380,6 +383,6 @@ def fetch_platforms(
     pairs = stacked(platforms, pieces, locations)
     with stacked_out.open("w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["platform", "other", "overlap"])
-        writer.writerows((a, b, f"{o:.2f}") for a, b, o in pairs)
+        writer.writerow(["platform", "other", "levels", "overlap"])
+        writer.writerows((a, b, n, f"{o:.2f}") for a, b, n, o in pairs)
     print(f"wrote {stacked_out}: {len(pairs)} pairs of platforms stacked")

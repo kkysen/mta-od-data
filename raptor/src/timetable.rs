@@ -471,8 +471,9 @@ impl Timetable {
     /// changing to another of the station's platforms takes `up_and_over`,
     /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
     /// of `BASE_WALK` plus the straight-line distance at `WALK_SPEED`.
-    /// Between `platforms` stacked one right over another, a flight of stairs,
-    /// any change takes `stacked` instead, within a station or a complex.
+    /// Between `platforms` stacked one right over another,
+    /// any change takes `stacked_per_level` a level instead, a flight of stairs each,
+    /// within a station or a complex.
     /// A stop's platform is from `split_platforms`;
     /// two stops whose platforms aren't both known are up and over.
     pub fn use_walk_distance_transfers<'a>(
@@ -480,7 +481,7 @@ impl Timetable {
         complexes: impl Iterator<Item = &'a [StopIdx]>,
         platforms: &Platforms,
         up_and_over: Secs,
-        stacked: Secs,
+        stacked_per_level: Secs,
     ) {
         self.min_change.fill(0);
         for (a, paths) in self.footpaths.iter_mut().enumerate() {
@@ -516,9 +517,9 @@ impl Timetable {
             };
             for (b, walk) in paths {
                 if let Some(b) = &self.stops[*b as usize].platform
-                    && platforms.stacked(a, b)
+                    && let Some(levels) = platforms.stacked(a, b)
                 {
-                    *walk = stacked;
+                    *walk = stacked_per_level * Secs::from(levels);
                 }
             }
         }
@@ -758,13 +759,13 @@ mod tests {
     }
 
     #[test]
-    fn stacked_platforms_are_a_flight_apart() {
-        // Beta's local platform right over its island, as at 7 Av on 53 St.
-        let platforms = beta_platforms().with_stacked(&[("local", "island")]);
+    fn stacked_platforms_are_a_flight_a_level_apart() {
+        // Beta's local platform right over its island, two levels up, as at W 4 St.
+        let platforms = beta_platforms().with_stacked(&[("local", "island", 2)]);
         let mut tt = beta_split(&platforms);
         tt.use_walk_distance_transfers(std::iter::empty(), &platforms, 90, 30);
-        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (30, 30));
-        assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (30, 30));
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (60, 60));
+        assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (60, 60));
         // Across the island is still free.
         assert_eq!((walk(&tt, 5, 3), walk(&tt, 3, 5)), (0, 0));
     }
