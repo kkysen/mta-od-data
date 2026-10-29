@@ -8,7 +8,7 @@ use crate::assign::{PathRow, Unassigned};
 use crate::gtfs::{DAY, Feed, Secs};
 use crate::od::{ComplexId, Complexes, OdRow};
 use crate::raptor::{Journey, Leg, Legs, MAX_RIDES};
-use crate::timetable::{DEFAULT_MIN_CHANGE, DEPARTURES_UNTIL, SERVICE_DAY_START, Timetable};
+use crate::timetable::{DEPARTURES_UNTIL, SERVICE_DAY_START, Timetable};
 
 /// At most this many examples of each problem.
 const EXAMPLES: usize = 5;
@@ -94,12 +94,15 @@ pub fn timetable(tt: &Timetable) -> String {
     line!(out, "transfer types: {:?}", r.transfer_types);
     line!(
         out,
-        "transfers without a time: {}",
-        r.transfers_without_time
+        "transfers without a time: {} (defaults {}s same-stop, {}s between stops)",
+        r.transfers_without_time,
+        r.default_change,
+        r.default_footpath
     );
     line!(
         out,
-        "served stops on the default {DEFAULT_MIN_CHANGE}s change: {}",
+        "served stops on the default {}s change (the feed's most common): {}",
+        r.default_change,
         r.default_change_stops
     );
     let zero = tt.min_change.iter().filter(|&&c| c == 0).count();

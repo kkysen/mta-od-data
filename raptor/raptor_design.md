@@ -167,9 +167,11 @@ keyed on parent stops as the feed does:
   between alighting and boarding at that stop,
   kept separate from footpaths so RAPTOR charges it
   (`nycriders` makes every same-stop change free);
-- a stop with no same-stop row gets `DEFAULT_MIN_CHANGE`, 180s,
-  what the feed gives almost every stop it lists
+- a stop with no same-stop row gets the feed's most common same-stop time,
+  180s on the 2026-08 version
   (33 served stops on the 2025-10-18 version, single-line stops);
+- a row with no `min_transfer_time` gets the most common time
+  of its kind, same-stop or between stops;
 - other rows are footpaths;
 - `transfer_type` 3 (not possible) rows are dropped.
 

@@ -552,8 +552,11 @@ mod tests {
             a_to_d(&format!("{header}B,B,2,180\n")),
             [["r1a A-B", "r2b B-D"]]
         );
-        // No row for B: the 180s default.
-        assert_eq!(a_to_d(header), [["r1a A-B", "r2b B-D"]]);
+        // No row for B: the feed's most common change time, 180s at A.
+        assert_eq!(
+            a_to_d(&format!("{header}A,A,2,180\n")),
+            [["r1a A-B", "r2b B-D"]]
+        );
     }
 
     #[test]

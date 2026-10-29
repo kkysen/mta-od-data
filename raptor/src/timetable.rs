@@ -12,10 +12,6 @@ use jiff::civil::Date;
 use crate::calendar::{active_services, span};
 use crate::gtfs::{DAY, Feed, Secs};
 
-/// Minimum time to change trains at a stop `transfers.txt` gives no same-stop row for.
-/// 180s is what the feed gives almost every stop it does list.
-pub const DEFAULT_MIN_CHANGE: Secs = 180;
-
 /// A date's service day runs from 04:00 to 04:00 the next morning,
 /// around when the subway is quietest, so a night counts with the evening before it.
 /// Its OD rows are the date's hours 4 to 23 and the next date's 0 to 3, as hours 24 to 27.
@@ -88,10 +84,16 @@ pub struct Report {
     pub fifo_splits: usize,
     /// Trips with exactly the same times as another on the same pattern.
     pub duplicate_trips: Vec<String>,
-    /// Served stops with no same-stop transfer row, so on `DEFAULT_MIN_CHANGE`.
+    /// The most common same-stop `min_transfer_time`,
+    /// for same-stop changes `transfers.txt` gives no time for.
+    pub default_change: Secs,
+    /// The most common `min_transfer_time` between different stops,
+    /// for footpaths `transfers.txt` gives no time for.
+    pub default_footpath: Secs,
+    /// Served stops with no same-stop transfer row, so on `default_change`.
     pub default_change_stops: usize,
     pub transfer_types: BTreeMap<u8, usize>,
-    /// Transfer rows with no `min_transfer_time`, so on `DEFAULT_MIN_CHANGE`.
+    /// Transfer rows with no `min_transfer_time`, so on `default_change` or `default_footpath`.
     pub transfers_without_time: usize,
     /// Footpaths `a -> b` with no `b -> a`.
     pub asymmetric_footpaths: Vec<(String, String)>,
@@ -251,19 +253,37 @@ impl Timetable {
             }
         }
 
-        let mut min_change: Vec<Option<Secs>> = vec![None; stops.len()];
-        let mut footpaths: Vec<Vec<(StopIdx, Secs)>> = vec![Vec::new(); stops.len()];
+        // 3: transfers between these stops aren't possible.
+        let mut transfers = Vec::new();
         for t in &feed.transfers {
             *report.transfer_types.entry(t.transfer_type).or_default() += 1;
-            // 3: transfers between these stops aren't possible.
-            if t.transfer_type == 3 {
-                continue;
+            if t.transfer_type != 3 {
+                let (from, to) = (stop_idx(&t.from_stop_id)?, stop_idx(&t.to_stop_id)?);
+                transfers.push((from, to, t.min_transfer_time));
             }
-            let time = t.min_transfer_time.unwrap_or_else(|| {
+        }
+        let time_mode = |same_stop: bool| {
+            mode(
+                transfers
+                    .iter()
+                    .filter(|&&(from, to, _)| (from == to) == same_stop)
+                    .filter_map(|&(_, _, time)| time),
+            )
+        };
+        report.default_change = time_mode(true);
+        report.default_footpath = time_mode(false);
+
+        let mut min_change: Vec<Option<Secs>> = vec![None; stops.len()];
+        let mut footpaths: Vec<Vec<(StopIdx, Secs)>> = vec![Vec::new(); stops.len()];
+        for (from, to, time) in transfers {
+            let time = time.unwrap_or_else(|| {
                 report.transfers_without_time += 1;
-                DEFAULT_MIN_CHANGE
+                if from == to {
+                    report.default_change
+                } else {
+                    report.default_footpath
+                }
             });
-            let (from, to) = (stop_idx(&t.from_stop_id)?, stop_idx(&t.to_stop_id)?);
             if from == to {
                 let change = &mut min_change[from as usize];
                 *change = Some(change.map_or(time, |c| c.max(time)));
@@ -285,7 +305,7 @@ impl Timetable {
             .count();
         let min_change = min_change
             .into_iter()
-            .map(|c| c.unwrap_or(DEFAULT_MIN_CHANGE))
+            .map(|c| c.unwrap_or(report.default_change))
             .collect();
 
         let name = |s: StopIdx| stops[s as usize].id.clone();
@@ -349,6 +369,19 @@ impl Timetable {
             }
         }
     }
+}
+
+/// The most common time, the shortest of any tied, or 0 if there are none.
+fn mode(times: impl Iterator<Item = Secs>) -> Secs {
+    let mut counts: BTreeMap<Secs, usize> = BTreeMap::new();
+    for time in times {
+        *counts.entry(time).or_default() += 1;
+    }
+    counts
+        .into_iter()
+        .rev()
+        .max_by_key(|&(_, n)| n)
+        .map_or(0, |(time, _)| time)
 }
 
 /// Approximate meters between two nearby `(latitude, longitude)` points.
@@ -587,9 +620,47 @@ mod tests {
     }
 
     #[test]
+    fn missing_times_get_the_mode() {
+        // Same-stop times 60, 180, 180, 300; footpath times 120, 240, 240.
+        let transfers = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n\
+            A,A,2,180\nC,C,2,180\nD,D,2,60\nE,E,2,300\nB,B,2,\n\
+            A,C,2,240\nC,A,2,240\nD,E,2,120\nA,B,2,\n";
+        let stops = "stop_id,stop_name,stop_lat,stop_lon\n\
+            A,A,40,-74\nB,B,40,-74\nC,C,40,-74\nD,D,40,-74\nE,E,40,-74\nF,F,40,-74\n";
+        let files = HashMap::from([
+            ("stops.txt", stops),
+            ("trips.txt", "route_id,trip_id,service_id\n1,t,Weekday\n"),
+            (
+                "stop_times.txt",
+                "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+                 t,A,08:00:00,08:00:00,1\nt,B,08:10:00,08:10:00,2\n",
+            ),
+            ("calendar.txt", CALENDAR),
+            ("transfers.txt", transfers),
+        ]);
+        let feed = Feed::load(&mut { files }).unwrap();
+        let tt = Timetable::build(&feed, wednesday()).unwrap();
+        assert_eq!(
+            (tt.report.default_change, tt.report.default_footpath),
+            (180, 240)
+        );
+        assert_eq!(tt.report.transfers_without_time, 2);
+        // `B`'s row has no time, and `F` has no row.
+        assert_eq!(tt.min_change, [180, 180, 180, 60, 300, 180]);
+        assert_eq!(tt.footpaths[0], [(2, 240), (1, 240)]);
+    }
+
+    #[test]
+    fn mode_ties_go_to_the_shortest() {
+        assert_eq!(mode([300, 60, 300, 60].into_iter()), 60);
+        assert_eq!(mode(std::iter::empty()), 0);
+    }
+
+    #[test]
     fn transfers_at_their_word() {
         let tt = build(TRIPS, STOP_TIMES, TRANSFERS, wednesday());
-        assert_eq!(tt.min_change, [0, DEFAULT_MIN_CHANGE, DEFAULT_MIN_CHANGE]);
+        // `B` and `C` have no same-stop row, so get `A`'s, the only one.
+        assert_eq!(tt.min_change, [0, 0, 0]);
         // `B` is served and has no same-stop row.
         assert_eq!(tt.report.default_change_stops, 1);
         assert_eq!(tt.footpaths[0], [(1, 120)]);
