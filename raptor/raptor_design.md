@@ -239,7 +239,7 @@ Range RAPTOR per (origin complex, hour):
 run RAPTOR for every departure in the hour, latest first,
 reusing labels across departures (standard rRAPTOR),
 from all directional stops of the origin complex.
-Labels are per round `k` (at most `MAX_RIDES` rides, 4),
+Labels are per round `k` (at most `max_rides` rides, `DEFAULT_MAX_RIDES` or `assign.json5`'s, 4),
 with a backpointer per (round, stop),
 so every Pareto-optimal (arrival, rides) journey per departure
 is extractable without ambiguity.
@@ -387,7 +387,7 @@ Complexity is added only once the simple version works end to end.
      a second route with the same rides arriving later gets none,
      until McRAPTOR.
    - Unassigned riders are reported by cause
-     (no served stop, unreachable in `MAX_RIDES`, entering after the last departure),
+     (no served stop, unreachable in `max_rides`, entering after the last departure),
      and assigned plus unassigned must equal the input,
      but for rounding each path's riders to a ten-thousandth:
      paths with a sliver of a row's riders round down, ~2 riders a date.

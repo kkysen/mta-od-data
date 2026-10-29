@@ -12,9 +12,9 @@ use std::ops::Range;
 use crate::gtfs::Secs;
 use crate::timetable::{Pattern, StopIdx, Timetable};
 
-/// Most rides in a journey: 4, as riders take 4-ride trips;
+/// Most rides in a journey by default: 4, as riders take 4-ride trips;
 /// `nycriders`' cap of 3 cut them off.
-pub const MAX_RIDES: usize = 4;
+pub const DEFAULT_MAX_RIDES: usize = 4;
 
 const NEVER: Secs = Secs::MAX;
 
@@ -112,6 +112,8 @@ pub struct Router<'a> {
     tt: &'a Timetable,
     /// `(pattern, position)` of each stop's every appearance in a pattern.
     stop_patterns: Vec<Vec<(u32, u32)>>,
+    /// Most rides in a journey: queries run this many rounds.
+    max_rides: usize,
 }
 
 /// Labels per round, kept across runs of one range query.
@@ -139,6 +141,15 @@ const UNMARKED: u32 = u32::MAX;
 
 impl<'a> Router<'a> {
     pub fn new(tt: &'a Timetable) -> Self {
+        Self::with_max_rides(tt, DEFAULT_MAX_RIDES)
+    }
+
+    /// Finds journeys of at most `max_rides` rides.
+    pub fn with_max_rides(tt: &'a Timetable, max_rides: usize) -> Self {
+        assert!(
+            (1..=usize::from(u8::MAX)).contains(&max_rides),
+            "max rides {max_rides}: a journey's rides are a `u8`, and at least 1"
+        );
         let mut stop_patterns = vec![Vec::new(); tt.stops.len()];
         for (p, pattern) in tt.patterns.iter().enumerate() {
             assert!(
@@ -150,12 +161,20 @@ impl<'a> Router<'a> {
                 stop_patterns[s as usize].push((p as u32, pos as u32));
             }
         }
-        Self { tt, stop_patterns }
+        Self {
+            tt,
+            stop_patterns,
+            max_rides,
+        }
+    }
+
+    pub fn max_rides(&self) -> usize {
+        self.max_rides
     }
 
     pub fn labels(&self) -> Labels<'_> {
         let n = self.tt.stops.len();
-        let rounds = MAX_RIDES + 1;
+        let rounds = self.max_rides + 1;
         Labels {
             router: self,
             depart: NEVER,
@@ -219,7 +238,7 @@ impl<'a> Router<'a> {
         let mut legs = Legs::default();
         let mut journeys = vec![Vec::new(); targets.len()];
         // Each target set's earliest arrival per round, over the runs so far.
-        let mut best = vec![[NEVER; MAX_RIDES + 1]; targets.len()];
+        let mut best = vec![vec![NEVER; self.max_rides + 1]; targets.len()];
         for depart in self.departures(origins, from, until) {
             labels.run(origins, depart);
             for ((target, best), journeys) in targets.iter().zip(&mut best).zip(&mut journeys) {
@@ -418,7 +437,7 @@ impl Labels<'_> {
         let journey = Journey {
             depart: self.depart,
             arrive: self.ride_arrival[rides][target as usize],
-            rides: u8::try_from(rides).expect("`MAX_RIDES` fits a `u8`"),
+            rides: u8::try_from(rides).expect("`Router::max_rides` fits a `u8`"),
             legs: u32::try_from(start).expect("under 2^32 legs")
                 ..u32::try_from(legs.len()).expect("under 2^32 legs"),
         };

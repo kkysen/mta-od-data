@@ -22,7 +22,7 @@ use serde::Deserialize;
 
 use crate::gtfs::Secs;
 use crate::od::{ComplexId, Complexes, OdRow, Riders};
-use crate::raptor::{Journey, Leg, Legs, MAX_RIDES, Router};
+use crate::raptor::{DEFAULT_MAX_RIDES, Journey, Leg, Legs, Router};
 use crate::timetable::{DEPARTURES_UNTIL, Pattern, SERVICE_DAY_START, StopIdx, Timetable};
 
 const HOUR: Secs = 60 * 60;
@@ -36,6 +36,13 @@ pub struct Config {
     pub logit_scale_per_min: f64,
     #[serde(default)]
     pub transfers: Transfers,
+    /// Most rides in a journey.
+    #[serde(default = "default_max_rides")]
+    pub max_rides: usize,
+}
+
+fn default_max_rides() -> usize {
+    DEFAULT_MAX_RIDES
 }
 
 /// Where transfer times come from.
@@ -96,7 +103,7 @@ impl PathRow {
 pub struct Unassigned {
     /// The origin or destination complex has no served stop.
     pub no_stops: f64,
-    /// No journey within `MAX_RIDES` rides departs that day.
+    /// No journey within `Config::max_rides` rides departs that day.
     pub unreachable: f64,
     /// Entering after the day's last journey departs.
     pub no_departure: f64,
@@ -121,7 +128,7 @@ pub fn assign(
     rows: &[OdRow],
     config: &Config,
 ) -> (Vec<PathRow>, PathTexts, Unassigned) {
-    let routes = route(tt, complexes);
+    let routes = route(tt, complexes, config.max_rides);
     let (paths, unassigned) = split(&routes, complexes, rows, config, &TripLoads::new(tt));
     let texts = PathTexts(routes.texts().map(Box::from).collect());
     (paths, texts, unassigned)
@@ -423,8 +430,8 @@ struct LegsId(u32);
 /// Routes every pair of `complexes` on `tt`,
 /// so any OD data on its dates splits over the same routes.
 /// That's barely more than the OD data's own pairs, ~98% of them.
-pub fn route(tt: &Timetable, complexes: &Complexes) -> Routes {
-    let router = Router::new(tt);
+pub fn route(tt: &Timetable, complexes: &Complexes, max_rides: usize) -> Routes {
+    let router = Router::with_max_rides(tt, max_rides);
     let ids: Vec<ComplexId> = complexes.stops.keys().copied().collect();
     let mut routes: BTreeMap<_, _> = ids
         .par_iter()
@@ -531,7 +538,10 @@ fn route_origin(
     let intervals = destinations
         .iter()
         .zip(profiles)
-        .map(|(&d, journeys)| (d, intervals(tt, &mut paths, &legs, &journeys)))
+        .map(|(&d, journeys)| {
+            let intervals = intervals(tt, router.max_rides(), &mut paths, &legs, &journeys);
+            (d, intervals)
+        })
         .collect();
     drop(legs);
     // Drops the interner's maps now, not when the routes are.
@@ -641,14 +651,20 @@ struct Choice {
 }
 
 /// The choice intervals of one OD pair's profile (latest departure first).
-fn intervals(tt: &Timetable, paths: &mut Paths, legs: &Legs, journeys: &[Journey]) -> Intervals {
+fn intervals(
+    tt: &Timetable,
+    max_rides: usize,
+    paths: &mut Paths,
+    legs: &Legs,
+    journeys: &[Journey],
+) -> Intervals {
     // Built latest first, then reversed.
     let mut latest_first = Intervals::default();
     // The latest journey seen per ride count:
     // the earliest arriving of those departing at or after the current departure,
     // since the profile dropped any arriving no earlier than a later one.
-    let mut latest: [Option<&Journey>; MAX_RIDES + 1] = [None; MAX_RIDES + 1];
-    let mut candidates = Vec::with_capacity(MAX_RIDES);
+    let mut latest: Vec<Option<&Journey>> = vec![None; max_rides + 1];
+    let mut candidates = Vec::with_capacity(max_rides);
     let mut i = 0;
     while i < journeys.len() {
         let depart = journeys[i].depart;
@@ -1288,6 +1304,7 @@ mod tests {
         transfer_penalty_min: 0.0,
         logit_scale_per_min: 0.2,
         transfers: Transfers::Gtfs,
+        max_rides: DEFAULT_MAX_RIDES,
     };
 
     fn timetable(trips: &str, stop_times: &str, transfers: &str) -> Timetable {
@@ -1349,7 +1366,7 @@ mod tests {
     fn waits_at(tt: &Timetable, rows: &[OdRow], stop: &str) -> BTreeMap<usize, f64> {
         let loads = TripLoads::new(tt);
         split(
-            &route(tt, &complexes(tt)),
+            &route(tt, &complexes(tt), DEFAULT_MAX_RIDES),
             &complexes(tt),
             rows,
             &NEUTRAL,

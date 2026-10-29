@@ -7,7 +7,7 @@ from typing import final
 
 type StrPath = str | PathLike[str]
 
-MAX_RIDES: int
+DEFAULT_MAX_RIDES: int
 
 @final
 class Version:
@@ -61,6 +61,7 @@ def route_report(
     origins: list[str],
     destinations: list[str],
     depart: str,
+    max_rides: int = ...,
 ) -> str: ...
 def profile_report(
     feed: StrPath,
@@ -69,5 +70,6 @@ def profile_report(
     destinations: list[str],
     after: str,
     before: str,
+    max_rides: int = ...,
 ) -> str: ...
 def od_report(feed: StrPath, date: date, od: StrPath, stations: StrPath) -> str: ...

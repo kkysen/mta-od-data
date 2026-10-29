@@ -7,7 +7,7 @@ use std::time::Duration;
 use crate::assign::{PathRow, Unassigned};
 use crate::gtfs::{DAY, Feed, Secs};
 use crate::od::{ComplexId, Complexes, OdRow};
-use crate::raptor::{Journey, Leg, Legs, MAX_RIDES};
+use crate::raptor::{Journey, Leg, Legs};
 use crate::timetable::{DEPARTURES_UNTIL, SERVICE_DAY_START, Timetable};
 
 /// At most this many examples of each problem.
@@ -232,6 +232,7 @@ pub fn assignment(
     rows: &[OdRow],
     paths: &[PathRow],
     unassigned: &Unassigned,
+    max_rides: usize,
     timings: &Timings,
 ) -> String {
     let mut out = String::new();
@@ -256,7 +257,7 @@ pub fn assignment(
         "  unassigned: {:.4} no served stop, {:.4} unreachable in {} rides, {:.4} after the last departure",
         unassigned.no_stops,
         unassigned.unreachable,
-        MAX_RIDES,
+        max_rides,
         unassigned.no_departure
     );
     // Not exactly 0: each path's riders are rounded to a ten-thousandth, as written,
@@ -267,7 +268,7 @@ pub fn assignment(
         "  conservation error: {:.6} (paths' riders rounded to 0.0001)",
         input - assigned - unassigned.total()
     );
-    let mut by_rides = [0.0; MAX_RIDES + 1];
+    let mut by_rides = vec![0.0; max_rides + 1];
     let mut minutes = 0.0;
     for p in paths {
         by_rides[p.rides as usize] += p.riders.to_f64();

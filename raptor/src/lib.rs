@@ -171,7 +171,7 @@ pub fn assign_dates(
         let mut writing = VecDeque::new();
         for (g, group) in groups.iter().enumerate() {
             let start = Instant::now();
-            let routes = route(&group.tt, &group.complexes);
+            let routes = route(&group.tt, &group.complexes, config.max_rides);
             let routed = start.elapsed();
             let (slices, loaded) = join(loading.take().expect("loading this group"))?;
             loading = groups.get(g + 1).map(load);
@@ -245,7 +245,13 @@ pub fn assign_dates(
                     unassigned_no_departure: no_departure,
                     paths: paths.len(),
                     path_texts: path_texts.clone(),
-                    report: report::assignment(rows, &paths, &unassigned, &timings),
+                    report: report::assignment(
+                        rows,
+                        &paths,
+                        &unassigned,
+                        config.max_rides,
+                        &timings,
+                    ),
                 });
                 while writing.len() >= WRITERS {
                     join(writing.pop_front().expect("WRITERS > 0"))?;
@@ -434,6 +440,7 @@ fn timetable_report(py: Python<'_>, feed: PathBuf, date: Date) -> Result<String>
 
 /// Earliest-arrival journeys between two sets of stops, one per number of rides.
 #[pyfunction]
+#[pyo3(signature = (feed, date, origins, destinations, depart, max_rides = raptor::DEFAULT_MAX_RIDES))]
 fn route_report(
     py: Python<'_>,
     feed: PathBuf,
@@ -441,12 +448,13 @@ fn route_report(
     origins: Vec<String>,
     destinations: Vec<String>,
     depart: &str,
+    max_rides: usize,
 ) -> Result<String> {
     let depart = secs(depart)?;
     py.detach(|| {
         let tt = Timetable::build(&Feed::open(&feed)?, date)?;
         let (from, to) = (stops(&tt, &origins)?, stops(&tt, &destinations)?);
-        let router = Router::new(&tt);
+        let router = Router::with_max_rides(&tt, max_rides);
         let (legs, journeys) = router.query(&from, depart).journeys(&to);
         Ok(report::journeys(&tt, &legs, &journeys))
     })
@@ -454,6 +462,8 @@ fn route_report(
 
 /// Every Pareto-optimal journey between two sets of stops departing in `[after, before)`.
 #[pyfunction]
+#[pyo3(signature = (feed, date, origins, destinations, after, before, max_rides = raptor::DEFAULT_MAX_RIDES))]
+#[allow(clippy::too_many_arguments)]
 fn profile_report(
     py: Python<'_>,
     feed: PathBuf,
@@ -462,12 +472,13 @@ fn profile_report(
     destinations: Vec<String>,
     after: &str,
     before: &str,
+    max_rides: usize,
 ) -> Result<String> {
     let (after, before) = (secs(after)?, secs(before)?);
     py.detach(|| {
         let tt = Timetable::build(&Feed::open(&feed)?, date)?;
         let (from, to) = (stops(&tt, &origins)?, stops(&tt, &destinations)?);
-        let router = Router::new(&tt);
+        let router = Router::with_max_rides(&tt, max_rides);
         let (legs, mut journeys) = router.profile(&from, after, before, &[&to]);
         journeys[0].sort_by_key(|j| (j.depart, j.rides()));
         Ok(report::journeys(&tt, &legs, &journeys[0]))
@@ -497,7 +508,7 @@ fn od_report(
 fn raptor_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Version>()?;
     m.add_class::<AssignSummary>()?;
-    m.add("MAX_RIDES", raptor::MAX_RIDES)?;
+    m.add("DEFAULT_MAX_RIDES", raptor::DEFAULT_MAX_RIDES)?;
     m.add_function(wrap_pyfunction!(py_load_versions, m)?)?;
     m.add_function(wrap_pyfunction!(py_pick_weekdays, m)?)?;
     m.add_function(wrap_pyfunction!(py_assign_date, m)?)?;

@@ -13,6 +13,7 @@ from typer import BadParameter, Option, Typer
 
 from mta_od_data import DATA, ROOT
 from mta_od_data._raptor import (
+    DEFAULT_MAX_RIDES,
     Version,
     assign_date,
     assign_dates,
@@ -57,6 +58,7 @@ Stops = Annotated[
     list[str],
     Option(help="Parent stop ID, e.g. 127 (repeatable; several means any of them)"),
 ]
+MaxRides = Annotated[int, Option(min=1, max=255, help="Most rides in a journey")]
 Od = Annotated[Path, Option(help="The OD Parquet, from `mta-od-data prepare`")]
 Stations = Annotated[Path, Option(help="The station reference CSV")]
 Config = Annotated[Path, Option(help="Generalized cost weights")]
@@ -112,9 +114,10 @@ def route(
     depart: Annotated[
         str, Option(help="Departure time, HH:MM:SS from the service date's start")
     ],
+    max_rides: MaxRides = DEFAULT_MAX_RIDES,
 ) -> None:
     """Earliest-arrival journeys between two stops, one per number of rides."""
-    print(route_report(feed, date, origin, destination, depart), end="")
+    print(route_report(feed, date, origin, destination, depart, max_rides), end="")
 
 
 @app.command()
@@ -125,9 +128,13 @@ def profile(
     destination: Stops,
     after: Annotated[str, Option(help="Window start, HH:MM:SS, inclusive")],
     before: Annotated[str, Option(help="Window end, HH:MM:SS, exclusive")],
+    max_rides: MaxRides = DEFAULT_MAX_RIDES,
 ) -> None:
     """Every Pareto-optimal journey between two stops departing in a window."""
-    print(profile_report(feed, date, origin, destination, after, before), end="")
+    print(
+        profile_report(feed, date, origin, destination, after, before, max_rides),
+        end="",
+    )
 
 
 @app.command()
