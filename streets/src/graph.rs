@@ -24,6 +24,8 @@ pub struct Edge {
     pub to: u32,
     pub length: Mm,
     pub walk: Walk,
+    /// The OSM way it's along.
+    pub way: i64,
     /// Whether points may be linked to it (`permissions::linkable`).
     pub linkable: bool,
     /// Its `(latitude, longitude)`s, from `from` to `to`, in `Graph::points`.
@@ -37,8 +39,8 @@ pub struct Graph {
     pub edges: Vec<Edge>,
     /// Every edge's geometry, one after another.
     pub points: Vec<(f64, f64)>,
-    /// `(to, length)` of each walkable edge out of each vertex, from `out_start[v]`.
-    pub(crate) out: Vec<(u32, Mm)>,
+    /// `(to, length, edge)` of each walkable edge out of each vertex, from `out_start[v]`.
+    pub(crate) out: Vec<(u32, Mm, u32)>,
     pub(crate) out_start: Vec<u32>,
     pub(crate) index: Index,
 }
@@ -78,7 +80,7 @@ impl Graph {
                 let last = n == way.nodes.len() - 1;
                 if osm.intersections.contains(&node) || last || osm.impassable.contains(&node) {
                     let nodes = &way.nodes[begin..=n];
-                    graph.add_edge(osm, &mut vertex_of, nodes, walk, linkable);
+                    graph.add_edge(osm, &mut vertex_of, way.id, nodes, walk, linkable);
                     begin = n;
                 }
             }
@@ -92,6 +94,7 @@ impl Graph {
         &mut self,
         osm: &Osm,
         vertex_of: &mut HashMap<i64, u32>,
+        way: i64,
         nodes: &[i64],
         walk: Walk,
         linkable: bool,
@@ -121,6 +124,7 @@ impl Graph {
             to,
             length,
             walk,
+            way,
             linkable,
             geometry,
         });
@@ -159,12 +163,12 @@ impl Graph {
     fn link(&mut self) {
         let n = self.vertices.len();
         let mut out = vec![Vec::new(); n];
-        for e in &self.edges {
+        for (i, e) in self.edges.iter().enumerate() {
             if e.walk.forward {
-                out[e.from as usize].push((e.to, e.length));
+                out[e.from as usize].push((e.to, e.length, i as u32));
             }
             if e.walk.backward {
-                out[e.to as usize].push((e.from, e.length));
+                out[e.to as usize].push((e.from, e.length, i as u32));
             }
         }
         self.out_start = Vec::with_capacity(n + 1);
@@ -177,8 +181,8 @@ impl Graph {
         self.index = Index::build(self);
     }
 
-    /// The walkable edges out of `v`, as `(to, length)`.
-    pub fn out(&self, v: u32) -> &[(u32, Mm)] {
+    /// The walkable edges out of `v`, as `(to, length, edge)`.
+    pub fn out(&self, v: u32) -> &[(u32, Mm, u32)] {
         &self.out[self.out_start[v as usize] as usize..self.out_start[v as usize + 1] as usize]
     }
 
@@ -293,10 +297,12 @@ mod tests {
             osm.nodes.insert(id, at);
         }
         osm.ways.push(Way {
+            id: 1,
             nodes: vec![1, 2, 3],
             tags: tags(&[("highway", "residential")]),
         });
         osm.ways.push(Way {
+            id: 2,
             nodes: vec![2, 4],
             tags: tags(&[("highway", "footway"), ("tunnel", "yes")]),
         });

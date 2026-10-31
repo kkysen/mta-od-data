@@ -41,6 +41,7 @@ impl FromIterator<(String, String)> for Tags {
 
 #[derive(Clone, Debug)]
 pub struct Way {
+    pub id: i64,
     pub nodes: Vec<i64>,
     pub tags: Tags,
 }
@@ -87,6 +88,7 @@ impl Osm {
                     let tags = owned(&mut w.tags());
                     if permissions::routable(&tags) {
                         osm.ways.push(Way {
+                            id: w.id(),
                             nodes: w.refs().collect(),
                             tags,
                         });
