@@ -33,7 +33,8 @@ profile = "release"
 cache-keys = [
     { file = "pyproject.toml" },
     { file = "raptor/Cargo.toml" },
-    { file = "raptor/Cargo.lock" },
+    { file = "Cargo.toml" },
+    { file = "Cargo.lock" },
     { file = "raptor/src/**/*.rs" },
 ]
 

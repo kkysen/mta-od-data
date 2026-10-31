@@ -43,19 +43,19 @@ repos:
     hooks:
       - id: cargo-fmt
         name: cargo fmt
-        entry: cargo fmt --manifest-path raptor/Cargo.toml --check
+        entry: cargo fmt --all --check
         language: system
-        files: ^raptor/
+        files: (\.rs|Cargo\.(toml|lock))$
         pass_filenames: false
       - id: cargo-clippy
         name: cargo clippy
-        entry: cargo clippy --manifest-path raptor/Cargo.toml --all-targets -- -D warnings
+        entry: cargo clippy --workspace --all-targets -- -D warnings
         language: system
-        files: ^raptor/
+        files: (\.rs|Cargo\.(toml|lock))$
         pass_filenames: false
       - id: cargo-test
         name: cargo test
-        entry: cargo test --manifest-path raptor/Cargo.toml
+        entry: cargo test --workspace
         language: system
-        files: ^raptor/
+        files: (\.rs|Cargo\.(toml|lock))$
         pass_filenames: false

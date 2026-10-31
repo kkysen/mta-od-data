@@ -1,0 +1,4 @@
+# The Rust crates: `raptor`, built by `maturin` as the `mta_od_data._raptor` extension.
+[workspace]
+members = ["raptor"]
+resolver = "3"
