@@ -115,6 +115,9 @@ pub struct Router<'a> {
     stop_patterns: Vec<Vec<(u32, u32)>>,
     /// Most rides in a journey: queries run this many rounds.
     max_rides: usize,
+    /// How long before a train leaves a rider must be ready to board it,
+    /// whether starting, changing trains, or after a walk.
+    board_slack: Secs,
 }
 
 /// Labels per round, kept across runs of one range query.
@@ -212,7 +215,18 @@ impl<'a> Router<'a> {
             tt,
             stop_patterns,
             max_rides,
+            board_slack: 0,
         }
+    }
+
+    /// Boards only trains leaving at least `board_slack` after a rider is ready to board,
+    /// rather than any leaving once they're ready.
+    /// To match R5, which boards only trains leaving more than 60 s after (`MINIMUM_BOARD_WAIT_SEC`),
+    /// that's 61 s.
+    pub fn with_board_slack(mut self, board_slack: Secs) -> Self {
+        assert!(board_slack >= 0, "board slack {board_slack}: negative");
+        self.board_slack = board_slack;
+        self
     }
 
     pub fn max_rides(&self) -> usize {
@@ -243,7 +257,7 @@ impl<'a> Router<'a> {
 
     /// Every time in `[from, until)` a journey from `origins` can start
     /// by boarding a train, at an origin or after a footpath from one,
-    /// latest first, as range RAPTOR runs them.
+    /// with the board slack to spare, latest first, as range RAPTOR runs them.
     pub fn departures(&self, origins: &[StopIdx], from: Secs, until: Secs) -> Vec<Secs> {
         let mut starts: Vec<(StopIdx, Secs)> = origins.iter().map(|&o| (o, 0)).collect();
         for &o in origins {
@@ -262,7 +276,7 @@ impl<'a> Router<'a> {
                 times.extend(
                     trips
                         .iter()
-                        .map(|t| t.times[pos as usize].1 - walk)
+                        .map(|t| t.times[pos as usize].1 - walk - self.board_slack)
                         .filter(|t| (from..until).contains(t)),
                 );
             }
@@ -413,6 +427,7 @@ impl Labels<'_> {
                     if ready == NEVER {
                         continue;
                     }
+                    let ready = ready + self.router.board_slack;
                     if riding.is_none_or(|(trip, _)| ready < pattern.trips[trip].times[pos].1) {
                         // FIFO patterns are sorted by departure at every stop.
                         let trip = pattern.trips.partition_point(|t| t.times[pos].1 < ready);
@@ -696,6 +711,33 @@ mod tests {
         assert_eq!(labels.arrivals().nth(c), Some(t("08:50:00")));
         labels.run_access(&a, t("08:00:00"));
         assert_eq!(labels.arrivals().nth(c), Some(t("08:30:00")));
+    }
+
+    #[test]
+    fn board_slack_at_the_start_and_on_changing() {
+        let tt = timetable(
+            TRIPS,
+            STOP_TIMES,
+            "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nB,B,2,0\n",
+        );
+        let a_to_d = |depart, slack| {
+            let router = Router::new(&tt).with_board_slack(slack);
+            let (legs, js) = router
+                .query(&[stop(&tt, "A")], t(depart))
+                .journeys(&[stop(&tt, "D")]);
+            js.iter()
+                .map(|j| summary(&tt, legs.of(j)))
+                .collect::<Vec<_>>()
+        };
+        // Cross-platform at B: make the 08:11.
+        assert_eq!(a_to_d("07:59:00", 0), [["r1a A-B", "r2a B-D"]]);
+        // At least the slack: a minute still makes the 08:00 at A and the 08:11 at B.
+        assert_eq!(a_to_d("07:59:00", 60), [["r1a A-B", "r2a B-D"]]);
+        // 61 s makes the 08:00 leaving 2 minutes early, but not the 08:11.
+        assert_eq!(a_to_d("07:58:00", 61), [["r1a A-B", "r2b B-D"]]);
+        // Leaving 1 minute early, it misses the 08:00,
+        // and the 08:20 reaches B after the last train to D.
+        assert!(a_to_d("07:59:00", 61).is_empty());
     }
 
     #[test]
