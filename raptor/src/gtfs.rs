@@ -77,6 +77,9 @@ pub struct Trip {
     pub service_id: String,
     #[serde(default)]
     pub direction_id: Option<u8>,
+    /// The shape it runs along, if `shapes.txt` has one.
+    #[serde(default)]
+    pub shape_id: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
