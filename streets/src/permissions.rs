@@ -84,6 +84,7 @@ impl Label {
 
 /// `(access, foot)` before a way's own tags, by its `highway` (or platform) tag:
 /// R5's defaults, with the US's foot on cycleways and bridleways.
+/// Like R5, a major road's `_link` takes the road's: a motorway's ramps are no more walkable.
 fn defaults(tags: &Tags) -> (Label, Label) {
     use Label::{No, Unknown, Yes};
     let key = match tags.get("highway") {
@@ -94,7 +95,7 @@ fn defaults(tags: &Tags) -> (Label, Label) {
         None => "road".to_owned(),
     };
     match key.as_str() {
-        "motorway" => (Yes, No),
+        "motorway" | "motorway_link" => (Yes, No),
         "pedestrian" | "path" | "bridleway" | "cycleway" | "footway" | "steps" | "platform"
         | "corridor" => (No, Yes),
         // `trunk` through `track`, and any other `highway`, as `road`.
@@ -155,7 +156,8 @@ mod tests {
         assert!(walkable(&[("highway", "residential")]));
         assert!(walkable(&[("highway", "footway")]));
         assert!(walkable(&[("highway", "cycleway")]));
-        assert!(walkable(&[("highway", "motorway_link")]));
+        assert!(walkable(&[("highway", "trunk_link")]));
+        assert!(!walkable(&[("highway", "motorway_link")]));
         assert!(!walkable(&[("highway", "motorway")]));
         assert!(walkable(&[("railway", "platform")]));
     }
