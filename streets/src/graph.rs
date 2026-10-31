@@ -102,11 +102,18 @@ impl Graph {
         if nodes.iter().any(|id| !osm.nodes.contains_key(id)) {
             return;
         }
+        // An impassable node, like a locked gate, is a new vertex at each edge that reaches it,
+        // so no walk passes through it, as R5 does (`StreetLayer.getVertexIndexForOsmNode`).
         let mut vertex = |id: i64, vertices: &mut Vec<(f64, f64)>| {
-            *vertex_of.entry(id).or_insert_with(|| {
+            let mut add = || {
                 vertices.push(osm.nodes[&id]);
                 (vertices.len() - 1) as u32
-            })
+            };
+            if osm.impassable.contains(&id) {
+                add()
+            } else {
+                *vertex_of.entry(id).or_insert_with(add)
+            }
         };
         let from = vertex(nodes[0], &mut self.vertices);
         let to = vertex(nodes[nodes.len() - 1], &mut self.vertices);
@@ -320,6 +327,22 @@ mod tests {
         let expected = distance_m((40.7, -74.002), (40.7, -74.001));
         assert_eq!(e.length, (expected * 1000.0) as Mm);
         assert!((84_000..85_000).contains(&e.length), "{}", e.length);
+    }
+
+    #[test]
+    fn impassable_nodes_join_nothing() {
+        let mut osm = osm();
+        osm.impassable.insert(2);
+        let g = Graph::build_pruning(&osm, 0);
+        // Node 2 is a vertex for each of its three edges.
+        assert_eq!(g.vertices.len(), 6);
+        let (a, b) = (
+            g.snap(40.7, -74.0015).unwrap(),
+            g.snap(40.7, -74.0005).unwrap(),
+        );
+        let mut search = Search::new(&g);
+        search.run(&a, 1_000_000);
+        assert_eq!(search.to(&b), None);
     }
 
     #[test]
