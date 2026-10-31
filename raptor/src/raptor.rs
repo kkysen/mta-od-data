@@ -328,6 +328,44 @@ impl Labels<'_> {
                 }
             }
         }
+        self.rounds(marked);
+    }
+
+    /// Lowers labels with journeys leaving at `depart`
+    /// and reaching each `(stop, walk)` of `access` after its walk,
+    /// as from a place off the network, not a stop:
+    /// the walks already go to every stop worth starting from, so no footpaths follow.
+    /// Runs of a range query must go latest first.
+    pub fn run_access(&mut self, access: &[(StopIdx, Secs)], depart: Secs) {
+        debug_assert!(depart <= self.depart, "runs must go latest first");
+        self.depart = depart;
+        let mut marked = Vec::new();
+        for &(s, walk) in access {
+            if self.lower_ready(0, s, depart + walk, Ready::Origin) {
+                marked.push(s);
+            }
+        }
+        marked.sort_unstable();
+        marked.dedup();
+        self.rounds(marked);
+    }
+
+    /// Each stop's earliest arrival by train, on any number of rides, `NEVER` if none:
+    /// after runs of a range query, of journeys leaving at the latest run's departure or later.
+    pub fn arrivals(&self) -> impl Iterator<Item = Secs> {
+        let k = self.ride_arrival.rounds - 1;
+        (0..self.ride_arrival.stops).map(move |s| {
+            self.ride_arrival
+                .up_to(k, s)
+                .copied()
+                .min()
+                .unwrap_or(NEVER)
+        })
+    }
+
+    /// Rounds `1..` from the stops `marked` ready in round 0.
+    fn rounds(&mut self, mut marked: Vec<StopIdx>) {
+        let tt = self.router.tt;
 
         for k in 1..self.ride_arrival.rounds {
             if marked.is_empty() {
@@ -618,6 +656,46 @@ mod tests {
         assert_eq!(js.len(), 1);
         assert_eq!(summary(&tt, legs.of(&js[0])), ["r1b A-C"]);
         assert_eq!(js[0].arrive, t("08:50:00"));
+    }
+
+    #[test]
+    fn access_walks_decide_the_first_train() {
+        let tt = timetable(
+            TRIPS,
+            STOP_TIMES,
+            "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nB,B,2,0\n",
+        );
+        let router = Router::new(&tt);
+        let mut labels = router.labels();
+        // 1 minute to B makes the 08:11 to D; 10 minutes to A misses the 08:00 to C.
+        labels.run_access(
+            &[(stop(&tt, "A"), 600), (stop(&tt, "B"), 60)],
+            t("07:59:00"),
+        );
+        let arrivals: Vec<Secs> = labels.arrivals().collect();
+        assert_eq!(arrivals[stop(&tt, "D") as usize], t("08:20:00"));
+        assert_eq!(arrivals[stop(&tt, "C") as usize], t("08:30:00"));
+        assert_eq!(arrivals[stop(&tt, "A") as usize], NEVER);
+    }
+
+    #[test]
+    fn arrivals_leave_at_the_latest_run_or_later() {
+        let tt = timetable(
+            TRIPS,
+            STOP_TIMES,
+            "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n",
+        );
+        let router = Router::new(&tt);
+        let mut labels = router.labels();
+        let c = stop(&tt, "C") as usize;
+        let a = [(stop(&tt, "A"), 0)];
+        labels.run_access(&a, t("08:10:00"));
+        assert_eq!(labels.arrivals().nth(c), Some(t("08:50:00")));
+        // Leaving earlier still waits for the 08:20 when the 08:00 is gone.
+        labels.run_access(&a, t("08:05:00"));
+        assert_eq!(labels.arrivals().nth(c), Some(t("08:50:00")));
+        labels.run_access(&a, t("08:00:00"));
+        assert_eq!(labels.arrivals().nth(c), Some(t("08:30:00")));
     }
 
     #[test]
