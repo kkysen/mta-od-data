@@ -1,0 +1,9 @@
+[package]
+name = "streets"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.104"
+osmpbf = "0.3.8"
+rustc-hash = "2.1.3"

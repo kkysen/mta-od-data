@@ -1,4 +1,5 @@
-# The Rust crates: `raptor`, built by `maturin` as the `mta_od_data._raptor` extension.
+# The Rust crates: `raptor`, built by `maturin` as the `mta_od_data._raptor` extension,
+# and `streets`, for walking.
 [workspace]
-members = ["raptor"]
+members = ["raptor", "streets"]
 resolver = "3"
