@@ -3,6 +3,9 @@
 .ruff_cache/
 __pycache__/
 
+# Large or scratch outputs kept on disk, not in `/tmp` (tmpfs, RAM).
+.cache/
+
 # Rust
 target/
 # The `raptor` extension module, built by `maturin`.
