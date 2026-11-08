@@ -152,12 +152,28 @@ def platform_loads(
             f"FROM read_parquet('{file}')"
         )
     directions = ", ".join(f"({k}, '{v}')" for k, v in DIRECTIONS.items())
-    return (
-        connection()
-        .execute(
-            f"""
+    db = connection()
+    # Stops as `trip_stops`' `ENUM`, and directions and platforms as these,
+    # in text order, so the ~3M per-minute groups' keys are a few bytes, not text:
+    # grouped by text, they spilled 1.2 GiB.
+    # Its own, not `build_events`' `dir_id`/`platform_id`: that may not have run.
+    db.execute("DROP TYPE IF EXISTS load_dir")
+    db.execute(
+        "CREATE TYPE load_dir AS ENUM ("
+        + ", ".join(f"'{v}'" for v in sorted(DIRECTIONS.values()))
+        + ")"
+    )
+    db.execute("DROP TYPE IF EXISTS load_platform")
+    db.execute(
+        "CREATE TYPE load_platform AS ENUM ("
+        "SELECT v FROM (SELECT pa FROM directions UNION SELECT pb FROM directions "
+        "UNION SELECT '') t(v) WHERE v IS NOT NULL ORDER BY v)"
+    )
+    return db.execute(
+        f"""
             WITH waiting AS (
-                SELECT stop_id, dirs.dir, coalesce(leaving.pa, '') AS platform,
+                SELECT stop_id::trip_stop_id AS stop_id, dirs.dir::load_dir AS dir,
+                    coalesce(leaving.pa, '')::load_platform AS platform,
                     minute, sum(riders * w) AS riders
                 FROM ({" UNION ALL ".join(parts)}) s
                 LEFT JOIN (VALUES {directions}) dirs(direction_id, dir)
@@ -170,7 +186,8 @@ def platform_loads(
             ),
             off AS (
                 -- At the first minute's start from their train's arrival.
-                SELECT stop_id, dir, coalesce(leaving.pa, arriving.pb, '') AS platform,
+                SELECT stop_id, dir::load_dir AS dir,
+                    coalesce(leaving.pa, arriving.pb, '')::load_platform AS platform,
                     (arrival + 59) // 60 AS minute,
                     sum(alightings * w) AS riders
                 FROM trip_stops t
@@ -184,8 +201,10 @@ def platform_loads(
                 GROUP BY ALL
             ),
             minutes AS (
-                SELECT platform, if(platform = '', stop_id, '') AS s,
-                    if(platform = '', dir, '') AS d, minute,
+                -- `NULL`, not `''`, for a platform's own:
+                -- `''` isn't a stop or direction.
+                SELECT platform, if(platform = '', stop_id, NULL) AS s,
+                    if(platform = '', dir, NULL) AS d, minute,
                     min(stop_id) AS stop_id, min(dir) AS dir,
                     sum(riders) / {days} AS riders
                 FROM (SELECT * FROM waiting UNION ALL SELECT * FROM off)
@@ -197,9 +216,7 @@ def platform_loads(
                 PARTITION BY platform, s, d ORDER BY riders DESC, minute
             ) = 1
             """
-        )
-        .fetchall()
-    )
+    ).fetchall()
 
 
 def place_hours(with_route: bool, days: int) -> list[tuple[Any, ...]]:
