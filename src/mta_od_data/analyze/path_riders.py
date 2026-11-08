@@ -320,19 +320,25 @@ def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths
             """,
             paths_params(d, c) | {"texts": str(d.texts), "days": int(row["days"])},
         )
-    # Each text once, numbered in text order, so the routings' sums are by number:
-    # holding every routing's texts until they're summed spilled gigabytes.
+    # Each text once, numbered as first seen, so the routings' sums are by number:
+    # holding every routing's texts until they're summed spilled gigabytes,
+    # and so did a `DISTINCT` and sort over all of them to number them in text order.
+    # Only the summed paths are sorted, at the end.
     all_texts = sorted({str(d.texts) for d in dates})
-    db.execute(
-        """
-        CREATE OR REPLACE TEMP TABLE path_texts AS
-        SELECT path, row_number() OVER (ORDER BY path)::UINTEGER AS n
-        FROM (SELECT DISTINCT path FROM read_parquet($all_texts))
-        """,
-        {"all_texts": all_texts},
-    )
+    db.execute("CREATE OR REPLACE TEMP TABLE path_texts (path VARCHAR, n UINTEGER)")
     db.execute("CREATE OR REPLACE TEMP TABLE by_n (n UINTEGER, riders EXACT)")
     for texts in all_texts:
+        db.execute(
+            """
+            INSERT INTO path_texts BY NAME
+            SELECT t.path,
+                ((SELECT count(*) FROM path_texts) + row_number() OVER ())::UINTEGER
+                    AS n
+            FROM (SELECT DISTINCT path FROM read_parquet($texts)) t
+            ANTI JOIN path_texts p USING (path)
+            """,
+            {"texts": texts},
+        )
         db.execute(
             """
             INSERT INTO by_n BY NAME
@@ -357,7 +363,7 @@ def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths
                 FROM by_n GROUP BY n
             ) s
             JOIN path_texts p USING (n)
-            ORDER BY n
+            ORDER BY p.path
         ) TO '{partial}' (FORMAT parquet, COMPRESSION zstd)
         """
     )
