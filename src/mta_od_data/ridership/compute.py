@@ -531,10 +531,14 @@ def route_rows(names: list[str], with_line: bool) -> list[tuple[Any, ...]]:
             f"""
             WITH {LEG_LINES if with_line else "x AS (SELECT 1)"},
             journeys AS (
-                SELECT DISTINCT path, grp{line}, {", ".join(names)}
+                SELECT DISTINCT path, grp{line}
                 FROM legs JOIN route_groups USING (route) {on_line}
             )
-            SELECT grp{line}, {sums} FROM journeys GROUP BY ALL
+            -- As in `line_rows`, riders from each path's first leg.
+            SELECT grp{line}, {sums}
+            FROM journeys JOIN (SELECT path, {", ".join(names)} FROM legs WHERE i = 1)
+                USING (path)
+            GROUP BY ALL
             """,
         )
         .fetchall()
@@ -644,10 +648,14 @@ def line_rows(names: list[str]) -> list[tuple[Any, ...]]:
             f"""
             WITH {LEG_LINES},
             journeys AS (
-                SELECT DISTINCT path, name, {", ".join(names)}
-                FROM legs JOIN leg_lines USING (route, stops)
+                SELECT DISTINCT path, name FROM legs JOIN leg_lines USING (route, stops)
             )
-            SELECT name, {sums} FROM journeys GROUP BY ALL
+            -- A path's riders are on each of its legs, so from its first's,
+            -- not carried through the `DISTINCT`.
+            SELECT name, {sums}
+            FROM journeys JOIN (SELECT path, {", ".join(names)} FROM legs WHERE i = 1)
+                USING (path)
+            GROUP BY ALL
             """
         )
         .fetchall()
