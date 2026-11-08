@@ -346,6 +346,18 @@ def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
     if built.get("events") == key:
         return
     db = connection()
+    # Directions and platforms as `ENUM`s, as `load_legs` does routes and stops:
+    # every one of `events`' rows had both as text.
+    # Listed from `directions`, the only place they come from, and `''` for none.
+    for table in ["staying", "events"]:
+        db.execute(f"DROP TABLE IF EXISTS {table}")
+    for name, a, b in [("dir_id", "da", "db"), ("platform_id", "pa", "pb")]:
+        db.execute(f"DROP TYPE IF EXISTS {name}")
+        db.execute(
+            f"CREATE TYPE {name} AS ENUM ("
+            f"SELECT v FROM (SELECT {a} FROM directions UNION SELECT {b} "
+            "FROM directions UNION SELECT '') t(v) WHERE v IS NOT NULL ORDER BY v)"
+        )
     db.execute(
         """
         CREATE OR REPLACE TEMP TABLE rides AS
@@ -374,15 +386,16 @@ def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
     db.execute(
         f"""
         CREATE OR REPLACE TEMP TABLE events AS
-        SELECT w.path, stops[1] AS stop, coalesce(d.da, '') AS dir,
-            coalesce(d.pa, '') AS platform, w.route,
+        SELECT w.path, stops[1] AS stop, coalesce(d.da, '')::dir_id AS dir,
+            coalesce(d.pa, '')::platform_id AS platform, w.route,
             {", ".join(names)}, true AS boarding, i > first_ride AS transfer
         FROM rides w
         LEFT JOIN directions d
             ON d.route = w.route AND d.a = stops[1] AND d.b = stops[2]
         WHERE NOT cont_in
         UNION ALL
-        SELECT w.path, stops[-1], coalesce(d.db, ''), coalesce(d.pb, ''), w.route,
+        SELECT w.path, stops[-1], coalesce(d.db, '')::dir_id,
+            coalesce(d.pb, '')::platform_id, w.route,
             {", ".join(names)}, false, i < last_ride
         FROM rides w
         LEFT JOIN directions d
@@ -398,15 +411,15 @@ def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
             SELECT route, stops, {first}, unnest(range(2, len(stops))) AS j
             FROM rides
         )
-        SELECT stops[j] AS stop, coalesce(d.da, '') AS dir,
-            coalesce(d.pa, '') AS platform, b.route, sum({first}) AS riders
+        SELECT stops[j] AS stop, coalesce(d.da, '')::dir_id AS dir,
+            coalesce(d.pa, '')::platform_id AS platform, b.route, sum({first}) AS riders
         FROM between b
         LEFT JOIN directions d
             ON d.route = b.route AND d.a = stops[j] AND d.b = stops[j + 1]
         GROUP BY ALL
         UNION ALL
-        SELECT stops[-1], coalesce(d.db, ''), coalesce(d.pb, ''), w.route,
-            sum({first})
+        SELECT stops[-1], coalesce(d.db, '')::dir_id,
+            coalesce(d.pb, '')::platform_id, w.route, sum({first})
         FROM rides w
         LEFT JOIN directions d
             ON d.route = w.route AND d.a = stops[-2] AND d.b = stops[-1]
