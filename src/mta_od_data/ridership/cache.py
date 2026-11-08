@@ -8,13 +8,15 @@ the snapshot tests would pass:
   transitively (`modules`): not the rest of `analyze/`, say,
   nor `ridership/__init__.py`, which only names and lays out rows;
 - every data file in the package (like `platforms.csv`)
-  but its `.md` reports and `RENDER_ONLY`'s;
+  but its `.md` reports, their `.svg` charts, and `RENDER_ONLY`'s;
 - `uv.lock`, for DuckDB's version and the rest, and Python's version;
-- every file under `data/`, the argument paths, and every file beside the manifest
-  (size and modification time);
+- what it reads under `data/` (`DATA_INPUTS`), the argument paths,
+  and every file beside the manifest (size and modification time);
 - `compute`'s arguments.
 So it can miss more than it has to (a change to `platform_areas.csv`, say),
 but never serves rows from other inputs.
+Not every file under `data/`, as that's also where commands write their outputs,
+like `one-seat-rides`' `--csv-out`, and rewriting one would miss every entry.
 """
 
 import ast
@@ -24,8 +26,10 @@ import sys
 from hashlib import sha256
 from pathlib import Path
 
-from mta_od_data import DATA, ROOT
+from mta_od_data import ROOT
 from mta_od_data.analyze.common import CACHE
+from mta_od_data.analyze.path_riders import DEFAULT_FARE_EVASION
+from mta_od_data.gtfs import DEFAULT_GTFS_DIR
 from mta_od_data.ridership.compute import By, Computed, compute
 
 # Each report's rows, by `key`.
@@ -36,6 +40,9 @@ HERE = Path(__file__).parent
 RENDER_ONLY = frozenset({HERE / "__init__.py", HERE / "direction_labels.json5"})
 # What computes the rows, and what's imported from it is followed from.
 COMPUTE = "mta_od_data.ridership.compute"
+# What `compute` reads under `data/` besides its argument paths:
+# the GTFS feeds the manifest's dates name, and each quarter's fare evasion.
+DATA_INPUTS = [DEFAULT_GTFS_DIR, DEFAULT_FARE_EVASION]
 
 
 def files(root: Path) -> list[Path]:
@@ -111,12 +118,14 @@ def key(args: tuple[object, ...], paths: list[Path]) -> str:
     data = [
         f
         for f in files(PACKAGE)
-        if f.suffix not in {".py", ".md", ".pyi", ".so"} and f not in RENDER_ONLY
+        if f.suffix not in {".py", ".md", ".svg", ".pyi", ".so"}
+        and f not in RENDER_ONLY
     ]
     for f in [*code, *data]:
         h.update(str(f.relative_to(PACKAGE)).encode())
         h.update(f.read_bytes())
-    for f in [*files(DATA), *paths]:
+    inputs = [f for d in DATA_INPUTS for f in (files(d) if d.is_dir() else [d])]
+    for f in [*inputs, *paths]:
         h.update(repr(stat(f)).encode())
     h.update(repr(args).encode())
     return h.hexdigest()
