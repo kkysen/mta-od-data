@@ -94,8 +94,23 @@ class Names:
 
 # Complexes the MTA lists apart but riders can walk between without a fare,
 # shown as one virtual complex as well as each on its own:
-# Times Sq and 42 St-Bryant Pk/5 Av since the 42 St passageway opened.
+# Times Sq and 42 St-Bryant Pk/5 Av since the 42 St Connection opened in September 2021.
 COMBINED_COMPLEXES = [("611", "609")]
+
+
+def combined_name(names: Sequence[str]) -> str:
+    """Complexes' names as one, each part named once:
+    `Times Sq-42 St/PABT` and `42 St-Bryant Pk/5 Av`
+    are `Times Sq-42 St/PABT/Bryant Pk/5 Av`."""
+    seen: set[str] = set()
+    out: list[str] = []
+    for name in names:
+        for station in name.split("/"):
+            parts = [p for p in station.split("-") if p not in seen]
+            seen.update(parts)
+            if parts:
+                out.append("-".join(parts))
+    return "/".join(out)
 
 
 def load_names(stations: Path, complexes: Path) -> Names:
@@ -114,7 +129,7 @@ def load_names(stations: Path, complexes: Path) -> Names:
         combined = "+".join(ids)
         members = [by_id[i] for i in ids]
         complex_names[combined] = display_station(
-            "/".join(c.name for c in members),
+            combined_name([c.name for c in members]),
             frozenset().union(*(c.routes for c in members)),
         )
         for i in ids:
