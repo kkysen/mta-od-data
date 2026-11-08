@@ -73,10 +73,17 @@ def load_trip_stops(manifest: Path, evasion: FareEvasion | None) -> TripStops:
     directions = ", ".join(f"({k}, '{v}')" for k, v in DIRECTIONS.items())
     union = " UNION ALL ".join(parts)
     db = connection()
+    # Routes and stops as `ENUM`s, 1 or 2 bytes each, not their text,
+    # as `load_legs` does, but of the trains' own: they needn't be the paths'.
+    # Each lists its values in text order, so any order by them is the text's.
     db.execute("DROP TABLE IF EXISTS trip_stops")
-    # `trip_id` is only ever a key (to count trains), so an `ENUM` of the trains' own:
-    # exact, unlike a hash, and in 2 bytes, not its text, as there are fewer than 65536.
-    for name, col in [("trip_trip_id", "trip_id")]:
+    # `trip_id` too, though only ever a key (to count trains): exact, unlike a hash,
+    # and in 2 bytes, not 8, as there are fewer than 65536.
+    for name, col in [
+        ("trip_route_id", "route_id"),
+        ("trip_stop_id", "stop_id"),
+        ("trip_trip_id", "trip_id"),
+    ]:
         db.execute(f"DROP TYPE IF EXISTS {name}")
         db.execute(
             f"CREATE TYPE {name} AS ENUM (SELECT DISTINCT {col} FROM ({union}) "
@@ -89,7 +96,8 @@ def load_trip_stops(manifest: Path, evasion: FareEvasion | None) -> TripStops:
         -- in the lists' order: the text of a whole trip's stops,
         -- on each of its rows, was 3.9 GB.
         WITH trips AS (
-            SELECT d, trip_id, day, list(stop_id ORDER BY stop_sequence) AS l
+            SELECT d, trip_id, day,
+                list(stop_id::trip_stop_id ORDER BY stop_sequence) AS l
             FROM ({union})
             GROUP BY ALL
         ),
@@ -97,12 +105,16 @@ def load_trip_stops(manifest: Path, evasion: FareEvasion | None) -> TripStops:
             SELECT d, trip_id, day, (dense_rank() OVER (ORDER BY l))::INTEGER AS stops
             FROM trips
         )
-        SELECT s.* REPLACE (trip_id::trip_trip_id AS trip_id), dirs.dir,
-            first_value(stop_id) OVER t AS first_stop,
+        SELECT s.* REPLACE (
+                trip_id::trip_trip_id AS trip_id, route_id::trip_route_id AS route_id,
+                stop_id::trip_stop_id AS stop_id
+            ),
+            dirs.dir,
+            first_value(stop_id::trip_stop_id) OVER t AS first_stop,
             first_value(departure) OVER t AS first_departure,
             n.stops,
-            lag(stop_id) OVER t AS prev_stop,
-            lead(stop_id) OVER t AS next_stop
+            lag(stop_id::trip_stop_id) OVER t AS prev_stop,
+            lead(stop_id::trip_stop_id) OVER t AS next_stop
         FROM ({union}) s
         JOIN numbered n USING (d, trip_id, day)
         LEFT JOIN (VALUES {directions}) dirs(direction_id, dir) USING (direction_id)
