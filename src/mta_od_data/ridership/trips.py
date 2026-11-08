@@ -72,7 +72,17 @@ def load_trip_stops(manifest: Path, evasion: FareEvasion | None) -> TripStops:
         )
     directions = ", ".join(f"({k}, '{v}')" for k, v in DIRECTIONS.items())
     union = " UNION ALL ".join(parts)
-    connection().execute(
+    db = connection()
+    db.execute("DROP TABLE IF EXISTS trip_stops")
+    # `trip_id` is only ever a key (to count trains), so an `ENUM` of the trains' own:
+    # exact, unlike a hash, and in 2 bytes, not its text, as there are fewer than 65536.
+    for name, col in [("trip_trip_id", "trip_id")]:
+        db.execute(f"DROP TYPE IF EXISTS {name}")
+        db.execute(
+            f"CREATE TYPE {name} AS ENUM (SELECT DISTINCT {col} FROM ({union}) "
+            f"WHERE {col} IS NOT NULL ORDER BY {col})"
+        )
+    db.execute(
         f"""
         CREATE OR REPLACE TEMP TABLE trip_stops AS
         -- A train's stops are only ever a key, so a number for each distinct list,
@@ -87,7 +97,7 @@ def load_trip_stops(manifest: Path, evasion: FareEvasion | None) -> TripStops:
             SELECT d, trip_id, day, (dense_rank() OVER (ORDER BY l))::INTEGER AS stops
             FROM trips
         )
-        SELECT s.*, dirs.dir,
+        SELECT s.* REPLACE (trip_id::trip_trip_id AS trip_id), dirs.dir,
             first_value(stop_id) OVER t AS first_stop,
             first_value(departure) OVER t AS first_departure,
             n.stops,
