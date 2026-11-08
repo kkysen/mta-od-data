@@ -88,6 +88,14 @@ class Names:
     direction: dict[tuple[str, str], str] = field(default_factory=dict)
     # Each station's name alone, without its routes.
     stop: dict[str, str] = field(default_factory=dict)
+    # Each complex's virtual complexes it's also part of, and their names.
+    combined_of: dict[str, list[str]] = field(default_factory=dict)
+
+
+# Complexes the MTA lists apart but riders can walk between without a fare,
+# shown as one virtual complex as well as each on its own:
+# Times Sq and 42 St-Bryant Pk/5 Av since the 42 St passageway opened.
+COMBINED_COMPLEXES = [("611", "609")]
 
 
 def load_names(stations: Path, complexes: Path) -> Names:
@@ -95,11 +103,22 @@ def load_names(stations: Path, complexes: Path) -> Names:
     with their routes as `display_station` lists them, `DeKalb Av (B,Q,R)`."""
     with stations.open() as f:
         rows = list(DictReader(f))
-    complex_names = {
-        str(c.complex_id): c.display()
+    by_id = {
+        str(c.complex_id): c
         for c in Complex.load_all(complexes)
         if not isinstance(c, MissingComplex)
     }
+    complex_names = {i: c.display() for i, c in by_id.items()}
+    combined_of: defaultdict[str, list[str]] = defaultdict(list)
+    for ids in COMBINED_COMPLEXES:
+        combined = "+".join(ids)
+        members = [by_id[i] for i in ids]
+        complex_names[combined] = display_station(
+            "/".join(c.name for c in members),
+            frozenset().union(*(c.routes for c in members)),
+        )
+        for i in ids:
+            combined_of[i].append(combined)
     return Names(
         station={
             r["gtfs_stop_id"]: display_station(
@@ -110,6 +129,7 @@ def load_names(stations: Path, complexes: Path) -> Names:
         complex_of={r["gtfs_stop_id"]: r["complex_id"] for r in rows},
         stop={r["gtfs_stop_id"]: abbreviate_name(r["stop_name"]) for r in rows},
         complex=complex_names,
+        combined_of=dict(combined_of),
         direction={
             (r["gtfs_stop_id"], d): r[f"{label}_direction_label"]
             for r in rows
@@ -323,18 +343,29 @@ def place_table(
                 return (platform,) if platform else (stop, d)
         raise AssertionError(by)
 
+    def places(stop: str, d: str, platform: str) -> list[tuple[tuple[str, ...], ...]]:
+        """Each `(label, identity)` a row counts toward:
+        its own place, and for a complex, any virtual complex it's part of."""
+        own = (label(stop, d, platform), identity(stop, d, platform))
+        if by is not By.COMPLEX:
+            return [own]
+        also = names_.combined_of.get(names_.complex_of.get(stop, ""), [])
+        return [own, *(((names_.complex[c],), (c,)) for c in also)]
+
     named: dict[tuple[str, ...], tuple[str, ...]] = {}
     # In a set order, so a complex's floating-point sum of its stations is too.
     for row in sorted(rows, key=as_text):
         stop, d, platform, *rest = row
         grp = (rest.pop(0),) if with_route else ()
-        key = (*label(stop, d, platform), *grp)
-        place = identity(stop, d, platform)
-        if named.setdefault(key, place) != place:
-            raise ValueError(f"{named[key]} and {place} are both named {key}")
-        for j, v in enumerate(rest):
-            merged[key][j] += v or 0.0
-    peaks = busiest((*label(stop, d, p), *rest) for stop, d, p, *rest in hours)
+        for name, place in places(stop, d, platform):
+            key = (*name, *grp)
+            if named.setdefault(key, place) != place:
+                raise ValueError(f"{named[key]} and {place} are both named {key}")
+            for j, v in enumerate(rest):
+                merged[key][j] += v or 0.0
+    peaks = busiest(
+        (*name, *rest) for stop, d, p, *rest in hours for name, _ in places(stop, d, p)
+    )
     most = {label(stop, d, p): (m, r) for stop, d, p, m, r in loads}
     head = [
         *(
@@ -423,6 +454,19 @@ def place_table(
             f"† Its OpenStreetMap outline is under {PART_MAPPED:.0%} "
             "of another platform's at its station, so likely mapped only in part, "
             f"and it has that platform's area instead: {outlines}.",
+        ]
+    if by is By.COMPLEX:
+        combined = "; ".join(
+            f"{names_.complex['+'.join(ids)]}, of "
+            + " and ".join(names_.complex[i] for i in ids)
+            for ids in COMBINED_COMPLEXES
+        )
+        lines += [
+            "",
+            "Also as one complex, as riders walk between them without a fare: "
+            f"{combined}. "
+            "Riders staying on a train stopping at more than one of them "
+            "count at each.",
         ]
     return lines
 

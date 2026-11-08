@@ -13,6 +13,7 @@ Produced by `mta-od-data ridership --by complex --markdown-out src/mta_od_data/r
 
 | Complex | On + Off, Aug-Dec 2025 | On + Off, 2019 | On, Aug-Dec 2025 | Off, Aug-Dec 2025 | Transfers On + Off, Aug-Dec 2025 | Staying On, Aug-Dec 2025 | Peak Hour | On + Off in Peak Hour, Aug-Dec 2025 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
+| Times Sq-42 St/PABT/42 St-Bryant Pk/5 Av (1,2,3,7,A,B,C,D,E,F,M,N,Q,R,S,W) | 1,158,192 | 1,509,439 | 579,709 | 578,483 | 735,168 | 944,698 | 5:00 PM | 118,598 |
 | Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) | 936,114 | 1,222,617 | 469,687 | 466,426 | 613,941 | 562,515 | 5:00 PM | 94,543 |
 | 14 St-Union Sq (4,5,6,L,N,Q,R,W) | 594,868 | 752,362 | 294,421 | 300,447 | 420,669 | 531,413 | 5:00 PM | 58,318 |
 | Grand Central-42 St (4,5,6,7,S) | 528,504 | 686,849 | 265,734 | 262,770 | 267,383 | 369,852 | 5:00 PM | 55,113 |
@@ -437,6 +438,8 @@ Produced by `mta-od-data ridership --by complex --markdown-out src/mta_od_data/r
 | Beach 44 St (A) | 1,023 | 2,197 | 530 | 494 | 0 | 10,301 | 7:00 AM | 97 |
 | Beach 98 St (A,S) | 619 | 1,314 | 317 | 303 | 0 | 1,498 | 7:00 AM | 55 |
 | Beach 105 St (A,S) | 420 | 640 | 212 | 208 | 0 | 1,103 | 7:00 AM | 48 |
+
+Also as one complex, as riders walk between them without a fare: Times Sq-42 St/PABT/42 St-Bryant Pk/5 Av (1,2,3,7,A,B,C,D,E,F,M,N,Q,R,S,W), of Times Sq-42 St/PABT (1,2,3,7,A,C,E,N,Q,R,S,W) and 42 St-Bryant Pk/5 Av (7,B,D,F,M). Riders staying on a train stopping at more than one of them count at each.
 
 </details>
 
