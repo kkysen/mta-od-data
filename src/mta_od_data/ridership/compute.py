@@ -332,8 +332,8 @@ def directions_table(manifest: Path) -> None:
 
 
 def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
-    """Each ride's boarding and alighting on `routes` as a temp table `events`:
-    its stop, platform direction, route, riders per column,
+    """Rides' boardings and alightings on `routes` as a temp table `events`:
+    riders per column by stop, platform direction, route,
     and whether it's a boarding and a transfer;
     and the first column's riders staying on at each stop between, as `staying`,
     by stop, platform direction, and route.
@@ -383,24 +383,32 @@ def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
         """,
         {"routes": list(routes), "merge": merge},
     )
+    # Summed by all `place_rows` groups or filters by, not one row per ride's end:
+    # 19M rows of those stayed resident through every later report,
+    # and pushed `platform_loads` to spill. Exact, as `RIDERS` sum exactly.
+    sums = ", ".join(f"sum({n}) AS {n}" for n in names)
     db.execute(
         f"""
         CREATE OR REPLACE TEMP TABLE events AS
-        SELECT w.path, stops[1] AS stop, coalesce(d.da, '')::dir_id AS dir,
-            coalesce(d.pa, '')::platform_id AS platform, w.route,
-            {", ".join(names)}, true AS boarding, i > first_ride AS transfer
-        FROM rides w
-        LEFT JOIN directions d
-            ON d.route = w.route AND d.a = stops[1] AND d.b = stops[2]
-        WHERE NOT cont_in
-        UNION ALL
-        SELECT w.path, stops[-1], coalesce(d.db, '')::dir_id,
-            coalesce(d.pb, '')::platform_id, w.route,
-            {", ".join(names)}, false, i < last_ride
-        FROM rides w
-        LEFT JOIN directions d
-            ON d.route = w.route AND d.a = stops[-2] AND d.b = stops[-1]
-        WHERE NOT cont_out
+        SELECT stop, dir, platform, route, boarding, transfer, {sums}
+        FROM (
+            SELECT stops[1] AS stop, coalesce(d.da, '')::dir_id AS dir,
+                coalesce(d.pa, '')::platform_id AS platform, w.route,
+                {", ".join(names)}, true AS boarding, i > first_ride AS transfer
+            FROM rides w
+            LEFT JOIN directions d
+                ON d.route = w.route AND d.a = stops[1] AND d.b = stops[2]
+            WHERE NOT cont_in
+            UNION ALL
+            SELECT stops[-1], coalesce(d.db, '')::dir_id,
+                coalesce(d.pb, '')::platform_id, w.route,
+                {", ".join(names)}, false, i < last_ride
+            FROM rides w
+            LEFT JOIN directions d
+                ON d.route = w.route AND d.a = stops[-2] AND d.b = stops[-1]
+            WHERE NOT cont_out
+        )
+        GROUP BY ALL
         """
     )
     first = names[0]
