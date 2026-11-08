@@ -11,6 +11,7 @@ from pathlib import Path
 import duckdb
 import pytest
 
+from mta_od_data.analyze import common
 from mta_od_data.analyze.common import DayCoverage, DayFilterError, _day_coverage
 
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
@@ -29,6 +30,13 @@ def write_extract(path: Path, rows: list[tuple[int, int, str]]) -> Path:
         """
     )
     return path
+
+
+@pytest.fixture(autouse=True)
+def own_query_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Its scans cached beside its extracts, not in the real cache,
+    which their throwaway files would only fill with entries never read again."""
+    monkeypatch.setattr(common, "QUERIES", tmp_path / "queries")
 
 
 @pytest.fixture
