@@ -23,6 +23,20 @@ uv run mta-od-data ridership --by route        # or any report's own `Produced b
 `assign-range` needs the OD Parquet from `mta-od-data prepare` (`data/mta_od_2025.parquet`).
 The cost weights for splitting riders are in [`assign.json5`](assign.json5).
 
+## The other `raptor` subcommands
+
+`assign-range` is the one the reports need.
+The rest are for inspecting a step of it, one date or one pair of stops at a time
+(`uv run mta-od-data raptor <subcommand> --help` for their options):
+
+- `feed`: load a static GTFS feed zip and summarize it.
+- `timetable`: build one service date's timetable and report what it found.
+- `route`: earliest-arrival journeys between two stops, one per number of rides.
+- `profile`: every Pareto-optimal journey between two stops departing in a window.
+- `od`: load the OD rows for a date's service day, 04:00 to 04:00,
+  and map their station complexes to the date's timetable.
+- `assign`: split a single date's OD rows across their journeys, and write the paths taken.
+
 ## What `assign-range` writes, in `data/raptor/`
 
 The OD data is an average for each (month, day of week),

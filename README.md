@@ -1,45 +1,45 @@
-# MTA OD data: subway deinterlining analysis
+# MTA OD data
 
-MTA has floated "deinterlining" several subway junctions:
-no longer letting two route pairs cross between trunks,
-in exchange for more reliable service.
-This analyzes MTA's public subway origin-destination ridership data
-to quantify, for a given junction and route set:
+Analyses of MTA's public subway origin-destination (OD) ridership data,
+which says how many riders go from each station complex to each other,
+by month, day of week, and hour,
+but not which trains they take.
+The `mta-od-data` CLI converts that data to Parquet,
+analyzes it directly (deinterlining scenarios, flows across a region),
+routes it onto the GTFS timetable's trains,
+and from the routed paths counts riders by station, platform, route, line, and train.
 
-1. What share are one-seat rides (no transfer needed)?
-2. Of those riders who'd lose a one-seat ride under a given deinterlining
-   scenario, what share would still be a short walk from the *other* trunk,
-   i.e. riders who wouldn't really be stranded by it?
+This is an overview, one section per subcommand;
+each links to the details.
+Every committed `.md` report is generated, not hand-written:
+each has its own `Produced by` line with its exact invocation,
+and [the snapshot tests](#tests) keep them from drifting.
 
-Two junctions are currently tracked as committed snapshots:
+## Setup
 
-- **DeKalb Av**: no longer letting B/D (6 Av express trunk)
-  and N/Q (Broadway express trunk) trains cross between trunks in Manhattan,
-  for weekday trips on B/D/N/Q/R
-  originating south of Atlantic Av-Barclays Ctr in Brooklyn.
-  See [`src/mta_od_data/analyze/dekalb_one_seat_rides.md`](src/mta_od_data/analyze/dekalb_one_seat_rides.md).
-- **Nostrand/Rogers Junction**: MTA's planned reroute of 2,3 to the Nostrand
-  Av Line and 4,5 to Eastern Pkwy/New Lots
-  (today's actual routing interlines 2,5/3,4),
-  for weekday trips on 2,3,4,5 originating south of Franklin Av.
-  See [`src/mta_od_data/analyze/nostrand_one_seat_rides.md`](src/mta_od_data/analyze/nostrand_one_seat_rides.md).
+```sh
+mise install        # uv and pre-commit, pinned in mise.toml
+uv sync             # Python, dependencies, and the Rust extension
+pre-commit install  # the git hooks, see Tests below
+```
 
-Both are generated, not hand-written:
-see each file's own `Produced by` line for its exact invocation,
-and [Development](#development) for the hook that keeps them from drifting.
+[`src/mta_od_data/`](src/mta_od_data/) is a package with a `mta-od-data` entry point,
+built by `maturin`, which compiles the [`raptor`](raptor/) crate as the `mta_od_data._raptor` extension,
+so `uv sync` needs a Rust toolchain.
+Run `uv run mta-od-data --help`, or any subcommand's `--help`, for every option.
 
-## Data
+## Getting the data
 
-- **OD ridership**: MTA's "Subway Origin-Destination Ridership Estimate"
-  extract (not committed here, see [`.gitignore`](.gitignore)--it's a 27GB
-  CSV).
-  Each row is an (origin station complex, destination station complex, date,
-  hour) with an estimated rider count.
+- **OD ridership**: MTA's "Subway Origin-Destination Ridership Estimate" extract
+  (not committed here, see [`.gitignore`](.gitignore): it's a 27GB CSV).
+  Each row is an (origin station complex, destination station complex, date, hour)
+  with an estimated rider count.
   Get it from
   [data.ny.gov](https://data.ny.gov/Transportation/MTA-Subway-Origin-Destination-Ridership-Estimate-2/jsu2-fbtj)
   (2025 vintage used here; there's a separate dataset per year)
-  and drop the CSV (or its `.xz`) in `data/`.
-- **Station reference data**: fetched automatically from `data.ny.gov`.
+  and drop the CSV (or its `.xz`) in `data/`,
+  or skip it and download the Parquet `prepare` builds from it (below).
+- **Station reference data**: fetched automatically from data.ny.gov by `prepare`.
   The "Subway Stations and Complexes" dataset
   (resource `5f5g-n3cz`, one row per station complex:
   borough, routes served, lat/long),
@@ -48,49 +48,17 @@ and [Development](#development) for the hook that keeps them from drifting.
   (e.g. Times Sq-42 St/Port Authority Bus Terminal)
   whose combined centroid can sit well away from any actual platform.
 
-## The `mta-od-data` CLI
-
-[`src/mta_od_data/`](src/mta_od_data/) is an installable package
-(`duckdb`/`typer` as its only runtime dependencies);
-`uv sync` installs it and its `mta-od-data` entry point
-into the project's `.venv`.
-
-### `mta-od-data prepare`
-
-Fetches the station reference CSVs
-and converts the OD CSV(s) into Parquet (`data/mta_od_2025.parquet`)
-for fast repeated querying.
-Re-runnable as new OD extracts are released:
-point `--csv` at the new file(s) (globs work) and/or `--out` at a new
-Parquet path.
-Run `--help` for all options.
-
-```sh
-uv run mta-od-data prepare
-```
-
-The Parquet comes out considerably smaller than the extract it's built from
-(1.5GB to 358MB for 2025), losslessly:
-
-- The origin/destination name, latitude, longitude, and point columns are dropped:
-  each is functionally determined by the complex ID beside it,
-  so they are the station reference CSVs repeated once per row,
-  and `analyze` joins them by complex ID instead.
-- `Timestamp` is dropped too:
-  it holds one synthesized label per (year, month, day of week, hour) group,
-  which `DayCoverage` reconstructs from those columns.
-- Ridership is stored as `DECIMAL(9, 4)`,
-  exact for every value in the extract,
-  and packed as an integer rather than as a `DOUBLE` that never compresses.
-- Rows are sorted by origin/destination pair,
-  which runs the ID columns into long constant stretches: ~190MB by itself.
-
-### Publishing the Parquet as a release asset
+### The prepared Parquet, as a release asset
 
 `data/mta_od_2025.parquet` is too big to commit (358MB for the 2025 extract),
-but small enough to download in seconds, so it lives as an asset on the `od-data` release.
+but small enough to download in seconds, so it lives as an asset on the `od-data` GitHub release.
 CI fetches it before `pytest`, which is what lets
 the `analyze` tests run there instead of skipping.
+Anyone (including a fresh clone) can get it without rebuilding from the 27GB CSV:
+
+```sh
+gh release download od-data --pattern mta_od_2025.parquet --dir data
+```
 
 Publish (or replace) it from a machine that has run `prepare`:
 
@@ -100,12 +68,6 @@ gh release create od-data --title 'OD dataset' \
     --notes 'Parquet built by `mta-od-data prepare` from the 2025 extract.'
 
 gh release upload od-data data/mta_od_2025.parquet --clobber
-```
-
-Anyone (including a fresh clone) can then get it without rebuilding from the 27GB CSV:
-
-```sh
-gh release download od-data --pattern mta_od_2025.parquet --dir data
 ```
 
 Other years' extracts are assets beside it, each built to its own Parquet,
@@ -120,196 +82,175 @@ gh release upload od-data data/mta_od_2026.parquet --clobber
 gh release download od-data --pattern mta_od_2026.parquet --dir data
 ```
 
-### `mta-od-data analyze one-seat-rides`
+## How the pieces fit together
 
-Does the actual classification:
-resolves the origin station set,
-queries the Parquet file for average-weekday ridership by (origin,
-destination) pair,
-classifies each pair as one-seat or transfer,
-and for one-seat trips whether the destination is close to the trunk not
-used to reach it.
-Prints a summary plus per-origin and per-destination breakdowns,
-can dump full row-level detail with `--csv-out`,
-and can write a markdown report with `--markdown-out`.
-
-```sh
-uv run mta-od-data analyze one-seat-rides --routes B,D,N,Q,R \
-    --primary-routes B,D,N,Q --trunk-b N,Q,R \
-    --csv-out data/dekalb_weekday_pairs.csv \
-    --markdown-out src/mta_od_data/analyze/dekalb_one_seat_rides.md
+```text
+OD CSV ──prepare──> data/mta_od_2025.parquet ──analyze──> src/mta_od_data/analyze/*.md
+                              │
+GTFS (fetch-gtfs) ──raptor assign-range──> data/raptor/ (routed paths)
+                                                  │
+entry counts ──scale-od──> data/*.factors.parquet │
+OSM (fetch-platforms) ──> platforms.csv           │
+                         └──────────ridership──> src/mta_od_data/ridership/*.md
 ```
 
-Everything is parameterized via CLI flags,
-so the same command covers other day types, other station criteria,
-other data extracts,
-and other deinterlining scenarios entirely
-(different junction, different trunk pairs).
-Run `--help` for the full list, or see the module docstring for worked
-examples.
+Inputs and outputs live in the gitignored `data/`.
+Caches live on disk outside the repo:
+`~/.cache/mta-od-data/` holds `analyze`'s scans of the OD data and `ridership`'s computed rows,
+each keyed on what it was computed from,
+and `~/.cache/mta-od-scratch/` is DuckDB's spill directory.
 
-### `mta-od-data analyze deinterlining`
+## `prepare`
 
-The systemwide successor to `one-seat-rides`,
-for junctions its shape can't express:
-a scenario overrides which routes serve individual stations,
-so it covers express/local swaps at a single trunk (Columbus Circle)
-as well as corridor swaps.
-Scenarios live in
-[`scenarios.json5`](src/mta_od_data/analyze/scenarios.json5),
-grouped into categories that `--category` selects by,
-each declaring the routes it covers.
-Today's real routing is always compared against,
-and selecting two categories runs every combination of them.
-See [`deinterlining_design.md`](src/mta_od_data/analyze/deinterlining_design.md),
-and [`src/mta_od_data/analyze/dekalb_deinterlining.md`](src/mta_od_data/analyze/dekalb_deinterlining.md)
-for the DeKalb Av category's report.
+Fetches the station reference CSVs
+and converts the OD CSV(s) into Parquet (`data/mta_od_2025.parquet`)
+for fast repeated querying.
+Re-runnable as new OD extracts are released:
+point `--csv` at the new file(s) (globs work) and/or `--out` at a new Parquet path.
+To skip it, download its output instead ([above](#the-prepared-parquet-as-a-release-asset)).
 
 ```sh
-uv run mta-od-data analyze deinterlining --category Columbus
+uv run mta-od-data prepare
 ```
 
-### `mta-od-data analyze regional-flow`
+Details: [why the Parquet is smaller](src/mta_od_data/README.md#prepare), and `--help`.
 
-A more general question than `one-seat-rides`:
-for any region, what share of riders enter it from outside,
-leave it for outside, stay entirely within it, or never touch it at all?
-Unlike `one-seat-rides` this is system-wide
-(every origin/destination pair, no route filter or side-of-junction split),
-and classifies each pair
-by whether its origin/destination fall inside the region,
-using `--region`/`--region-borough`/`--region-bbox`
-(see [How regions are defined](#how-regions-are-defined) below).
+## `fetch-gtfs`
+
+Downloads every static GTFS feed version listed in
+[`gtfs_versions.json5`](src/mta_od_data/gtfs_versions.json5) to `data/gtfs/`,
+the timetables `raptor` routes on and `fetch-platforms` maps.
 
 ```sh
-uv run mta-od-data analyze regional-flow --region cbd
+uv run mta-od-data fetch-gtfs
 ```
 
-Defaults to `cbd`.
-Same `--csv-out`/`--markdown-out` options as `one-seat-rides`;
-see [`src/mta_od_data/analyze/regional_flow.md`](src/mta_od_data/analyze/regional_flow.md)
-for example output.
+Details: [`raptor/README.md`](raptor/README.md#running-it).
 
-### `mta-od-data fetch-platforms`
+## `fetch-platforms`
 
-Maps each route's consecutive stops, in every feed in `data/gtfs/`,
-to the physical platforms its trains stop at,
-from OpenStreetMap's NYC Subway route relations
+Maps each route's consecutive stops, in every feed version,
+to the OpenStreetMap platforms its trains stop at
 (© OpenStreetMap contributors, under the [ODbL](https://www.openstreetmap.org/copyright)),
 read from [Geofabrik's New York extract](https://download.geofabrik.de/north-america/us/new-york.html)
-(fetched to `data/osm/` if missing, ~500MB).
-It writes the checked-in [`src/mta_od_data/ridership/platforms.csv`](src/mta_od_data/ridership/platforms.csv),
-which `mta-od-data ridership --by platform` reads,
-so it only needs rerunning when the feeds or OSM change.
+(fetched to `data/osm/` if missing, ~500MB),
+writing the checked-in [`platforms.csv`](src/mta_od_data/ridership/platforms.csv)
+that `ridership --by platform` reads.
 
 ```sh
 uv run mta-od-data fetch-platforms
 ```
 
-### `mta-od-data fetch-mbta`
+Details: [`raptor/README.md`](raptor/README.md).
 
-Fetches a pinned version of the MBTA's GTFS to `data/mbta-gtfs/` (~22MB),
-which has `pathways.txt`, as the MTA's doesn't yet,
-and cuts from it the checked-in [`raptor/tests/data/mbta-downtown/`](raptor/tests/data/mbta-downtown/),
-four downtown Boston stations RAPTOR's pathways tests read.
-Data provided by MassDOT, under its
-[Developers License Agreement](https://github.com/mbta/gtfs-documentation/blob/master/developers-license-agreement.pdf).
+## `fetch-mbta`
+
+Fetches a pinned MBTA GTFS version to `data/mbta-gtfs/` (~22MB; it has `pathways.txt`, unlike MTA's)
+and cuts from it the checked-in fixture RAPTOR's pathways tests read,
+four downtown Boston stations
+(data provided by MassDOT, under its [Developers License Agreement](https://github.com/mbta/gtfs-documentation/blob/master/developers-license-agreement.pdf)).
 With the whole version fetched, `cargo test -- --ignored` in `raptor/` checks it too.
 
 ```sh
 uv run mta-od-data fetch-mbta
 ```
 
-## How the classification works
+Details: [`raptor/tests/data/mbta-downtown/README.md`](raptor/tests/data/mbta-downtown/README.md).
 
-- **Origin set**: stations served by at least one route in `--routes`,
-  on the `--origin-side` (default south) of `--boundary-complex-id`'s
-  latitude (default Atlantic Av-Barclays Ctr).
-  This is a latitude-based proxy, not real route topology,
-  but it cleanly separates the Brooklyn B/D/N/Q/R branches from everything
-  else without needing a GTFS feed.
-- **Destination scope**: destinations on `--dest-side` (default north)
-  of the same boundary latitude,
-  i.e. trips that actually cross the junction;
-  intra-Brooklyn trips that never reach it are excluded.
-  The boundary complex itself counts as a valid destination by default.
-- **One-seat ride**: true if some route in `--routes`
-  serves both origin and destination.
-  `--primary-routes` (a subset of `--routes`)
-  marks which routes actually cross the boundary junction.
-  A route in `--routes` but not `--primary-routes`
-  (e.g. R, which reaches Manhattan via the Montague St Tunnel
-  and never goes near DeKalb/Atlantic)
-  only makes a trip one-seat
-  if the destination isn't served by any primary route either;
-  otherwise a real transfer at the junction is assumed,
-  matching actual rider behavior
-  even though the OD data has no transfer field.
-- **Close to the other trunk**: for one-seat trips,
-  `--trunk-a`/`--trunk-b` (default B,D / N,Q)
-  define the two trunks being compared.
-  A trip whose one-seat connection doesn't use any primary route at all
-  is trivially close
-  (deinterlining can't affect a trip that never crosses the junction).
-  Otherwise, a destination already served by both trunks
-  (e.g. Herald Sq, Atlantic Av-Barclays Ctr) is trivially close (0m);
-  a single-trunk destination is compared by haversine distance,
-  using per-physical-station coordinates,
-  against every station on the other trunk system-wide,
-  and flagged close within `--close-threshold-m`
-  (default 300m, roughly one long Manhattan avenue block).
+## `scale-od`
 
-## How regions are defined
-
-`regional-flow`'s `Region` abstraction
-([`src/mta_od_data/analyze/regions.py`](src/mta_od_data/analyze/regions.py))
-is just a name plus a predicate over a station,
-so its containment test can be backed
-by whatever's available for a given region. Currently:
-
-- **`--region cbd`** (the default): the source station data's own curated
-  `cbd` flag, i.e. Manhattan's real Congestion Relief Zone boundary,
-  not a latitude cut.
-  Manhattan's grid is rotated relative to true north,
-  so no single latitude cleanly separates "below 60th St,"
-  and a latitude cut would also wrongly include Roosevelt Island
-  (south of 60th St by latitude, but not part of the zone),
-  which `cbd` correctly excludes.
-- **`--region manhattan`/`brooklyn`/`queens`/`bronx`/`staten-island`**:
-  the station data's `borough` column.
-- **`--region-borough M,Bk`**: a custom combination of boroughs
-  (overrides `--region`), for regions like "Manhattan + Brooklyn."
-- **`--region-bbox MIN_LAT,MIN_LON,MAX_LAT,MAX_LON`**: a lat/lon bounding
-  box (overrides `--region`),
-  for an ad hoc region like a rough Midtown Manhattan.
-
-Neighborhood-level regions (Midtown, Downtown Brooklyn, etc.)
-aren't built in yet:
-there's no authoritative boundary data for them bundled here,
-only the crude `--region-bbox` approximation above.
-A geojson-polygon backend
-(point-in-polygon against a real neighborhood boundary dataset,
-e.g. NYC's Neighborhood Tabulation Areas)
-would slot into the same `Region` abstraction without changing the CLI
-shape, once there's a real geojson file to build and test it against.
-
-## Development
+Fits factors, per complex and (month, weekday) slice,
+scaling the OD data's trips to another year's counted station entries
+(from mta.info's ridership spreadsheet),
+or with `--to-counts`, leveling it to its own year's counts.
+`ridership --od-factors` reads them, a column per factors file.
 
 ```sh
-mise install        # uv and pre-commit, pinned in mise.toml
-pre-commit install
+uv run mta-od-data scale-od --year 2019 --out data/mta_od_scaled_to_2019.factors.parquet
 ```
 
-installs the `git` hooks in
-[`.pre-commit-config.yaml`](.pre-commit-config.yaml):
-`ruff`, `ty`, `pyrefly`, and `pytest`.
+Details: [`scale_od.py`](src/mta_od_data/scale_od.py) and `--help`.
 
+## `ridership`
+
+Average weekday riders by where they actually ride,
+over `raptor assign-range`'s routed dates,
+`--by` complex, station, station direction, platform, route, line, or trip,
+with fare evaders added back and a column per OD scaling.
+
+```sh
+uv run mta-od-data ridership --by line
+```
+
+Details: [the reports and how to read them](raptor/README.md#the-reports-in-srcmta_od_dataridership),
+e.g. [`by_line.md`](src/mta_od_data/ridership/by_line.md).
+
+## `raptor`
+
+Routes each OD row onto the journeys a rider could have taken
+(trains, transfers, walks) on that day's GTFS timetable, using RAPTOR,
+and splits its riders across them.
+`assign-range` routes a representative date per (month, weekday) into `data/raptor/`;
+the other subcommands inspect one step at a time.
+
+```sh
+uv run mta-od-data raptor assign-range --from 2025-08-11 --to 2025-12-31
+```
+
+Details: [`raptor/README.md`](raptor/README.md), and the design in [`raptor/raptor_design.md`](raptor/raptor_design.md).
+
+## `analyze one-seat-rides`
+
+For weekday trips crossing one junction,
+what share are one-seat rides,
+and of riders who'd lose one under a deinterlining scenario,
+what share end a short walk from the other trunk anyway?
+
+```sh
+uv run mta-od-data analyze one-seat-rides --routes B,D,N,Q,R --primary-routes B,D,N,Q --trunk-b N,Q,R
+```
+
+Details: [`analyze/README.md`](src/mta_od_data/analyze/README.md#one-seat-rides),
+e.g. [`dekalb_one_seat_rides.md`](src/mta_od_data/analyze/dekalb_one_seat_rides.md).
+
+## `analyze regional-flow`
+
+For any region (the Congestion Relief Zone, a borough, a bounding box),
+what share of riders enter it, leave it, stay within it, or never touch it?
+
+```sh
+uv run mta-od-data analyze regional-flow --region cbd
+```
+
+Details: [`analyze/README.md`](src/mta_od_data/analyze/README.md#regional-flow),
+e.g. [`regional_flow.md`](src/mta_od_data/analyze/regional_flow.md).
+
+## `analyze deinterlining`
+
+Classifies every OD pair on the selected scenarios' routes as one-seat or transfer,
+under today's routing and each route-override scenario
+in [`scenarios.json5`](src/mta_od_data/analyze/scenarios.json5),
+selected by `--category`.
+
+```sh
+uv run mta-od-data analyze deinterlining --category Nostrand
+```
+
+Details: [`analyze/README.md`](src/mta_od_data/analyze/README.md#deinterlining),
+e.g. [`nostrand_deinterlining.md`](src/mta_od_data/analyze/nostrand_deinterlining.md).
+
+## Tests
+
+`pre-commit install` installs the git hooks in [`.pre-commit-config.yaml`](.pre-commit-config.yaml):
+`ruff`, `ty`, `pyrefly`, and `pytest` ([`tests/`](tests/)) for Python,
+and `cargo fmt`, `cargo clippy`, and `cargo test` for the Rust crates
+([`raptor`](raptor/), and [`streets`](streets/), for walking OpenStreetMap's streets).
 [`tests/test_analyze_snapshots.py`](tests/test_analyze_snapshots.py)
-reruns each `analyze` subcommand
-and diffs it against its committed `.md` snapshot.
+reruns every `analyze` and `ridership` report and diffs it against its committed `.md`,
 Check-only, like every other hook here:
 it fails with a diff and the regen command
 rather than rewriting the snapshot itself.
-Skipped, not failed, without `data/mta_od_2025.parquet`,
-which is gitignored, so a fresh clone that hasn't downloaded the release asset
+It skips, rather than fails, a report whose gitignored inputs are missing
+(e.g. `data/mta_od_2025.parquet`),
+so a fresh clone that hasn't downloaded the release asset
 still gets a passing suite.
