@@ -1337,7 +1337,7 @@ fn properties(metadata: Vec<(String, String)>, zstd_level: i32) -> Result<Writer
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
+    use std::collections::{HashMap, HashSet};
 
     use jiff::civil::Date;
 
@@ -1412,6 +1412,30 @@ mod tests {
         // Waits average 5 min over the first 10 min, 15 over the next 30.
         assert_eq!(p.wait, (10 * 5 + 30 * 15) * 60 / 40);
         assert_eq!((p.in_vehicle, p.walk), (20 * 60, 0));
+    }
+
+    #[test]
+    fn every_origins_path_texts_are_distinct() {
+        // `write_path_texts` writes each text once, under one id, and readers rely on it:
+        // `average_path_riders` joins each file's ids to texts without deduplicating.
+        // Every origin rides the same 1 and 2, so their paths share stretches,
+        // and B to D takes either the 1 and a transfer or the 2 alone.
+        let trips = "route_id,trip_id,service_id\n1,a,W\n1,b,W\n2,c,W\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            a,A,08:00:00,08:00:00,1\na,B,08:05:00,08:05:00,2\na,C,08:10:00,08:10:00,3\n\
+            b,A,08:30:00,08:30:00,1\nb,B,08:35:00,08:35:00,2\nb,C,08:40:00,08:40:00,3\n\
+            c,B,08:06:00,08:06:00,1\nc,C,08:12:00,08:12:00,2\nc,D,08:20:00,08:20:00,3\n";
+        let transfers = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nC,C,2,60\n";
+        let tt = timetable(trips, stop_times, transfers);
+        let routes = route(&tt, &complexes(&tt), DEFAULT_MAX_RIDES);
+        let texts: Vec<&str> = routes.texts().collect();
+        assert!(texts.len() > 3, "a few paths to compare: {texts:?}");
+        let distinct: HashSet<&str> = texts.iter().copied().collect();
+        assert_eq!(
+            distinct.len(),
+            texts.len(),
+            "a text written twice: {texts:?}"
+        );
     }
 
     /// Riders waiting at `stop` each minute, by `TripLoads::waits`.
