@@ -328,26 +328,38 @@ def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths
     db.execute("CREATE OR REPLACE TEMP TABLE path_texts (path VARCHAR, n UINTEGER)")
     db.execute("CREATE OR REPLACE TEMP TABLE by_n (n UINTEGER, riders EXACT)")
     for texts in all_texts:
+        # One join by text per file, mapping its ids to numbers;
+        # the routing's sums then join by id.
+        # Unseen texts are numbered per id:
+        # a file has each text once (`raptor` interns them), under one id.
         db.execute(
             """
-            INSERT INTO path_texts BY NAME
-            SELECT t.path,
-                ((SELECT count(*) FROM path_texts) + row_number() OVER ())::UINTEGER
-                    AS n
-            FROM (SELECT DISTINCT path FROM read_parquet($texts)) t
-            ANTI JOIN path_texts p USING (path)
+            CREATE OR REPLACE TEMP TABLE ids AS
+            SELECT t.path_id, if(p.n IS NULL, t.path, NULL) AS path, p.n
+            FROM read_parquet($texts) t
+            LEFT JOIN path_texts p USING (path)
             """,
             {"texts": texts},
         )
         db.execute(
             """
+            CREATE OR REPLACE TEMP TABLE fresh AS
+            SELECT path_id, path,
+                ((SELECT count(*) FROM path_texts) + row_number() OVER ())::UINTEGER
+                    AS n
+            FROM ids WHERE n IS NULL
+            """
+        )
+        db.execute("INSERT INTO path_texts BY NAME SELECT path, n FROM fresh")
+        db.execute(
+            """
             INSERT INTO by_n BY NAME
-            SELECT p.n, sum(b.riders) AS riders
+            SELECT coalesce(i.n, f.n) AS n, sum(b.riders) AS riders
             FROM by_id b
-            JOIN read_parquet($texts) t USING (path_id)
-            JOIN path_texts p USING (path)
+            JOIN ids i USING (path_id)
+            LEFT JOIN fresh f USING (path_id)
             WHERE b.texts = $texts
-            GROUP BY p.n
+            GROUP BY ALL
             """,
             {"texts": texts},
         )
@@ -367,6 +379,7 @@ def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths
         ) TO '{partial}' (FORMAT parquet, COMPRESSION zstd)
         """
     )
-    db.execute("DROP TABLE by_id; DROP TABLE by_n; DROP TABLE path_texts")
+    for table in ["by_id", "by_n", "path_texts", "ids", "fresh"]:
+        db.execute(f"DROP TABLE {table}")
     partial.rename(out)
     return AveragePaths(file=out, days=days)
