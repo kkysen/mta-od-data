@@ -173,13 +173,37 @@ def load_legs(cols: Sequence[Column]) -> list[str]:
     riders = ", ".join(
         f"coalesce(c{k}.riders, 0)::{RIDERS} AS {n}" for k, n in enumerate(names)
     )
+    # Routes and stops as `ENUM`s, 1 or 2 bytes each, not their text:
+    # `stops` was 81M strings. Each lists its values in text order,
+    # so any order by them is the text's, and casting a value not listed fails.
+    # From the distinct legs, far fewer than the paths' legs.
+    for table in ["staying", "events", "legs"]:
+        db.execute(f"DROP TABLE IF EXISTS {table}")
+    db.execute(
+        f"""
+        CREATE OR REPLACE TEMP TABLE distinct_legs AS
+        SELECT DISTINCT unnest(string_split(path, ' | ')) AS leg FROM ({union})
+        """
+    )
+    db.execute("DROP TYPE IF EXISTS route_id")
+    db.execute(
+        "CREATE TYPE route_id AS ENUM ("
+        "SELECT DISTINCT split_part(leg, ' ', 1) AS r FROM distinct_legs ORDER BY r)"
+    )
+    db.execute("DROP TYPE IF EXISTS stop_id")
+    db.execute(
+        "CREATE TYPE stop_id AS ENUM ("
+        "SELECT DISTINCT unnest(string_split(split_part(leg, ' ', 2), '>')) AS s "
+        "FROM distinct_legs ORDER BY s)"
+    )
+    db.execute("DROP TABLE distinct_legs")
     db.execute(
         f"""
         CREATE OR REPLACE TEMP TABLE legs AS
         SELECT
             id AS path, {", ".join(names)}, i,
-            split_part(leg, ' ', 1) AS route,
-            string_split(split_part(leg, ' ', 2), '>') AS stops
+            split_part(leg, ' ', 1)::route_id AS route,
+            string_split(split_part(leg, ' ', 2), '>')::stop_id[] AS stops
         FROM (
             SELECT
                 id, {", ".join(names)},
