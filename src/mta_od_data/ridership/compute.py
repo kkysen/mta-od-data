@@ -148,10 +148,11 @@ RIDERS = "DECIMAL(18, 10)"
 
 
 def load_legs(cols: Sequence[Column]) -> list[str]:
-    """Each path's legs as a temp table `legs`,
-    with each column's riders as `r0`, `r1`, and so on; returns those names.
+    """Each path's legs as a temp table `legs`: `path`, `i`, and `leg`,
+    with each leg's `route`, or `walk`, and `stops`, its parent stops in order,
+    in `leg_stops`, and each path's riders per column in `paths`,
+    as `r0`, `r1`, and so on; returns those names.
 
-    `route` is the leg's route, or `walk`, and `stops` its parent stops in order.
     `path` is a number for each path, not its text, which every query here
     only partitions or counts by: the text is a few hundred bytes,
     and on every leg of millions of paths it was most of the table,
@@ -177,7 +178,7 @@ def load_legs(cols: Sequence[Column]) -> list[str]:
     # `stops` was 81M strings. Each lists its values in text order,
     # so any order by them is the text's, and casting a value not listed fails.
     # From the distinct legs, far fewer than the paths' legs.
-    for table in ["staying", "events", "legs"]:
+    for table in ["staying", "events", "legs", "leg_stops", "paths"]:
         db.execute(f"DROP TABLE IF EXISTS {table}")
     db.execute(
         f"""
@@ -196,26 +197,46 @@ def load_legs(cols: Sequence[Column]) -> list[str]:
         "SELECT DISTINCT unnest(string_split(split_part(leg, ' ', 2), '>')) AS s "
         "FROM distinct_legs ORDER BY s)"
     )
+    # Each distinct leg's route and stops once, in `leg_stops`, and its number,
+    # `leg`, on the paths' legs: the routes and stops of all 13M legs,
+    # and their riders, the same on each of a path's legs, were most of `legs`,
+    # resident through every later report and pushing those to spill.
+    db.execute(
+        """
+        CREATE OR REPLACE TEMP TABLE leg_stops AS
+        SELECT (row_number() OVER ())::INTEGER AS leg, leg AS text,
+            split_part(leg, ' ', 1)::route_id AS route,
+            string_split(split_part(leg, ' ', 2), '>')::stop_id[] AS stops
+        FROM distinct_legs
+        """
+    )
     db.execute("DROP TABLE distinct_legs")
     db.execute(
         f"""
-        CREATE OR REPLACE TEMP TABLE legs AS
-        SELECT
-            id AS path, {", ".join(names)}, i,
-            split_part(leg, ' ', 1)::route_id AS route,
-            string_split(split_part(leg, ' ', 2), '>')::stop_id[] AS stops
+        CREATE OR REPLACE TEMP TABLE path_legs AS
+        SELECT id AS path, {", ".join(names)}, i, s.leg
         FROM (
             SELECT
                 id, {", ".join(names)},
-                unnest(string_split(path, ' | ')) AS leg,
+                unnest(string_split(path, ' | ')) AS text,
                 unnest(range(1, len(string_split(path, ' | ')) + 1))::SMALLINT AS i
             FROM (
                 SELECT (row_number() OVER ())::INTEGER AS id, p.path, {riders}
                 FROM ({union}) p {joins}
             )
         )
+        JOIN leg_stops s USING (text)
         """
     )
+    db.execute("ALTER TABLE leg_stops DROP COLUMN text")
+    db.execute(
+        f"CREATE OR REPLACE TEMP TABLE paths AS "
+        f"SELECT path, {', '.join(names)} FROM path_legs WHERE i = 1"
+    )
+    db.execute(
+        "CREATE OR REPLACE TEMP TABLE legs AS SELECT path, i, leg FROM path_legs"
+    )
+    db.execute("DROP TABLE path_legs")
     built["legs"] = files
     return names
 
@@ -226,7 +247,7 @@ def ride_routes(routes: Sequence[str]) -> tuple[list[str], dict[str, list[str]]]
     every = [
         r
         for (r,) in connection()
-        .execute("SELECT DISTINCT route FROM legs WHERE route != 'walk'")
+        .execute("SELECT DISTINCT route FROM leg_stops WHERE route != 'walk'")
         .fetchall()
     ]
     groups = {r: gs for r in every if (gs := route_groups(r, every))}
@@ -362,7 +383,8 @@ def build_events(routes: Sequence[str], names: list[str], merge: bool) -> None:
         """
         CREATE OR REPLACE TEMP TABLE rides AS
         WITH l AS (
-            SELECT *, route IN $routes AS f FROM legs
+            SELECT *, route IN $routes AS f
+            FROM legs JOIN leg_stops USING (leg) JOIN paths USING (path)
         ),
         -- Over every leg, then only `routes`' rides kept:
         -- a journey's first and last rides, and the legs beside one, may be off them.
@@ -531,7 +553,7 @@ def route_service(
 
 def route_rows(names: list[str], with_line: bool) -> list[tuple[Any, ...]]:
     line = ", name" if with_line else ""
-    on_line = "JOIN leg_lines USING (route, stops)" if with_line else ""
+    on_line = "JOIN leg_lines USING (leg)" if with_line else ""
     sums = ", ".join(f"sum({n})::DOUBLE" for n in names)
     return (
         connection()
@@ -540,12 +562,12 @@ def route_rows(names: list[str], with_line: bool) -> list[tuple[Any, ...]]:
             WITH {LEG_LINES if with_line else "x AS (SELECT 1)"},
             journeys AS (
                 SELECT DISTINCT path, grp{line}
-                FROM legs JOIN route_groups USING (route) {on_line}
+                FROM legs JOIN leg_stops USING (leg)
+                JOIN route_groups USING (route) {on_line}
             )
-            -- As in `line_rows`, riders from each path's first leg.
+            -- As in `line_rows`, riders from `paths`.
             SELECT grp{line}, {sums}
-            FROM journeys JOIN (SELECT path, {", ".join(names)} FROM legs WHERE i = 1)
-                USING (path)
+            FROM journeys JOIN paths USING (path)
             GROUP BY ALL
             """,
         )
@@ -553,17 +575,15 @@ def route_rows(names: list[str], with_line: bool) -> list[tuple[Any, ...]]:
     )
 
 
-# The lines each ride rides, by its route and stops:
+# The lines each ride rides, by its `leg`:
 # matched once for each different ride, however many paths take it.
 LEG_LINES = f"""
     leg_lines AS (
-        SELECT DISTINCT route, stops, name
+        SELECT DISTINCT leg, name
         FROM (
-            SELECT route, stops, unnest(stops[:-2]) AS a, unnest(stops[2:]) AS b
-            FROM (
-                SELECT DISTINCT route, stops FROM legs
-                WHERE route IN (SELECT route FROM route_groups)
-            )
+            SELECT leg, route, unnest(stops[:-2]) AS a, unnest(stops[2:]) AS b
+            FROM leg_stops
+            WHERE route IN (SELECT route FROM route_groups)
         ) h
         JOIN line_hops USING (a, b)
         WHERE {hop_on("line_hops", "route")}
@@ -656,13 +676,11 @@ def line_rows(names: list[str]) -> list[tuple[Any, ...]]:
             f"""
             WITH {LEG_LINES},
             journeys AS (
-                SELECT DISTINCT path, name FROM legs JOIN leg_lines USING (route, stops)
+                SELECT DISTINCT path, name FROM legs JOIN leg_lines USING (leg)
             )
-            -- A path's riders are on each of its legs, so from its first's,
-            -- not carried through the `DISTINCT`.
+            -- A path's riders from `paths`, not carried through the `DISTINCT`.
             SELECT name, {sums}
-            FROM journeys JOIN (SELECT path, {", ".join(names)} FROM legs WHERE i = 1)
-                USING (path)
+            FROM journeys JOIN paths USING (path)
             GROUP BY ALL
             """
         )
