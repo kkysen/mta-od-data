@@ -18,8 +18,8 @@ from mta_od_data.analyze.common import (
     DayFilterError,
     DayType,
     Station,
+    cached_rows,
     complexes_of,
-    connection,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.invocation import produced_by
@@ -1098,7 +1098,6 @@ def one_seat_rides(
         s = complexes_by_id[cid]
         print(f"  {cid:>4}  {s.name}  routes={sorted(s.routes)}")
 
-    con = connection()
     day_params: list[str] = list(days_list) if days_list else []
     day_filter_sql = (
         "TRUE"
@@ -1124,9 +1123,9 @@ def one_seat_rides(
         WHERE {day_filter_sql} AND {origin_filter_sql}
         GROUP BY 1, 2
     """
-    pairs: list[tuple[int, int, float]] = con.execute(
-        pairs_query, [str(parquet), *day_params]
-    ).fetchall()
+    pairs: list[tuple[int, int, float]] = cached_rows(
+        pairs_query, [str(parquet), *day_params], [parquet]
+    )
     print(
         f"\n{len(pairs):,} distinct origin/destination pairs, averaged over "
         f"{n_distinct_days} distinct days matching the day filter "

@@ -41,8 +41,8 @@ from mta_od_data.analyze.common import (
     DayType,
     MissingComplexError,
     Station,
+    cached_rows,
     complexes_of,
-    connection,
 )
 from mta_od_data.analyze.markdown import collapsed, table_row, table_rule
 from mta_od_data.analyze.scenarios import (
@@ -1608,7 +1608,6 @@ def deinterlining(
         f"({len(stations):,} stations)"
     )
 
-    con = connection()
     day_params: list[str] = list(days_list) if days_list else []
     day_filter_sql = (
         "TRUE"
@@ -1645,9 +1644,9 @@ def deinterlining(
         -- snapshot tests rather than fail them honestly.
         ORDER BY 1, 2
     """
-    fetched: list[tuple[int, int, float]] = con.execute(
-        pairs_query, [str(parquet), *day_params]
-    ).fetchall()
+    fetched: list[tuple[int, int, float]] = cached_rows(
+        pairs_query, [str(parquet), *day_params], [parquet]
+    )
     try:
         pairs = resolve_pairs(fetched, complexes_by_id, complexes_path)
     except ScenarioError as e:

@@ -13,8 +13,8 @@ from mta_od_data.analyze.common import (
     DayCoverage,
     DayFilterError,
     DayType,
+    cached_rows,
     complexes_of,
-    connection,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.regions import (
@@ -299,7 +299,6 @@ def regional_flow(
     print(f"Region: {region_def.name} ({n_inside} of {len(complexes)} complexes)")
     print(f"Day filter: {days_list if days_list else 'all days'}")
 
-    con = connection()
     day_params: list[str] = list(days_list) if days_list else []
     day_filter_sql = (
         "TRUE"
@@ -324,9 +323,9 @@ def regional_flow(
         WHERE {day_filter_sql}
         GROUP BY 1, 2
     """
-    pairs: list[tuple[int, int, float]] = con.execute(
-        pairs_query, [str(parquet), *day_params]
-    ).fetchall()
+    pairs: list[tuple[int, int, float]] = cached_rows(
+        pairs_query, [str(parquet), *day_params], [parquet]
+    )
     print(
         f"\n{len(pairs):,} distinct origin/destination pairs, averaged over "
         f"{n_distinct_days} distinct days matching the day filter "

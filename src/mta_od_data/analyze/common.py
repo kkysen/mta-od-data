@@ -1,14 +1,17 @@
 import csv
+import os
+import pickle
 from collections import defaultdict
-from collections.abc import Collection, Hashable, Iterator
+from collections.abc import Collection, Hashable, Iterator, Sequence
 from dataclasses import dataclass, fields
 from enum import StrEnum
 from functools import cache
+from hashlib import sha256
 from io import StringIO
 from math import asin, cos, radians, sin, sqrt
 from operator import attrgetter
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, Protocol, override
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol, override
 
 import duckdb
 
@@ -239,6 +242,49 @@ def connection() -> duckdb.DuckDBPyConnection:
             "temp_directory": str(SCRATCH),
         }
     )
+
+
+# Each `cached_rows` query's rows, by `query_key`.
+QUERIES = CACHE / "queries"
+
+
+def query_key(query: str, params: Sequence[object], reads: Collection[Path]) -> str:
+    """What a query's rows could depend on, hashed:
+    its text and parameters, DuckDB's version,
+    and each file it reads, by its size and modification time,
+    as `prepare` rewrites the extract at the same path."""
+    h = sha256()
+    h.update(duckdb.__version__.encode())
+    h.update(query.encode())
+    h.update(repr(list(params)).encode())
+    for path in sorted(reads):
+        st = path.stat()
+        h.update(repr((str(path), st.st_size, st.st_mtime_ns)).encode())
+    return h.hexdigest()
+
+
+def cached_rows(
+    query: str, params: Sequence[object], reads: Collection[Path]
+) -> list[tuple[Any, ...]]:
+    """`query`'s rows, from the on-disk cache if it ran before on the same `reads`,
+    which must be every file it reads, so they're never served from other data.
+
+    For the scans of the OD extract every `analyze` command starts with:
+    a full pass over its 121M rows, against a few hundred thousand rows out,
+    so a run whose data hasn't changed doesn't read it at all,
+    whatever changed in the Python that lays the rows out."""
+    file = QUERIES / f"{query_key(query, params, reads)}.pickle"
+    if file.exists():
+        with file.open("rb") as f:
+            return pickle.load(f)
+    rows = connection().execute(query, list(params)).fetchall()
+    QUERIES.mkdir(parents=True, exist_ok=True)
+    # To a temporary name, then renamed: an interrupted write leaves no cache behind.
+    tmp = file.with_suffix(f".{os.getpid()}.tmp")
+    with tmp.open("wb") as f:
+        pickle.dump(rows, f)
+    tmp.replace(file)
+    return rows
 
 
 def read_csv_text(path: Path) -> str:
@@ -614,6 +660,8 @@ def _day_coverage(
     Its own connection rather than the caller's: nothing here depends on
     session state, and a result shared between callers can't be tied to
     whichever connection happened to miss the cache first.
+    Also kept on disk by `cached_rows`, for the next process;
+    `@cache` saves this one from even hashing the query again.
     An empty filter is remembered too, as the error it would raise:
     `@cache` stores nothing when a call raises, so raising here would
     rescan the whole extract for every repeat of a question already
@@ -628,10 +676,7 @@ def _day_coverage(
             WHERE {day_filter_sql}
         )
     """
-    result: tuple[int, int, int] | None = (
-        connection().execute(query, [str(parquet), *day_params]).fetchone()
-    )
-    assert result is not None, "aggregate query always returns exactly one row"
+    (result,) = cached_rows(query, [str(parquet), *day_params], [parquet])
     n_days, first, last = result
     if not n_days:
         # Before anything divides by it: every command averages its
