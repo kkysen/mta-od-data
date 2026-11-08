@@ -302,29 +302,14 @@ def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths
 
     db = connection()
     db.execute(f"CREATE TYPE IF NOT EXISTS EXACT AS {EXACT}")
-    # By id first, per routing's texts: summing a few million integers per date
-    # is far cheaper than grouping by text, which then happens once per routing.
-    db.execute(
-        """
-        CREATE OR REPLACE TEMP TABLE by_id
-            (texts VARCHAR, path_id UINTEGER, riders EXACT)
-        """
-    )
-    for row, d in zip(manifest_rows, dates, strict=True):
-        db.execute(
-            f"""
-            INSERT INTO by_id BY NAME
-            SELECT $texts AS texts, path_id, sum(riders::EXACT) * $days AS riders
-            FROM ({paths_query(c)})
-            GROUP BY path_id
-            """,
-            paths_params(d, c) | {"texts": str(d.texts), "days": int(row["days"])},
-        )
     # Each text once, numbered as first seen, so the routings' sums are by number:
     # holding every routing's texts until they're summed spilled gigabytes,
     # and so did a `DISTINCT` and sort over all of them to number them in text order.
     # Only the summed paths are sorted, at the end.
-    all_texts = sorted({str(d.texts) for d in dates})
+    by_texts: dict[str, list[tuple[DatePaths, int]]] = {}
+    for row, d in zip(manifest_rows, dates, strict=True):
+        by_texts.setdefault(str(d.texts), []).append((d, int(row["days"])))
+    all_texts = sorted(by_texts)
     db.execute("CREATE OR REPLACE TEMP TABLE path_texts (path VARCHAR, n UINTEGER)")
     db.execute("CREATE OR REPLACE TEMP TABLE by_n (n UINTEGER, riders EXACT)")
     for texts in all_texts:
@@ -351,6 +336,22 @@ def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths
             """
         )
         db.execute("INSERT INTO path_texts BY NAME SELECT path, n FROM fresh")
+        # This routing's dates, summed by id first (a few million integers per date,
+        # far cheaper than by text), then into `by_n` once per routing:
+        # holding every routing's dates until all texts were numbered took ~1 GiB.
+        db.execute(
+            "CREATE OR REPLACE TEMP TABLE by_id (path_id UINTEGER, riders EXACT)"
+        )
+        for d, weight in by_texts[texts]:
+            db.execute(
+                f"""
+                INSERT INTO by_id BY NAME
+                SELECT path_id, sum(riders::EXACT) * $days AS riders
+                FROM ({paths_query(c)})
+                GROUP BY path_id
+                """,
+                paths_params(d, c) | {"days": weight},
+            )
         db.execute(
             """
             INSERT INTO by_n BY NAME
@@ -358,10 +359,8 @@ def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths
             FROM by_id b
             JOIN ids i USING (path_id)
             LEFT JOIN fresh f USING (path_id)
-            WHERE b.texts = $texts
             GROUP BY ALL
-            """,
-            {"texts": texts},
+            """
         )
     # To a temporary name, then renamed: an interrupted write leaves no cache behind.
     out.parent.mkdir(parents=True, exist_ok=True)
