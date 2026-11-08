@@ -41,7 +41,8 @@ class TripStops:
 def load_trip_stops(manifest: Path, evasion: FareEvasion | None) -> TripStops:
     """Every date's trains' stops as a temp table `trip_stops`:
     each row's date `d`, its `w`eight (`days`, times evasion's 1 / (1 - rate)),
-    the train's key (route, direction, first stop, departure there, its stops),
+    the train's key (route, direction, first stop, departure there,
+    a number for its stops' list),
     its `dir` (`N` or `S`), and the trips file's columns."""
     rows = read_manifest(manifest)
     days = sum(int(row["days"]) for row in rows)
@@ -70,19 +71,30 @@ def load_trip_stops(manifest: Path, evasion: FareEvasion | None) -> TripStops:
             f"FROM read_parquet('{file}')"
         )
     directions = ", ".join(f"({k}, '{v}')" for k, v in DIRECTIONS.items())
+    union = " UNION ALL ".join(parts)
     connection().execute(
         f"""
         CREATE OR REPLACE TEMP TABLE trip_stops AS
+        -- A train's stops are only ever a key, so a number for each distinct list,
+        -- in the lists' order: the text of a whole trip's stops,
+        -- on each of its rows, was 3.9 GB.
+        WITH trips AS (
+            SELECT d, trip_id, day, list(stop_id ORDER BY stop_sequence) AS l
+            FROM ({union})
+            GROUP BY ALL
+        ),
+        numbered AS (
+            SELECT d, trip_id, day, (dense_rank() OVER (ORDER BY l))::INTEGER AS stops
+            FROM trips
+        )
         SELECT s.*, dirs.dir,
             first_value(stop_id) OVER t AS first_stop,
             first_value(departure) OVER t AS first_departure,
-            string_agg(stop_id, ' ') OVER (
-                PARTITION BY d, trip_id, day ORDER BY stop_sequence
-                ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-            ) AS stops,
+            n.stops,
             lag(stop_id) OVER t AS prev_stop,
             lead(stop_id) OVER t AS next_stop
-        FROM ({" UNION ALL ".join(parts)}) s
+        FROM ({union}) s
+        JOIN numbered n USING (d, trip_id, day)
         LEFT JOIN (VALUES {directions}) dirs(direction_id, dir) USING (direction_id)
         WINDOW t AS (PARTITION BY d, trip_id, day ORDER BY stop_sequence)
         """
