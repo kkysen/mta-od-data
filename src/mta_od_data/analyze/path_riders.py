@@ -320,15 +320,28 @@ def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths
             """,
             paths_params(d, c) | {"texts": str(d.texts), "days": int(row["days"])},
         )
-    db.execute("CREATE OR REPLACE TEMP TABLE by_text (path VARCHAR, riders EXACT)")
-    for texts in sorted({str(d.texts) for d in dates}):
+    # Each text once, numbered in text order, so the routings' sums are by number:
+    # holding every routing's texts until they're summed spilled gigabytes.
+    all_texts = sorted({str(d.texts) for d in dates})
+    db.execute(
+        """
+        CREATE OR REPLACE TEMP TABLE path_texts AS
+        SELECT path, row_number() OVER (ORDER BY path)::UINTEGER AS n
+        FROM (SELECT DISTINCT path FROM read_parquet($all_texts))
+        """,
+        {"all_texts": all_texts},
+    )
+    db.execute("CREATE OR REPLACE TEMP TABLE by_n (n UINTEGER, riders EXACT)")
+    for texts in all_texts:
         db.execute(
             """
-            INSERT INTO by_text BY NAME
-            SELECT t.path, sum(b.riders) AS riders
-            FROM by_id b JOIN read_parquet($texts) t USING (path_id)
+            INSERT INTO by_n BY NAME
+            SELECT p.n, sum(b.riders) AS riders
+            FROM by_id b
+            JOIN read_parquet($texts) t USING (path_id)
+            JOIN path_texts p USING (path)
             WHERE b.texts = $texts
-            GROUP BY t.path
+            GROUP BY p.n
             """,
             {"texts": texts},
         )
@@ -338,11 +351,16 @@ def average_path_riders(manifest: Path, c: Counting = AS_ROUTED) -> AveragePaths
     db.execute(
         f"""
         COPY (
-            SELECT path, (sum(riders) / {days})::EXACT AS riders
-            FROM by_text GROUP BY path ORDER BY path
+            SELECT p.path, s.riders
+            FROM (
+                SELECT n, (sum(riders) / {days})::EXACT AS riders
+                FROM by_n GROUP BY n
+            ) s
+            JOIN path_texts p USING (n)
+            ORDER BY n
         ) TO '{partial}' (FORMAT parquet, COMPRESSION zstd)
         """
     )
-    db.execute("DROP TABLE by_id; DROP TABLE by_text")
+    db.execute("DROP TABLE by_id; DROP TABLE by_n; DROP TABLE path_texts")
     partial.rename(out)
     return AveragePaths(file=out, days=days)
