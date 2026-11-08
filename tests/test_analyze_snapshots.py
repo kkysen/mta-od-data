@@ -153,6 +153,15 @@ def test_snapshot_matches_fresh_run(
         )
     tmp_out = tmp_path / snapshot.path.name
     prog, *args = snapshot.cmd
+    # `--csv-out` to the scratch directory too, not into `data/`:
+    # rewriting files there would change `ridership`'s cache key,
+    # which stats every file under `data/`, so every run missed it.
+    csv_dir: Path | None = None
+    for i, arg in enumerate(args[:-1]):
+        if arg == "--csv-out":
+            csv_out = Path(args[i + 1])
+            csv_dir = csv_out.parent
+            args[i + 1] = str(tmp_path / csv_out.name)
     # `cmd` names its paths relative to the repo root, and the committed
     # `Produced by` line quotes them exactly as written, so they have to
     # be resolved from there rather than from wherever pytest was run.
@@ -173,6 +182,8 @@ def test_snapshot_matches_fresh_run(
     # which would otherwise be a spurious diff on that line alone.
     rel_path = snapshot.path.relative_to(ROOT)
     fresh = tmp_out.read_text().replace(str(tmp_out), str(rel_path))
+    if csv_dir is not None:
+        fresh = fresh.replace(f"{tmp_path}/", f"{csv_dir}/")
     # A missing snapshot is just the empty case of an out-of-date one:
     # read it as such so it gets the same "regenerate it with" message
     # instead of an opaque `FileNotFoundError`.
