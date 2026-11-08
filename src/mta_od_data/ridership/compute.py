@@ -150,6 +150,10 @@ def load_legs(cols: Sequence[Column]) -> list[str]:
     with each column's riders as `r0`, `r1`, and so on; returns those names.
 
     `route` is the leg's route, or `walk`, and `stops` its parent stops in order.
+    `path` is a number for each path, not its text, which every query here
+    only partitions or counts by: the text is a few hundred bytes,
+    and on every leg of millions of paths it was most of the table,
+    more than DuckDB's memory limit, so it spilled to disk.
     """
     db = connection()
     names = [f"r{k}" for k in range(len(cols))]
@@ -166,15 +170,18 @@ def load_legs(cols: Sequence[Column]) -> list[str]:
         f"""
         CREATE OR REPLACE TEMP TABLE legs AS
         SELECT
-            path, {", ".join(names)}, i,
+            id AS path, {", ".join(names)}, i,
             split_part(leg, ' ', 1) AS route,
             string_split(split_part(leg, ' ', 2), '>') AS stops
         FROM (
             SELECT
-                path, {", ".join(names)},
+                id, {", ".join(names)},
                 unnest(string_split(path, ' | ')) AS leg,
                 unnest(range(1, len(string_split(path, ' | ')) + 1)) AS i
-            FROM (SELECT p.path, {riders} FROM ({union}) p {joins})
+            FROM (
+                SELECT (row_number() OVER ())::INTEGER AS id, p.path, {riders}
+                FROM ({union}) p {joins}
+            )
         )
         """
     )
