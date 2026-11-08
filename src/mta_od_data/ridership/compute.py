@@ -143,6 +143,8 @@ def columns(
 # (the snapshot tests) builds each once: `legs` takes ~3 s, `events` ~5 s,
 # and `directions` reads every feed, ~8 s.
 built: dict[str, object] = {}
+# A path's riders, exactly: see `load_legs`.
+RIDERS = "DECIMAL(18, 10)"
 
 
 def load_legs(cols: Sequence[Column]) -> list[str]:
@@ -165,7 +167,12 @@ def load_legs(cols: Sequence[Column]) -> list[str]:
     joins = " ".join(
         f"LEFT JOIN read_parquet('{f}') c{k} USING (path)" for k, f in enumerate(files)
     )
-    riders = ", ".join(f"coalesce(c{k}.riders, 0) AS {n}" for k, n in enumerate(names))
+    # Riders exactly, as `average_path_riders` gives them, but in 8 bytes, not 16:
+    # a path has at most a few thousand, far under `RIDERS`' 10^8,
+    # and DuckDB sums them as `DECIMAL(38, 10)`, so totals stay exact.
+    riders = ", ".join(
+        f"coalesce(c{k}.riders, 0)::{RIDERS} AS {n}" for k, n in enumerate(names)
+    )
     db.execute(
         f"""
         CREATE OR REPLACE TEMP TABLE legs AS
@@ -177,7 +184,7 @@ def load_legs(cols: Sequence[Column]) -> list[str]:
             SELECT
                 id, {", ".join(names)},
                 unnest(string_split(path, ' | ')) AS leg,
-                unnest(range(1, len(string_split(path, ' | ')) + 1)) AS i
+                unnest(range(1, len(string_split(path, ' | ')) + 1))::SMALLINT AS i
             FROM (
                 SELECT (row_number() OVER ())::INTEGER AS id, p.path, {riders}
                 FROM ({union}) p {joins}
