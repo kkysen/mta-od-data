@@ -1,7 +1,7 @@
 //! Walks between stations, and from origins to them, in seconds,
 //! on OpenStreetMap's streets (the `streets` crate),
 //! through stations' entrances, each with its own time between the street and the platforms
-//! (`mta-od-data access`'s `data/station_access.csv`).
+//! (`mta-od-data fetch-station-access`'s `data/station_access.csv`).
 //!
 //! The streets are walked once, for every feed's stations (`StreetWalks`),
 //! and each feed takes its own stops' walks from them (`Walks`).

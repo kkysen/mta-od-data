@@ -143,7 +143,7 @@ uv run mta-od-data fetch-platforms
 
 Details: [`raptor/README.md`](raptor/README.md).
 
-## `access`
+## `fetch-station-access`
 
 Times each station entrance between the street and the platforms,
 for changing trains between complexes on the streets,
@@ -154,7 +154,7 @@ depths published elsewhere where those are blank,
 and the levels OSM puts platforms on.
 
 ```sh
-uv run mta-od-data access
+uv run mta-od-data fetch-station-access
 ```
 
 Details: [`access.py`](src/mta_od_data/access.py).
