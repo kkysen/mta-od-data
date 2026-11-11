@@ -36,6 +36,8 @@ cache-keys = [
     { file = "Cargo.toml" },
     { file = "Cargo.lock" },
     { file = "raptor/src/**/*.rs" },
+    { file = "streets/Cargo.toml" },
+    { file = "streets/src/**/*.rs" },
 ]
 
 [dependency-groups]

@@ -11,6 +11,7 @@ pub mod platforms;
 pub mod raptor;
 pub mod report;
 pub mod timetable;
+pub mod walks;
 
 use std::collections::VecDeque;
 use std::path::{Path, PathBuf};
