@@ -250,6 +250,25 @@ with 1,344 walks between them,
 between the Orange or Green Line and the commuter rail at North Station and Ruggles,
 behind gates of their own, and between Courthouse's two platforms.
 
+Passages inside the fare gates between complexes the MTA lists apart,
+which neither the station data nor `transfers.txt` joins,
+are in `raptor/passages.json5`, after the above under any transfers (`passages.rs`):
+so far the 42 St Connection,
+from 42 St-Bryant Pk's B, D, F, and M platform up a level to Times Sq's shuttle platform.
+A passage is timed as a complex's other walks between platforms are under OSM's:
+its ends' straight-line distance at 1.2 m/s, platform middle to platform middle,
+plus `stacked_secs_per_level` a level, 230s for the 42 St Connection.
+Every stop of either complex gets a footpath to every stop of the other through it,
+by its complex's own walks to and from the passage's ends,
+as RAPTOR takes one footpath a change.
+A passage is open while its route runs at its far end on the date,
+from its first departure to its last arrival there, not the previous or next date's,
+as the 42 St Connection is reached through the shuttle's platforms, closed overnight with it:
+05:51 to 23:58 on 2026-09-16, a Wednesday.
+RAPTOR walks such a footpath only when it starts while open,
+looked up only from stops that have one.
+`ridership` takes the same passages' complexes as one virtual complex.
+
 Everything below is the plan for making it accurate later.
 
 GTFS `transfers.txt` is not good enough on its own.

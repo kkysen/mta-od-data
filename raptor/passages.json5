@@ -1,0 +1,24 @@
+// Passages inside the fare gates between complexes the MTA lists apart,
+// which neither the station data nor `transfers.txt` joins
+// (`raptor/src/passages.rs`).
+// Routing walks them, and `ridership` shows their complexes as one virtual complex
+// as well as each on its own.
+{
+  passages: [
+    {
+      // The 42 St Connection, open since September 2021,
+      // from 42 St-Bryant Pk's B, D, F, and M platform up a level
+      // and west under 42 St to Times Sq's shuttle platform:
+      // https://www.mta.info/project/42-st-connection.
+      // It's open while the shuttle runs, as it's reached through the shuttle's platforms,
+      // which close overnight with it:
+      // https://subwaynut.com/ct/times_sq_s_new/index.php.
+      name: "42 St Connection",
+      complexes: [611, 609],
+      from: "D16",
+      to: "902",
+      levels: 1,
+      open_with_route: "GS",
+    },
+  ],
+}

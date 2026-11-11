@@ -6,6 +6,7 @@ pub mod batch;
 pub mod calendar;
 pub mod gtfs;
 pub mod od;
+pub mod passages;
 pub mod pathways;
 pub mod platforms;
 pub mod raptor;
@@ -132,6 +133,7 @@ pub fn assign_dates(
         Transfers::Gtfs => None,
     };
 
+    let passages = passages::load()?;
     let start = Instant::now();
     let timetables: Vec<(Timetable, Complexes)> = jobs
         .par_iter()
@@ -157,6 +159,7 @@ pub fn assign_dates(
                     pathways::walks(&job.version.feed, &tt, gate_penalty, pathways::MAX_WALK);
                 tt.use_pathways(&walks, &report.covered);
             }
+            tt.use_passages(&passages, &complexes, config.stacked_secs_per_level);
             Ok((tt, complexes))
         })
         .collect::<Result<_>>()?;

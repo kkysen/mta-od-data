@@ -337,7 +337,9 @@ impl Labels<'_> {
         }
         for &o in origins {
             for &(to, walk) in &tt.footpaths[o as usize] {
-                if self.lower_ready(0, to, depart + walk, Ready::Walk { from: o }) {
+                if tt.walk_open(o, to, depart)
+                    && self.lower_ready(0, to, depart + walk, Ready::Walk { from: o })
+                {
                     marked.push(to);
                 }
             }
@@ -450,7 +452,9 @@ impl Labels<'_> {
             for &s in &improved {
                 let arrive = self.ride_arrival[(k, s as usize)];
                 for &(to, walk) in &tt.footpaths[s as usize] {
-                    if self.lower_ready(k, to, arrive + walk, Ready::Walk { from: s }) {
+                    if tt.walk_open(s, to, arrive)
+                        && self.lower_ready(k, to, arrive + walk, Ready::Walk { from: s })
+                    {
                         marked.push(to);
                     }
                 }
@@ -915,6 +919,28 @@ mod tests {
         // From E: its own 08:00, and B's trains less the 2 min walk.
         let times = router.departures(&[stop(&tt, "E")], t("08:00:00"), t("08:13:00"));
         assert_eq!(times, [t("08:09:00"), t("08:00:00")]);
+    }
+
+    #[test]
+    fn closed_footpaths_are_not_walked() {
+        let trips = "route_id,trip_id,service_id\n2,r2a,W\n2,r2b,W\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            r2a,B,08:11:00,08:11:00,1\nr2a,D,08:20:00,08:20:00,2\n\
+            r2b,B,08:15:00,08:15:00,1\nr2b,D,08:24:00,08:24:00,2\n";
+        let transfers =
+            "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nE,B,2,120\nB,E,2,120\n";
+        let mut tt = timetable(trips, stop_times, transfers);
+        let (e, b, d) = (stop(&tt, "E"), stop(&tt, "B"), stop(&tt, "D"));
+        // Open to start walking from 08:00 to 08:05.
+        tt.footpath_hours
+            .insert((e, b), (t("08:00:00"), t("08:05:00")));
+        tt.has_hours = vec![false; tt.stops.len()];
+        tt.has_hours[e as usize] = true;
+        let router = Router::new(&tt);
+        let (legs, js) = router.query(&[e], t("08:05:00")).journeys(&[d]);
+        assert_eq!(summary(&tt, legs.of(&js[0])), ["walk E-B", "r2a B-D"]);
+        let (_, js) = router.query(&[e], t("08:06:00")).journeys(&[d]);
+        assert!(js.is_empty());
     }
 
     #[test]

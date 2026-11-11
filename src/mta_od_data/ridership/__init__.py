@@ -32,7 +32,7 @@ from typing import Annotated, Any
 import json5
 from typer import BadParameter, Context, Option, Typer
 
-from mta_od_data import DATA
+from mta_od_data import DATA, ROOT
 from mta_od_data.analyze.common import (
     Complex,
     MissingComplex,
@@ -94,8 +94,13 @@ class Names:
 
 # Complexes the MTA lists apart but riders can walk between without a fare,
 # shown as one virtual complex as well as each on its own:
-# Times Sq and 42 St-Bryant Pk/5 Av since the 42 St Connection opened in September 2021.
-COMBINED_COMPLEXES = [("611", "609")]
+# those of the passages routing walks between them, like the 42 St Connection
+# between Times Sq and 42 St-Bryant Pk/5 Av.
+PASSAGES = ROOT / "raptor" / "passages.json5"
+COMBINED_COMPLEXES = [
+    tuple(str(c) for c in p["complexes"])
+    for p in json5.loads(PASSAGES.read_text())["passages"]
+]
 
 
 def combined_name(names: Sequence[str]) -> str:

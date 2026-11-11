@@ -75,6 +75,12 @@ pub struct Timetable {
     /// Footpaths out of the paid area through the gates and back in,
     /// and how many times (`use_pathways`).
     pub exits: HashMap<(StopIdx, StopIdx), u8>,
+    /// Footpaths open only part of the day, `(open, close)`, by when the walk starts
+    /// (`use_passages`).
+    pub footpath_hours: HashMap<(StopIdx, StopIdx), (Secs, Secs)>,
+    /// Whether each stop has a footpath of `footpath_hours`, to look it up only then;
+    /// stops past its end have none.
+    pub has_hours: Vec<bool>,
     pub report: Report,
 }
 
@@ -133,6 +139,7 @@ impl Timetable {
             && self.min_change == other.min_change
             && self.footpaths == other.footpaths
             && self.exits == other.exits
+            && self.footpath_hours == other.footpath_hours
             && self.patterns.len() == other.patterns.len()
             && self
                 .patterns
@@ -388,6 +395,8 @@ impl Timetable {
             min_change,
             footpaths,
             exits: HashMap::new(),
+            footpath_hours: HashMap::new(),
+            has_hours: Vec::new(),
             report,
         })
     }
@@ -584,7 +593,7 @@ fn mode(times: impl Iterator<Item = Secs>) -> Secs {
 }
 
 /// Approximate meters between two nearby `(latitude, longitude)` points.
-fn distance_m((lat1, lon1): (f64, f64), (lat2, lon2): (f64, f64)) -> f64 {
+pub fn distance_m((lat1, lon1): (f64, f64), (lat2, lon2): (f64, f64)) -> f64 {
     let dy = (lat2 - lat1) * 111_320.0;
     let dx = (lon2 - lon1) * 111_320.0 * ((lat1 + lat2) / 2.0).to_radians().cos();
     dx.hypot(dy)
