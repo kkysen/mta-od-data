@@ -410,8 +410,8 @@ def _drop_misattributed(rows: list[dict[str, object]]) -> list[dict[str, object]
     ]
 
 
-@app.command(name="fetch-station-access")
-def write(
+@app.command()
+def fetch_station_access(
     stations: Annotated[
         Path, Option(help="The station reference CSV")
     ] = DEFAULT_STATIONS_CSV,
