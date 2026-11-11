@@ -91,8 +91,8 @@ August to December 2025 is 25 dates, Monday to Friday.
     Only minutes with any.
 - **`assign-range.log`**: the run's log.
 
-`data/raptor-osm/` is the same run with `transfers: "osm"`,
-transfer times by OSM's platforms, kept to compare against.
+`data/raptor-gtfs/` is the same run with `transfers: "gtfs"`,
+transfer times from `transfers.txt` at its word, kept to compare against.
 
 ## The reports, in [`src/mta_od_data/ridership/`](../src/mta_od_data/ridership/)
 

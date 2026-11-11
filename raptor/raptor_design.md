@@ -192,8 +192,8 @@ and footpaths not transitively closed,
 since RAPTOR relaxes footpaths once a round and assumes closure.
 Every version so far has none of either.
 
-`transfers: "osm"` in `raptor/assign.json5`
-switches to transfers by OSM's platforms instead, begun as Anita's rules:
+`transfers: "osm"`, the default in `raptor/assign.json5`,
+times transfers by OSM's platforms instead, begun as Anita's rules:
 changing trains on one platform is free,
 at one stop or across an island to the other direction's;
 changing to another of the station's platforms, up and over, takes `up_and_over_secs`, 90s,

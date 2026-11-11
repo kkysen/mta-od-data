@@ -13,234 +13,234 @@ Produced by `mta-od-data ridership --by line --by route --markdown-out src/mta_o
 
 | Line | Route | Aug-Dec 2025 | 2019 | Peak Hour | Riders in Peak Hour, Aug-Dec 2025 |
 | --- | --- | ---: | ---: | --- | ---: |
-| 4 Av | R | 145,567 | 180,413 | 8:00 AM | 14,584 |
-| 4 Av | N | 94,532 | 108,001 | 8:00 AM | 7,986 |
-| 4 Av | D | 78,380 | 100,977 | 5:00 PM | 6,848 |
-| 4 Av | W | 1,530 | 1,847 | 7:00 AM | 691 |
-| 4 Av express | N | 83,846 | 95,798 | 8:00 AM | 7,986 |
-| 4 Av express | D | 66,669 | 86,166 | 5:00 PM | 6,848 |
-| 4 Av local | R | 112,700 | 139,118 | 5:00 PM | 11,293 |
-| 4 Av local | N | 12,477 | 14,196 | 5:00 AM | 2,034 |
-| 4 Av local | D | 9,884 | 12,476 | 5:00 AM | 1,855 |
-| 4 Av local | W | 1,094 | 1,291 | 7:00 AM | 442 |
-| 42 St Shuttle | GS | 63,814 | 85,619 | 5:00 PM | 7,614 |
-| 53 St | E | 241,580 | 314,394 | 5:00 PM | 24,971 |
-| 53 St | M | 52,926 | 71,540 | 6:00 PM | 4,891 |
-| 53 St | F | 38,379 | 50,070 | 5:00 PM | 3,964 |
-| 53 St | FL | 38,097 | 49,698 | 5:00 PM | 3,872 |
-| 53 St | FX | 282 | 372 | 8:00 AM | 105 |
-| 6 Av | F | 359,007 | 456,618 | 5:00 PM | 37,499 |
-| 6 Av | FL | 354,234 | 450,434 | 5:00 PM | 35,121 |
-| 6 Av | D | 176,302 | 239,792 | 5:00 PM | 16,556 |
-| 6 Av | B | 143,244 | 188,165 | 5:00 PM | 15,925 |
-| 6 Av | M | 125,679 | 169,025 | 6:00 PM | 12,596 |
-| 6 Av | FX | 4,773 | 6,184 | 5:00 PM | 2,378 |
-| 6 Av express | D | 137,334 | 187,309 | 5:00 PM | 12,832 |
-| 6 Av express | B | 111,677 | 147,621 | 5:00 PM | 12,502 |
-| 6 Av local | F | 258,043 | 331,577 | 5:00 PM | 27,315 |
-| 6 Av local | FL | 254,753 | 327,265 | 5:00 PM | 25,306 |
-| 6 Av local | M | 103,294 | 139,611 | 5:00 PM | 10,760 |
-| 6 Av local | FX | 3,289 | 4,312 | 5:00 PM | 2,009 |
-| 63 St | F | 150,625 | 192,802 | 5:00 PM | 13,803 |
-| 63 St | FL | 149,848 | 191,794 | 5:00 PM | 13,529 |
-| 63 St | Q | 97,138 | 128,044 | 8:00 AM | 9,486 |
-| 63 St | M | 18,111 | 23,483 | 5:00 PM | 1,712 |
-| 63 St | N | 3,963 | 5,201 | 4:00 PM | 1,433 |
-| 63 St | FX | 797 | 1,037 | 8:00 AM | 290 |
-| 63 St | R | 490 | 637 | 7:00 AM | 490 |
-| 8 Av | A | 358,684 | 491,837 | 5:00 PM | 38,017 |
-| 8 Av | E | 202,140 | 264,298 | 5:00 PM | 21,822 |
-| 8 Av | C | 184,765 | 238,130 | 6:00 PM | 14,939 |
-| 8 Av | D | 86,218 | 129,288 | 5:00 PM | 6,405 |
-| 8 Av | B | 74,607 | 97,011 | 5:00 PM | 9,057 |
-| 8 Av express | A | 286,093 | 387,682 | 5:00 PM | 30,986 |
-| 8 Av express | D | 86,218 | 129,288 | 5:00 PM | 6,405 |
-| 8 Av local | E | 201,158 | 262,750 | 5:00 PM | 21,700 |
-| 8 Av local | C | 155,914 | 198,691 | 6:00 PM | 12,933 |
-| 8 Av local | B | 74,607 | 97,011 | 5:00 PM | 9,057 |
-| 8 Av local | A | 22,104 | 29,016 | 11:00 PM | 10,430 |
-| Astoria | N | 54,519 | 63,430 | 5:00 PM | 5,601 |
-| Astoria | W | 46,504 | 54,792 | 8:00 AM | 5,402 |
-| Brighton | Q | 149,446 | 197,206 | 8:00 AM | 13,070 |
-| Brighton | B | 85,619 | 116,940 | 8:00 AM | 9,216 |
-| Brighton express | B | 66,700 | 92,567 | 8:00 AM | 7,225 |
-| Brighton local | Q | 109,612 | 145,304 | 8:00 AM | 9,796 |
-| Broadway | R | 230,406 | 312,379 | 5:00 PM | 24,408 |
-| Broadway | Q | 205,264 | 272,857 | 5:00 PM | 19,557 |
-| Broadway | N | 197,252 | 245,169 | 5:00 PM | 19,249 |
-| Broadway | W | 139,039 | 182,407 | 5:00 PM | 14,131 |
-| Broadway express | Q | 200,319 | 266,303 | 5:00 PM | 19,557 |
-| Broadway express | N | 104,199 | 128,808 | 4:00 PM | 12,151 |
-| Broadway local | R | 152,946 | 209,729 | 5:00 PM | 16,119 |
-| Broadway local | N | 118,534 | 146,140 | 5:00 PM | 11,081 |
-| Broadway local | W | 113,500 | 151,320 | 5:00 PM | 11,244 |
-| Broadway local | Q | 10,805 | 14,075 | 12:00 AM | 3,927 |
-| Broadway-7 Av | 1 | 511,652 | 678,410 | 5:00 PM | 50,348 |
-| Broadway-7 Av | 2 | 230,327 | 319,746 | 5:00 PM | 21,871 |
-| Broadway-7 Av | 3 | 165,839 | 230,271 | 8:00 AM | 17,055 |
-| Broadway-7 Av express | 2 | 202,590 | 281,505 | 5:00 PM | 19,352 |
-| Broadway-7 Av express | 3 | 145,689 | 201,870 | 8:00 AM | 15,123 |
-| Broadway-7 Av local | 1 | 427,356 | 565,795 | 5:00 PM | 42,485 |
-| Broadway-7 Av local | 2 | 6,931 | 9,543 | 1:00 AM | 2,077 |
-| Canarsie | L | 376,186 | 424,383 | 5:00 PM | 35,461 |
-| Concourse | D | 79,997 | 128,229 | 3:00 PM | 6,234 |
-| Concourse | B | 34,658 | 53,205 | 5:00 PM | 4,928 |
-| Concourse express | D | 14,984 | 25,119 | 7:00 AM | 3,234 |
-| Concourse express | B | 43 | 80 | 9:00 AM | 43 |
-| Concourse local | D | 72,637 | 115,798 | 3:00 PM | 6,217 |
-| Concourse local | B | 34,656 | 53,202 | 5:00 PM | 4,928 |
-| Crosstown | G | 133,141 | 154,325 | 5:00 PM | 12,282 |
-| Culver | F | 115,225 | 148,627 | 8:00 AM | 11,663 |
-| Culver | FL | 112,776 | 145,348 | 8:00 AM | 11,663 |
-| Culver | G | 47,319 | 55,715 | 5:00 PM | 4,130 |
-| Culver | FX | 2,686 | 3,592 | 7:00 AM | 1,578 |
-| Culver express | F | 2,423 | 3,249 | 7:00 AM | 1,386 |
-| Culver express | FX | 2,423 | 3,249 | 7:00 AM | 1,386 |
-| Culver local | F | 111,684 | 144,027 | 8:00 AM | 11,411 |
-| Culver local | FL | 110,137 | 141,928 | 8:00 AM | 11,411 |
-| Culver local | G | 39,659 | 46,876 | 8:00 AM | 3,593 |
-| Culver local | FX | 1,561 | 2,117 | 7:00 AM | 965 |
-| Dyre Av | 5 | 25,099 | 37,996 | 7:00 AM | 2,766 |
-| Eastern Pkwy | 3 | 95,842 | 131,856 | 8:00 AM | 9,390 |
-| Eastern Pkwy | 2 | 88,552 | 115,808 | 8:00 AM | 9,073 |
-| Eastern Pkwy | 4 | 81,525 | 110,898 | 7:00 AM | 6,926 |
-| Eastern Pkwy | 5 | 75,936 | 100,188 | 8:00 AM | 7,999 |
-| Eastern Pkwy express | 4 | 78,073 | 106,206 | 7:00 AM | 6,904 |
-| Eastern Pkwy express | 5 | 71,026 | 93,767 | 8:00 AM | 7,709 |
-| Eastern Pkwy local | 3 | 71,946 | 98,443 | 8:00 AM | 6,905 |
-| Eastern Pkwy local | 2 | 67,130 | 87,252 | 8:00 AM | 6,294 |
-| Eastern Pkwy local | 4 | 8,103 | 11,127 | 5:00 AM | 1,924 |
-| Eastern Pkwy local | 5 | 161 | 227 | 5:00 AM | 147 |
-| Far Rockaway branch | A | 16,535 | 34,093 | 7:00 AM | 1,568 |
-| Flushing | 7 | 492,034 | 565,807 | 5:00 PM | 53,777 |
-| Flushing | 7L | 401,266 | 461,716 | 5:00 PM | 36,495 |
-| Flushing | 7X | 93,004 | 106,666 | 5:00 PM | 17,282 |
-| Flushing express | 7 | 35,231 | 40,447 | 5:00 PM | 5,743 |
-| Flushing express | 7X | 35,231 | 40,447 | 5:00 PM | 5,743 |
-| Flushing local | 7 | 220,703 | 246,049 | 4:00 PM | 16,378 |
-| Flushing local | 7L | 220,703 | 246,049 | 4:00 PM | 16,378 |
-| Franklin Av Shuttle | FS | 13,030 | 17,391 | 8:00 AM | 1,111 |
-| Fulton St | A | 171,539 | 241,526 | 5:00 PM | 15,989 |
-| Fulton St | C | 85,413 | 112,009 | 5:00 PM | 7,452 |
-| Fulton St express | A | 136,496 | 194,271 | 5:00 PM | 13,609 |
-| Fulton St local | C | 77,507 | 102,241 | 5:00 PM | 6,912 |
-| Fulton St local | A | 14,295 | 19,812 | 11:00 PM | 3,862 |
-| Hillside Av | F | 55,565 | 77,226 | 5:00 PM | 4,790 |
-| Hillside Av | FL | 55,202 | 76,739 | 5:00 PM | 4,720 |
-| Hillside Av | E | 2,161 | 3,109 | 7:00 AM | 847 |
-| Hillside Av | FX | 363 | 487 | 8:00 AM | 151 |
-| Hillside Av express | E | 2,028 | 2,924 | 7:00 AM | 847 |
-| Hillside Av local | F | 55,565 | 77,226 | 5:00 PM | 4,790 |
-| Hillside Av local | FL | 55,202 | 76,739 | 5:00 PM | 4,720 |
-| Hillside Av local | FX | 363 | 487 | 8:00 AM | 151 |
-| Hillside Av local | E | 133 | 185 | 8:00 PM | 133 |
-| Jamaica | J | 129,659 | 175,399 | 4:00 PM | 10,607 |
-| Jamaica | M | 57,806 | 77,296 | 8:00 AM | 5,829 |
-| Jamaica | Z | 9,004 | 12,187 | 5:00 PM | 3,526 |
-| Jamaica express | J | 24,219 | 33,264 | 9:00 AM | 3,151 |
-| Jamaica express | Z | 4,160 | 5,688 | 8:00 AM | 1,944 |
-| Jamaica local | J | 68,626 | 93,150 | 4:00 PM | 5,365 |
-| Jamaica local | M | 50,321 | 66,744 | 8:00 AM | 5,111 |
-| Jamaica local | Z | 4,418 | 6,052 | 8:00 AM | 1,616 |
-| Jerome Av | 4 | 160,638 | 229,167 | 3:00 PM | 13,212 |
-| Lefferts branch | A | 16,087 | 24,484 | 7:00 AM | 1,672 |
-| Lenox Av | 2 | 95,859 | 141,249 | 8:00 AM | 8,214 |
-| Lenox Av | 3 | 32,693 | 48,154 | 5:00 PM | 2,930 |
-| Lexington Av | 6 | 508,923 | 667,267 | 5:00 PM | 48,547 |
-| Lexington Av | 6L | 383,138 | 499,734 | 5:00 PM | 33,104 |
-| Lexington Av | 4 | 327,507 | 447,971 | 5:00 PM | 29,893 |
-| Lexington Av | 5 | 231,990 | 316,116 | 8:00 AM | 25,180 |
-| Lexington Av | 6X | 125,990 | 167,795 | 5:00 PM | 15,442 |
-| Lexington Av express | 4 | 269,207 | 362,902 | 5:00 PM | 24,492 |
-| Lexington Av express | 5 | 199,721 | 268,676 | 8:00 AM | 21,693 |
-| Lexington Av local | 6 | 508,923 | 667,267 | 5:00 PM | 48,547 |
-| Lexington Av local | 6L | 383,138 | 499,734 | 5:00 PM | 33,104 |
-| Lexington Av local | 6X | 125,990 | 167,795 | 5:00 PM | 15,442 |
-| Lexington Av local | 4 | 7,057 | 9,425 | 5:00 AM | 1,535 |
-| Lower Culver | F | 39,750 | 54,041 | 7:00 AM | 4,110 |
-| Lower Culver | FL | 38,136 | 51,857 | 8:00 AM | 3,949 |
-| Lower Culver | FX | 1,614 | 2,184 | 7:00 AM | 995 |
-| Lower Culver local | F | 37,059 | 50,554 | 7:00 AM | 3,872 |
-| Lower Culver local | FL | 35,497 | 48,437 | 8:00 AM | 3,698 |
-| Lower Culver local | FX | 1,561 | 2,117 | 7:00 AM | 965 |
-| Manhattan Bridge | Q | 92,553 | 121,823 | 8:00 AM | 8,711 |
-| Manhattan Bridge | N | 71,458 | 84,524 | 5:00 PM | 7,663 |
-| Manhattan Bridge | D | 64,189 | 82,165 | 5:00 PM | 5,819 |
-| Manhattan Bridge | B | 55,842 | 74,482 | 5:00 PM | 6,251 |
-| Myrtle Av | M | 49,044 | 61,612 | 8:00 AM | 4,308 |
-| Nassau St | J | 59,755 | 83,000 | 4:00 PM | 4,633 |
-| Nassau St | Z | 4,684 | 6,594 | 8:00 AM | 2,515 |
-| Nostrand Av | 5 | 43,084 | 55,556 | 7:00 AM | 4,618 |
-| Nostrand Av | 2 | 39,036 | 50,253 | 8:00 AM | 3,347 |
-| Pelham | 6 | 126,272 | 183,651 | 7:00 AM | 13,427 |
-| Pelham | 6L | 90,200 | 129,163 | 7:00 AM | 7,309 |
-| Pelham | 6X | 41,430 | 62,084 | 7:00 AM | 6,117 |
-| Pelham express | 6 | 36,881 | 55,353 | 7:00 AM | 5,396 |
-| Pelham express | 6X | 36,837 | 55,282 | 7:00 AM | 5,396 |
-| Pelham express | 6L | 44 | 71 | 9:00 PM | 30 |
-| Pelham local | 6 | 80,771 | 115,815 | 7:00 AM | 6,465 |
-| Pelham local | 6L | 80,771 | 115,815 | 7:00 AM | 6,465 |
-| Queens Blvd | E | 214,249 | 265,708 | 5:00 PM | 19,966 |
-| Queens Blvd | F | 183,748 | 237,356 | 5:00 PM | 16,444 |
-| Queens Blvd | FL | 182,768 | 236,096 | 5:00 PM | 16,192 |
-| Queens Blvd | R | 84,700 | 113,056 | 5:00 PM | 8,486 |
-| Queens Blvd | M | 82,151 | 110,080 | 8:00 AM | 8,383 |
-| Queens Blvd | FX | 980 | 1,260 | 8:00 AM | 407 |
-| Queens Blvd east | E | 103,610 | 131,001 | 7:00 AM | 9,022 |
-| Queens Blvd east | F | 83,971 | 115,874 | 8:00 AM | 7,795 |
-| Queens Blvd east | FL | 83,404 | 115,112 | 8:00 AM | 7,558 |
-| Queens Blvd east | FX | 568 | 762 | 8:00 AM | 238 |
-| Queens Blvd express | E | 186,235 | 230,251 | 5:00 PM | 19,214 |
-| Queens Blvd express | F | 99,125 | 132,136 | 5:00 PM | 9,716 |
-| Queens Blvd express | FL | 98,521 | 131,354 | 5:00 PM | 9,528 |
-| Queens Blvd express | FX | 605 | 782 | 8:00 AM | 259 |
-| Queens Blvd local | F | 95,722 | 130,865 | 8:00 AM | 8,000 |
-| Queens Blvd local | FL | 95,133 | 130,075 | 8:00 AM | 7,749 |
-| Queens Blvd local | R | 84,700 | 113,056 | 5:00 PM | 8,486 |
-| Queens Blvd local | M | 81,694 | 109,384 | 8:00 AM | 8,323 |
-| Queens Blvd local | E | 32,999 | 41,259 | 10:00 PM | 4,813 |
-| Queens Blvd local | FX | 589 | 791 | 8:00 AM | 250 |
-| Queens Blvd west | E | 189,310 | 233,356 | 5:00 PM | 17,726 |
-| Queens Blvd west | F | 113,405 | 150,577 | 5:00 PM | 9,716 |
-| Queens Blvd west | FL | 112,801 | 149,795 | 5:00 PM | 9,528 |
-| Queens Blvd west | R | 84,700 | 113,056 | 5:00 PM | 8,486 |
-| Queens Blvd west | M | 81,694 | 109,384 | 8:00 AM | 8,323 |
-| Queens Blvd west | FX | 605 | 782 | 8:00 AM | 259 |
-| Queens Blvd west express | E | 174,205 | 214,514 | 5:00 PM | 17,726 |
-| Queens Blvd west express | F | 99,125 | 132,136 | 5:00 PM | 9,716 |
-| Queens Blvd west express | FL | 98,521 | 131,354 | 5:00 PM | 9,528 |
-| Queens Blvd west express | FX | 605 | 782 | 8:00 AM | 259 |
-| Queens Blvd west local | R | 84,700 | 113,056 | 5:00 PM | 8,486 |
-| Queens Blvd west local | M | 81,694 | 109,384 | 8:00 AM | 8,323 |
-| Queens Blvd west local | E | 15,208 | 18,987 | 10:00 PM | 3,797 |
-| Queens Blvd west local | F | 14,321 | 18,498 | 10:00 PM | 4,393 |
-| Queens Blvd west local | FL | 14,321 | 18,498 | 10:00 PM | 4,393 |
-| Rockaway | A | 27,390 | 48,997 | 7:00 AM | 2,435 |
-| Rockaway | H | 2,771 | 5,419 | 4:00 PM | 242 |
-| Rockaway Park branch | H | 2,771 | 5,419 | 4:00 PM | 242 |
-| Rockaway Park branch | A | 431 | 847 | 7:00 AM | 149 |
-| SAS Phase 1 | Q | 134,288 | 175,274 | 8:00 AM | 13,234 |
-| SAS Phase 1 | N | 5,231 | 6,828 | 4:00 PM | 2,495 |
-| SAS Phase 1 | R | 796 | 1,018 | 7:00 AM | 796 |
-| Sea Beach | N | 78,741 | 86,571 | 5:00 PM | 7,306 |
-| Sea Beach | W | 519 | 560 | 7:00 AM | 293 |
-| Upper Culver | F | 104,940 | 134,694 | 8:00 AM | 10,748 |
-| Upper Culver | FL | 102,752 | 131,756 | 8:00 AM | 10,748 |
-| Upper Culver | G | 39,659 | 46,876 | 8:00 AM | 3,593 |
-| Upper Culver | FX | 2,423 | 3,249 | 7:00 AM | 1,386 |
-| Upper Culver express | F | 2,423 | 3,249 | 7:00 AM | 1,386 |
-| Upper Culver express | FX | 2,423 | 3,249 | 7:00 AM | 1,386 |
-| Upper Culver local | F | 102,752 | 131,756 | 8:00 AM | 10,748 |
-| Upper Culver local | FL | 102,752 | 131,756 | 8:00 AM | 10,748 |
-| Upper Culver local | G | 39,659 | 46,876 | 8:00 AM | 3,593 |
-| West End | D | 81,950 | 107,068 | 7:00 AM | 7,860 |
-| West End | W | 57 | 73 | 10:00 AM | 35 |
-| West End | R | 30 | 37 | 9:00 AM | 30 |
-| White Plains Rd | 2 | 97,838 | 149,611 | 8:00 AM | 8,386 |
-| White Plains Rd | 5 | 70,785 | 102,466 | 7:00 AM | 8,304 |
-| White Plains Rd express | 5 | 18,340 | 27,077 | 7:00 AM | 4,306 |
-| White Plains Rd local | 2 | 77,239 | 117,012 | 7:00 AM | 6,684 |
-| White Plains Rd local | 5 | 32,471 | 46,205 | 3:00 PM | 4,431 |
+| 4 Av | R | 145,315 | 179,592 | 8:00 AM | 14,655 |
+| 4 Av | N | 91,387 | 104,164 | 8:00 AM | 7,493 |
+| 4 Av | D | 77,079 | 99,366 | 5:00 PM | 6,764 |
+| 4 Av | W | 1,535 | 1,837 | 7:00 AM | 746 |
+| 4 Av express | N | 80,763 | 92,041 | 8:00 AM | 7,493 |
+| 4 Av express | D | 65,844 | 85,117 | 5:00 PM | 6,764 |
+| 4 Av local | R | 112,769 | 139,105 | 8:00 AM | 11,251 |
+| 4 Av local | N | 12,122 | 13,766 | 5:00 AM | 1,998 |
+| 4 Av local | D | 9,483 | 12,020 | 5:00 AM | 1,807 |
+| 4 Av local | W | 1,086 | 1,275 | 7:00 AM | 452 |
+| 42 St Shuttle | GS | 62,778 | 84,192 | 5:00 PM | 7,501 |
+| 53 St | E | 265,901 | 345,966 | 5:00 PM | 27,817 |
+| 53 St | M | 45,898 | 62,153 | 8:00 AM | 4,377 |
+| 53 St | F | 37,755 | 49,355 | 5:00 PM | 3,924 |
+| 53 St | FL | 37,495 | 49,012 | 5:00 PM | 3,853 |
+| 53 St | FX | 260 | 343 | 8:00 AM | 101 |
+| 6 Av | F | 352,688 | 449,058 | 5:00 PM | 36,265 |
+| 6 Av | FL | 348,033 | 443,022 | 5:00 PM | 33,873 |
+| 6 Av | D | 189,129 | 257,960 | 5:00 PM | 17,951 |
+| 6 Av | B | 154,745 | 202,983 | 5:00 PM | 17,497 |
+| 6 Av | M | 124,250 | 167,136 | 5:00 PM | 12,839 |
+| 6 Av | FX | 4,655 | 6,036 | 5:00 PM | 2,392 |
+| 6 Av express | D | 137,553 | 188,187 | 5:00 PM | 13,197 |
+| 6 Av express | B | 112,160 | 148,642 | 5:00 PM | 12,931 |
+| 6 Av local | F | 243,159 | 313,062 | 5:00 PM | 25,274 |
+| 6 Av local | FL | 240,046 | 308,971 | 5:00 PM | 23,387 |
+| 6 Av local | M | 96,765 | 130,846 | 5:00 PM | 10,548 |
+| 6 Av local | FX | 3,113 | 4,091 | 5:00 PM | 1,887 |
+| 63 St | F | 156,718 | 200,552 | 5:00 PM | 14,517 |
+| 63 St | FL | 155,788 | 199,351 | 5:00 PM | 14,162 |
+| 63 St | Q | 102,755 | 134,776 | 8:00 AM | 10,074 |
+| 63 St | M | 18,616 | 24,087 | 5:00 PM | 1,763 |
+| 63 St | N | 4,220 | 5,501 | 4:00 PM | 1,583 |
+| 63 St | FX | 956 | 1,239 | 8:00 AM | 361 |
+| 63 St | R | 470 | 612 | 7:00 AM | 470 |
+| 8 Av | A | 357,444 | 490,543 | 5:00 PM | 37,858 |
+| 8 Av | E | 195,739 | 255,875 | 5:00 PM | 20,843 |
+| 8 Av | C | 189,321 | 244,314 | 6:00 PM | 15,472 |
+| 8 Av | D | 84,811 | 126,952 | 4:00 PM | 6,301 |
+| 8 Av | B | 74,357 | 96,261 | 5:00 PM | 8,967 |
+| 8 Av express | A | 283,961 | 385,275 | 5:00 PM | 30,722 |
+| 8 Av express | D | 84,811 | 126,952 | 4:00 PM | 6,301 |
+| 8 Av local | E | 194,775 | 254,356 | 5:00 PM | 20,723 |
+| 8 Av local | C | 159,324 | 203,363 | 6:00 PM | 13,320 |
+| 8 Av local | B | 74,357 | 96,261 | 5:00 PM | 8,967 |
+| 8 Av local | A | 22,159 | 29,099 | 11:00 PM | 10,408 |
+| Astoria | N | 54,399 | 63,309 | 5:00 PM | 5,570 |
+| Astoria | W | 46,624 | 54,912 | 8:00 AM | 5,409 |
+| Brighton | Q | 148,678 | 195,988 | 8:00 AM | 13,034 |
+| Brighton | B | 86,416 | 118,134 | 8:00 AM | 9,121 |
+| Brighton express | B | 66,533 | 92,532 | 8:00 AM | 7,131 |
+| Brighton local | Q | 108,026 | 143,085 | 8:00 AM | 9,747 |
+| Broadway | R | 231,003 | 312,652 | 5:00 PM | 24,368 |
+| Broadway | Q | 208,757 | 276,931 | 5:00 PM | 20,581 |
+| Broadway | N | 190,228 | 236,515 | 5:00 PM | 18,136 |
+| Broadway | W | 137,839 | 180,721 | 5:00 PM | 13,988 |
+| Broadway express | Q | 203,414 | 269,885 | 5:00 PM | 20,581 |
+| Broadway express | N | 98,548 | 121,727 | 4:00 PM | 11,747 |
+| Broadway local | R | 148,670 | 203,738 | 5:00 PM | 15,757 |
+| Broadway local | N | 115,517 | 142,489 | 5:00 PM | 10,547 |
+| Broadway local | W | 113,249 | 150,773 | 5:00 PM | 11,255 |
+| Broadway local | Q | 11,297 | 14,651 | 12:00 AM | 4,189 |
+| Broadway-7 Av | 1 | 514,785 | 682,754 | 5:00 PM | 51,321 |
+| Broadway-7 Av | 2 | 235,980 | 325,882 | 5:00 PM | 23,150 |
+| Broadway-7 Av | 3 | 178,916 | 246,907 | 5:00 PM | 18,946 |
+| Broadway-7 Av express | 2 | 208,388 | 287,942 | 5:00 PM | 20,738 |
+| Broadway-7 Av express | 3 | 158,049 | 217,589 | 5:00 PM | 16,486 |
+| Broadway-7 Av local | 1 | 386,381 | 512,316 | 5:00 PM | 37,547 |
+| Broadway-7 Av local | 2 | 6,822 | 9,393 | 1:00 AM | 2,044 |
+| Canarsie | L | 370,379 | 417,108 | 5:00 PM | 34,864 |
+| Concourse | D | 79,616 | 127,613 | 3:00 PM | 6,192 |
+| Concourse | B | 34,959 | 53,627 | 5:00 PM | 5,038 |
+| Concourse express | D | 14,547 | 24,448 | 7:00 AM | 3,193 |
+| Concourse express | B | 46 | 86 | 9:00 AM | 46 |
+| Concourse local | D | 72,341 | 115,313 | 3:00 PM | 6,175 |
+| Concourse local | B | 34,957 | 53,623 | 5:00 PM | 5,038 |
+| Crosstown | G | 133,593 | 154,895 | 5:00 PM | 12,356 |
+| Culver | F | 115,623 | 149,242 | 8:00 AM | 11,869 |
+| Culver | FL | 113,207 | 146,005 | 8:00 AM | 11,869 |
+| Culver | G | 45,020 | 53,090 | 5:00 PM | 3,963 |
+| Culver | FX | 2,628 | 3,518 | 7:00 AM | 1,569 |
+| Culver express | F | 2,382 | 3,195 | 7:00 AM | 1,383 |
+| Culver express | FX | 2,382 | 3,195 | 7:00 AM | 1,383 |
+| Culver local | F | 111,963 | 144,493 | 8:00 AM | 11,612 |
+| Culver local | FL | 110,427 | 142,410 | 8:00 AM | 11,612 |
+| Culver local | G | 36,933 | 43,690 | 8:00 AM | 3,294 |
+| Culver local | FX | 1,550 | 2,102 | 7:00 AM | 974 |
+| Dyre Av | 5 | 25,099 | 37,996 | 7:00 AM | 2,769 |
+| Eastern Pkwy | 3 | 94,643 | 130,179 | 8:00 AM | 9,214 |
+| Eastern Pkwy | 2 | 85,955 | 112,177 | 8:00 AM | 8,736 |
+| Eastern Pkwy | 4 | 79,981 | 108,897 | 7:00 AM | 6,869 |
+| Eastern Pkwy | 5 | 75,089 | 99,106 | 8:00 AM | 7,743 |
+| Eastern Pkwy express | 4 | 76,570 | 104,259 | 7:00 AM | 6,841 |
+| Eastern Pkwy express | 5 | 70,271 | 92,815 | 8:00 AM | 7,528 |
+| Eastern Pkwy local | 3 | 70,897 | 96,978 | 5:00 PM | 6,827 |
+| Eastern Pkwy local | 2 | 64,925 | 84,174 | 8:00 AM | 5,988 |
+| Eastern Pkwy local | 4 | 8,076 | 11,094 | 5:00 AM | 1,914 |
+| Eastern Pkwy local | 5 | 163 | 230 | 5:00 AM | 149 |
+| Far Rockaway branch | A | 16,535 | 34,093 | 7:00 AM | 1,570 |
+| Flushing | 7 | 486,930 | 559,421 | 5:00 PM | 53,041 |
+| Flushing | 7L | 397,985 | 457,573 | 5:00 PM | 36,048 |
+| Flushing | 7X | 91,611 | 105,010 | 5:00 PM | 16,993 |
+| Flushing express | 7 | 35,035 | 40,248 | 5:00 PM | 5,833 |
+| Flushing express | 7X | 35,035 | 40,248 | 5:00 PM | 5,833 |
+| Flushing local | 7 | 220,297 | 245,609 | 4:00 PM | 16,253 |
+| Flushing local | 7L | 220,297 | 245,609 | 4:00 PM | 16,253 |
+| Franklin Av Shuttle | FS | 13,901 | 18,531 | 8:00 AM | 1,245 |
+| Fulton St | A | 173,180 | 243,154 | 5:00 PM | 16,119 |
+| Fulton St | C | 88,970 | 116,354 | 5:00 PM | 8,088 |
+| Fulton St express | A | 137,042 | 194,797 | 5:00 PM | 13,692 |
+| Fulton St local | C | 77,697 | 102,458 | 5:00 PM | 7,016 |
+| Fulton St local | A | 14,311 | 19,816 | 11:00 PM | 3,807 |
+| Hillside Av | F | 55,484 | 77,105 | 5:00 PM | 4,806 |
+| Hillside Av | FL | 55,115 | 76,609 | 5:00 PM | 4,737 |
+| Hillside Av | E | 2,363 | 3,393 | 7:00 AM | 931 |
+| Hillside Av | FX | 369 | 496 | 8:00 AM | 156 |
+| Hillside Av express | E | 2,204 | 3,171 | 7:00 AM | 931 |
+| Hillside Av local | F | 55,484 | 77,105 | 5:00 PM | 4,806 |
+| Hillside Av local | FL | 55,115 | 76,609 | 5:00 PM | 4,737 |
+| Hillside Av local | FX | 369 | 496 | 8:00 AM | 156 |
+| Hillside Av local | E | 160 | 222 | 8:00 PM | 160 |
+| Jamaica | J | 131,313 | 177,822 | 4:00 PM | 10,508 |
+| Jamaica | M | 57,605 | 77,002 | 8:00 AM | 5,818 |
+| Jamaica | Z | 8,860 | 12,006 | 5:00 PM | 3,340 |
+| Jamaica express | J | 23,427 | 32,145 | 9:00 AM | 3,036 |
+| Jamaica express | Z | 4,038 | 5,533 | 8:00 AM | 1,864 |
+| Jamaica local | J | 67,330 | 91,384 | 4:00 PM | 5,193 |
+| Jamaica local | M | 50,427 | 66,890 | 8:00 AM | 5,125 |
+| Jamaica local | Z | 4,309 | 5,921 | 8:00 AM | 1,553 |
+| Jerome Av | 4 | 156,404 | 222,698 | 4:00 PM | 12,837 |
+| Lefferts branch | A | 16,087 | 24,484 | 7:00 AM | 1,670 |
+| Lenox Av | 2 | 96,414 | 141,941 | 8:00 AM | 8,322 |
+| Lenox Av | 3 | 32,607 | 48,036 | 8:00 AM | 2,951 |
+| Lexington Av | 6 | 487,349 | 637,565 | 5:00 PM | 46,649 |
+| Lexington Av | 6L | 367,276 | 478,213 | 5:00 PM | 32,060 |
+| Lexington Av | 4 | 332,133 | 453,882 | 5:00 PM | 30,402 |
+| Lexington Av | 5 | 244,996 | 334,522 | 8:00 AM | 26,354 |
+| Lexington Av | 6X | 120,820 | 160,317 | 5:00 PM | 14,589 |
+| Lexington Av express | 4 | 274,018 | 369,321 | 5:00 PM | 25,062 |
+| Lexington Av express | 5 | 210,139 | 283,216 | 8:00 AM | 22,562 |
+| Lexington Av local | 6 | 487,349 | 637,565 | 5:00 PM | 46,649 |
+| Lexington Av local | 6L | 367,276 | 478,213 | 5:00 PM | 32,060 |
+| Lexington Av local | 6X | 120,820 | 160,317 | 5:00 PM | 14,589 |
+| Lexington Av local | 4 | 6,931 | 9,254 | 5:00 AM | 1,441 |
+| Lower Culver | F | 39,759 | 54,063 | 7:00 AM | 4,134 |
+| Lower Culver | FL | 38,163 | 51,902 | 8:00 AM | 3,952 |
+| Lower Culver | FX | 1,596 | 2,161 | 7:00 AM | 1,003 |
+| Lower Culver local | F | 36,934 | 50,409 | 7:00 AM | 3,873 |
+| Lower Culver local | FL | 35,384 | 48,307 | 8:00 AM | 3,694 |
+| Lower Culver local | FX | 1,550 | 2,102 | 7:00 AM | 974 |
+| Manhattan Bridge | Q | 99,211 | 129,997 | 8:00 AM | 10,082 |
+| Manhattan Bridge | N | 66,787 | 78,856 | 5:00 PM | 6,938 |
+| Manhattan Bridge | D | 62,413 | 79,909 | 5:00 PM | 5,601 |
+| Manhattan Bridge | B | 57,911 | 76,977 | 5:00 PM | 6,403 |
+| Myrtle Av | M | 48,614 | 61,128 | 8:00 AM | 4,278 |
+| Nassau St | J | 58,287 | 81,015 | 4:00 PM | 4,519 |
+| Nassau St | Z | 4,542 | 6,407 | 8:00 AM | 2,453 |
+| Nostrand Av | 5 | 43,622 | 56,291 | 7:00 AM | 4,717 |
+| Nostrand Av | 2 | 40,018 | 51,565 | 8:00 AM | 3,467 |
+| Pelham | 6 | 126,272 | 183,651 | 7:00 AM | 13,401 |
+| Pelham | 6L | 90,200 | 129,156 | 7:00 AM | 7,388 |
+| Pelham | 6X | 40,727 | 61,114 | 7:00 AM | 6,013 |
+| Pelham express | 6 | 36,198 | 54,405 | 7:00 AM | 5,307 |
+| Pelham express | 6X | 36,151 | 54,329 | 7:00 AM | 5,307 |
+| Pelham express | 6L | 47 | 76 | 9:00 PM | 36 |
+| Pelham local | 6 | 80,733 | 115,755 | 7:00 AM | 6,540 |
+| Pelham local | 6L | 80,733 | 115,755 | 7:00 AM | 6,540 |
+| Queens Blvd | E | 232,694 | 288,803 | 5:00 PM | 21,411 |
+| Queens Blvd | F | 187,034 | 241,499 | 5:00 PM | 16,874 |
+| Queens Blvd | FL | 186,014 | 240,190 | 5:00 PM | 16,611 |
+| Queens Blvd | M | 83,916 | 112,149 | 8:00 AM | 8,016 |
+| Queens Blvd | R | 83,442 | 111,756 | 5:00 PM | 8,704 |
+| Queens Blvd | FX | 1,019 | 1,309 | 8:00 AM | 428 |
+| Queens Blvd east | E | 106,241 | 134,591 | 7:00 AM | 9,343 |
+| Queens Blvd east | F | 81,744 | 112,837 | 8:00 AM | 7,540 |
+| Queens Blvd east | FL | 81,180 | 112,079 | 8:00 AM | 7,295 |
+| Queens Blvd east | FX | 564 | 757 | 8:00 AM | 245 |
+| Queens Blvd express | E | 206,171 | 255,263 | 5:00 PM | 20,757 |
+| Queens Blvd express | F | 95,623 | 127,427 | 5:00 PM | 9,208 |
+| Queens Blvd express | FL | 95,023 | 126,650 | 5:00 PM | 9,024 |
+| Queens Blvd express | FX | 600 | 777 | 8:00 AM | 260 |
+| Queens Blvd local | F | 94,125 | 128,640 | 8:00 AM | 7,762 |
+| Queens Blvd local | FL | 93,540 | 127,854 | 8:00 AM | 7,504 |
+| Queens Blvd local | M | 83,450 | 111,452 | 8:00 AM | 7,955 |
+| Queens Blvd local | R | 83,442 | 111,756 | 5:00 PM | 8,704 |
+| Queens Blvd local | E | 32,885 | 41,084 | 10:00 PM | 4,767 |
+| Queens Blvd local | FX | 585 | 786 | 8:00 AM | 257 |
+| Queens Blvd west | E | 211,597 | 261,361 | 5:00 PM | 19,724 |
+| Queens Blvd west | F | 110,230 | 146,268 | 5:00 PM | 9,208 |
+| Queens Blvd west | FL | 109,631 | 145,491 | 5:00 PM | 9,024 |
+| Queens Blvd west | M | 83,450 | 111,452 | 8:00 AM | 7,955 |
+| Queens Blvd west | R | 83,442 | 111,756 | 5:00 PM | 8,704 |
+| Queens Blvd west | FX | 600 | 777 | 8:00 AM | 260 |
+| Queens Blvd west express | E | 196,662 | 242,778 | 5:00 PM | 19,724 |
+| Queens Blvd west express | F | 95,623 | 127,427 | 5:00 PM | 9,208 |
+| Queens Blvd west express | FL | 95,023 | 126,650 | 5:00 PM | 9,024 |
+| Queens Blvd west express | FX | 600 | 777 | 8:00 AM | 260 |
+| Queens Blvd west local | M | 83,450 | 111,452 | 8:00 AM | 7,955 |
+| Queens Blvd west local | R | 83,442 | 111,756 | 5:00 PM | 8,704 |
+| Queens Blvd west local | E | 15,017 | 18,696 | 10:00 PM | 3,813 |
+| Queens Blvd west local | F | 14,627 | 18,868 | 10:00 PM | 4,388 |
+| Queens Blvd west local | FL | 14,627 | 18,868 | 10:00 PM | 4,388 |
+| Rockaway | A | 27,390 | 48,997 | 7:00 AM | 2,434 |
+| Rockaway | H | 2,776 | 5,429 | 4:00 PM | 242 |
+| Rockaway Park branch | H | 2,776 | 5,429 | 4:00 PM | 242 |
+| Rockaway Park branch | A | 426 | 836 | 7:00 AM | 150 |
+| SAS Phase 1 | Q | 143,330 | 186,472 | 5:00 PM | 14,269 |
+| SAS Phase 1 | N | 5,755 | 7,477 | 4:00 PM | 2,859 |
+| SAS Phase 1 | R | 798 | 1,023 | 7:00 AM | 798 |
+| Sea Beach | N | 78,562 | 86,338 | 5:00 PM | 7,330 |
+| Sea Beach | W | 526 | 568 | 7:00 AM | 300 |
+| Upper Culver | F | 105,175 | 135,089 | 8:00 AM | 10,945 |
+| Upper Culver | FL | 103,003 | 132,172 | 8:00 AM | 10,945 |
+| Upper Culver | G | 36,933 | 43,690 | 8:00 AM | 3,294 |
+| Upper Culver | FX | 2,382 | 3,195 | 7:00 AM | 1,383 |
+| Upper Culver express | F | 2,382 | 3,195 | 7:00 AM | 1,383 |
+| Upper Culver express | FX | 2,382 | 3,195 | 7:00 AM | 1,383 |
+| Upper Culver local | F | 103,003 | 132,172 | 8:00 AM | 10,945 |
+| Upper Culver local | FL | 103,003 | 132,172 | 8:00 AM | 10,945 |
+| Upper Culver local | G | 36,933 | 43,690 | 8:00 AM | 3,294 |
+| West End | D | 81,889 | 106,995 | 7:00 AM | 7,858 |
+| West End | W | 68 | 87 | 10:00 AM | 42 |
+| West End | R | 29 | 36 | 9:00 AM | 29 |
+| White Plains Rd | 2 | 99,027 | 151,514 | 7:00 AM | 8,819 |
+| White Plains Rd | 5 | 77,900 | 113,227 | 7:00 AM | 8,945 |
+| White Plains Rd express | 5 | 20,564 | 30,561 | 7:00 AM | 4,597 |
+| White Plains Rd local | 2 | 74,666 | 112,952 | 7:00 AM | 6,414 |
+| White Plains Rd local | 5 | 32,994 | 47,072 | 3:00 PM | 4,532 |
 
 </details>
 

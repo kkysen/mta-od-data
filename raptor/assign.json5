@@ -21,13 +21,14 @@
   // Where transfer times come from, where `pathways.txt` doesn't have them:
   // a feed's pathways always come first, their quickest walks between the stops they reach,
   // free across one platform.
-  // Elsewhere, "gtfs", `transfers.txt` at its word,
-  // or "osm", by OSM's platforms: changing trains on one platform is free,
+  // Elsewhere, "osm", by OSM's platforms: changing trains on one platform is free,
   // changing to another of a station's platforms takes `up_and_over_secs`
   // (`platforms.csv`),
   // and a complex's stops without a `transfers.txt` footpath are
-  // 60s plus their straight-line distance at 1.2 m/s apart.
-  transfers: "gtfs",
+  // 60s plus their straight-line distance at 1.2 m/s apart;
+  // or "gtfs", `transfers.txt` at its word,
+  // whose flat 180s to change trains even across a platform is the less real.
+  transfers: "osm",
   // Under "osm", up the stairs, over, and down to another platform,
   // or down, under, and up.
   up_and_over_secs: 90,
