@@ -90,19 +90,20 @@ pub fn street_transfers_out(out: &Path, date: Date) -> PathBuf {
     out.with_file_name(format!("street-transfers-{date}.csv"))
 }
 
-/// Writes `transfers`, `(from, to, walk)`, to `path` as CSV, by GTFS stop ID, once each.
+/// Writes `transfers`, `(from, to, walk)`, to `path` as CSV, once each,
+/// by station, as path texts name walks' ends.
 fn write_street_transfers(
     path: &Path,
     tt: &Timetable,
     transfers: &[(StopIdx, StopIdx, Secs)],
 ) -> Result<()> {
-    let id = |s: StopIdx| tt.stops[s as usize].id.as_str();
+    let id = |s: StopIdx| tt.stops[s as usize].station.as_str();
     let mut rows: Vec<(&str, &str, Secs)> = transfers
         .iter()
         .map(|&(a, b, walk)| (id(a), id(b), walk))
         .collect();
     rows.sort_unstable();
-    // A GTFS stop split by platform walks as one.
+    // A station's stops walk as one: each direction's, and those split by platform.
     rows.dedup_by_key(|&mut (a, b, _)| (a, b));
     let mut out =
         csv::Writer::from_path(path).with_context(|| format!("writing {}", path.display()))?;
