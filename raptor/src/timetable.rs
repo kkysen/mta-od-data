@@ -81,6 +81,10 @@ pub struct Timetable {
     /// Whether each stop has a footpath of `footpath_hours`, to look it up only then;
     /// stops past its end have none.
     pub has_hours: Vec<bool>,
+    /// Footpaths only for changing trains, not walked from an origin before the first:
+    /// a rider entering at one station doesn't walk out to another to start
+    /// (`use_street_transfers`).
+    pub changes_only: HashSet<(StopIdx, StopIdx)>,
     pub report: Report,
 }
 
@@ -140,6 +144,7 @@ impl Timetable {
             && self.footpaths == other.footpaths
             && self.exits == other.exits
             && self.footpath_hours == other.footpath_hours
+            && self.changes_only == other.changes_only
             && self.patterns.len() == other.patterns.len()
             && self
                 .patterns
@@ -397,6 +402,7 @@ impl Timetable {
             exits: HashMap::new(),
             footpath_hours: HashMap::new(),
             has_hours: Vec::new(),
+            changes_only: HashSet::new(),
             report,
         })
     }

@@ -410,7 +410,8 @@ impl Walks {
 impl Timetable {
     /// `transfers`, `(from, to, walk)`, as footpaths,
     /// but those between stops it has a footpath between already,
-    /// like `transfers.txt`'s free ones out of the system, or a passage inside it.
+    /// like `transfers.txt`'s free ones out of the system, or a passage inside it,
+    /// each only for changing trains (`changes_only`).
     /// Those it adds.
     pub fn use_street_transfers(
         &mut self,
@@ -423,6 +424,7 @@ impl Timetable {
                 continue;
             }
             paths.push((to, walk));
+            self.changes_only.insert((from, to));
             added.push((from, to, walk));
         }
         added

@@ -275,6 +275,10 @@ each entrance takes its time to the platforms (`data/station_access.csv`),
 and the streets are walked at 3 mph between stations within 15 minutes of each other,
 to the closest stop on each pattern, as R5 keeps them.
 Stops a footpath joins already keep it, like `transfers.txt`'s free ones or a passage.
+They're only for changing trains:
+a rider entering at one station doesn't walk out to another to board the first train,
+as RAPTOR walks them only after a ride,
+and a journey ends leaving a train at its destination, never walking there.
 
 Everything below is the plan for making it accurate later.
 

@@ -263,11 +263,9 @@ impl<'a> Router<'a> {
         for &o in origins {
             // Not to another origin, already a start without the walk:
             // its departures less the walk would be runs finding nothing new.
-            starts.extend(
-                self.tt.footpaths[o as usize]
-                    .iter()
-                    .filter(|(s, _)| !origins.contains(s)),
-            );
+            starts.extend(self.tt.footpaths[o as usize].iter().filter(|&&(s, _)| {
+                !origins.contains(&s) && !self.tt.changes_only.contains(&(o, s))
+            }));
         }
         let mut times = Vec::new();
         for (s, walk) in starts {
@@ -337,7 +335,8 @@ impl Labels<'_> {
         }
         for &o in origins {
             for &(to, walk) in &tt.footpaths[o as usize] {
-                if tt.walk_open(o, to, depart)
+                if !tt.changes_only.contains(&(o, to))
+                    && tt.walk_open(o, to, depart)
                     && self.lower_ready(0, to, depart + walk, Ready::Walk { from: o })
                 {
                     marked.push(to);
@@ -941,6 +940,26 @@ mod tests {
         assert_eq!(summary(&tt, legs.of(&js[0])), ["walk E-B", "r2a B-D"]);
         let (_, js) = router.query(&[e], t("08:06:00")).journeys(&[d]);
         assert!(js.is_empty());
+    }
+
+    #[test]
+    fn changes_only_footpaths_are_not_walked_from_origins() {
+        let trips = "route_id,trip_id,service_id\n2,r2a,W\n";
+        let stop_times = "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+            r2a,B,08:11:00,08:11:00,1\nr2a,D,08:20:00,08:20:00,2\n";
+        let transfers =
+            "from_stop_id,to_stop_id,transfer_type,min_transfer_time\nE,B,2,120\nB,E,2,120\n";
+        let mut tt = timetable(trips, stop_times, transfers);
+        let (e, b, d) = (stop(&tt, "E"), stop(&tt, "B"), stop(&tt, "D"));
+        tt.changes_only.insert((e, b));
+        let router = Router::new(&tt);
+        let (_, js) = router.query(&[e], t("08:00:00")).journeys(&[d]);
+        assert!(js.is_empty());
+        assert!(
+            router
+                .departures(&[e], t("08:00:00"), t("09:00:00"))
+                .is_empty()
+        );
     }
 
     #[test]
