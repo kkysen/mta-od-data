@@ -16,6 +16,9 @@ use streets::{Graph, Mm, Search, Split};
 use crate::gtfs::Secs;
 use crate::timetable::{StopIdx, Timetable};
 
+/// Walking on the streets at 3 mph, as R5 does, in millimeters a second.
+pub const WALKING_SPEED_MM_PER_S: Mm = 1341;
+
 /// How far apart stations may be to change between them on the streets:
 /// about the 1000 m R5 walked between stops, as a time, entrances included.
 const TRANSFER_LIMIT: Secs = 15 * 60;
@@ -246,6 +249,34 @@ impl StreetWalks {
     }
 }
 
+#[derive(serde::Deserialize)]
+struct AccessRow {
+    station: String,
+    complex: String,
+    lat: f64,
+    lon: f64,
+    secs: Secs,
+}
+
+/// Each station's entrances in `mta-od-data fetch-station-access`'s `station_access.csv`,
+/// in the order it first lists them.
+pub fn load_stations(path: &std::path::Path) -> anyhow::Result<Vec<Station>> {
+    use anyhow::Context;
+    let mut reader =
+        csv::Reader::from_path(path).with_context(|| format!("opening {}", path.display()))?;
+    let mut stations: Vec<Station> = Vec::new();
+    let mut index: HashMap<String, usize> = HashMap::default();
+    for row in reader.deserialize() {
+        let row: AccessRow = row?;
+        let i = *index.entry(row.station.clone()).or_insert_with(|| {
+            stations.push((row.station.clone(), row.complex.clone(), Vec::new()));
+            stations.len() - 1
+        });
+        stations[i].2.push((row.lat, row.lon, row.secs));
+    }
+    Ok(stations)
+}
+
 /// Reads what `StreetWalks::write` writes, from the start of `bytes`.
 struct Reader<'a> {
     bytes: &'a [u8],
@@ -373,6 +404,28 @@ impl Walks {
             walks.access.insert(origin.clone(), access);
         }
         walks
+    }
+}
+
+impl Timetable {
+    /// `transfers`, `(from, to, walk)`, as footpaths,
+    /// but those between stops it has a footpath between already,
+    /// like `transfers.txt`'s free ones out of the system, or a passage inside it.
+    /// Those it adds.
+    pub fn use_street_transfers(
+        &mut self,
+        transfers: &[(StopIdx, StopIdx, Secs)],
+    ) -> Vec<(StopIdx, StopIdx, Secs)> {
+        let mut added = Vec::new();
+        for &(from, to, walk) in transfers {
+            let paths = &mut self.footpaths[from as usize];
+            if from == to || paths.iter().any(|&(s, _)| s == to) {
+                continue;
+            }
+            paths.push((to, walk));
+            added.push((from, to, walk));
+        }
+        added
     }
 }
 

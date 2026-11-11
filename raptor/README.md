@@ -36,6 +36,12 @@ The rest are for inspecting a step of it, one date or one pair of stops at a tim
 - `od`: load the OD rows for a date's service day, 04:00 to 04:00,
   and map their station complexes to the date's timetable.
 - `assign`: split a single date's OD rows across their journeys, and write the paths taken.
+- `street-walks`: walk the streets between stations, out one entrance and in another,
+  by each entrance's time to the platforms (`mta-od-data fetch-station-access`),
+  to `data/street_walks.bin`,
+  for `assign` and `assign-range` with `--street-walks`
+  to change trains between complexes on the streets too, with no fare,
+  writing the transfers that adds beside each date's paths (`street-transfers-<date>.csv`).
 
 ## What `assign-range` writes, in `data/raptor/`
 

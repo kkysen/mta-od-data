@@ -35,7 +35,8 @@ use crate::od::{Complexes, load_service_day, load_service_days};
 use crate::platforms::Platforms;
 use crate::raptor::Router;
 use crate::report::Timings;
-use crate::timetable::Timetable;
+use crate::timetable::{StopIdx, Timetable};
+use crate::walks::{StreetWalks, Walks};
 
 /// Assigning a date allocates path text, journeys, and intervals on every core:
 /// glibc's `malloc` and `free` took ~26% of a date's samples.
@@ -64,6 +65,55 @@ pub struct AssignSummary {
     pub report: String,
 }
 
+/// Walks the streets between `access`'s stations' entrances (`walks::load_stations`)
+/// on `osm`'s, an `.osm.pbf`, and writes them to `out` (`StreetWalks::write`),
+/// for `assign_dates` to change trains between complexes on.
+/// What it walked, to print.
+pub fn street_walks(osm: &Path, access: &Path, out: &Path) -> Result<String> {
+    let start = Instant::now();
+    let stations = walks::load_stations(access)?;
+    let osm = streets::osm::Osm::read(osm)?;
+    let graph = streets::Graph::build(&osm);
+    drop(osm);
+    let all = StreetWalks::compute(&graph, &stations, &[], walks::WALKING_SPEED_MM_PER_S, 0);
+    all.write(out)?;
+    Ok(format!(
+        "walked {} walks between complexes of {} stations in {:.1?}\n",
+        all.transfers().len(),
+        stations.len(),
+        start.elapsed()
+    ))
+}
+
+/// Where a date's transfers on the streets go: beside its paths, `out`.
+pub fn street_transfers_out(out: &Path, date: Date) -> PathBuf {
+    out.with_file_name(format!("street-transfers-{date}.csv"))
+}
+
+/// Writes `transfers`, `(from, to, walk)`, to `path` as CSV, by GTFS stop ID, once each.
+fn write_street_transfers(
+    path: &Path,
+    tt: &Timetable,
+    transfers: &[(StopIdx, StopIdx, Secs)],
+) -> Result<()> {
+    let id = |s: StopIdx| tt.stops[s as usize].id.as_str();
+    let mut rows: Vec<(&str, &str, Secs)> = transfers
+        .iter()
+        .map(|&(a, b, walk)| (id(a), id(b), walk))
+        .collect();
+    rows.sort_unstable();
+    // A GTFS stop split by platform walks as one.
+    rows.dedup_by_key(|&mut (a, b, _)| (a, b));
+    let mut out =
+        csv::Writer::from_path(path).with_context(|| format!("writing {}", path.display()))?;
+    out.write_record(["from_stop_id", "to_stop_id", "walk"])?;
+    for (a, b, walk) in rows {
+        out.write_record([a, b, &walk.to_string()])?;
+    }
+    out.flush()?;
+    Ok(())
+}
+
 /// One date to assign, on its feed version, writing its paths to `out`.
 /// Their texts go beside the first `out` of the dates routed alike.
 pub struct Job<'a> {
@@ -73,7 +123,8 @@ pub struct Job<'a> {
 }
 
 /// Assigns `date`'s OD rows on `version`'s timetable for it,
-/// with the config at `config`, and writes the paths to `out`, zstd at `zstd_level`.
+/// with the config at `config`, and writes the paths to `out`, zstd at `zstd_level`,
+/// changing trains between complexes on the streets too with `street_walks`.
 #[allow(clippy::too_many_arguments)]
 pub fn assign_date(
     version: &Version,
@@ -82,6 +133,7 @@ pub fn assign_date(
     stations: &Path,
     platforms: &Path,
     config: &Path,
+    street_walks: Option<&Path>,
     out: &Path,
     zstd_level: i32,
 ) -> Result<AssignSummary> {
@@ -90,7 +142,15 @@ pub fn assign_date(
         date,
         out: out.to_owned(),
     };
-    let mut summaries = assign_dates(&[job], od, stations, platforms, config, zstd_level)?;
+    let mut summaries = assign_dates(
+        &[job],
+        od,
+        stations,
+        platforms,
+        config,
+        street_walks,
+        zstd_level,
+    )?;
     Ok(summaries.pop().expect("one summary per job"))
 }
 
@@ -114,6 +174,10 @@ fn trip_ids(tt: &Timetable) -> Vec<Vec<String>> {
 /// Assigns each job's date as `assign_date` does,
 /// but routes each distinct timetable once, for every date with it:
 /// a feed version's Mondays to Thursdays mostly share one.
+/// With `street_walks` (`street_walks`'), trains change between complexes on the streets too,
+/// out of the system and back in with no fare,
+/// and each date's transfers that adds are written beside its paths
+/// (`street_transfers_out`).
 /// Summaries are in `jobs`' order.
 pub fn assign_dates(
     jobs: &[Job],
@@ -121,6 +185,7 @@ pub fn assign_dates(
     stations: &Path,
     platforms: &Path,
     config: &Path,
+    street_walks: Option<&Path>,
     zstd_level: i32,
 ) -> Result<Vec<AssignSummary>> {
     // Writes `dhat-heap.json` to the working directory when dropped.
@@ -134,6 +199,7 @@ pub fn assign_dates(
     };
 
     let passages = passages::load()?;
+    let street_walks = street_walks.map(StreetWalks::read).transpose()?;
     let start = Instant::now();
     let timetables: Vec<(Timetable, Complexes)> = jobs
         .par_iter()
@@ -160,6 +226,12 @@ pub fn assign_dates(
                 tt.use_pathways(&walks, &report.covered);
             }
             tt.use_passages(&passages, &complexes, config.stacked_secs_per_level);
+            // Last, so as not to replace any walk there is.
+            if let Some(all) = &street_walks {
+                let walks = Walks::for_feed(all, &[&tt], &[]);
+                let added = tt.use_street_transfers(&walks.transfers);
+                write_street_transfers(&street_transfers_out(&job.out, job.date), &tt, &added)?;
+            }
             Ok((tt, complexes))
         })
         .collect::<Result<_>>()?;
@@ -423,6 +495,9 @@ fn py_pick_weekdays<'py>(
 
 /// `assign_date`, without holding the GIL.
 #[pyfunction(name = "assign_date")]
+#[pyo3(signature = (
+    version, date, od, stations, platforms, config, out, zstd_level, street_walks = None,
+))]
 #[allow(clippy::too_many_arguments)]
 fn py_assign_date(
     py: Python<'_>,
@@ -434,17 +509,28 @@ fn py_assign_date(
     config: PathBuf,
     out: PathBuf,
     zstd_level: i32,
+    street_walks: Option<PathBuf>,
 ) -> Result<AssignSummary> {
     let version = version.get();
     py.detach(|| {
         assign_date(
-            version, date, &od, &stations, &platforms, &config, &out, zstd_level,
+            version,
+            date,
+            &od,
+            &stations,
+            &platforms,
+            &config,
+            street_walks.as_deref(),
+            &out,
+            zstd_level,
         )
     })
 }
 
 /// `assign_dates` on `(version, date, out)` jobs, without holding the GIL.
 #[pyfunction(name = "assign_dates")]
+#[pyo3(signature = (jobs, od, stations, platforms, config, zstd_level, street_walks = None))]
+#[allow(clippy::too_many_arguments)]
 fn py_assign_dates(
     py: Python<'_>,
     jobs: Vec<(Bound<'_, Version>, Date, PathBuf)>,
@@ -453,6 +539,7 @@ fn py_assign_dates(
     platforms: PathBuf,
     config: PathBuf,
     zstd_level: i32,
+    street_walks: Option<PathBuf>,
 ) -> Result<Vec<AssignSummary>> {
     let jobs: Vec<Job> = jobs
         .iter()
@@ -462,7 +549,23 @@ fn py_assign_dates(
             out: out.clone(),
         })
         .collect();
-    py.detach(|| assign_dates(&jobs, &od, &stations, &platforms, &config, zstd_level))
+    py.detach(|| {
+        assign_dates(
+            &jobs,
+            &od,
+            &stations,
+            &platforms,
+            &config,
+            street_walks.as_deref(),
+            zstd_level,
+        )
+    })
+}
+
+/// `street_walks`, without holding the GIL.
+#[pyfunction(name = "street_walks")]
+fn py_street_walks(py: Python<'_>, osm: PathBuf, access: PathBuf, out: PathBuf) -> Result<String> {
+    py.detach(|| street_walks(&osm, &access, &out))
 }
 
 /// A summary of the feed zip at `feed`.
@@ -562,6 +665,7 @@ fn raptor_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(py_pick_weekdays, m)?)?;
     m.add_function(wrap_pyfunction!(py_assign_date, m)?)?;
     m.add_function(wrap_pyfunction!(py_assign_dates, m)?)?;
+    m.add_function(wrap_pyfunction!(py_street_walks, m)?)?;
     m.add_function(wrap_pyfunction!(feed_report, m)?)?;
     m.add_function(wrap_pyfunction!(timetable_report, m)?)?;
     m.add_function(wrap_pyfunction!(route_report, m)?)?;

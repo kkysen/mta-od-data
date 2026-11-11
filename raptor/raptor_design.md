@@ -269,6 +269,13 @@ RAPTOR walks such a footpath only when it starts while open,
 looked up only from stops that have one.
 `ridership` takes the same passages' complexes as one virtual complex.
 
+With `--street-walks`, trains change between complexes on the streets too,
+out through one entrance and in through another, with no fare (`walks.rs`, from `subway-sheds`):
+each entrance takes its time to the platforms (`data/station_access.csv`),
+and the streets are walked at 3 mph between stations within 15 minutes of each other,
+to the closest stop on each pattern, as R5 keeps them.
+Stops a footpath joins already keep it, like `transfers.txt`'s free ones or a passage.
+
 Everything below is the plan for making it accurate later.
 
 GTFS `transfers.txt` is not good enough on its own.
