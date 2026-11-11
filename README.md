@@ -143,6 +143,22 @@ uv run mta-od-data fetch-platforms
 
 Details: [`raptor/README.md`](raptor/README.md).
 
+## `access`
+
+Times each station entrance between the street and the platforms,
+for changing trains between complexes on the streets,
+writing the checked-in [`station_access.csv`](data/station_access.csv) to review:
+the climb from the MTA's [entrances](https://data.ny.gov/d/i9wp-a4ja)
+and the heights of its [elevators and escalators](https://data.ny.gov/d/94fv-bak7),
+depths published elsewhere where those are blank,
+and the levels OSM puts platforms on.
+
+```sh
+uv run mta-od-data access
+```
+
+Details: [`access.py`](src/mta_od_data/access.py).
+
 ## `fetch-mbta`
 
 Fetches a pinned MBTA GTFS version to `data/mbta-gtfs/` (~22MB; it has `pathways.txt`, unlike MTA's)

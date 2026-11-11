@@ -1,6 +1,7 @@
 from typer import Typer
 
 from mta_od_data import (
+    access,
     analyze,
     gtfs,
     mbta,
@@ -16,6 +17,7 @@ app = Typer(cls=InvocationGroup)
 app.add_typer(prepare.app)
 app.add_typer(gtfs.app)
 app.add_typer(platforms.app)
+app.add_typer(access.app)
 app.add_typer(mbta.app)
 app.add_typer(scale_od.app)
 app.add_typer(ridership.app)

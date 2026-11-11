@@ -22,6 +22,9 @@ data/*
 # so checked in rather than refetched from `data.ny.gov` by `mta-od-data prepare`.
 !data/complexes.csv
 !data/stations.csv
+# Reviewed on each rebuild by `mta-od-data access`, so checked in:
+# what the MTA or OSM change doesn't change routing until then.
+!data/station_access.csv
 # Hand-reviewed, so checked in rather than regenerated.
 !src/mta_od_data/station_ridership_complexes.csv
 # Small (~100K), and ~100 s to build from a ~500MB OSM extract,
