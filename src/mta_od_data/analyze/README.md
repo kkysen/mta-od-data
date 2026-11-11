@@ -137,3 +137,25 @@ Reports:
 [`dekalb_deinterlining.md`](dekalb_deinterlining.md),
 [`nostrand_deinterlining.md`](nostrand_deinterlining.md),
 [`fm_swap_deinterlining.md`](fm_swap_deinterlining.md).
+
+## `free-transfers`
+
+Which transfers out of the system would save riders the most time if they were free,
+and how much:
+the OD data routed as today, where the only free ones are what `transfers.txt` has,
+against routed with every walk between complexes on the streets free
+(`mta-od-data raptor assign-range --street-walks`).
+
+```sh
+uv run mta-od-data raptor street-walks
+uv run mta-od-data raptor assign-range --from 2025-08-11 --to 2025-12-31 \
+  --street-walks data/street_walks.bin --out-dir data/raptor-street
+uv run mta-od-data analyze free-transfers
+```
+
+Each OD row's time saved is its mean journey as today less each of its paths' with free transfers,
+split evenly between the transfers out of the system a path makes,
+and grouped by the two complexes each joins, either way.
+Every transfer is free at once, so two serving the same riders split them.
+
+Report: [`free_transfers.md`](free_transfers.md).

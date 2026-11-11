@@ -120,6 +120,15 @@ SNAPSHOTS = [
         cmd=["mta-od-data", "analyze", "deinterlining", "--category", "F/M Swap"],
         path=ANALYZE_DIR / "fm_swap_deinterlining.md",
     ),
+    Snapshot(
+        name="free-transfers",
+        cmd=["mta-od-data", "analyze", "free-transfers"],
+        path=ANALYZE_DIR / "free_transfers.md",
+        needs=(
+            DATA / "raptor" / "manifest.csv",
+            DATA / "raptor-street" / "manifest.csv",
+        ),
+    ),
     *(
         Snapshot(
             name=f"ridership-by-{'-and-'.join(by)}",

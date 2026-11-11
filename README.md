@@ -255,6 +255,22 @@ uv run mta-od-data analyze deinterlining --category Nostrand
 Details: [`analyze/README.md`](src/mta_od_data/analyze/README.md#deinterlining),
 e.g. [`nostrand_deinterlining.md`](src/mta_od_data/analyze/nostrand_deinterlining.md).
 
+## `analyze free-transfers`
+
+Which transfers out of the system would save riders the most time if they were free,
+and how much:
+routed as today, against with every walk between complexes on the streets free.
+
+```sh
+uv run mta-od-data raptor street-walks
+uv run mta-od-data raptor assign-range --from 2025-08-11 --to 2025-12-31 \
+  --street-walks data/street_walks.bin --out-dir data/raptor-street
+uv run mta-od-data analyze free-transfers
+```
+
+Details: [`analyze/README.md`](src/mta_od_data/analyze/README.md#free-transfers),
+e.g. [`free_transfers.md`](src/mta_od_data/analyze/free_transfers.md).
+
 ## Tests
 
 `pre-commit install` installs the git hooks in [`.pre-commit-config.yaml`](.pre-commit-config.yaml):
