@@ -85,6 +85,17 @@ class StationMap:
     platforms: tuple[MapPlatform, ...]
     # Connectors read one by one, for platforms whose `reaches` is `None`.
     table: str | None
+    # Fare-controlled areas apart from the station's main one, as `(name, x_min)`:
+    # a connector whose foot is right of `x_min` on the full-size map reaches
+    # the first that it's right of.
+    # A walk only joins two connectors reaching one area.
+    side_areas: tuple[tuple[str, float], ...] = ()
+
+    def area(self, pxy: np.ndarray) -> str:
+        for name, x_min in self.side_areas:
+            if pxy[0] > x_min:
+                return name
+        return "main"
 
 
 TIMES_SQ = StationMap(
@@ -99,6 +110,9 @@ TIMES_SQ = StationMap(
         MapPlatform("w513706084", "magenta", "7", -4, -3),
     ),
     table="times_sq_123_connectors.csv",
+    # The N/Q/R/W's and 1/2/3's south ends each have stairs up to their own
+    # mezzanine at 40 St, not joined to the rest inside the gates.
+    side_areas=(("40 St & Broadway", 13_000), ("40 St & 7 Av", 10_500)),
 )
 MAPS = (TIMES_SQ,)
 
@@ -351,6 +365,7 @@ class Connector:
     north: float
     reaches: int
     kind: str
+    area: str
 
 
 def connectors(m: StationMap, extract: Path) -> tuple[list[Connector], Projection]:
@@ -369,7 +384,7 @@ def connectors(m: StationMap, extract: Path) -> tuple[list[Connector], Projectio
             continue
         for kind, pxy in feet(img, pieces[piece], colour_mask(img, p.color)):
             e, n = proj.to_ground(pxy, p.group)
-            out.append(Connector(way, float(e), float(n), p.reaches, kind))
+            out.append(Connector(way, float(e), float(n), p.reaches, kind, m.area(pxy)))
     if m.table:
         with open(TABLES / m.table) as f:
             for row in csv.DictReader(f):
@@ -381,10 +396,13 @@ def connectors(m: StationMap, extract: Path) -> tuple[list[Connector], Projectio
                     row["landing_y"].split(";"),
                     strict=True,
                 ):
-                    e, n = proj.to_ground(np.array([float(x), float(y)]), p.group)
+                    pxy = np.array([float(x), float(y)])
+                    e, n = proj.to_ground(pxy, p.group)
                     reaches = p.level + (1 if row["goes"] == "up" else -1)
                     out.append(
-                        Connector(p.way, float(e), float(n), reaches, row["kind"])
+                        Connector(
+                            p.way, float(e), float(n), reaches, row["kind"], m.area(pxy)
+                        )
                     )
     return out, proj
 
@@ -401,7 +419,7 @@ def walks(
     for a, b in permutations(level, 2):
         best = None
         for c in (c for c in conns if c.way == a):
-            for d in (d for d in conns if d.way == b):
+            for d in (d for d in conns if d.way == b and d.area == c.area):
                 steps = (
                     c.reaches - level[a],
                     d.reaches - c.reaches,
