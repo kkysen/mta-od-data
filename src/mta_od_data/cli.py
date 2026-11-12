@@ -6,6 +6,7 @@ from mta_od_data import (
     gtfs,
     lidar,
     mbta,
+    osm_walks,
     platforms,
     prepare,
     raptor,
@@ -20,6 +21,7 @@ app.add_typer(gtfs.app)
 app.add_typer(platforms.app)
 app.add_typer(access.app)
 app.add_typer(lidar.app)
+app.add_typer(osm_walks.app)
 app.add_typer(mbta.app)
 app.add_typer(scale_od.app)
 app.add_typer(ridership.app)
