@@ -1,7 +1,7 @@
 """Walks between a station's platforms along OSM's indoor ways
 (© OpenStreetMap contributors, under the ODbL: https://www.openstreetmap.org/copyright),
 for `raptor`'s transfers where no LiDAR map covers a station (`raptor/osm_walks.csv`),
-once checked against LiDAR walks and riders' knowledge: `raptor` doesn't read them yet.
+where OSM joins two platforms, over `raptor`'s guesses.
 
 OSM maps many stations' insides: footways and corridors on each level,
 `highway=steps` between levels (`level=-2;-1`), escalators as steps with `conveying`,
