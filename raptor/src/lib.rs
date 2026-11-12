@@ -230,7 +230,7 @@ pub fn assign_dates(
             }
             // LiDAR maps' walks over any other inside the gates,
             // before passages, which are walked from them.
-            tt.use_lidar_walks(&lidar_walks, config.stacked_secs_per_level);
+            tt.use_lidar_walks(&lidar_walks, &config.lidar_speeds);
             tt.use_passages(&passages, &complexes, config.stacked_secs_per_level);
             // Last, so as not to replace any walk there is.
             if let Some(all) = &street_walks {

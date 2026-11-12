@@ -5,9 +5,11 @@
 //! as the maps are drawn from 3D scans of the stations themselves.
 //! A pair of platforms the maps don't cover keeps the walk it had.
 //!
-//! The file holds geometry only, the distance and the levels climbed and descended,
-//! timed here as OSM transfers are: `WALK_SPEED` on the level,
-//! and a flight of stairs a level.
+//! The file holds geometry only, in metres:
+//! the straight line on the level between the connectors used,
+//! and how far up and down stairs and escalators, along their slopes,
+//! each flight measured off the map where its drawing shows it whole.
+//! It's timed here by `Speeds`.
 
 use std::collections::HashMap;
 
@@ -15,15 +17,46 @@ use anyhow::{Context, Result};
 use serde::Deserialize;
 
 use crate::gtfs::Secs;
-use crate::timetable::{StopIdx, Timetable, WALK_SPEED};
+use crate::timetable::{StopIdx, Timetable};
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
 pub struct LidarWalk {
     /// The straight line on the level between the two connectors used.
     pub metres: f64,
-    pub levels_up: u8,
-    pub levels_down: u8,
+    pub stairs_up_m: f64,
+    pub stairs_down_m: f64,
+    pub escalator_up_m: f64,
+    pub escalator_down_m: f64,
 }
+
+/// Walking speeds in a station, in miles an hour,
+/// on stairs and escalators along their slopes.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct Speeds {
+    pub walk_mph: f64,
+    pub stairs_up_mph: f64,
+    pub stairs_down_mph: f64,
+    pub escalator_up_mph: f64,
+    pub escalator_down_mph: f64,
+}
+
+impl Default for Speeds {
+    /// Guesses the user agreed to: walking 3 mph, as on the street;
+    /// stairs slower up than down; an escalator's 1.1 mph,
+    /// with some riders walking up or down it.
+    fn default() -> Self {
+        Self {
+            walk_mph: 3.0,
+            stairs_up_mph: 1.1,
+            stairs_down_mph: 1.6,
+            escalator_up_mph: 1.3,
+            escalator_down_mph: 1.6,
+        }
+    }
+}
+
+const METRES_PER_MILE: f64 = 1609.344;
 
 #[derive(Deserialize)]
 struct Row {
@@ -48,10 +81,15 @@ pub fn load() -> Result<LidarWalks> {
 }
 
 impl LidarWalk {
-    /// Its time, at `WALK_SPEED` and `secs_per_level` a flight, up or down.
-    pub fn secs(&self, secs_per_level: Secs) -> Secs {
-        let levels = Secs::from(self.levels_up) + Secs::from(self.levels_down);
-        (self.metres / WALK_SPEED).round() as Secs + levels * secs_per_level
+    /// Its time, at `speeds`.
+    pub fn secs(&self, speeds: &Speeds) -> Secs {
+        let at = |metres: f64, mph: f64| metres / (mph * METRES_PER_MILE / 3600.0);
+        (at(self.metres, speeds.walk_mph)
+            + at(self.stairs_up_m, speeds.stairs_up_mph)
+            + at(self.stairs_down_m, speeds.stairs_down_mph)
+            + at(self.escalator_up_m, speeds.escalator_up_mph)
+            + at(self.escalator_down_m, speeds.escalator_down_mph))
+        .round() as Secs
     }
 }
 
@@ -59,7 +97,7 @@ impl Timetable {
     /// `walks` between every two stops on platforms they join,
     /// replacing any footpath there was.
     /// Stops need their platforms from `split_platforms`.
-    pub fn use_lidar_walks(&mut self, walks: &LidarWalks, secs_per_level: Secs) {
+    pub fn use_lidar_walks(&mut self, walks: &LidarWalks, speeds: &Speeds) {
         let on_mapped: Vec<(StopIdx, &str)> = self
             .stops
             .iter()
@@ -77,7 +115,7 @@ impl Timetable {
                 let Some(walk) = walks.get(&(pa.to_owned(), pb.to_owned())) else {
                     continue;
                 };
-                let secs = walk.secs(secs_per_level);
+                let secs = walk.secs(speeds);
                 let paths = &mut self.footpaths[a as usize];
                 match paths.iter_mut().find(|(s, _)| *s == b) {
                     Some((_, t)) => *t = secs,
@@ -103,10 +141,13 @@ mod tests {
     #[test]
     fn secs_walk_and_climb() {
         let walk = LidarWalk {
-            metres: 24.0,
-            levels_up: 1,
-            levels_down: 2,
+            metres: 26.8224,
+            stairs_up_m: 4.9175,
+            stairs_down_m: 7.1526,
+            escalator_up_m: 5.8115,
+            escalator_down_m: 0.0,
         };
-        assert_eq!(walk.secs(30), 20 + 90);
+        // 20s at 3 mph, then 10s each up and down stairs, and on an escalator.
+        assert_eq!(walk.secs(&Speeds::default()), 50);
     }
 }

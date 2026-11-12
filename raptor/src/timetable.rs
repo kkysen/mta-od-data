@@ -947,12 +947,14 @@ mod tests {
         let walks = crate::lidar::LidarWalks::from([(
             ("wA".to_owned(), "wB".to_owned()),
             crate::lidar::LidarWalk {
-                metres: 12.0,
-                levels_up: 1,
-                levels_down: 1,
+                metres: 26.8224,
+                stairs_up_m: 4.9175,
+                stairs_down_m: 7.1526,
+                escalator_up_m: 0.0,
+                escalator_down_m: 0.0,
             },
         )]);
-        tt.use_lidar_walks(&walks, 30);
+        tt.use_lidar_walks(&walks, &crate::lidar::Speeds::default());
 
         let walk = |x: usize, y: usize| {
             tt.footpaths[x]
@@ -961,7 +963,7 @@ mod tests {
                 .map(|p| p.1)
         };
         // The mapped direction is LiDAR's; the other, and the uncovered pair, stay up and over.
-        assert_eq!(walk(a, b), Some(10 + 60));
+        assert_eq!(walk(a, b), Some(20 + 10 + 10));
         assert_eq!(walk(b, a), Some(90));
         assert_eq!(walk(a, c), Some(90));
     }

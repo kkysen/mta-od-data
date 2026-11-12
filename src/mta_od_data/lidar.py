@@ -19,10 +19,13 @@ Stairs off the N/Q/R/W rise to the upper mezzanine, and off the 7 to the lower;
 the 1/2/3's go both ways, so theirs were read one by one
 (`lidar_maps/times_sq_123_connectors.csv`).
 
+Each stair and escalator drawn whole is measured to scale (`Flights`):
+how far it rises, and runs on the level.
+
 A walk between two platforms is the quickest over a connector off each
 reaching mezzanines: the straight line between their feet,
-and the levels climbed and descended, which `raptor` times
-(`raptor/src/lidar.rs`).
+and how far up and down stairs and escalators along their slopes,
+which `raptor` times by its speeds (`raptor/src/lidar.rs`).
 Where corridors are long and bent, like Court Sq's,
 a walk instead follows the map's floors (`corridor_walks`).
 It assumes a rider on the car nearest the connector;
@@ -31,7 +34,7 @@ where else on the train riders are is left for later.
 
 import csv
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from itertools import permutations, product
 from pathlib import Path
 from typing import Annotated
@@ -51,15 +54,22 @@ from mta_od_data.platforms import DEFAULT_EXTRACT
 
 app = Typer()
 
+# The maps are huge, and trusted.
+Image.MAX_IMAGE_PIXELS = None
+
 MAPS_DIR = DATA / "station-maps-lidar"
 TABLES = Path(__file__).parent / "lidar_maps"
 DEFAULT_OUT = Path(__file__).parents[2] / "raptor" / "lidar_walks.csv"
 CACHE = Path(__file__).parents[2] / "target" / "lidar"
 
-# `raptor`'s walking speed in a station, and a flight of stairs a level,
-# to pick the quickest pair of connectors.
-WALK_M_PER_S = 1.2
-FLIGHT_SECS = 30
+# `raptor`'s default speeds (`raptor/assign.json5`), in metres a second,
+# to pick the quickest pair of connectors; stairs and escalators along their slopes.
+MPH = 0.44704
+WALK_M_PER_S = 3.0 * MPH
+STAIRS_UP_M_PER_S = 1.1 * MPH
+STAIRS_DOWN_M_PER_S = 1.6 * MPH
+ESCALATOR_UP_M_PER_S = 1.3 * MPH
+ESCALATOR_DOWN_M_PER_S = 1.6 * MPH
 # The maps are read at a quarter of their size: a pixel is still under 10 cm.
 REDUCE = 4
 # How far apart, across them, a color's platforms at one station are
@@ -67,6 +77,24 @@ REDUCE = 4
 MAX_ISLAND_SPREAD = 400
 # How near two platforms floor can be, on the reduced map, and still join them.
 CONTACT_PX = 6
+# A stair or escalator's whole drawing, on the reduced map, at most:
+# any bigger is joined to a floor.
+FLIGHT_MAX_PX = 20_000
+# How strongly a stair's brightness repeats at its steps' spacing, at least,
+# to count them.
+STEP_SCORE_MIN = 30
+# Measured slopes believed, in degrees: stairs are about 30,
+# and escalators 30 but flatter overall for their landings.
+STAIR_SLOPE = (25, 38)
+ESCALATOR_SLOPE = (20, 34)
+ESCALATOR_RISE_MIN = 2.0
+# A flight's rise where none is measured, in metres,
+# and its run, at 30 degrees.
+DEFAULT_RISE = 4.5
+# How near, on the full-size map, a stair found by color is to a table's,
+# at most, to be the same.
+MATCH_PX = 300
+DEFAULT_RUN = DEFAULT_RISE * 3**0.5
 
 
 @dataclass(frozen=True, slots=True)
@@ -188,7 +216,6 @@ def load_map(m: StationMap) -> np.ndarray:
     cached = CACHE / f"{Path(m.file).stem}.npy"
     if cached.exists():
         return np.load(cached)[: m.main_rows // REDUCE]
-    Image.MAX_IMAGE_PIXELS = None
     with Image.open(MAPS_DIR / m.file) as im:
         im = im.convert("RGB")
         img = np.asarray(im.reduce(REDUCE))[: m.main_rows // REDUCE]
@@ -367,10 +394,10 @@ def fit(
 
 def feet(
     img: np.ndarray, pts: np.ndarray, platform_mask: np.ndarray
-) -> list[tuple[str, np.ndarray]]:
+) -> list[tuple[str, np.ndarray, np.ndarray]]:
     """Each stair or escalator touching a platform, by kind,
-    and where its foot meets the platform,
-    in full-size map coordinates."""
+    where its foot meets the platform, in full-size map coordinates,
+    and its pixels near the platform, on the reduced map, as `(x, y)` rows."""
     r, g, b = (img[..., i].astype(np.int16) for i in range(3))
     grey = (abs(r - g) < 16) & (abs(g - b) < 16)
     steps = grey & (r >= 60) & (r < 200)
@@ -408,8 +435,194 @@ def feet(
         kind = "escalator" if black[on].mean() > 0.5 else "stairs"
         foot = si[ti >= np.percentile(ti, 97)]
         s_foot = ss[int(round(foot.mean()))]
-        out.append((kind, (mean + s_foot * ax) * REDUCE))
+        out.append(
+            (kind, (mean + s_foot * ax) * REDUCE, np.stack([x[si, ti], y[si, ti]], 1))
+        )
     return out
+
+
+@dataclass(frozen=True, slots=True)
+class Flight:
+    """A stair or escalator's climb, measured to scale off a map, in metres:
+    `run` on the level, along its platform, and `rise` straight up."""
+
+    run: float
+    rise: float
+
+
+class Flights:
+    """Measures each whole stair and escalator drawn in a map's main view.
+
+    The view is to scale: a step on the level along a platform lands at `A @ u`,
+    and a step straight up at `v` px a metre up the page,
+    `v` from `A`'s foreshortening, as a tilted orthographic view's.
+    So a vector drawn along a flight splits into its run and rise.
+
+    A stair's drawn steps are larger and fewer than real ones, about 9.5 in by 16.5 in,
+    but each flight is to scale as a whole.
+    Its riser faces are the lighter of its two grays (Otsu's split);
+    the count is the median of the faces each of 9 lines along its run crosses,
+    checked against its length along the run over the steps' spacing.
+    A step is the median vector between neighbouring faces' centroids.
+    An escalator has no steps to count, so its rise is from its two ends:
+    the flat landings at either end add only run, not rise."""
+
+    def __init__(self, m: StationMap, img: np.ndarray, proj: Projection) -> None:
+        self.full = Image.open(MAPS_DIR / m.file)
+        self.a = proj.a
+        s = np.linalg.norm(self.a[0])
+        k = np.linalg.norm(self.a[1]) / s
+        self.v = s * np.sqrt(1 - k * k)
+        r, g, b = (img[..., i].astype(np.int16) for i in range(3))
+        grey = (abs(r - g) < 16) & (abs(g - b) < 16)
+        self.stairs, _ = ndimage.label(
+            ndimage.binary_opening(grey & (r >= 60) & (r < 215), np.ones((3, 3)))
+        )
+        black = (r < 60) & (g < 60) & (b < 60)
+        self.escalators, _ = ndimage.label(
+            ndimage.binary_opening(black, np.ones((3, 3)))
+        )
+
+    def crop(self, lab: np.ndarray, px: np.ndarray) -> np.ndarray | None:
+        """The whole component under `px`, on the reduced map, at full size."""
+        ids = np.bincount(lab[px[:, 1], px[:, 0]])
+        ids[0] = 0
+        if not ids.any():
+            return None
+        ys, xs = np.nonzero(lab == ids.argmax())
+        # Joined to a floor, not a flight on its own.
+        if len(xs) > FLIGHT_MAX_PX:
+            return None
+        box = (
+            xs.min() * REDUCE - 8,
+            ys.min() * REDUCE - 8,
+            xs.max() * REDUCE + 12,
+            ys.max() * REDUCE + 12,
+        )
+        return np.asarray(self.full.crop(box).convert("RGB")).astype(np.int16)
+
+    def split(self, p: np.ndarray, axis_page: np.ndarray) -> Flight:
+        """A vector drawn up a flight, split into its run along the platform
+        whose axis on the page is `axis_page`, and its rise."""
+        u = np.linalg.solve(self.a, axis_page)
+        u /= np.linalg.norm(u)
+        run, rise = np.linalg.solve(np.column_stack([self.a @ u, [0, -self.v]]), p)
+        return Flight(abs(float(run)), float(rise))
+
+    def measure(
+        self, kind: str, px: np.ndarray, axis_page: np.ndarray
+    ) -> Flight | None:
+        if kind == "escalator":
+            return self.escalator(px, axis_page)
+        return self.stair(px, axis_page)
+
+    def stair(self, px: np.ndarray, axis_page: np.ndarray) -> Flight | None:
+        a = self.crop(self.stairs, px)
+        if a is None:
+            return None
+        r, g, b = a[..., 0], a[..., 1], a[..., 2]
+        stair = (abs(r - g) < 12) & (abs(g - b) < 12) & (r > 90) & (r < 215)
+        ys, xs = np.nonzero(stair)
+        pts = np.stack([xs, ys], 1).astype(float)
+        c = pts.mean(0)
+        lum = a.mean(2)
+        # The run is the direction brightness repeats along most strongly.
+        best = None
+        for ang in np.radians(np.arange(0, 180, 1.0)):
+            d = np.array([np.cos(ang), np.sin(ang)])
+            bins = ((pts - c) @ d - ((pts - c) @ d).min()).astype(int)
+            cnt = np.bincount(bins)
+            prof = np.bincount(bins, weights=lum[ys, xs]) / np.maximum(cnt, 1)
+            ok = cnt > 3
+            if ok.sum() < 60:
+                continue
+            hp = np.where(ok, prof - ndimage.uniform_filter1d(prof, 41), 0)
+            f = np.abs(np.fft.rfft(hp * np.hanning(len(hp))))
+            freqs = np.fft.rfftfreq(len(hp))
+            band = (freqs > 1 / 40) & (freqs < 1 / 12)
+            if not band.any():
+                continue
+            i = np.argmax(np.where(band, f, 0))
+            score = f[i] / (np.median(f[band]) + 1e-9)
+            if best is None or score > best[0]:
+                best = (score, d, 1 / freqs[i])
+        if best is None or best[0] < STEP_SCORE_MIN:
+            return None
+        _, d, period = best
+        hist = np.bincount(r[stair], minlength=256).astype(float)
+        light_min = otsu(hist)
+        faces = stair & (r >= light_min)
+        nrm = np.array([-d[1], d[0]])
+        counts = []
+        for off in range(-40, 41, 10):
+            line = c + off * nrm + np.arange(-600, 600, 0.5)[:, None] * d
+            xi, yi = np.round(line).astype(int).T
+            ok = (xi >= 0) & (yi >= 0) & (xi < a.shape[1]) & (yi < a.shape[0])
+            on = faces[yi[ok], xi[ok]]
+            lab, n = ndimage.label(on)
+            counts.append(int((ndimage.sum(on, lab, range(1, n + 1)) >= 4).sum()))
+        risers = int(np.median(counts))
+        t = (pts - c) @ d
+        span = (np.percentile(t, 99.5) - np.percentile(t, 0.5)) / period
+        # A flat floor drawn joined to its foot or top makes it longer, never shorter.
+        if risers < 3 or risers > span + 1.5:
+            return None
+        inner = faces & ndimage.binary_erosion(stair, iterations=12)
+        lab, n = ndimage.label(inner)
+        if n < 3:
+            return None
+        cents = np.array(ndimage.center_of_mass(inner, lab, range(1, n + 1)))[:, ::-1]
+        cents = cents[np.argsort((cents - c) @ d)]
+        diffs = np.diff(cents, axis=0)
+        # Neighbouring faces a step apart, not broken pieces of one or two steps.
+        diffs = diffs[abs(diffs @ d / period - 1) < 0.3]
+        if len(diffs) < 3:
+            return None
+        step = np.median(diffs, axis=0)
+        if step[1] > 0:
+            step = -step
+        flight = self.split(step * risers, axis_page)
+        slope = np.degrees(np.arctan2(flight.rise, flight.run))
+        return flight if STAIR_SLOPE[0] <= slope <= STAIR_SLOPE[1] else None
+
+    def escalator(self, px: np.ndarray, axis_page: np.ndarray) -> Flight | None:
+        a = self.crop(self.escalators, px)
+        if a is None:
+            return None
+        black = ndimage.binary_closing(
+            (a[..., 0] < 60) & (a[..., 1] < 60) & (a[..., 2] < 60), np.ones((5, 5))
+        )
+        lab, n = ndimage.label(black)
+        if not n:
+            return None
+        ys, xs = np.nonzero(lab == np.argmax(np.bincount(lab.ravel())[1:]) + 1)
+        pts = np.stack([xs, ys], 1).astype(float)
+        c = pts.mean(0)
+        d = np.linalg.eigh(np.cov((pts - c).T))[1][:, 1]
+        t = (pts - c) @ d
+        p = d * (np.percentile(t, 99.5) - np.percentile(t, 0.5))
+        if p[1] > 0:
+            p = -p
+        flight = self.split(p, axis_page)
+        # Landings flatten it overall; a cut-off stub is too steep or too short.
+        slope = np.degrees(np.arctan2(flight.rise, flight.run))
+        ok = ESCALATOR_SLOPE[0] <= slope <= ESCALATOR_SLOPE[1]
+        return flight if ok and flight.rise >= ESCALATOR_RISE_MIN else None
+
+
+def otsu(hist: np.ndarray) -> int:
+    """The level splitting `hist` into two classes most apart (Otsu's method)."""
+    levels = np.arange(len(hist))
+
+    def between(th: int) -> float:
+        lo, hi = hist[:th].sum(), hist[th:].sum()
+        if not lo or not hi:
+            return 0.0
+        mu_lo = (hist[:th] * levels[:th]).sum() / lo
+        mu_hi = (hist[th:] * levels[th:]).sum() / hi
+        return float(lo * hi * (mu_lo - mu_hi) ** 2)
+
+    return max(range(1, len(hist) - 1), key=between)
 
 
 @dataclass(frozen=True, slots=True)
@@ -420,6 +633,8 @@ class Connector:
     reaches: int
     kind: str
     area: str
+    # Measured off the map, or `None` where its drawing is partly hidden.
+    flight: Flight | None = None
 
 
 def connectors(m: StationMap, extract: Path) -> tuple[list[Connector], Projection]:
@@ -431,20 +646,29 @@ def connectors(m: StationMap, extract: Path) -> tuple[list[Connector], Projectio
     ground = {w: ground_points(o, first) for w, o in handler.outlines.items()}
     proj = fit(m, pieces, ground)
     by_way = {p.way: p for p in m.platforms}
+    flights = Flights(m, img, proj)
     out = []
     for piece, way in proj.pieces.items():
         p = by_way[way]
         if p.reaches is None:
             continue
-        for kind, pxy in feet(img, pieces[piece], colour_mask(img, p.color)):
+        _, ax, _ = axis(pieces[piece])
+        for kind, pxy, px in feet(img, pieces[piece], colour_mask(img, p.color)):
             e, n = proj.to_ground(pxy, p.group)
-            out.append(Connector(way, float(e), float(n), p.reaches, kind, m.area(pxy)))
+            flight = flights.measure(kind, px, ax)
+            out.append(
+                Connector(way, float(e), float(n), p.reaches, kind, m.area(pxy), flight)
+            )
     if m.table:
+        piece_of = {way: piece for piece, way in proj.pieces.items()}
         with open(TABLES / m.table) as f:
             for row in csv.DictReader(f):
                 if row["kind"] == "elevator":
                     continue
                 p = by_way[row["osm_way"]]
+                piece = pieces[piece_of[p.way]]
+                _, ax, _ = axis(piece)
+                found = feet(img, piece, colour_mask(img, p.color))
                 for x, y in zip(
                     row["landing_x"].split(";"),
                     row["landing_y"].split(";"),
@@ -453,46 +677,135 @@ def connectors(m: StationMap, extract: Path) -> tuple[list[Connector], Projectio
                     pxy = np.array([float(x), float(y)])
                     e, n = proj.to_ground(pxy, p.group)
                     reaches = p.level + (1 if row["goes"] == "up" else -1)
+                    # Two flights with a landing between, or two stairs side by side,
+                    # aren't one flight to measure.
+                    flight = None
+                    near = [
+                        (np.linalg.norm(f - pxy), kind, px)
+                        for kind, f, px in found
+                        if kind == row["kind"]
+                    ]
+                    if near and (best := min(near, key=lambda t: t[0]))[0] < MATCH_PX:
+                        flight = flights.measure(best[1], best[2], ax)
                     out.append(
                         Connector(
-                            p.way, float(e), float(n), reaches, row["kind"], m.area(pxy)
+                            p.way,
+                            float(e),
+                            float(n),
+                            reaches,
+                            row["kind"],
+                            m.area(pxy),
+                            flight,
                         )
                     )
     return out, proj
 
 
-def walks(
-    m: StationMap, conns: list[Connector]
-) -> list[tuple[str, str, float, int, int]]:
-    """The quickest walk between every two platforms, each way:
-    `(from, to, metres, levels up, levels down)`,
-    picked at `WALK_M_PER_S` and `FLIGHT_SECS` a level,
-    which `raptor` times them by its own speeds."""
+@dataclass(frozen=True, slots=True)
+class Walk:
+    """A walk between two platforms, in metres:
+    on the level, and up and down stairs and escalators along their slopes."""
+
+    metres: float
+    stairs_up: float = 0.0
+    stairs_down: float = 0.0
+    escalator_up: float = 0.0
+    escalator_down: float = 0.0
+
+    def secs(self) -> float:
+        return (
+            self.metres / WALK_M_PER_S
+            + self.stairs_up / STAIRS_UP_M_PER_S
+            + self.stairs_down / STAIRS_DOWN_M_PER_S
+            + self.escalator_up / ESCALATOR_UP_M_PER_S
+            + self.escalator_down / ESCALATOR_DOWN_M_PER_S
+        )
+
+    def climb(self, kind: str, levels: int, flight: Flight) -> Walk:
+        """This walk, then `levels` flights like `flight`, up or down."""
+        slope = abs(levels) * float(np.hypot(flight.run, flight.rise))
+        up = levels > 0
+        if "escalator" in kind:
+            return replace(
+                self,
+                escalator_up=self.escalator_up + slope * up,
+                escalator_down=self.escalator_down + slope * (not up),
+            )
+        return replace(
+            self,
+            stairs_up=self.stairs_up + slope * up,
+            stairs_down=self.stairs_down + slope * (not up),
+        )
+
+    def row(self) -> tuple[float, ...]:
+        return tuple(
+            round(x, 1)
+            for x in (
+                self.metres,
+                self.stairs_up,
+                self.stairs_down,
+                self.escalator_up,
+                self.escalator_down,
+            )
+        )
+
+
+def typical_flight(conns: list[Connector]) -> Flight:
+    """A station's median measured stair, for a connector not measured,
+    or `DEFAULT_RISE` where none is."""
+    measured = [c.flight for c in conns if c.flight and "escalator" not in c.kind]
+    if not measured:
+        return Flight(DEFAULT_RUN, DEFAULT_RISE)
+    return Flight(
+        float(np.median([f.run for f in measured])),
+        float(np.median([f.rise for f in measured])),
+    )
+
+
+def levels_climbed(c: Connector, level: int, typical: Flight) -> int:
+    """How many levels a connector climbs from its platform at `level`:
+    to the level it reaches, or, for an escalator measured,
+    as many as its rise is typical flights."""
+    if "escalator" in c.kind and c.flight:
+        n = max(1, round(c.flight.rise / typical.rise))
+        return n if c.reaches > level else -n
+    return c.reaches - level
+
+
+def walks(m: StationMap, conns: list[Connector]) -> list[tuple[str, str, Walk]]:
+    """The quickest walk between every two platforms, each way,
+    over a connector off each: the straight line between their feet,
+    and each connector's flight, as measured or the station's typical one,
+    with typical stairs between the levels they reach."""
     level = {p.way: p.level for p in m.platforms}
+    typical = typical_flight(conns)
     out = []
     for a, b in permutations(level, 2):
-        best = None
+        best: Walk | None = None
         for c in (c for c in conns if c.way == a):
             for d in (d for d in conns if d.way == b and d.area == c.area):
-                steps = (
-                    c.reaches - level[a],
-                    d.reaches - c.reaches,
-                    level[b] - d.reaches,
+                up_c = levels_climbed(c, level[a], typical)
+                up_d = levels_climbed(d, level[b], typical)
+                walk = (
+                    Walk(float(np.hypot(c.east - d.east, c.north - d.north)))
+                    .climb(c.kind, up_c, c.flight or typical)
+                    .climb("stairs", (level[b] + up_d) - (level[a] + up_c), typical)
+                    .climb(d.kind, -up_d, d.flight or typical)
                 )
-                up = sum(x for x in steps if x > 0)
-                down = -sum(x for x in steps if x < 0)
-                metres = float(np.hypot(c.east - d.east, c.north - d.north))
-                secs = metres / WALK_M_PER_S + (up + down) * FLIGHT_SECS
-                if best is None or secs < best[0]:
-                    best = (secs, (a, b, round(metres, 1), up, down))
+                if best is None or walk.secs() < best.secs():
+                    best = walk
         if best:
-            out.append(best[1])
+            out.append((a, b, best))
     return out
 
 
 def corridor_walks(
-    m: StationMap, img: np.ndarray, pieces: dict[str, np.ndarray], proj: Projection
-) -> list[tuple[str, str, float, int, int]]:
+    m: StationMap,
+    img: np.ndarray,
+    pieces: dict[str, np.ndarray],
+    proj: Projection,
+    typical: Flight,
+) -> list[tuple[str, str, Walk]]:
     """The shortest walk between every two platforms along the map's floors:
     gray floors, stairs, and black escalators, not the platforms themselves,
     so a path can't jump between platforms drawn crossing over one another,
@@ -501,7 +814,8 @@ def corridor_walks(
     which a level's offset up the page doesn't change.
     It starts and ends at any floor touching each platform: the car nearest it.
     Levels are OSM's: as many as the platforms are apart,
-    or one up and back down between platforms on one level."""
+    or one up and back down between platforms on one level,
+    each climbed by `typical` stairs."""
     r, g, b = (img[..., i].astype(np.int16) for i in range(3))
     grey = (abs(r - g) < 16) & (abs(g - b) < 16) & (r < 238)
     walkable = ndimage.binary_opening(grey, np.ones((3, 3)))
@@ -552,8 +866,13 @@ def corridor_walks(
         if not np.isfinite(metres):
             continue
         diff = level[b_way] - level[a_way]
-        up, down = (max(diff, 0), max(-diff, 0)) if diff else (1, 1)
-        out.append((a_way, b_way, round(metres, 1), up, down))
+        walk = Walk(metres)
+        walk = (
+            walk.climb("stairs", diff, typical)
+            if diff
+            else walk.climb("stairs", 1, typical).climb("stairs", -1, typical)
+        )
+        out.append((a_way, b_way, walk))
     return out
 
 
@@ -575,12 +894,20 @@ def lidar_walks(
             f"{m.name}: fit to OSM within {proj.rms_px:.0f} px RMS, "
             f"{len(conns)} connectors, pieces {json.dumps(proj.pieces)}"
         )
+        for c in conns:
+            if c.flight:
+                print(
+                    f"  {c.way} {c.kind} at ({c.east:.0f}, {c.north:.0f}) m: "
+                    f"rises {c.flight.rise:.2f} m over {c.flight.run:.2f} m"
+                )
         if m.corridors:
             img = load_map(m)
-            ws = corridor_walks(m, img, split_by_colour(img, m), proj)
+            ws = corridor_walks(
+                m, img, split_by_colour(img, m), proj, typical_flight(conns)
+            )
         else:
             ws = walks(m, conns)
-        rows.extend((*w, m.name) for w in ws)
+        rows.extend((a, b, *w.row(), m.name) for a, b, w in ws)
     with open(out, "w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(
@@ -588,8 +915,10 @@ def lidar_walks(
                 "from_platform",
                 "to_platform",
                 "metres",
-                "levels_up",
-                "levels_down",
+                "stairs_up_m",
+                "stairs_down_m",
+                "escalator_up_m",
+                "escalator_down_m",
                 "station",
             ]
         )

@@ -21,6 +21,7 @@ use rustc_hash::FxHashMap;
 use serde::Deserialize;
 
 use crate::gtfs::Secs;
+use crate::lidar::Speeds;
 use crate::od::{ComplexId, Complexes, OdRow, Riders};
 use crate::raptor::{DEFAULT_MAX_RIDES, Journey, Leg, Legs, Router};
 use crate::timetable::{DEPARTURES_UNTIL, Pattern, SERVICE_DAY_START, StopIdx, Timetable};
@@ -51,6 +52,9 @@ pub struct Config {
     /// on top of its walk: paying again, or the bother of it.
     #[serde(default = "default_fare_gate_penalty_min")]
     pub fare_gate_penalty_min: f64,
+    /// Walking speeds for walks measured off LiDAR maps (`raptor/lidar_walks.csv`).
+    #[serde(default)]
+    pub lidar_speeds: Speeds,
 }
 
 fn default_fare_gate_penalty_min() -> f64 {
@@ -1357,6 +1361,13 @@ mod tests {
         up_and_over_secs: DEFAULT_UP_AND_OVER_SECS,
         stacked_secs_per_level: DEFAULT_STACKED_SECS_PER_LEVEL,
         fare_gate_penalty_min: DEFAULT_FARE_GATE_PENALTY_MIN,
+        lidar_speeds: Speeds {
+            walk_mph: 3.0,
+            stairs_up_mph: 1.1,
+            stairs_down_mph: 1.6,
+            escalator_up_mph: 1.3,
+            escalator_down_mph: 1.6,
+        },
     };
 
     fn timetable(trips: &str, stop_times: &str, transfers: &str) -> Timetable {

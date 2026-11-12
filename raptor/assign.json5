@@ -40,6 +40,17 @@
   // on top of its walk.
   // A placeholder, like `logit_scale_per_min`: no source gives one.
   fare_gate_penalty_min: 10.0,
+  // Walks measured off LiDAR maps (`raptor/lidar_walks.csv`), in miles an hour:
+  // on the level, and up and down stairs and escalators along their slopes.
+  // Guesses: 3 mph on the level, as on the street;
+  // an escalator moves at 1.1 mph, and some riders walk on it.
+  lidar_speeds: {
+    walk_mph: 3.0,
+    stairs_up_mph: 1.1,
+    stairs_down_mph: 1.6,
+    escalator_up_mph: 1.3,
+    escalator_down_mph: 1.6,
+  },
   // Most rides in a journey: riders take up to 4-ride trips,
   // and one more allows the rare fastest trip that takes 5.
   max_rides: 5,
