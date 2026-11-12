@@ -23,6 +23,8 @@ A walk between two platforms is the quickest over a connector off each
 reaching mezzanines: the straight line between their feet,
 and the levels climbed and descended, which `raptor` times
 (`raptor/src/lidar.rs`).
+Where corridors are long and bent, like Court Sq's,
+a walk instead follows the map's floors (`corridor_walks`).
 It assumes a rider on the car nearest the connector;
 where else on the train riders are is left for later.
 """
@@ -39,6 +41,8 @@ import osmium
 from osmium.osm import Way
 from PIL import Image
 from scipy import ndimage
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import dijkstra
 from shapely import Polygon, contains_xy
 from typer import Option, Typer
 
@@ -61,6 +65,8 @@ REDUCE = 4
 # How far apart, across them, a color's platforms at one station are
 # on the reduced map, at most.
 MAX_ISLAND_SPREAD = 400
+# How near two platforms floor can be, on the reduced map, and still join them.
+CONTACT_PX = 6
 
 
 @dataclass(frozen=True, slots=True)
@@ -74,6 +80,9 @@ class MapPlatform:
     level: int
     # The mezzanine level every connector off it reaches, if all reach one.
     reaches: int | None
+    # Whether to fit the projection to it: not where the map grays out part of it
+    # that OSM maps whole.
+    fit: bool = True
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,6 +94,9 @@ class StationMap:
     platforms: tuple[MapPlatform, ...]
     # Connectors read one by one, for platforms whose `reaches` is `None`.
     table: str | None
+    # Whether walks follow the map's floors (`corridor_walks`),
+    # not a straight line between connectors, where corridors are long and bent.
+    corridors: bool = False
     # Fare-controlled areas apart from the station's main one, as `(name, x_min)`:
     # a connector whose foot is right of `x_min` on the full-size map reaches
     # the first that it's right of.
@@ -126,7 +138,23 @@ NEVINS_ST = StationMap(
     ),
     table="nevins_st_connectors.csv",
 )
-MAPS = (TIMES_SQ, NEVINS_ST)
+COURT_SQ = StationMap(
+    name="Court Sq-23 St",
+    file="Court Sq–23 St (NYC subway station map) v2.png",
+    main_rows=12970,
+    # Levels are OSM's.
+    platforms=(
+        MapPlatform("w426103113", "magenta", "7", 2, None),
+        MapPlatform("w426103110", "magenta", "7", 2, None),
+        MapPlatform("w818637922", "striped", "ef", -2, None),
+        MapPlatform("w721007405", "striped", "ef", -2, None),
+        # The map grays out the G platform's closed south end; OSM maps it whole.
+        MapPlatform("w510552245", "green", "g", -2, None, fit=False),
+    ),
+    table=None,
+    corridors=True,
+)
+MAPS = (TIMES_SQ, NEVINS_ST, COURT_SQ)
 
 
 def colour_mask(img: np.ndarray, color: str) -> np.ndarray:
@@ -143,6 +171,13 @@ def colour_mask(img: np.ndarray, color: str) -> np.ndarray:
             )
         case "lightgrey":
             return (abs(r - g) < 4) & (abs(g - b) < 4) & (r >= 218) & (r <= 226)
+        case "striped":
+            # The E/F's blue and orange stripes, joined.
+            blue = (b - r > 80) & (b > 120) & (g < 120)
+            orange = (r > 200) & (r - b > 120) & (g > 70) & (g < 160)
+            return ndimage.binary_closing(blue | orange, iterations=6)
+        case "green":
+            return (g - r > 40) & (g - b > 40)
         case "magenta":
             return (r > 150) & (b > 140) & (r - g > 50) & (b - g > 40)
     raise ValueError(color)
@@ -276,14 +311,19 @@ def fit(
     """The projection fitting the platforms' full-width ends best,
     over each way to match the pieces of a color to its ways
     and each piece's ends to its outline's."""
-    by_way = {p.way: p for p in m.platforms}
-    groups = list(dict.fromkeys(p.group for p in m.platforms))
-    gends = {w: full_width_ends(g, 0.1) for w, g in ground.items()}
-    pends = {k: full_width_ends(v, REDUCE) for k, v in pieces.items()}
-    colors = list(dict.fromkeys(p.color for p in m.platforms))
+    fitted = [p for p in m.platforms if p.fit]
+    by_way = {p.way: p for p in fitted}
+    groups = list(dict.fromkeys(p.group for p in fitted))
+    gends = {w: full_width_ends(g, 0.1) for w, g in ground.items() if w in by_way}
+    colors = list(dict.fromkeys(p.color for p in fitted))
+    pends = {
+        k: full_width_ends(v, REDUCE)
+        for k, v in pieces.items()
+        if k in by_way or k.split(":")[0] in colors
+    }
     choices = []
     for color in colors:
-        ways = [p.way for p in m.platforms if p.color == color]
+        ways = [p.way for p in fitted if p.color == color]
         if len(ways) == 1:
             choices.append([{ways[0]: ways[0]}])
         else:
@@ -450,6 +490,73 @@ def walks(
     return out
 
 
+def corridor_walks(
+    m: StationMap, img: np.ndarray, pieces: dict[str, np.ndarray], proj: Projection
+) -> list[tuple[str, str, float, int, int]]:
+    """The shortest walk between every two platforms along the map's floors:
+    gray floors, stairs, and black escalators, not the platforms themselves,
+    so a path can't jump between platforms drawn crossing over one another,
+    nor along thin drop lines.
+    Each step is measured on the ground through the projection,
+    which a level's offset up the page doesn't change.
+    It starts and ends at any floor touching each platform: the car nearest it.
+    Levels are OSM's: as many as the platforms are apart,
+    or one up and back down between platforms on one level."""
+    r, g, b = (img[..., i].astype(np.int16) for i in range(3))
+    grey = (abs(r - g) < 16) & (abs(g - b) < 16) & (r < 238)
+    walkable = ndimage.binary_opening(grey, np.ones((3, 3)))
+    masks = {}
+    for piece, way in proj.pieces.items() | {
+        (p.way, p.way) for p in m.platforms if not p.fit
+    }:
+        q = (pieces[piece] / REDUCE).astype(int)
+        mask = np.zeros(walkable.shape, bool)
+        mask[q[:, 1], q[:, 0]] = True
+        masks[way] = mask
+    near = np.zeros(walkable.shape, np.int8)
+    for mask in masks.values():
+        walkable &= ~mask
+        near += ndimage.binary_dilation(mask, iterations=CONTACT_PX)
+    # Floor right by two platforms is where they're drawn crossing, not a way between.
+    walkable &= near < 2
+    idx = -np.ones(walkable.shape, np.int64)
+    ys, xs = np.nonzero(walkable)
+    idx[ys, xs] = np.arange(len(ys))
+    rows: list[np.ndarray] = []
+    cols: list[np.ndarray] = []
+    costs: list[np.ndarray] = []
+    h, w = idx.shape
+    for dx, dy in ((1, 0), (0, 1), (1, 1), (-1, 1)):
+        a = idx[: h - dy, max(0, -dx) : w - max(0, dx)]
+        c = idx[dy:, max(0, dx) : w - max(0, -dx)]
+        ok = (a >= 0) & (c >= 0)
+        rows.append(a[ok])
+        cols.append(c[ok])
+        step = float(
+            np.linalg.norm(np.linalg.solve(proj.a, [dx * REDUCE, dy * REDUCE]))
+        )
+        costs.append(np.full(ok.sum(), step))
+    n = len(ys)
+    graph = csr_matrix(
+        (np.concatenate(costs), (np.concatenate(rows), np.concatenate(cols))), (n, n)
+    )
+    seeds = {
+        way: idx[ndimage.binary_dilation(mask, iterations=2) & walkable]
+        for way, mask in masks.items()
+    }
+    level = {p.way: p.level for p in m.platforms}
+    out = []
+    for a_way, b_way in permutations(masks, 2):
+        dist = dijkstra(graph, directed=False, indices=seeds[a_way], min_only=True)
+        metres = float(dist[seeds[b_way]].min())
+        if not np.isfinite(metres):
+            continue
+        diff = level[b_way] - level[a_way]
+        up, down = (max(diff, 0), max(-diff, 0)) if diff else (1, 1)
+        out.append((a_way, b_way, round(metres, 1), up, down))
+    return out
+
+
 @app.command()
 def lidar_walks(
     extract: Annotated[
@@ -468,7 +575,12 @@ def lidar_walks(
             f"{m.name}: fit to OSM within {proj.rms_px:.0f} px RMS, "
             f"{len(conns)} connectors, pieces {json.dumps(proj.pieces)}"
         )
-        rows.extend((*w, m.name) for w in walks(m, conns))
+        if m.corridors:
+            img = load_map(m)
+            ws = corridor_walks(m, img, split_by_colour(img, m), proj)
+        else:
+            ws = walks(m, conns)
+        rows.extend((*w, m.name) for w in ws)
     with open(out, "w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(
