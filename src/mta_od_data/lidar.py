@@ -49,6 +49,7 @@ from PIL import Image
 from scipy import ndimage
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import dijkstra
+from scipy.spatial import KDTree
 from shapely import MultiPoint, Polygon, contains_xy
 from typer import Option, Typer
 
@@ -102,6 +103,10 @@ DEFAULT_RUN = DEFAULT_RISE * 3**0.5
 MATCH_PX = 300
 # A way off a platform this little slower than another from anywhere isn't kept.
 USEFUL_SECS = 2.0
+# A walk this near a flight, on the reduced map, takes it, or the one beside it.
+ALONGSIDE_PX = 12
+# ... along at least this share of its length.
+TAKEN_SHARE = 0.25
 # Paid floors are gray darker than this; lighter gray is outside the gates.
 PAID_MAX = 200
 # Dashed drop lines' gray, about 186, on maps drawing levels apart.
@@ -1140,7 +1145,13 @@ def climbs(
             # Joined to a floor, so the floor, or too small to be a flight.
             if not FLIGHT_MIN_PX <= sizes[comp] <= FLIGHT_MAX_PX:
                 continue
-            i = np.nonzero(on == comp)[0]
+            # Alongside it, as by the stairs drawn beside an escalator,
+            # joined to the floor, as at Court Sq, climbing as far.
+            cy, cx = np.nonzero(lab == comp)
+            near, _ = KDTree(np.stack([cx, cy], 1)).query(
+                pxy[path], distance_upper_bound=ALONGSIDE_PX
+            )
+            i = np.nonzero(np.isfinite(near))[0]
             # On and off it, as one may be drawn passing over another.
             first, last = i.min(), i.max()
             flight = flights.measure(kind, pxy[path[first : last + 1]], None)
@@ -1149,7 +1160,7 @@ def climbs(
             page = np.array(flight.page)
             along = (pxy[path[last]] - pxy[path[first]]) * REDUCE @ page / (page @ page)
             # Only clipped a corner of it.
-            if abs(along) < 0.5:
+            if abs(along) < TAKEN_SHARE:
                 continue
             up = 1 if along > 0 else -1
             risen += up * flight.rise
