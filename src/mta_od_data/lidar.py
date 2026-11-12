@@ -109,6 +109,8 @@ ALONGSIDE_PX = 12
 TAKEN_SHARE = 0.25
 # Paid floors are gray darker than this; lighter gray is outside the gates.
 PAID_MAX = 200
+# A stair's lighter treads, on an exploded map.
+TREAD_MAX = 215
 # Dashed drop lines' gray, about 186, on maps drawing levels apart.
 DASH_GRAY = (175, 200)
 # On the reduced map: the gap between one dash and the next, at most,
@@ -155,6 +157,15 @@ class StationMap:
     # the first that it's right of.
     # A walk only joins two connectors reaching one area.
     side_areas: tuple[tuple[str, float], ...] = ()
+    # Whether a color's platforms are drawn end to end, staggered along one line,
+    # as Port Authority's, so told apart along it, not across.
+    end_to_end: bool = False
+    # The drop lines' grays, darker where drawn behind something translucent.
+    dash_gray: tuple[int, int] = DASH_GRAY
+    # Whether floor drawn across a group's platforms is cut, as Bryant Pk's
+    # 42 St Connection, drawn over its B/D/F/M, is on another level;
+    # not where platforms drawn end to end have stairs between them.
+    cut_across: bool = True
 
     def area(self, pxy: np.ndarray) -> str:
         for name, x_min in self.side_areas:
@@ -221,7 +232,25 @@ BRYANT_PK = StationMap(
     corridors=True,
     exploded=True,
 )
-MAPS = (TIMES_SQ, NEVINS_ST, COURT_SQ, BRYANT_PK)
+PORT_AUTHORITY = StationMap(
+    name="42 St-Port Authority Bus Terminal",
+    file="42nd Street–Port Authority Bus Terminal (NYC subway station map).png",
+    main_rows=21666,
+    # Levels are OSM's: two islands under one long mezzanine.
+    # The passage to Times Sq runs off the map's edge, so isn't measured.
+    platforms=(
+        MapPlatform("w513706052", "blue", "ace", -2, None),
+        MapPlatform("w719086603", "blue", "ace", -2, None),
+    ),
+    table=None,
+    corridors=True,
+    exploded=True,
+    end_to_end=True,
+    # Darker behind the translucent bus terminal drawn over the mezzanine.
+    dash_gray=(170, 200),
+    cut_across=False,
+)
+MAPS = (TIMES_SQ, NEVINS_ST, COURT_SQ, BRYANT_PK, PORT_AUTHORITY)
 
 
 def colour_mask(img: np.ndarray, color: str) -> np.ndarray:
@@ -247,6 +276,8 @@ def colour_mask(img: np.ndarray, color: str) -> np.ndarray:
             return (r > 190) & (r - b > 110) & (g > 70) & (g < 150)
         case "green":
             return (g - r > 40) & (g - b > 40)
+        case "blue":
+            return (b - r > 120) & (b > 150) & (g < 110)
         case "magenta":
             return (r > 150) & (b > 140) & (r - g > 50) & (b - g > 40)
     raise ValueError(color)
@@ -314,8 +345,8 @@ def split_by_colour(img: np.ndarray, m: StationMap) -> dict[str, np.ndarray]:
         if len(ways) == 1:
             out[ways[0]] = pts
             continue
-        mean, _, cr = axis(pts)
-        t = (pts - mean) @ cr
+        mean, ax, cr = axis(pts)
+        t = (pts - mean) @ (ax if m.end_to_end else cr)
         lo, hi = np.percentile(t, 25), np.percentile(t, 75)
         for _ in range(30):
             cut = (lo + hi) / 2
@@ -997,11 +1028,20 @@ def corridor_walks(
     r, g, b = (img[..., i].astype(np.int16) for i in range(3))
     grey = (abs(r - g) < 16) & (abs(g - b) < 16)
     # Paid floors are darker; light gray is outside the gates, or closed.
-    dashes = grey & (r >= DASH_GRAY[0]) & (r < DASH_GRAY[1])
+    dashes = grey & (r >= m.dash_gray[0]) & (r < m.dash_gray[1])
     paid = grey & (r < PAID_MAX)
     if m.exploded:
         paid &= ~dashes
     walkable = ndimage.binary_opening(paid, np.ones((3, 3)))
+    if m.exploded:
+        # A stair hanging down from a floor, across its lighter treads,
+        # so it isn't cut into stripes apart from the floor, as at Port Authority.
+        walkable |= (
+            ndimage.binary_closing(walkable, iterations=3)
+            & grey
+            & (r < TREAD_MAX)
+            & ~dashes
+        )
     masks = {}
     for piece, way in proj.pieces.items() | {
         (p.way, p.way) for p in m.platforms if not p.fit
@@ -1019,7 +1059,7 @@ def corridor_walks(
     # Floor drawn over a group's platforms and the gap between them,
     # like Bryant Pk's 42 St Connection, is on another level, not a way across.
     group_of = {p.way: p.group for p in m.platforms}
-    for group in set(group_of.values()) if m.exploded else ():
+    for group in set(group_of.values()) if m.exploded and m.cut_across else ():
         ways = [w for w in masks if group_of[w] == group]
         if len(ways) < 2:
             continue
@@ -1075,13 +1115,33 @@ def corridor_walks(
             ndimage.binary_opening(grey & (r >= 60) & (r < 215), np.ones((3, 3)))
         )
         sizes = np.bincount(steps.ravel())
+        own: dict[str, set[int]] = {}
+        near_of = {
+            w: ndimage.binary_dilation(mask, iterations=CONTACT_PX)
+            for w, mask in masks.items()
+        }
         for piece, way in proj.pieces.items():
-            stairs = np.zeros(walkable.shape, bool)
+            own[way] = set()
             for _, _, px in feet(img, pieces[piece], masks[way]):
                 ids = steps[px[:, 1], px[:, 0]]
-                ids = ids[(ids > 0) & (sizes[ids] <= FLIGHT_MAX_PX)]
-                stairs |= np.isin(steps, np.unique(ids))
-            starts[way] &= stairs
+                own[way] |= set(ids[(ids > 0) & (sizes[ids] <= FLIGHT_MAX_PX)].tolist())
+        # One drawn touching two platforms, as where Port Authority's are
+        # drawn end to end, is the one's at its foot, the end lowest on the page,
+        # not a way between them.
+        for sid in set.intersection(*own.values()) if len(own) > 1 else set():
+            ys_s, xs_s = np.nonzero(steps == sid)
+            foot = ys_s >= ys_s.max() - 2
+            at = {
+                w: int(near_of[w][ys_s[foot], xs_s[foot]].sum())
+                for w in own
+                if sid in own[w]
+            }
+            keep = max(at, key=at.__getitem__)
+            for w in at:
+                if w != keep:
+                    own[w].discard(sid)
+        for way, ids in own.items():
+            starts[way] &= np.isin(steps, list(ids))
     seeds = {way: idx[start] for way, start in starts.items()}
     level = {p.way: p.level for p in m.platforms}
     pxy = np.stack([xs, ys], 1)
