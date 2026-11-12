@@ -273,7 +273,11 @@ With `--street-walks`, trains change between complexes on the streets too,
 out through one entrance and in through another, with no fare (`walks.rs`, from `subway-sheds`):
 each entrance takes its time to the platforms (`data/station_access.csv`),
 and the streets are walked at 3 mph between stations within 15 minutes of each other,
-to the closest stop on each pattern, as R5 keeps them.
+to every stop of each station reached,
+not just the closest on each pattern as R5 keeps them,
+so a transfer between stations near two adjacent stops of one line, like Broadway (G)'s
+between Hewes St and Lorimer St (J,M), is walked to whichever a rider wants,
+not all to whichever is a few seconds closer.
 Stops a footpath joins already keep it, like `transfers.txt`'s free ones or a passage.
 They're only for changing trains:
 a rider entering at one station doesn't walk out to another to board the first train,

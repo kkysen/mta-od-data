@@ -48,6 +48,9 @@ pub struct Walks {
     pub access: HashMap<String, Vec<(StopIdx, Secs)>>,
     /// `(from, to, walk)` between stops of stations in different complexes.
     pub transfers: Vec<(StopIdx, StopIdx, Secs)>,
+    /// Every `(from, to, walk)` between them, to every stop, not just the closest on each pattern,
+    /// for telling which station riders walk to apart from which is quickest to board at.
+    pub all_transfers: Vec<(StopIdx, StopIdx, Secs)>,
     /// Those of them between complexes changed between free though out of the system,
     /// to every stop, not just the closest on each pattern, which may not be free.
     pub free_transfers: Vec<(StopIdx, StopIdx, Secs)>,
@@ -385,6 +388,9 @@ impl Walks {
                 .filter(|&&(t, _)| &all.complexes[t as usize] != complex)
                 .flat_map(|&(t, walk)| stops[t as usize].iter().map(move |&b| (b, walk)))
                 .collect();
+            walks
+                .all_transfers
+                .extend(near.iter().map(|&(to, walk)| (i as StopIdx, to, walk)));
             for (to, walk) in closest_on_patterns(tts, &near) {
                 walks.transfers.push((i as StopIdx, to, walk));
             }

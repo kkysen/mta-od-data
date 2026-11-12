@@ -230,7 +230,7 @@ pub fn assign_dates(
             // Last, so as not to replace any walk there is.
             if let Some(all) = &street_walks {
                 let walks = Walks::for_feed(all, &[&tt], &[]);
-                let added = tt.use_street_transfers(&walks.transfers);
+                let added = tt.use_street_transfers(&walks.all_transfers);
                 write_street_transfers(&street_transfers_out(&job.out, job.date), &tt, &added)?;
             }
             Ok((tt, complexes))
