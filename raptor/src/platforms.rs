@@ -18,6 +18,8 @@ pub struct Platforms {
     /// Pairs of platforms one right over the other, each way round,
     /// and how many levels the second is above the first.
     stacked: HashMap<(String, String), i8>,
+    /// Each platform's OSM `level`, where it has one.
+    levels: HashMap<String, f64>,
 }
 
 #[derive(Deserialize)]
@@ -35,6 +37,12 @@ struct StackedRow {
     other: String,
     /// How many levels `other` is above `platform`, below if negative.
     levels_up: i8,
+}
+
+#[derive(Deserialize)]
+struct LevelRow {
+    platform: String,
+    level: f64,
 }
 
 impl Platforms {
@@ -61,7 +69,20 @@ impl Platforms {
             stacked.insert((row.other.clone(), row.platform.clone()), -row.levels_up);
             stacked.insert((row.platform, row.other), row.levels_up);
         }
-        Ok(Self { platforms, stacked })
+        let levels_path = path.with_file_name("platform_levels.csv");
+        let mut reader = csv::Reader::from_path(&levels_path)
+            .with_context(|| format!("opening {}", levels_path.display()))?;
+        let mut levels = HashMap::new();
+        for row in reader.deserialize() {
+            let row: LevelRow =
+                row.with_context(|| format!("reading {}", levels_path.display()))?;
+            levels.insert(row.platform, row.level);
+        }
+        Ok(Self {
+            platforms,
+            stacked,
+            levels,
+        })
     }
 
     /// The platform `route`'s trains from `prev` to `next` stop at at `stop`, if known.
@@ -77,8 +98,24 @@ impl Platforms {
     }
 }
 
+impl Platforms {
+    /// How many levels `b` is above `a` by OSM's `level`s, below if negative,
+    /// if both have one.
+    pub fn levels_up(&self, a: &str, b: &str) -> Option<i8> {
+        Some((self.levels.get(b)? - self.levels.get(a)?).round() as i8)
+    }
+}
+
 #[cfg(test)]
 impl Platforms {
+    /// These platforms, on these levels.
+    pub fn with_levels(mut self, levels: &[(&str, f64)]) -> Self {
+        for &(p, level) in levels {
+            self.levels.insert(p.into(), level);
+        }
+        self
+    }
+
     /// These platforms, with these pairs stacked, so many levels apart.
     pub fn with_stacked(mut self, pairs: &[(&str, &str, i8)]) -> Self {
         for &(a, b, levels) in pairs {
@@ -95,6 +132,7 @@ impl FromIterator<(Key, String)> for Platforms {
         Self {
             platforms: iter.into_iter().collect(),
             stacked: HashMap::new(),
+            levels: HashMap::new(),
         }
     }
 }

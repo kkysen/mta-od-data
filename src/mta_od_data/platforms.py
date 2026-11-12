@@ -69,6 +69,7 @@ DEFAULT_OUT = Path(__file__).parent / "ridership" / "platforms.csv"
 DEFAULT_AREAS_OUT = Path(__file__).parent / "ridership" / "platform_areas.csv"
 # Beside `platforms.csv`, where RAPTOR looks for it.
 DEFAULT_STACKED_OUT = Path(__file__).parent / "ridership" / "stacked_platforms.csv"
+DEFAULT_LEVELS_OUT = Path(__file__).parent / "ridership" / "platform_levels.csv"
 
 # Two platforms on different levels overlapping by at least this much of the smaller
 # are stacked: on OSM's, those a level apart overlap 68% or more, or 28% or less.
@@ -229,6 +230,9 @@ def fetch_platforms(
     stacked_out: Annotated[
         Path, Option(help="Those platforms stacked one right over another")
     ] = DEFAULT_STACKED_OUT,
+    levels_out: Annotated[
+        Path, Option(help="Each of those platforms' OSM `level`")
+    ] = DEFAULT_LEVELS_OUT,
 ) -> None:
     """Map each route's consecutive stops, in every feed version,
     to the OSM platforms its trains stop at there."""
@@ -387,3 +391,11 @@ def fetch_platforms(
         writer.writerow(["platform", "other", "levels_up", "overlap"])
         writer.writerows((a, b, n, f"{o:.2f}") for a, b, n, o in pairs)
     print(f"wrote {stacked_out}: {len(pairs)} pairs of platforms stacked")
+
+    with levels_out.open("w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["platform", "level"])
+        writer.writerows(
+            (p, f"{locations.levels[p]:g}") for p in platforms if p in locations.levels
+        )
+    print(f"wrote {levels_out}: {sum(p in locations.levels for p in platforms)} levels")

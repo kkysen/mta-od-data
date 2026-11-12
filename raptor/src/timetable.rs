@@ -413,14 +413,24 @@ impl Timetable {
 /// stairs, doors, overhead (Anita's `BASE_TRANSFER_TIME`).
 pub const BASE_WALK: Secs = 60;
 
-/// Up a flight of stairs, across between two stops, and down a flight,
-/// to another of a station's platforms.
-fn up_and_over(speeds: &Speeds, a: Option<(f64, f64)>, b: Option<(f64, f64)>) -> Secs {
+/// Across between two stops, to another of a station's platforms,
+/// up and down as many flights as it's `levels_up` above, or below if negative,
+/// or, on the same level or unknown, up a flight and back down.
+fn up_and_over(
+    speeds: &Speeds,
+    a: Option<(f64, f64)>,
+    b: Option<(f64, f64)>,
+    levels_up: Option<i8>,
+) -> Secs {
     let across = match (a, b) {
         (Some(a), Some(b)) => speeds.walk_secs(distance_m(a, b)),
         _ => 0.0,
     };
-    (speeds.flights_secs(1, 1) + across).round() as Secs
+    let climb = match levels_up {
+        Some(n) if n != 0 => speeds.flights_secs(n.max(0) as u8, (-n).max(0) as u8),
+        _ => speeds.flights_secs(1, 1),
+    };
+    (climb + across).round() as Secs
 }
 
 impl Timetable {
@@ -498,7 +508,7 @@ impl Timetable {
     /// Transfers by OSM's platforms instead of `transfers.txt`'s at its word:
     /// changing trains on one platform is free, at one stop or across an island,
     /// changing to another of the station's platforms goes up a flight, across,
-    /// and down (`up_and_over`),
+    /// and down (`up_and_over`), or up or down the levels between them by OSM's `level`s,
     /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
     /// of `BASE_WALK` plus the straight-line distance at `speeds`' walk.
     /// Between `platforms` stacked one right over another,
@@ -519,10 +529,14 @@ impl Timetable {
                 let b = &self.stops[*b as usize];
                 if a.station == b.station {
                     let same_platform = a.platform.is_some() && a.platform == b.platform;
+                    let levels_up = match (&a.platform, &b.platform) {
+                        (Some(pa), Some(pb)) => platforms.levels_up(pa, pb),
+                        _ => None,
+                    };
                     *walk = if same_platform {
                         0
                     } else {
-                        up_and_over(speeds, a.coords, b.coords)
+                        up_and_over(speeds, a.coords, b.coords, levels_up)
                     };
                 }
             }
@@ -823,6 +837,17 @@ mod tests {
         assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (23, 23));
         // No pathway from downtown to the copy: none at all.
         assert!(!tt.footpaths[3].iter().any(|p| p.0 == 5));
+    }
+
+    #[test]
+    fn platforms_levels_apart_climb_between() {
+        // Beta's local platform two levels below its island, not right under it.
+        let platforms = beta_platforms().with_levels(&[("island", -1.0), ("local", -3.0)]);
+        let mut tt = beta_split(&platforms);
+        tt.use_osm_transfers(std::iter::empty(), &platforms, &Speeds::default());
+        // Two flights up from the local platform, 27s, and down to it, 18s.
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (27, 18));
+        assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (27, 18));
     }
 
     #[test]

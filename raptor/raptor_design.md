@@ -206,6 +206,8 @@ Platforms are OSM's, from `platforms.csv` by each train's stops before and after
 and a stop whose trains use several is split into one for each,
 as Penn's uptown 2, on the 3's express island by day and the 1's local platform late at night.
 Two stops whose platforms aren't both known are up and over.
+Two platforms on different levels by OSM's `level`s (`platform_levels.csv`)
+instead climb the flights between them, up or down, across the walk between their stops.
 Platforms stacked one right over another take a flight of stairs a level instead,
 up or down by OSM's levels, about 13s a level up and 9s down,
 whether in one station or a complex:
