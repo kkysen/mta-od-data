@@ -219,6 +219,12 @@ and every other pair of a complex's stops gets a footpath
 of 60s plus their straight-line distance at `speeds`' 3 mph walk.
 Cross-platform changes are free under both.
 
+Over these guesses, where OSM maps a station's insides well enough to join two platforms,
+the walk along OSM's indoor ways between them (`raptor/osm_walks.csv`, `mta-od-data osm-walks`)
+is taken as right; pairs OSM doesn't join keep the guesses.
+Only 94 of 1,226 pairs of platforms within 150 m are joined so far.
+Pathways come over those, and walks measured off LiDAR maps (`raptor/lidar_walks.csv`) over all.
+
 `pathways.txt`, where a feed has it, comes first under either,
 which the MTA's doesn't yet, so it's tested on the MBTA's.
 From each served stop, Dijkstra over every station's pathways at once

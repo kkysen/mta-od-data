@@ -203,6 +203,7 @@ pub fn assign_dates(
 
     let passages = passages::load()?;
     let lidar_walks = lidar::load()?;
+    let osm_walks = lidar::load_osm()?;
     let street_walks = street_walks.map(StreetWalks::read).transpose()?;
     let start = Instant::now();
     let timetables: Vec<(Timetable, Complexes)> = jobs
@@ -221,6 +222,8 @@ pub fn assign_dates(
                     &config.speeds,
                 ),
             }
+            // OSM's indoor ways' walks where it maps any, over OSM transfers' guesses.
+            tt.use_walks(&osm_walks, &config.speeds);
             // Pathways, where a feed has them, over either.
             if !job.version.feed.pathways.is_empty() {
                 let gate_penalty = (config.fare_gate_penalty_min * 60.0).round() as Secs;
@@ -230,7 +233,7 @@ pub fn assign_dates(
             }
             // LiDAR maps' walks over any other inside the gates,
             // before passages, which are walked from them.
-            tt.use_lidar_walks(&lidar_walks, &config.speeds);
+            tt.use_walks(&lidar_walks, &config.speeds);
             tt.use_passages(&passages, &complexes, &config.speeds);
             // Last, so as not to replace any walk there is.
             if let Some(all) = &street_walks {

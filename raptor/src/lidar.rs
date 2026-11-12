@@ -4,6 +4,8 @@
 //! from OSM, `transfers.txt`, or pathways, and passages are walked from them,
 //! as the maps are drawn from 3D scans of the stations themselves.
 //! A pair of platforms the maps don't cover keeps the walk it had.
+//! OSM's indoor ways give walks in the same form (`raptor/osm_walks.csv`),
+//! over OSM transfers' but under pathways' and the maps'.
 //!
 //! The file holds geometry only, in metres:
 //! the straight line on the level between the connectors used,
@@ -43,10 +45,21 @@ pub type LidarWalks = HashMap<(String, String), LidarWalk>;
 
 /// `raptor/lidar_walks.csv`'s walks, built in, so every run walks the same ones.
 pub fn load() -> Result<LidarWalks> {
+    parse(include_str!("../lidar_walks.csv"), "lidar_walks.csv")
+}
+
+/// `raptor/osm_walks.csv`'s, along OSM's indoor ways (`mta-od-data osm-walks`),
+/// in the same form, where OSM joins two platforms;
+/// OSM is taken as right where it maps a walk at all.
+pub fn load_osm() -> Result<LidarWalks> {
+    parse(include_str!("../osm_walks.csv"), "osm_walks.csv")
+}
+
+fn parse(text: &str, name: &str) -> Result<LidarWalks> {
     let mut walks = LidarWalks::new();
-    let mut reader = csv::Reader::from_reader(include_str!("../lidar_walks.csv").as_bytes());
+    let mut reader = csv::Reader::from_reader(text.as_bytes());
     for row in reader.deserialize() {
-        let row: Row = row.context("parsing lidar_walks.csv")?;
+        let row: Row = row.with_context(|| format!("parsing {name}"))?;
         walks.insert((row.from_platform, row.to_platform), row.walk);
     }
     Ok(walks)
@@ -69,7 +82,7 @@ impl Timetable {
     /// `walks` between every two stops on platforms they join,
     /// replacing any footpath there was.
     /// Stops need their platforms from `split_platforms`.
-    pub fn use_lidar_walks(&mut self, walks: &LidarWalks, speeds: &Speeds) {
+    pub fn use_walks(&mut self, walks: &LidarWalks, speeds: &Speeds) {
         let on_mapped: Vec<(StopIdx, &str)> = self
             .stops
             .iter()

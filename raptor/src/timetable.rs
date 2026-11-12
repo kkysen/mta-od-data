@@ -978,7 +978,7 @@ mod tests {
                 escalator_down_m: 0.0,
             },
         )]);
-        tt.use_lidar_walks(&walks, &Speeds::default());
+        tt.use_walks(&walks, &Speeds::default());
 
         let walk = |x: usize, y: usize| {
             tt.footpaths[x]
