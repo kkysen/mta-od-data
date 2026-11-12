@@ -114,7 +114,19 @@ TIMES_SQ = StationMap(
     # mezzanine at 40 St, not joined to the rest inside the gates.
     side_areas=(("40 St & Broadway", 13_000), ("40 St & 7 Av", 10_500)),
 )
-MAPS = (TIMES_SQ,)
+NEVINS_ST = StationMap(
+    name="Nevins St",
+    file="Nevins St (NYC subway station map).png",
+    main_rows=3000,
+    # Two islands, each a direction's local and express, one level,
+    # joined by an underpass from openings in each.
+    platforms=(
+        MapPlatform("w907175962", "lightgrey", "all", -1, None),
+        MapPlatform("w907175963", "lightgrey", "all", -1, None),
+    ),
+    table="nevins_st_connectors.csv",
+)
+MAPS = (TIMES_SQ, NEVINS_ST)
 
 
 def colour_mask(img: np.ndarray, color: str) -> np.ndarray:
@@ -129,6 +141,8 @@ def colour_mask(img: np.ndarray, color: str) -> np.ndarray:
                 & (abs(b - 119) < 35)
                 & (r - b > 60)
             )
+        case "lightgrey":
+            return (abs(r - g) < 4) & (abs(g - b) < 4) & (r >= 218) & (r <= 226)
         case "magenta":
             return (r > 150) & (b > 140) & (r - g > 50) & (b - g > 40)
     raise ValueError(color)
