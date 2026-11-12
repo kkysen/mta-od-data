@@ -19,10 +19,10 @@ and since walking along the platform too.
 """
 
 import json
-import math
 import re
 from csv import DictReader, DictWriter
 from dataclasses import dataclass
+from math import cos, hypot, isnan, nan, radians
 from pathlib import Path
 from statistics import median
 from typing import Annotated, Any
@@ -160,14 +160,14 @@ def feet(text: str) -> float:
         return int(m[1].replace(",", "")) / 304.8
     m = re.match(r"\s*(\d+)\s*(?:'|’|ft)?\s*-?\s*(\d+)?", text)
     if not m:
-        return math.nan
+        return nan
     return int(m[1]) + int(m[2] or 0) / 12
 
 
 def _max(values: list[float]) -> float:
     """The largest of `values` that aren't NaN, or NaN if none."""
-    values = [v for v in values if not math.isnan(v)]
-    return max(values) if values else math.nan
+    values = [v for v in values if not isnan(v)]
+    return max(values) if values else nan
 
 
 @dataclass(frozen=True, slots=True)
@@ -193,13 +193,11 @@ def _chain(lifts: list[Lift]) -> float:
     as at Hudson Yards.
     """
     tallest = _max([lift.rise for lift in lifts])
-    if math.isnan(tallest):
-        return math.nan
+    if isnan(tallest):
+        return nan
     top = _max([lift.rise for lift in lifts if lift.street])
     rest = _max([lift.rise for lift in lifts if not lift.street])
-    return max(
-        tallest, (0 if math.isnan(top) else top) + (0 if math.isnan(rest) else rest)
-    )
+    return max(tallest, (0 if isnan(top) else top) + (0 if isnan(rest) else rest))
 
 
 def lift_depths(lifts: list[dict[str, str]]) -> dict[str, LiftDepths]:
@@ -207,7 +205,7 @@ def lift_depths(lifts: list[dict[str, str]]) -> dict[str, LiftDepths]:
     by_station: dict[str, tuple[list[Lift], list[Lift]]] = {}
     for row in lifts:
         rise = row["elevator_rise"] or row["escalator_rise"]
-        lift = Lift(feet(rise) if rise else math.nan, row["street_access"] == "YES")
+        lift = Lift(feet(rise) if rise else nan, row["street_access"] == "YES")
         elevators, escalators = by_station.setdefault(
             row["station_mrn"].lstrip("0"), ([], [])
         )
@@ -218,8 +216,8 @@ def lift_depths(lifts: list[dict[str, str]]) -> dict[str, LiftDepths]:
                 escalators.append(lift)
     return {
         station: LiftDepths(
-            elevator_ft=_chain(elevators) if elevators else math.nan,
-            escalator_ft=_chain(escalators) if escalators else math.nan,
+            elevator_ft=_chain(elevators) if elevators else nan,
+            escalator_ft=_chain(escalators) if escalators else nan,
             has_escalators=bool(escalators),
         )
         for station, (elevators, escalators) in by_station.items()
@@ -240,11 +238,11 @@ def osm_levels(stations: list[dict[str, str]], osm: dict[str, Any]) -> list[floa
             platforms.append((center["lat"], center["lon"], level))
 
     def nearest(lat: float, lon: float) -> float:
-        best = (150.0, math.nan)
+        best = (150.0, nan)
         for plat, plon, level in platforms:
             dy = (plat - lat) * 111_111
-            dx = (plon - lon) * 111_111 * math.cos(math.radians(lat))
-            best = min(best, (math.hypot(dx, dy), level))
+            dx = (plon - lon) * 111_111 * cos(radians(lat))
+            best = min(best, (hypot(dx, dy), level))
         return best[1]
 
     return [
@@ -258,8 +256,8 @@ def platform_ft(station: dict[str, str], lat: float, lon: float) -> float:
     slat = float(station["gtfs_latitude"])
     slon = float(station["gtfs_longitude"])
     dy = (lat - slat) * 111_111
-    dx = (lon - slon) * 111_111 * math.cos(math.radians(slat))
-    return math.hypot(dx, dy) * 3.28084
+    dx = (lon - slon) * 111_111 * cos(radians(slat))
+    return hypot(dx, dy) * 3.28084
 
 
 def entrance_secs(
@@ -301,14 +299,14 @@ def depths(
 ) -> dict[str, Depth]:
     """Each station's `Depth`, by GTFS stop ID."""
     levels = osm_levels(stations, osm)
-    none = LiftDepths(math.nan, math.nan, has_escalators=False)
+    none = LiftDepths(nan, nan, has_escalators=False)
     by_lifts = [lifts.get(s["station_id"], none) for s in stations]
     mta_ft = [_max([d.elevator_ft, d.escalator_ft]) for d in by_lifts]
     # Feet a level, as the MTA's heights fit OSM's levels where both have a station.
     ft_per_level = median(
         ft / abs(level)
         for ft, level in zip(mta_ft, levels, strict=True)
-        if not math.isnan(ft) and not math.isnan(level) and level != 0
+        if not isnan(ft) and not isnan(level) and level != 0
     )
 
     def depth(
@@ -316,9 +314,9 @@ def depths(
     ) -> tuple[float, str]:
         if station["gtfs_stop_id"] in DEPTHS:
             return DEPTHS[station["gtfs_stop_id"]]
-        if not math.isnan(mta_ft):
+        if not isnan(mta_ft):
             return mta_ft, "MTA elevators and escalators"
-        if not math.isnan(level) and level != 0:
+        if not isnan(level) and level != 0:
             return abs(level) * ft_per_level, f"OSM level {level:g}"
         return STRUCTURE_FT.get(
             station["structure"], 25

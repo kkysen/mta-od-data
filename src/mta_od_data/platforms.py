@@ -40,11 +40,11 @@ whose public servers were too busy to answer.
 """
 
 import csv
-import math
 from collections import Counter, defaultdict
 from contextlib import suppress
 from dataclasses import dataclass
 from itertools import pairwise
+from math import cos, hypot, radians
 from pathlib import Path
 from typing import Annotated
 from urllib.request import urlretrieve
@@ -147,20 +147,20 @@ class Locations(osmium.SimpleHandler):
 
 def metres(a: tuple[float, float], b: tuple[float, float]) -> float:
     """Roughly, at New York's latitude: plenty to tell stations apart."""
-    return math.hypot((a[0] - b[0]) * 111_000, (a[1] - b[1]) * 84_000)
+    return hypot((a[0] - b[0]) * 111_000, (a[1] - b[1]) * 84_000)
 
 
 def square_metres(ring: list[tuple[float, float]]) -> float:
     """A closed ring's area, by the shoelace formula,
     on a plane through its first point: exact enough across a platform."""
-    lat0 = math.radians(ring[0][0])
-    xy = [(lon * 111_320 * math.cos(lat0), lat * 111_320) for lat, lon in ring]
+    lat0 = radians(ring[0][0])
+    xy = [(lon * 111_320 * cos(lat0), lat * 111_320) for lat, lon in ring]
     return abs(sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in pairwise(xy))) / 2
 
 
 def plane(ring: list[tuple[float, float]]) -> BaseGeometry:
     """A ring as a polygon in metres, on a plane through New York."""
-    k = 111_320 * math.cos(math.radians(40.7))
+    k = 111_320 * cos(radians(40.7))
     return Polygon([(lon * k, lat * 111_320) for lat, lon in ring]).buffer(0)
 
 
