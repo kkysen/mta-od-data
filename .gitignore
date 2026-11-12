@@ -32,6 +32,7 @@ data/*
 !src/mta_od_data/ridership/platforms.csv
 !src/mta_od_data/ridership/platform_areas.csv
 !src/mta_od_data/ridership/stacked_platforms.csv
+!src/mta_od_data/ridership/platform_levels.csv
 
 # Contains useful settings for JSON schemas.
 !.vscode/
