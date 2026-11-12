@@ -1,8 +1,11 @@
 """
 How long it takes to get between the street and the platforms
 through each station entrance:
-climbing or riding the station's depth or height, and through the fare gates,
+climbing or riding the station's depth or height, through the fare gates,
+and along the platform to its middle, the station's GTFS coordinate,
 for changing trains between stations on the streets.
+Riders who know which car stops by the stairs walk less,
+but no data says how many do.
 
 The depth comes from, in order:
 the heights of the MTA's elevators and escalators,
@@ -11,7 +14,8 @@ the levels OpenStreetMap puts the station's platforms on,
 in feet as the MTA's heights fit them,
 and last the station's structure.
 
-Moved from `subway-sheds`, as it was there but for its planned stations.
+Moved from `subway-sheds`, as it was there but for its planned stations,
+and since walking along the platform too.
 """
 
 import json
@@ -57,6 +61,7 @@ COLUMNS = [
     "kind",
     "depth_ft",
     "depth_source",
+    "platform_ft",
     "secs",
 ]
 
@@ -247,12 +252,31 @@ def osm_levels(stations: list[dict[str, str]], osm: dict[str, Any]) -> list[floa
     ]
 
 
+def platform_ft(station: dict[str, str], lat: float, lon: float) -> float:
+    """How far an entrance at `lat`, `lon` is along the platforms from their middle,
+    the station's GTFS coordinate, in a straight line."""
+    slat = float(station["gtfs_latitude"])
+    slon = float(station["gtfs_longitude"])
+    dy = (lat - slat) * 111_111
+    dx = (lon - slon) * 111_111 * math.cos(math.radians(slat))
+    return math.hypot(dx, dy) * 3.28084
+
+
 def entrance_secs(
-    kind: str, depth_ft: float, has_escalators: bool, walk: Walk | None
+    kind: str,
+    depth_ft: float,
+    has_escalators: bool,
+    walk: Walk | None,
+    platform_ft: float = 0.0,
 ) -> float:
-    """Seconds between the street and the platform through an entrance of `kind`."""
+    """Seconds between the street and the middle of the platform
+    through an entrance of `kind`, `platform_ft` from it along the platforms."""
     if walk is not None:
         return walk.feet / WALK_FT_PER_S + walk.climb_ft / STAIRS_FT_PER_S + GATES_S
+    return platform_ft / WALK_FT_PER_S + _climb_secs(kind, depth_ft, has_escalators)
+
+
+def _climb_secs(kind: str, depth_ft: float, has_escalators: bool) -> float:
     if "Elevator" in kind or (depth_ft > DEEP_FT and not has_escalators):
         return (
             ELEVATOR_WAIT_S + ELEVATOR_DOORS_S + depth_ft / ELEVATOR_FT_PER_S + GATES_S
@@ -325,6 +349,7 @@ def build(stations_csv: Path = DEFAULT_STATIONS_CSV) -> list[dict[str, object]]:
         depth = by_id[gtfs_id]
         complex_id = depth.station["complex_id"]
         walk = WALKS.get((lat, lon))
+        along = 0.0 if walk else platform_ft(depth.station, lat, lon)
         return {
             "station": gtfs_id,
             "complex": JOINED_COMPLEXES.get(complex_id, complex_id),
@@ -334,7 +359,10 @@ def build(stations_csv: Path = DEFAULT_STATIONS_CSV) -> list[dict[str, object]]:
             "kind": kind,
             "depth_ft": round(depth.ft, 1),
             "depth_source": walk.note if walk else depth.source,
-            "secs": round(entrance_secs(kind, depth.ft, depth.has_escalators, walk)),
+            "platform_ft": round(along),
+            "secs": round(
+                entrance_secs(kind, depth.ft, depth.has_escalators, walk, along)
+            ),
         }
 
     rows = [

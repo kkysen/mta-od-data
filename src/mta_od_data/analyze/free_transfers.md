@@ -11,11 +11,11 @@ Produced by `mta-od-data analyze free-transfers --markdown-out src/mta_od_data/a
 | Measure | Value |
 | --- | ---: |
 | Riders on an average weekday | 4,054,989 |
-| Riders making a free transfer out of the system | (9.7%) 392,277 |
-| Rider time saved a day (h:mm) | 15,822:37 |
-| By riders making a free transfer | 11,971:34 |
-| By the rest, splitting differently (not attributed) | 3,851:03 |
-| Time saved per rider making one | 1:50 |
+| Riders making a free transfer out of the system | (5.7%) 230,219 |
+| Rider time saved a day (h:mm) | 8,757:15 |
+| By riders making a free transfer | 5,659:06 |
+| By the rest, splitting differently (not attributed) | 3,098:09 |
+| Time saved per rider making one | 1:28 |
 
 ## The 50 transfers saving the most
 
@@ -23,53 +23,53 @@ Each way's riders are in the order the transfer names its complexes.
 
 | # | Transfer | Walk | Riders a day | Each way | Rider time saved a day (h:mm) | Time saved per rider |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | Fulton St (G) ↔ Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) | 5:02 | 17,146 | 7,793 / 9,353 | 1,208:01 | 4:14 |
-| 2 | Broadway (G) ↔ Lorimer St (M,J) | 3:55 | 11,535 | 6,691 / 4,844 | 1,114:08 | 5:48 |
-| 3 | 59 St-Columbus Circle (1,A,C,B,D) ↔ 57 St-7 Av (N,Q,R,W) | 4:16 | 26,537 | 15,078 / 11,460 | 966:49 | 2:11 |
-| 4 | Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) ↔ Fulton St (2,3,4,5,A,C,J,Z) | 1:06 | 18,682 | 8,960 / 9,721 | 607:18 | 1:57 |
-| 5 | Hunts Point Av (6) ↔ Simpson St (2,5) | 7:24 | 3,767 | 1,727 / 2,040 | 523:38 | 8:20 |
-| 6 | 50 St (C,E) ↔ 50 St (1) | 2:46 | 15,340 | 9,601 / 5,739 | 505:23 | 1:59 |
-| 7 | Hoyt-Schermerhorn Sts (A,C,G) ↔ Hoyt St (2,3) | 3:33 | 7,688 | 5,035 / 2,653 | 436:14 | 3:24 |
-| 8 | Chambers St (1,2,3) ↔ Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) | 2:56 | 9,735 | 5,366 / 4,369 | 362:55 | 2:14 |
-| 9 | Whitlock Av (6) ↔ Freeman St (2,5) | 9:05 | 1,662 | 1,002 / 660 | 358:32 | 12:57 |
-| 10 | 49 St (N,R,W) ↔ 50 St (1) | 2:17 | 11,771 | 5,044 / 6,727 | 266:31 | 1:22 |
-| 11 | Lafayette Av (C) ↔ Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) | 5:34 | 6,020 | 3,091 / 2,929 | 251:57 | 2:31 |
-| 12 | Hoyt St (2,3) ↔ Jay St-MetroTech (A,C,F,R) | 2:53 | 7,642 | 3,577 / 4,066 | 238:08 | 1:52 |
-| 13 | 7 Av (E,B,D) ↔ 57 St-7 Av (N,Q,R,W) | 3:11 | 10,378 | 4,507 / 5,872 | 227:11 | 1:19 |
-| 14 | 116 St (C,B) ↔ 116 St (2,3) | 7:22 | 2,024 | 886 / 1,138 | 208:48 | 6:11 |
-| 15 | 145 St (A,C,B,D) ↔ 145 St (1) | 7:48 | 4,894 | 2,578 / 2,316 | 207:08 | 2:32 |
-| 16 | 36 St (M,R) ↔ 39 Av-Dutch Kills (N,W) | 4:40 | 2,592 | 1,161 / 1,430 | 206:54 | 4:47 |
-| 17 | Rector St (1) ↔ Wall St (4,5) | 2:53 | 4,578 | 2,329 / 2,248 | 186:30 | 2:27 |
-| 18 | Hoyt-Schermerhorn Sts (A,C,G) ↔ DeKalb Av (B,Q,R) | 6:00 | 7,974 | 4,675 / 3,299 | 178:41 | 1:21 |
-| 19 | 135 St (C,B) ↔ 135 St (2,3) | 9:10 | 2,073 | 942 / 1,131 | 160:22 | 4:38 |
-| 20 | Hewes St (M,J) ↔ Metropolitan Av/Lorimer St (G,L) | 9:43 | 1,389 | 205 / 1,185 | 158:20 | 6:50 |
-| 21 | Hewes St (M,J) ↔ Broadway (G) | 4:04 | 1,454 | 1,454 / 0 | 136:53 | 5:39 |
-| 22 | 116 St (6) ↔ 116 St (2,3) | 10:36 | 2,122 | 828 / 1,293 | 134:20 | 3:48 |
-| 23 | Prince St (R,W) ↔ Broadway-Lafayette St/Bleecker St (6,B,D,F,M) | 3:11 | 7,215 | 3,147 / 4,067 | 134:08 | 1:07 |
-| 24 | 47-50 Sts-Rockefeller Ctr (B,D,F,M) ↔ 50 St (1) | 4:51 | 6,768 | 3,754 / 3,014 | 128:35 | 1:08 |
-| 25 | Nostrand Av (A,C) ↔ Franklin Av (C,S) | 4:18 | 1,992 | 1,030 / 962 | 128:25 | 3:52 |
-| 26 | Bedford Park Blvd (B,D) ↔ Bedford Park Blvd-Lehman College (4) | 4:32 | 1,444 | 564 / 879 | 125:36 | 5:13 |
-| 27 | 110 St (6) ↔ 110 St-Malcolm X Plaza (2,3) | 11:29 | 2,259 | 1,051 / 1,207 | 124:13 | 3:18 |
-| 28 | Longwood Av (6) ↔ Prospect Av (2,5) | 8:19 | 1,108 | 565 / 543 | 121:57 | 6:36 |
-| 29 | 3 Av (L) ↔ 14 St-Union Sq (4,5,6,L,N,Q,R,W) | 4:00 | 14,793 | 10,708 / 4,085 | 120:31 | 0:29 |
-| 30 | 14 St/6 Av (1,2,3,L,F,M) ↔ 14 St/8 Av (A,C,E,L) | 4:19 | 6,350 | 4,062 / 2,289 | 116:48 | 1:06 |
-| 31 | Queens Plaza (E,F,R) ↔ Queensboro Plaza (7,N,W) | 4:29 | 5,863 | 4,098 / 1,765 | 115:37 | 1:11 |
-| 32 | Canal St (A,C,E) ↔ Canal St (1) | 2:39 | 2,843 | 1,804 / 1,038 | 113:38 | 2:24 |
-| 33 | Fordham Rd (B,D) ↔ Fordham Rd (4) | 4:50 | 1,397 | 616 / 781 | 112:11 | 4:49 |
-| 34 | 86 St (4,5,6) ↔ 86 St (Q) | 7:01 | 2,009 | 1,448 / 561 | 111:40 | 3:20 |
-| 35 | Kingsbridge Rd (B,D) ↔ Kingsbridge Rd (4) | 4:54 | 835 | 371 / 465 | 84:21 | 6:03 |
-| 36 | Cathedral Pkwy (110 St) (C,B) ↔ 110 St-Malcolm X Plaza (2,3) | 8:11 | 763 | 499 / 264 | 84:11 | 6:37 |
-| 37 | 125 St (A,C,B,D) ↔ 125 St (2,3) | 9:16 | 1,808 | 822 / 986 | 83:15 | 2:46 |
-| 38 | W 4 St-Wash Sq (A,C,E,B,D,F,M) ↔ Christopher St-Stonewall (1) | 4:33 | 6,465 | 3,251 / 3,214 | 82:12 | 0:46 |
-| 39 | 125 St (4,5,6) ↔ 125 St (2,3) | 11:02 | 1,729 | 1,127 / 602 | 82:01 | 2:51 |
-| 40 | 34 St-Penn Station (1,2,3) ↔ 34 St-Herald Sq (B,D,F,M,N,Q,R,W) | 4:59 | 11,951 | 4,543 / 7,408 | 81:03 | 0:24 |
-| 41 | Rector St (R,W) ↔ Wall St (4,5) | 2:09 | 1,804 | 1,066 / 739 | 72:16 | 2:24 |
-| 42 | 23 St (F,M) ↔ 23 St (1) | 3:43 | 3,948 | 2,347 / 1,601 | 70:37 | 1:04 |
-| 43 | DeKalb Av (B,Q,R) ↔ Nevins St (2,3,4,5) | 3:45 | 7,789 | 5,203 / 2,585 | 69:26 | 0:32 |
-| 44 | Flushing Av (G) ↔ Flushing Av (M,J) | 10:09 | 648 | 0 / 648 | 67:55 | 6:17 |
-| 45 | City Hall (R,W) ↔ Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) | 2:39 | 2,659 | 1,641 / 1,018 | 66:27 | 1:30 |
-| 46 | 145 St (A,C,B,D) ↔ 145 St (3) | 11:16 | 535 | 362 / 173 | 64:31 | 7:14 |
-| 47 | Queens Plaza (E,F,R) ↔ 39 Av-Dutch Kills (N,W) | 6:35 | 1,412 | 0 / 1,412 | 63:34 | 2:42 |
-| 48 | Hoyt-Schermerhorn Sts (A,C,G) ↔ Nevins St (2,3,4,5) | 6:55 | 1,403 | 908 / 496 | 62:02 | 2:39 |
-| 49 | Parsons Blvd (F) ↔ Jamaica Center-Parsons/Archer (E,J,Z) | 9:06 | 831 | 433 / 398 | 60:23 | 4:22 |
-| 50 | WTC Cortlandt (1) ↔ Fulton St (2,3,4,5,A,C,J,Z) | 4:38 | 2,226 | 1,053 / 1,172 | 59:06 | 1:36 |
+| 1 | Hewes St (M,J) ↔ Broadway (G) | 5:54 | 6,092 | 1,272 / 4,820 | 670:33 | 6:36 |
+| 2 | Fulton St (G) ↔ Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) | 7:32 | 9,885 | 4,991 / 4,894 | 500:10 | 3:02 |
+| 3 | Hunts Point Av (6) ↔ Simpson St (2,5) | 8:50 | 3,144 | 1,573 / 1,571 | 453:26 | 8:39 |
+| 4 | Hoyt-Schermerhorn Sts (A,C,G) ↔ Hoyt St (2,3) | 5:07 | 6,019 | 3,934 / 2,085 | 264:54 | 2:38 |
+| 5 | Whitlock Av (6) ↔ Freeman St (2,5) | 10:36 | 1,127 | 632 / 495 | 263:12 | 14:01 |
+| 6 | Broadway (G) ↔ Lorimer St (M,J) | 5:59 | 3,188 | 0 / 3,188 | 259:01 | 4:52 |
+| 7 | 50 St (C,E) ↔ 50 St (1) | 3:54 | 12,366 | 7,791 / 4,574 | 247:24 | 1:12 |
+| 8 | 7 Av (E,B,D) ↔ 57 St-7 Av (N,Q,R,W) | 4:08 | 10,309 | 5,072 / 5,237 | 182:41 | 1:04 |
+| 9 | Longwood Av (6) ↔ Prospect Av (2,5) | 8:55 | 1,429 | 837 / 593 | 166:09 | 6:59 |
+| 10 | 116 St (C,B) ↔ 116 St (2,3) | 8:32 | 1,499 | 662 / 837 | 155:05 | 6:12 |
+| 11 | Lafayette Av (C) ↔ Atlantic Av-Barclays Ctr (2,3,4,5,B,D,N,Q,R) | 6:55 | 5,488 | 2,742 / 2,746 | 153:23 | 1:41 |
+| 12 | Rector St (1) ↔ Wall St (4,5) | 3:47 | 4,888 | 2,383 / 2,505 | 150:47 | 1:51 |
+| 13 | 36 St (M,R) ↔ 39 Av-Dutch Kills (N,W) | 6:51 | 1,988 | 954 / 1,034 | 130:10 | 3:56 |
+| 14 | 59 St-Columbus Circle (1,A,C,B,D) ↔ 57 St-7 Av (N,Q,R,W) | 7:14 | 6,170 | 3,296 / 2,874 | 123:36 | 1:12 |
+| 15 | Chambers St (1,2,3) ↔ Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) | 4:14 | 5,646 | 3,851 / 1,795 | 122:34 | 1:18 |
+| 16 | 116 St (6) ↔ 116 St (2,3) | 11:05 | 2,459 | 909 / 1,550 | 117:10 | 2:52 |
+| 17 | 145 St (A,C,B,D) ↔ 145 St (1) | 9:03 | 3,640 | 1,900 / 1,740 | 114:38 | 1:53 |
+| 18 | 135 St (C,B) ↔ 135 St (2,3) | 10:31 | 1,485 | 585 / 900 | 106:25 | 4:18 |
+| 19 | Bedford Park Blvd (B,D) ↔ Bedford Park Blvd-Lehman College (4) | 6:09 | 1,159 | 477 / 681 | 102:50 | 5:20 |
+| 20 | 86 St (4,5,6) ↔ 86 St (Q) | 7:40 | 1,857 | 1,393 / 463 | 100:45 | 3:15 |
+| 21 | 125 St (A,C,B,D) ↔ 125 St (2,3) | 9:54 | 2,243 | 1,093 / 1,150 | 98:58 | 2:39 |
+| 22 | Fordham Rd (B,D) ↔ Fordham Rd (4) | 5:38 | 1,181 | 465 / 716 | 98:08 | 4:59 |
+| 23 | Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) ↔ Fulton St (2,3,4,5,A,C,J,Z) | 3:12 | 6,127 | 3,148 / 2,979 | 98:03 | 0:58 |
+| 24 | 125 St (4,5,6) ↔ 125 St (2,3) | 11:28 | 2,185 | 1,338 / 847 | 94:01 | 2:35 |
+| 25 | Hoyt-Schermerhorn Sts (A,C,G) ↔ Nevins St (2,3,4,5) | 7:50 | 2,077 | 1,019 / 1,058 | 92:22 | 2:40 |
+| 26 | Prince St (R,W) ↔ Broadway-Lafayette St/Bleecker St (6,B,D,F,M) | 3:43 | 5,974 | 2,713 / 3,261 | 91:05 | 0:55 |
+| 27 | Queens Plaza (E,F,R) ↔ Queensboro Plaza (7,N,W) | 5:35 | 4,105 | 2,312 / 1,793 | 87:54 | 1:17 |
+| 28 | Hoyt St (2,3) ↔ Jay St-MetroTech (A,C,F,R) | 4:12 | 4,200 | 2,069 / 2,131 | 83:24 | 1:11 |
+| 29 | 110 St (6) ↔ 110 St-Malcolm X Plaza (2,3) | 12:08 | 1,969 | 977 / 993 | 80:38 | 2:27 |
+| 30 | Borough Hall/Court St (2,3,4,5,R) ↔ Jay St-MetroTech (A,C,F,R) | 5:27 | 5,157 | 2,914 / 2,243 | 73:58 | 0:52 |
+| 31 | Kingsbridge Rd (B,D) ↔ Kingsbridge Rd (4) | 6:28 | 619 | 291 / 328 | 68:40 | 6:40 |
+| 32 | Cathedral Pkwy (110 St) (C,B) ↔ 110 St-Malcolm X Plaza (2,3) | 9:38 | 626 | 413 / 213 | 63:13 | 6:04 |
+| 33 | Rector St (R,W) ↔ Wall St (4,5) | 3:11 | 1,642 | 1,047 / 595 | 59:53 | 2:11 |
+| 34 | City Hall (R,W) ↔ Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) | 3:57 | 2,894 | 1,592 / 1,301 | 55:47 | 1:09 |
+| 35 | Flushing Av (G) ↔ Flushing Av (M,J) | 12:02 | 559 | 0 / 559 | 53:19 | 5:43 |
+| 36 | 49 St (N,R,W) ↔ 50 St (1) | 3:57 | 7,400 | 3,174 / 4,226 | 52:48 | 0:26 |
+| 37 | 96 St (6) ↔ 96 St (Q) | 6:47 | 1,172 | 1,039 / 132 | 49:14 | 2:31 |
+| 38 | 145 St (A,C,B,D) ↔ 145 St (3) | 12:40 | 448 | 299 / 148 | 47:29 | 6:22 |
+| 39 | Marcy Av (M,J,Z) ↔ Broadway (G) | 10:49 | 664 | 241 / 422 | 40:42 | 3:41 |
+| 40 | Flushing Av (G) ↔ Lorimer St (M,J) | 10:00 | 308 | 308 / 0 | 40:33 | 7:55 |
+| 41 | WTC Cortlandt (1) ↔ Fulton St (2,3,4,5,A,C,J,Z) | 5:35 | 2,615 | 1,203 / 1,412 | 39:05 | 0:54 |
+| 42 | Sutphin Blvd (F) ↔ Sutphin Blvd-Archer Av-JFK Airport (E,J,Z) | 9:39 | 1,099 | 527 / 571 | 38:10 | 2:05 |
+| 43 | Canal St (A,C,E) ↔ Canal St (1) | 4:43 | 1,346 | 790 / 557 | 37:58 | 1:42 |
+| 44 | Winthrop St (2,5) ↔ Parkside Av (Q) | 13:55 | 820 | 399 / 420 | 37:53 | 2:46 |
+| 45 | Tremont Av (B,D) ↔ Burnside Av (4) | 7:57 | 748 | 470 / 278 | 37:33 | 3:01 |
+| 46 | 103 St (C,B) ↔ 103 St (1) | 10:48 | 629 | 246 / 383 | 35:22 | 3:22 |
+| 47 | Dyckman St (A) ↔ Dyckman St (1) | 8:41 | 441 | 175 / 266 | 32:07 | 4:22 |
+| 48 | WTC Cortlandt (1) ↔ Chambers St/WTC/Park Place/Cortlandt St (2,3,A,C,E,R,W) | 4:17 | 1,225 | 753 / 472 | 32:03 | 1:34 |
+| 49 | Hoyt-Schermerhorn Sts (A,C,G) ↔ DeKalb Av (B,Q,R) | 7:54 | 4,333 | 2,556 / 1,778 | 31:29 | 0:26 |
+| 50 | Avenue P (F) ↔ Bay Pkwy (N) | 13:37 | 315 | 145 / 169 | 30:48 | 5:52 |
