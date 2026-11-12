@@ -42,8 +42,8 @@
   // Crowding would slow them, but isn't modeled yet.
   // Where nothing measures it, a flight of stairs is a level, 4.5 m, at 30 degrees:
   // OSM transfers' up and over, and between platforms stacked one right over another
-  // (`stacked_platforms.csv`), a flight a level, which way unknown,
-  // and passages' levels.
+  // (`stacked_platforms.csv`), a flight a level, up or down by OSM's levels,
+  // and passages' levels, which way unknown.
   speeds: {
     walk_mph: 3.0,
     stairs_up_mph: 1.1,

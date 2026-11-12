@@ -206,7 +206,7 @@ and a stop whose trains use several is split into one for each,
 as Penn's uptown 2, on the 3's express island by day and the 1's local platform late at night.
 Two stops whose platforms aren't both known are up and over.
 Platforms stacked one right over another take a flight of stairs a level instead,
-halfway between up and down as which is higher isn't known, about 15s a level,
+up or down by OSM's levels, about 18s a level up and 13s down,
 whether in one station or a complex:
 OSM's on different levels and overlapping by at least half the smaller one,
 as 7 Av's on 53 St, 81 St's, or Jamaica Center's E over its J/Z, a level apart,
