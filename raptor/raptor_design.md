@@ -199,14 +199,15 @@ at one stop or across an island to the other direction's;
 changing to another of the station's platforms, up and over,
 takes a flight of stairs up, the walk across between the two stops, and a flight down,
 which Anita's model doesn't have (it makes every change within a station free).
-A flight is a level, 4.5 m, at 30 degrees: 9 m along its slope,
-at `speeds`' 1.1 mph up and 1.6 mph down (`raptor/assign.json5`), 31s up and down.
+A flight is a level, 3.3 m, at 30 degrees: 6.6 m along its slope,
+at `speeds`' 1.1 mph up and 1.6 mph down (`raptor/assign.json5`), 23s up and down.
+3.3 m is the median of the flights LiDAR maps measure, 3.1 to 3.4 m platform to mezzanine.
 Platforms are OSM's, from `platforms.csv` by each train's stops before and after,
 and a stop whose trains use several is split into one for each,
 as Penn's uptown 2, on the 3's express island by day and the 1's local platform late at night.
 Two stops whose platforms aren't both known are up and over.
 Platforms stacked one right over another take a flight of stairs a level instead,
-up or down by OSM's levels, about 18s a level up and 13s down,
+up or down by OSM's levels, about 13s a level up and 9s down,
 whether in one station or a complex:
 OSM's on different levels and overlapping by at least half the smaller one,
 as 7 Av's on 53 St, 81 St's, or Jamaica Center's E over its J/Z, a level apart,
@@ -261,7 +262,7 @@ so far the 42 St Connection,
 from 42 St-Bryant Pk's B, D, F, and M platform up a level to Times Sq's shuttle platform.
 A passage is timed as a complex's other walks between platforms are under OSM's:
 its ends' straight-line distance at `speeds`' 3 mph walk, platform middle to platform middle,
-plus a flight of stairs a level, about 195s for the 42 St Connection.
+plus a flight of stairs a level, about 190s for the 42 St Connection.
 Every stop of either complex gets a footpath to every stop of the other through it,
 by its complex's own walks to and from the passage's ends,
 as RAPTOR takes one footpath a change.

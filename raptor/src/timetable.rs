@@ -738,8 +738,8 @@ mod tests {
             &Platforms::default(),
             &Speeds::default(),
         );
-        // Up a flight and down another, 9 m each along the slope, at 1.1 and 1.6 mph.
-        assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 31)]);
+        // Up a flight and down another, 6.6 m each along the slope, at 1.1 and 1.6 mph.
+        assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 23)]);
     }
 
     /// Beta, where uptown 1s stop at the local platform, uptown 2s at the island,
@@ -796,7 +796,7 @@ mod tests {
         tt.use_osm_transfers(std::iter::empty(), &platforms, &Speeds::default());
         // Across the island is free, whichever direction; up and over isn't.
         assert_eq!((walk(&tt, 5, 3), walk(&tt, 3, 5)), (0, 0));
-        assert_eq!((walk(&tt, 2, 5), walk(&tt, 2, 3)), (31, 31));
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 2, 3)), (23, 23));
         assert_eq!(tt.min_change[2], 0);
     }
 
@@ -820,7 +820,7 @@ mod tests {
             (40, 40, 40)
         );
         // From the island to the local platform, by OSM.
-        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (31, 31));
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (23, 23));
         // No pathway from downtown to the copy: none at all.
         assert!(!tt.footpaths[3].iter().any(|p| p.0 == 5));
     }
@@ -831,9 +831,9 @@ mod tests {
         let platforms = beta_platforms().with_stacked(&[("island", "local", 2)]);
         let mut tt = beta_split(&platforms);
         tt.use_osm_transfers(std::iter::empty(), &platforms, &Speeds::default());
-        // Two flights down from the local platform, 25s, and up to it, 37s.
-        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (25, 37));
-        assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (25, 37));
+        // Two flights down from the local platform, 18s, and up to it, 27s.
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (18, 27));
+        assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (18, 27));
         // Across the island is still free.
         assert_eq!((walk(&tt, 5, 3), walk(&tt, 3, 5)), (0, 0));
     }
@@ -988,9 +988,9 @@ mod tests {
         };
         // The mapped direction is LiDAR's; the other, and the uncovered pair, stay up and over.
         assert_eq!(walk(a, b), Some(20 + 10 + 10));
-        // Up and down a flight, 31s, and across 120 m and 240 m at 3 mph, 89s and 179s.
-        assert_eq!(walk(b, a), Some(121));
-        assert_eq!(walk(a, c), Some(210));
+        // Up and down a flight, 23s, and across 120 m and 240 m at 3 mph, 89s and 179s.
+        assert_eq!(walk(b, a), Some(112));
+        assert_eq!(walk(a, c), Some(202));
     }
 
     #[test]

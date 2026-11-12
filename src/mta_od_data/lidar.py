@@ -88,9 +88,9 @@ STEP_SCORE_MIN = 30
 STAIR_SLOPE = (25, 38)
 ESCALATOR_SLOPE = (20, 34)
 ESCALATOR_RISE_MIN = 2.0
-# A flight's rise where none is measured, in metres,
-# and its run, at 30 degrees.
-DEFAULT_RISE = 4.5
+# A flight's rise where none is measured at a station, in metres,
+# the median measured here, as `raptor`'s `LEVEL_RISE_M`, and its run, at 30 degrees.
+DEFAULT_RISE = 3.3
 DEFAULT_RUN = DEFAULT_RISE * 3**0.5
 # How near, on the full-size map, a stair found by color is to a table's,
 # at most, to be the same.

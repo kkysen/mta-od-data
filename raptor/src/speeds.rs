@@ -38,9 +38,11 @@ pub fn m_per_s(mph: f64) -> f64 {
     mph * METRES_PER_MILE / 3600.0
 }
 
-/// A level's height where nothing measures it, in metres,
-/// as the user agreed; LiDAR maps measure 3.1 to 3.4 m platform to mezzanine.
-pub const LEVEL_RISE_M: f64 = 4.5;
+/// A level's height where nothing measures it, in metres:
+/// the median of the flights LiDAR maps measure, 3.1 to 3.4 m platform to mezzanine,
+/// as the user's count at 125 St, 3.2 m.
+/// Taller climbs, as by long escalators and the stairs beside them, span more levels.
+pub const LEVEL_RISE_M: f64 = 3.3;
 /// A flight of stairs a level, along its slope, at 30 degrees.
 pub const FLIGHT_M: f64 = 2.0 * LEVEL_RISE_M;
 
@@ -71,8 +73,8 @@ mod tests {
     #[test]
     fn flights() {
         let s = Speeds::default();
-        // 9 m along the slope, at 1.1 mph up and 1.6 mph down.
-        assert_eq!(s.flights_secs(1, 1).round(), 31.0);
-        assert_eq!(s.levels_secs(2).round(), 31.0);
+        // 6.6 m along the slope, at 1.1 mph up and 1.6 mph down.
+        assert_eq!(s.flights_secs(1, 1).round(), 23.0);
+        assert_eq!(s.levels_secs(2).round(), 23.0);
     }
 }
