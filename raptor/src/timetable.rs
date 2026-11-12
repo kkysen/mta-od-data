@@ -917,6 +917,56 @@ mod tests {
     }
 
     #[test]
+    fn lidar_walks_over_osm_transfers() {
+        // A and B on mapped platforms, C on one the maps don't cover; one station.
+        let stops = "stop_id,stop_name,stop_lat,stop_lon,parent_station\n\
+            P,P,40.0,-74.0,\nA,A,40.0,-74.0,P\nB,B,40.0,-73.99859,P\nC,C,40.002156,-74.0,P\n";
+        let files = HashMap::from([
+            ("stops.txt", stops),
+            ("trips.txt", "route_id,trip_id,service_id\n1,t,Weekday\n"),
+            (
+                "stop_times.txt",
+                "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+                 t,A,08:00:00,08:00:00,1\nt,B,08:10:00,08:10:00,2\nt,C,08:20:00,08:20:00,3\n",
+            ),
+            ("calendar.txt", CALENDAR),
+            (
+                "transfers.txt",
+                "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n\
+                 A,B,2,180\nB,A,2,180\nA,C,2,180\nC,A,2,180\n",
+            ),
+        ]);
+        let feed = Feed::load(&mut { files }).unwrap();
+        let mut tt = Timetable::build(&feed, wednesday()).unwrap();
+        let idx = |id: &str| tt.stops.iter().position(|s| s.id == id).unwrap();
+        let (a, b, c) = (idx("A"), idx("B"), idx("C"));
+        tt.stops[a].platform = Some("wA".into());
+        tt.stops[b].platform = Some("wB".into());
+        tt.stops[c].platform = Some("wC".into());
+        tt.use_osm_transfers(std::iter::empty(), &Platforms::default(), 90, 30);
+        let walks = crate::lidar::LidarWalks::from([(
+            ("wA".to_owned(), "wB".to_owned()),
+            crate::lidar::LidarWalk {
+                metres: 12.0,
+                levels_up: 1,
+                levels_down: 1,
+            },
+        )]);
+        tt.use_lidar_walks(&walks, 30);
+
+        let walk = |x: usize, y: usize| {
+            tt.footpaths[x]
+                .iter()
+                .find(|p| p.0 as usize == y)
+                .map(|p| p.1)
+        };
+        // The mapped direction is LiDAR's; the other, and the uncovered pair, stay up and over.
+        assert_eq!(walk(a, b), Some(10 + 60));
+        assert_eq!(walk(b, a), Some(90));
+        assert_eq!(walk(a, c), Some(90));
+    }
+
+    #[test]
     fn osm_transfers() {
         // A and B 120m apart, C 240m north of A; one complex of all three.
         let stops = "stop_id,stop_name,stop_lat,stop_lon\n\

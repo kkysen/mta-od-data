@@ -20,8 +20,9 @@ the 1/2/3's go both ways, so theirs were read one by one
 (`lidar_maps/times_sq_123_connectors.csv`).
 
 A walk between two platforms is the quickest over a connector off each
-reaching mezzanines: the straight line between their feet at `WALK_M_PER_S`,
-plus `FLIGHT_SECS` a level climbed or descended, as `raptor`'s stacked platforms.
+reaching mezzanines: the straight line between their feet,
+and the levels climbed and descended, which `raptor` times
+(`raptor/src/lidar.rs`).
 It assumes a rider on the car nearest the connector;
 where else on the train riders are is left for later.
 """
@@ -51,8 +52,9 @@ TABLES = Path(__file__).parent / "lidar_maps"
 DEFAULT_OUT = Path(__file__).parents[2] / "raptor" / "lidar_walks.csv"
 CACHE = Path(__file__).parents[2] / "target" / "lidar"
 
-# `raptor`'s walking speed on the street, and a flight of stairs a level.
-WALK_M_PER_S = 1.34
+# `raptor`'s walking speed in a station, and a flight of stairs a level,
+# to pick the quickest pair of connectors.
+WALK_M_PER_S = 1.2
 FLIGHT_SECS = 30
 # The maps are read at a quarter of their size: a pixel is still under 10 cm.
 REDUCE = 4
@@ -389,26 +391,30 @@ def connectors(m: StationMap, extract: Path) -> tuple[list[Connector], Projectio
 
 def walks(
     m: StationMap, conns: list[Connector]
-) -> list[tuple[str, str, int, float, int]]:
+) -> list[tuple[str, str, float, int, int]]:
     """The quickest walk between every two platforms, each way:
-    `(from, to, seconds, metres, levels)`."""
+    `(from, to, metres, levels up, levels down)`,
+    picked at `WALK_M_PER_S` and `FLIGHT_SECS` a level,
+    which `raptor` times them by its own speeds."""
     level = {p.way: p.level for p in m.platforms}
     out = []
     for a, b in permutations(level, 2):
         best = None
         for c in (c for c in conns if c.way == a):
             for d in (d for d in conns if d.way == b):
-                levels = (
-                    abs(level[a] - c.reaches)
-                    + abs(c.reaches - d.reaches)
-                    + abs(d.reaches - level[b])
+                steps = (
+                    c.reaches - level[a],
+                    d.reaches - c.reaches,
+                    level[b] - d.reaches,
                 )
+                up = sum(x for x in steps if x > 0)
+                down = -sum(x for x in steps if x < 0)
                 metres = float(np.hypot(c.east - d.east, c.north - d.north))
-                secs = metres / WALK_M_PER_S + levels * FLIGHT_SECS
-                if best is None or secs < best[2]:
-                    best = (a, b, round(secs), round(metres, 1), levels)
+                secs = metres / WALK_M_PER_S + (up + down) * FLIGHT_SECS
+                if best is None or secs < best[0]:
+                    best = (secs, (a, b, round(metres, 1), up, down))
         if best:
-            out.append(best)
+            out.append(best[1])
     return out
 
 
@@ -430,11 +436,17 @@ def lidar_walks(
             f"{m.name}: fit to OSM within {proj.rms_px:.0f} px RMS, "
             f"{len(conns)} connectors, pieces {json.dumps(proj.pieces)}"
         )
-        for a, b, secs, metres, levels in walks(m, conns):
-            rows.append((a, b, secs, metres, levels, m.name))
+        rows.extend((*w, m.name) for w in walks(m, conns))
     with open(out, "w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(
-            ["from_platform", "to_platform", "secs", "metres", "levels", "station"]
+            [
+                "from_platform",
+                "to_platform",
+                "metres",
+                "levels_up",
+                "levels_down",
+                "station",
+            ]
         )
         w.writerows(rows)

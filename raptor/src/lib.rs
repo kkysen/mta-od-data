@@ -228,9 +228,10 @@ pub fn assign_dates(
                     pathways::walks(&job.version.feed, &tt, gate_penalty, pathways::MAX_WALK);
                 tt.use_pathways(&walks, &report.covered);
             }
+            // LiDAR maps' walks over any other inside the gates,
+            // before passages, which are walked from them.
+            tt.use_lidar_walks(&lidar_walks, config.stacked_secs_per_level);
             tt.use_passages(&passages, &complexes, config.stacked_secs_per_level);
-            // LiDAR maps' walks over any other inside the gates.
-            tt.use_lidar_walks(&lidar_walks);
             // Last, so as not to replace any walk there is.
             if let Some(all) = &street_walks {
                 let walks = Walks::for_feed(all, &[&tt], &[]);
