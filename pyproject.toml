@@ -5,9 +5,12 @@ requires-python = ">=3.15"
 dependencies = [
     "duckdb>=2.0.0",
     "json5>=0.17.3",
+    "numpy>=2.5.4",
     "openpyxl>=3.1.5",
     "osmium>=4.3.2",
+    "pillow>=13.0.0",
     "pydantic>=2.14.1",
+    "scipy>=1.18.1",
     "shapely>=2",
     "typer>=0.27.3",
 ]

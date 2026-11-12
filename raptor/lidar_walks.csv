@@ -1,0 +1,21 @@
+from_platform,to_platform,secs,metres,levels,station
+w513706097,w513706098,70,13.6,2,Times Square-42nd Street
+w513706097,w513706124,109,65.5,2,Times Square-42nd Street
+w513706097,w513706125,100,54.0,2,Times Square-42nd Street
+w513706097,w513706084,77,22.9,2,Times Square-42nd Street
+w513706098,w513706097,70,13.6,2,Times Square-42nd Street
+w513706098,w513706124,119,79.0,2,Times Square-42nd Street
+w513706098,w513706125,110,67.1,2,Times Square-42nd Street
+w513706098,w513706084,86,34.8,2,Times Square-42nd Street
+w513706124,w513706097,109,65.5,2,Times Square-42nd Street
+w513706124,w513706098,119,79.0,2,Times Square-42nd Street
+w513706124,w513706125,70,13.3,2,Times Square-42nd Street
+w513706124,w513706084,157,49.2,4,Times Square-42nd Street
+w513706125,w513706097,100,54.0,2,Times Square-42nd Street
+w513706125,w513706098,110,67.1,2,Times Square-42nd Street
+w513706125,w513706124,70,13.3,2,Times Square-42nd Street
+w513706125,w513706084,146,34.7,4,Times Square-42nd Street
+w513706084,w513706097,77,22.9,2,Times Square-42nd Street
+w513706084,w513706098,86,34.8,2,Times Square-42nd Street
+w513706084,w513706124,157,49.2,4,Times Square-42nd Street
+w513706084,w513706125,146,34.7,4,Times Square-42nd Street

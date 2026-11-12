@@ -1,0 +1,15 @@
+platform,osm_way,kind,goes,platform_px_start,platform_px_end,landing_px,landing_pct_of_full_width,landing_m_from_north_end,note,landing_x,landing_y
+1/2/3 downtown island,w513706098,stairs,up,0,147,164,0.0,0.0,north end,4527,11188
+1/2/3 downtown island,w513706098,stairs in opening,down,1321,1579,1321,14.9,24.8,descends south from the opening's north edge,5555,11719
+1/2/3 downtown island,w513706098,stairs,up,2357,2649,2357,28.3,47.0,rises south from its foot,6476,12195
+1/2/3 downtown island,w513706098,elevator,both,3251,3436,3343,41.0,68.1,landing is the base's centre,7351,12647
+1/2/3 downtown island,w513706098,stairs (two flights),up,3597,4065,4065,50.3,83.6,rises north from its foot,7993,12979
+1/2/3 downtown island,w513706098,stairs in opening,down,4601,4882,4882,60.9,101.1,descends north from the opening's south edge,8719,13354
+1/2/3 downtown island,w513706098,stairs,up,7207,7454,7207,90.9,150.9,rises south from its foot,10784,14421
+1/2/3 uptown island,w513706097,stairs,up,0,154,165,0.0,0.0,north end,5118,10873
+1/2/3 uptown island,w513706097,two stairs in one opening,down,1348,1820,1348;1820,15.3;21.4,25.3;35.4,one descends from each end of the opening,6171;6591,11413;11628
+1/2/3 uptown island,w513706097,stairs,up,2363,2548,2363,28.4,47.1,rises south from its foot,7074,11875
+1/2/3 uptown island,w513706097,elevator,both,3240,3426,3333,40.9,67.9,landing is the base's centre,7937,12318
+1/2/3 uptown island,w513706097,stairs (two flights),up,3606,4099,4099,50.7,84.3,rises north from its foot,8619,12667
+1/2/3 uptown island,w513706097,stairs in opening,down,4601,4823,4823,60.1,99.8,descends north from the opening's south edge,9264,12997
+1/2/3 uptown island,w513706097,stairs,up,7210,7460,7210,90.9,150.9,rises south from its foot,11388,14085
