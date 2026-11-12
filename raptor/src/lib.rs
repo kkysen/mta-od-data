@@ -5,6 +5,7 @@ pub mod assign;
 pub mod batch;
 pub mod calendar;
 pub mod gtfs;
+pub mod lidar;
 pub mod od;
 pub mod passages;
 pub mod pathways;
@@ -200,6 +201,7 @@ pub fn assign_dates(
     };
 
     let passages = passages::load()?;
+    let lidar_walks = lidar::load()?;
     let street_walks = street_walks.map(StreetWalks::read).transpose()?;
     let start = Instant::now();
     let timetables: Vec<(Timetable, Complexes)> = jobs
@@ -227,6 +229,8 @@ pub fn assign_dates(
                 tt.use_pathways(&walks, &report.covered);
             }
             tt.use_passages(&passages, &complexes, config.stacked_secs_per_level);
+            // LiDAR maps' walks over any other inside the gates.
+            tt.use_lidar_walks(&lidar_walks);
             // Last, so as not to replace any walk there is.
             if let Some(all) = &street_walks {
                 let walks = Walks::for_feed(all, &[&tt], &[]);
