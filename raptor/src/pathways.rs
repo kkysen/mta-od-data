@@ -7,11 +7,13 @@ use std::cmp::Reverse;
 use std::collections::{BTreeMap, BinaryHeap, HashMap};
 
 use crate::gtfs::{Feed, Pathway, Secs};
-use crate::timetable::{StopIdx, Timetable, WALK_SPEED};
+use crate::timetable::{StopIdx, Timetable};
 
 /// Walking on the level, in meters a second: 3 mph.
-/// Slower than `WALK_SPEED`, which allows for stairs on the way.
 pub const LEVEL_WALK_SPEED: f64 = 1.34112;
+/// Over stairs by their length alone, in meters a second:
+/// Anita's model's in-station walk, which allows for stairs on the way.
+pub const STAIRS_LENGTH_SPEED: f64 = 1.2;
 /// Seconds a step, up or down: a guess, as no source gives one.
 pub const STEP_SECS: f64 = 0.6;
 /// An elevator without a `traversal_time`: waiting for it, and riding.
@@ -73,7 +75,7 @@ fn traversal(p: &Pathway) -> (Secs, bool, bool) {
         2 => p
             .stair_count
             .map(|n| (f64::from(n.unsigned_abs()) * STEP_SECS).round() as Secs)
-            .or(at(WALK_SPEED)),
+            .or(at(STAIRS_LENGTH_SPEED)),
         5 => Some(ELEVATOR_SECS),
         6 | 7 => Some(GATE_SECS),
         _ => by_length,

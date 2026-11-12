@@ -13,6 +13,7 @@ use crate::calendar::{active_services, span};
 use crate::gtfs::{DAY, Feed, Secs};
 use crate::pathways::Walk;
 use crate::platforms::Platforms;
+use crate::speeds::Speeds;
 
 /// A date's service day runs from 04:00 to 04:00 the next morning,
 /// around when the subway is quietest, so a night counts with the evening before it.
@@ -411,8 +412,6 @@ impl Timetable {
 /// Fixed time to walk between a complex's stops, on top of the distance:
 /// stairs, doors, overhead (Anita's `BASE_TRANSFER_TIME`).
 pub const BASE_WALK: Secs = 60;
-/// Walking speed in a station, in meters a second (Anita's `WALK_SPEED`).
-pub const WALK_SPEED: f64 = 1.2;
 
 impl Timetable {
     /// Splits each stop whose trains stop at more than one of `platforms`
@@ -490,7 +489,7 @@ impl Timetable {
     /// changing trains on one platform is free, at one stop or across an island,
     /// changing to another of the station's platforms takes `up_and_over`,
     /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
-    /// of `BASE_WALK` plus the straight-line distance at `WALK_SPEED`.
+    /// of `BASE_WALK` plus the straight-line distance at `speeds`' walk.
     /// Between `platforms` stacked one right over another,
     /// any change takes `stacked_per_level` a level instead, a flight of stairs each,
     /// within a station or a complex.
@@ -502,6 +501,7 @@ impl Timetable {
         platforms: &Platforms,
         up_and_over: Secs,
         stacked_per_level: Secs,
+        speeds: &Speeds,
     ) {
         self.min_change.fill(0);
         for (a, paths) in self.footpaths.iter_mut().enumerate() {
@@ -526,7 +526,7 @@ impl Timetable {
                     else {
                         continue;
                     };
-                    let walk = BASE_WALK + (distance_m(from, to) / WALK_SPEED) as Secs;
+                    let walk = BASE_WALK + speeds.walk_secs(distance_m(from, to)) as Secs;
                     self.footpaths[a as usize].push((b, walk));
                 }
             }
@@ -719,7 +719,13 @@ mod tests {
         assert!(tt.report.unclosed_footpaths.is_empty());
         // OSM transfers make changing at one stop free,
         // and to the other direction's, on a platform not known to be the same, up and over.
-        tt.use_osm_transfers(std::iter::empty(), &Platforms::default(), 90, 30);
+        tt.use_osm_transfers(
+            std::iter::empty(),
+            &Platforms::default(),
+            90,
+            30,
+            &Speeds::default(),
+        );
         assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 90)]);
     }
 
@@ -774,7 +780,7 @@ mod tests {
             (180, 180, 180)
         );
 
-        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30);
+        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30, &Speeds::default());
         // Across the island is free, whichever direction; up and over isn't.
         assert_eq!((walk(&tt, 5, 3), walk(&tt, 3, 5)), (0, 0));
         assert_eq!((walk(&tt, 2, 5), walk(&tt, 2, 3)), (90, 90));
@@ -785,7 +791,7 @@ mod tests {
     fn pathways_over_osm_transfers_but_not_between_copies() {
         let platforms = beta_platforms();
         let mut tt = beta_split(&platforms);
-        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30);
+        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30, &Speeds::default());
         // Pathways reach Beta's uptown and downtown stops, and the uptown 2s' copy,
         // but can't tell the copy from the uptown stop it was split from.
         let walk_of = |from, to, secs| Walk {
@@ -811,7 +817,7 @@ mod tests {
         // Beta's local platform right over its island, two levels up, as at W 4 St.
         let platforms = beta_platforms().with_stacked(&[("local", "island", 2)]);
         let mut tt = beta_split(&platforms);
-        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30);
+        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30, &Speeds::default());
         assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (60, 60));
         assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (60, 60));
         // Across the island is still free.
@@ -943,7 +949,13 @@ mod tests {
         tt.stops[a].platform = Some("wA".into());
         tt.stops[b].platform = Some("wB".into());
         tt.stops[c].platform = Some("wC".into());
-        tt.use_osm_transfers(std::iter::empty(), &Platforms::default(), 90, 30);
+        tt.use_osm_transfers(
+            std::iter::empty(),
+            &Platforms::default(),
+            90,
+            30,
+            &Speeds::default(),
+        );
         let walks = crate::lidar::LidarWalks::from([(
             ("wA".to_owned(), "wB".to_owned()),
             crate::lidar::LidarWalk {
@@ -954,7 +966,7 @@ mod tests {
                 escalator_down_m: 0.0,
             },
         )]);
-        tt.use_lidar_walks(&walks, &crate::lidar::Speeds::default());
+        tt.use_lidar_walks(&walks, &Speeds::default());
 
         let walk = |x: usize, y: usize| {
             tt.footpaths[x]
@@ -995,15 +1007,16 @@ mod tests {
             &Platforms::default(),
             90,
             30,
+            &Speeds::default(),
         );
 
         assert_eq!(tt.min_change, [0, 0, 0]);
         let walk = |a: usize, b: StopIdx| tt.footpaths[a].iter().find(|p| p.0 == b).unwrap().1;
-        // `transfers.txt`'s stays; the rest are 60s plus the distance at 1.2 m/s.
+        // `transfers.txt`'s stays; the rest are 60s plus the distance at 3 mph.
         assert_eq!(walk(0, 1), 300);
-        assert_eq!(walk(1, 0), 60 + 100);
-        assert_eq!(walk(0, 2), 60 + 200);
-        assert_eq!(walk(2, 1), 60 + 223);
+        assert_eq!(walk(1, 0), 60 + 89);
+        assert_eq!(walk(0, 2), 60 + 178);
+        assert_eq!(walk(2, 1), 60 + 200);
     }
 
     #[test]
@@ -1069,7 +1082,13 @@ mod tests {
         // `A`'s same-stop row is 0 in `transfers.txt`: a cross-platform change.
         let mut tt = build(TRIPS, STOP_TIMES, TRANSFERS, wednesday());
         assert_eq!(tt.min_change[0], 0);
-        tt.use_osm_transfers(std::iter::empty(), &Platforms::default(), 90, 30);
+        tt.use_osm_transfers(
+            std::iter::empty(),
+            &Platforms::default(),
+            90,
+            30,
+            &Speeds::default(),
+        );
         assert_eq!(tt.min_change[0], 0);
     }
 

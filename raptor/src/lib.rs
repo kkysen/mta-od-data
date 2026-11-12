@@ -12,6 +12,7 @@ pub mod pathways;
 pub mod platforms;
 pub mod raptor;
 pub mod report;
+pub mod speeds;
 pub mod timetable;
 pub mod walks;
 
@@ -219,6 +220,7 @@ pub fn assign_dates(
                     platforms.as_ref().expect("loaded for osm"),
                     config.up_and_over_secs,
                     config.stacked_secs_per_level,
+                    &config.speeds,
                 ),
             }
             // Pathways, where a feed has them, over either.
@@ -230,8 +232,13 @@ pub fn assign_dates(
             }
             // LiDAR maps' walks over any other inside the gates,
             // before passages, which are walked from them.
-            tt.use_lidar_walks(&lidar_walks, &config.lidar_speeds);
-            tt.use_passages(&passages, &complexes, config.stacked_secs_per_level);
+            tt.use_lidar_walks(&lidar_walks, &config.speeds);
+            tt.use_passages(
+                &passages,
+                &complexes,
+                config.stacked_secs_per_level,
+                &config.speeds,
+            );
             // Last, so as not to replace any walk there is.
             if let Some(all) = &street_walks {
                 let walks = Walks::for_feed(all, &[&tt], &[]);

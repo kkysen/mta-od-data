@@ -25,7 +25,7 @@
   // changing to another of a station's platforms takes `up_and_over_secs`
   // (`platforms.csv`),
   // and a complex's stops without a `transfers.txt` footpath are
-  // 60s plus their straight-line distance at 1.2 m/s apart;
+  // 60s plus their straight-line distance apart at `speeds`' walk;
   // or "gtfs", `transfers.txt` at its word,
   // whose flat 180s to change trains even across a platform is the less real.
   transfers: "osm",
@@ -40,11 +40,13 @@
   // on top of its walk.
   // A placeholder, like `logit_scale_per_min`: no source gives one.
   fare_gate_penalty_min: 10.0,
-  // Walks measured off LiDAR maps (`raptor/lidar_walks.csv`), in miles an hour:
+  // Walking speeds inside stations, in miles an hour:
   // on the level, and up and down stairs and escalators along their slopes.
-  // Guesses: 3 mph on the level, as on the street;
+  // Guesses: 3 mph on the level, as on the street
+  // (Anita's model's 1.2 m/s, 2.7 mph, allowed for stairs on the way);
   // an escalator moves at 1.1 mph, and some riders walk on it.
-  lidar_speeds: {
+  // Crowding would slow them, but isn't modeled yet.
+  speeds: {
     walk_mph: 3.0,
     stairs_up_mph: 1.1,
     stairs_down_mph: 1.6,

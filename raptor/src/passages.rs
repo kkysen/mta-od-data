@@ -5,7 +5,7 @@
 //!
 //! A passage runs from one stop's platform to another's,
 //! timed as a complex's other walks between platforms are under OSM transfers:
-//! the straight-line distance between their stops at `WALK_SPEED`,
+//! the straight-line distance between their stops at the walking speed (`Speeds`),
 //! plus a flight of stairs a level between them.
 //! Every stop of either complex walks to every stop of the other through it,
 //! by its complex's own walks to and from the passage's ends,
@@ -21,7 +21,8 @@ use serde::Deserialize;
 
 use crate::gtfs::Secs;
 use crate::od::{ComplexId, Complexes};
-use crate::timetable::{StopIdx, Timetable, WALK_SPEED, distance_m};
+use crate::speeds::Speeds;
+use crate::timetable::{StopIdx, Timetable, distance_m};
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -61,6 +62,7 @@ impl Timetable {
         passages: &[Passage],
         complexes: &Complexes,
         secs_per_level: Secs,
+        speeds: &Speeds,
     ) {
         for p in passages {
             let (from, to) = (
@@ -80,7 +82,7 @@ impl Timetable {
                     else {
                         continue;
                     };
-                    through.push((f, t, climb + (distance_m(a, b) / WALK_SPEED) as Secs));
+                    through.push((f, t, climb + speeds.walk_secs(distance_m(a, b)) as Secs));
                 }
             }
             let stops = |c: ComplexId| complexes.stops.get(&c).map_or(&[][..], Vec::as_slice);

@@ -17,6 +17,7 @@ use anyhow::{Context, Result};
 use serde::Deserialize;
 
 use crate::gtfs::Secs;
+use crate::speeds::{Speeds, m_per_s};
 use crate::timetable::{StopIdx, Timetable};
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
@@ -28,35 +29,6 @@ pub struct LidarWalk {
     pub escalator_up_m: f64,
     pub escalator_down_m: f64,
 }
-
-/// Walking speeds in a station, in miles an hour,
-/// on stairs and escalators along their slopes.
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields)]
-pub struct Speeds {
-    pub walk_mph: f64,
-    pub stairs_up_mph: f64,
-    pub stairs_down_mph: f64,
-    pub escalator_up_mph: f64,
-    pub escalator_down_mph: f64,
-}
-
-impl Default for Speeds {
-    /// Guesses the user agreed to: walking 3 mph, as on the street;
-    /// stairs slower up than down; an escalator's 1.1 mph,
-    /// with some riders walking up or down it.
-    fn default() -> Self {
-        Self {
-            walk_mph: 3.0,
-            stairs_up_mph: 1.1,
-            stairs_down_mph: 1.6,
-            escalator_up_mph: 1.3,
-            escalator_down_mph: 1.6,
-        }
-    }
-}
-
-const METRES_PER_MILE: f64 = 1609.344;
 
 #[derive(Deserialize)]
 struct Row {
@@ -83,7 +55,7 @@ pub fn load() -> Result<LidarWalks> {
 impl LidarWalk {
     /// Its time, at `speeds`.
     pub fn secs(&self, speeds: &Speeds) -> Secs {
-        let at = |metres: f64, mph: f64| metres / (mph * METRES_PER_MILE / 3600.0);
+        let at = |metres: f64, mph: f64| metres / m_per_s(mph);
         (at(self.metres, speeds.walk_mph)
             + at(self.stairs_up_m, speeds.stairs_up_mph)
             + at(self.stairs_down_m, speeds.stairs_down_mph)
