@@ -28,12 +28,15 @@ and how far up and down stairs and escalators along their slopes,
 which `raptor` times by its speeds (`raptor/src/lidar.rs`).
 Where corridors are long and bent, like Court Sq's,
 a walk instead follows the map's floors (`corridor_walks`).
-It assumes a rider on the car nearest the connector;
-where else on the train riders are is left for later.
+Each way off the first platform is kept, the quickest from each connector,
+with its foot's spot along the platform,
+but those never the quickest from any spot along it (`useful`),
+for `raptor` to spread riders along the train (`raptor/src/cars.rs`).
 """
 
 import csv
 import json
+from collections import defaultdict
 from dataclasses import dataclass, replace
 from itertools import permutations, product
 from pathlib import Path
@@ -97,6 +100,8 @@ DEFAULT_RUN = DEFAULT_RISE * 3**0.5
 # How near, on the full-size map, a stair found by color is to a table's,
 # at most, to be the same.
 MATCH_PX = 300
+# A way off a platform this little slower than another from anywhere isn't kept.
+USEFUL_SECS = 2.0
 # Paid floors are gray darker than this; lighter gray is outside the gates.
 PAID_MAX = 200
 # Dashed drop lines' gray, about 186, on maps drawing levels apart.
@@ -327,21 +332,29 @@ class Outlines(osmium.SimpleHandler):
             self.outlines[f"w{w.id}"] = [(n.lon, n.lat) for n in w.nodes]
 
 
+def ground_outline(
+    outline: list[tuple[float, float]], origin: tuple[float, float]
+) -> Polygon:
+    """An outline in metres east and north of `origin`."""
+    lon0, lat0 = origin
+    p = np.array(outline)
+    return Polygon(
+        np.stack(
+            [
+                (p[:, 0] - lon0) * 111_320 * np.cos(np.radians(lat0)),
+                (p[:, 1] - lat0) * 110_540,
+            ],
+            1,
+        )
+    )
+
+
 def ground_points(
     outline: list[tuple[float, float]], origin: tuple[float, float]
 ) -> np.ndarray:
     """A grid of points 10 cm apart inside an outline,
     in metres east and north of `origin`."""
-    lon0, lat0 = origin
-    p = np.array(outline)
-    xy = np.stack(
-        [
-            (p[:, 0] - lon0) * 111_320 * np.cos(np.radians(lat0)),
-            (p[:, 1] - lat0) * 110_540,
-        ],
-        1,
-    )
-    poly = Polygon(xy)
+    poly = ground_outline(outline, origin)
     x0, y0, x1, y1 = poly.bounds
     gx, gy = np.meshgrid(np.arange(x0, x1, 0.1), np.arange(y0, y1, 0.1))
     inside = contains_xy(poly, gx, gy)
@@ -697,13 +710,21 @@ class Connector:
     flight: Flight | None = None
 
 
-def connectors(m: StationMap, extract: Path) -> tuple[list[Connector], Projection]:
+def connectors(
+    m: StationMap, extract: Path
+) -> tuple[list[Connector], Projection, dict[str, PlatformAxis]]:
+    """Each platform's stairs and escalators, the map's fit to OSM,
+    and each platform's length on the ground."""
     img = load_map(m)
     pieces = split_by_colour(img, m)
     handler = Outlines({int(p.way[1:]) for p in m.platforms})
     handler.apply_file(str(extract), locations=True)
     first = handler.outlines[m.platforms[0].way][0]
     ground = {w: ground_points(o, first) for w, o in handler.outlines.items()}
+    axes = {
+        w: PlatformAxis.of(ground_outline(o, first))
+        for w, o in handler.outlines.items()
+    }
     proj = fit(m, pieces, ground)
     by_way = {p.way: p for p in m.platforms}
     flights = Flights(m, img, proj)
@@ -758,7 +779,7 @@ def connectors(m: StationMap, extract: Path) -> tuple[list[Connector], Projectio
                             flight,
                         )
                     )
-    return out, proj
+    return out, proj, axes
 
 
 @dataclass(frozen=True, slots=True)
@@ -852,13 +873,15 @@ class WayOff:
 
 
 def useful(paths: list[WayOff]) -> list[WayOff]:
-    """`paths` but those never the quickest from any spot along the platform:
-    as quick to reach another's foot and take it."""
+    """`paths` but those never the quickest from any spot along the platform,
+    within `USEFUL_SECS`: as quick to reach another's foot and take it,
+    as from a floor drawn all along a platform, like Court Sq's G."""
     out = []
     for p in sorted(paths, key=lambda p: p.walk.secs()):
         if p.along is None or not any(
             q.along is not None
-            and q.walk.secs() + abs(q.along - p.along) / WALK_M_PER_S <= p.walk.secs()
+            and q.walk.secs() + abs(q.along - p.along) / WALK_M_PER_S
+            <= p.walk.secs() + USEFUL_SECS
             for q in out
         ):
             out.append(p)
@@ -904,17 +927,22 @@ def rideable(c: Connector, up: int, conns: list[Connector]) -> bool:
     )
 
 
-def walks(m: StationMap, conns: list[Connector]) -> list[tuple[str, str, Walk]]:
-    """The quickest walk between every two platforms, each way,
-    over a connector off each: the straight line between their feet,
+def walks(
+    m: StationMap, conns: list[Connector], axes: dict[str, PlatformAxis]
+) -> list[tuple[str, str, WayOff]]:
+    """Every way between every two platforms, each way round,
+    the quickest from each connector off the first to one off the second:
+    the straight line between their feet,
     and each connector's flight, as measured or the station's typical one,
-    with typical stairs between the levels they reach."""
+    with typical stairs between the levels they reach;
+    but those never the quickest from any spot along the first (`useful`)."""
     level = {p.way: p.level for p in m.platforms}
     typical = typical_flight(conns)
     out = []
     for a, b in permutations(level, 2):
-        best: Walk | None = None
+        ways_off = []
         for c in (c for c in conns if c.way == a):
+            best: Walk | None = None
             for d in (d for d in conns if d.way == b and d.area == c.area):
                 up_c = levels_climbed(c, level[a], typical)
                 up_d = levels_climbed(d, level[b], typical)
@@ -928,8 +956,10 @@ def walks(m: StationMap, conns: list[Connector]) -> list[tuple[str, str, Walk]]:
                 )
                 if best is None or walk.secs() < best.secs():
                     best = walk
-        if best:
-            out.append((a, b, best))
+            if best:
+                spot = float(axes[a].along(np.array([c.east, c.north])))
+                ways_off.append(WayOff(best, spot, axes[a].length))
+        out.extend((a, b, w) for w in useful(ways_off))
     return out
 
 
@@ -938,16 +968,19 @@ def corridor_walks(
     img: np.ndarray,
     pieces: dict[str, np.ndarray],
     proj: Projection,
+    axes: dict[str, PlatformAxis],
     flights: Flights,
     typical: Flight,
-) -> list[tuple[str, str, Walk]]:
+) -> list[tuple[str, str, WayOff]]:
     """The shortest walk between every two platforms along the map's floors:
     gray floors, stairs, and black escalators, not the platforms themselves,
     so a path can't jump between platforms drawn crossing over one another,
     nor along thin drop lines.
     Each step is measured on the ground through the projection,
     which a level's offset up the page doesn't change.
-    It starts and ends at any floor touching each platform: the car nearest it.
+    It's searched from each stretch of floor touching the first platform in turn,
+    for every way off it, each from that stretch's spot along it,
+    and ends at any floor touching the second.
     Each stair the walk climbs whole is measured (`Flights.stair`),
     up or down by which way the walk takes it, and its drawn length is left off
     the walk on the level; it's climbed as one level of `typical` stairs if unmeasured.
@@ -1046,25 +1079,43 @@ def corridor_walks(
             starts[way] &= stairs
     seeds = {way: idx[start] for way, start in starts.items()}
     level = {p.way: p.level for p in m.platforms}
+    pxy = np.stack([xs, ys], 1)
     out = []
-    for a_way, b_way in permutations(masks, 2):
-        dist, pred, _ = dijkstra(
-            graph,
-            directed=False,
-            indices=seeds[a_way],
-            min_only=True,
-            return_predecessors=True,
-        )
-        end = seeds[b_way][np.argmin(dist[seeds[b_way]])]
-        if not np.isfinite(dist[end]):
-            continue
-        path = [end]
-        while pred[path[-1]] >= 0:
-            path.append(pred[path[-1]])
-        path = np.array(path[::-1])
-        diff = level[b_way] - level[a_way]
-        walk = climbs(path, dist, np.stack([xs, ys], 1), flights, typical, diff)
-        out.append((a_way, b_way, walk))
+    for a_way in masks:
+        ways_off = defaultdict(list)
+        # How far along the platform as drawn, as a share of its length:
+        # the same on the ground, in a parallel projection,
+        # even for a platform not fitted.
+        drawn = np.stack(np.nonzero(masks[a_way])[::-1], 1).astype(float)
+        mean, ax, _ = axis(drawn)
+        t = (drawn - mean) @ ax
+        lab, n = ndimage.label(starts[a_way], np.ones((3, 3)))
+        for k in range(1, n + 1):
+            stretch = idx[lab == k]
+            share = ((pxy[stretch].mean(0) - mean) @ ax - t.min()) / np.ptp(t)
+            spot = float(np.clip(share, 0, 1)) * axes[a_way].length
+            dist, pred, _ = dijkstra(
+                graph,
+                directed=False,
+                indices=stretch,
+                min_only=True,
+                return_predecessors=True,
+            )
+            for b_way in masks:
+                if b_way == a_way:
+                    continue
+                end = seeds[b_way][np.argmin(dist[seeds[b_way]])]
+                if not np.isfinite(dist[end]):
+                    continue
+                path = [end]
+                while pred[path[-1]] >= 0:
+                    path.append(pred[path[-1]])
+                path = np.array(path[::-1])
+                diff = level[b_way] - level[a_way]
+                walk = climbs(path, dist, pxy, flights, typical, diff)
+                ways_off[b_way].append(WayOff(walk, spot, axes[a_way].length))
+        for b_way, paths in ways_off.items():
+            out.extend((a_way, b_way, w) for w in useful(paths))
     return out
 
 
@@ -1185,7 +1236,7 @@ def lidar_walks(
     off Sabrina Mielke's LiDAR maps."""
     rows = []
     for m in MAPS:
-        conns, proj = connectors(m, extract)
+        conns, proj, axes = connectors(m, extract)
         print(
             f"{m.name}: fit to OSM within {proj.rms_px:.0f} px RMS, "
             f"{len(conns)} connectors, pieces {json.dumps(proj.pieces)}"
@@ -1203,14 +1254,16 @@ def lidar_walks(
                 img,
                 split_by_colour(img, m),
                 proj,
+                axes,
                 Flights(m, img, proj),
                 typical_flight(conns),
             )
         else:
-            ws = walks(m, conns)
+            ws = walks(m, conns, axes)
         # Sorted, as sets order Court Sq's platforms differently each run.
         rows.extend(
-            (a, b, *w.row(), m.name) for a, b, w in sorted(ws, key=lambda t: t[:2])
+            (a, b, *w.row(), m.name)
+            for a, b, w in sorted(ws, key=lambda t: (*t[:2], t[2].along or 0))
         )
     with open(out, "w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
@@ -1223,6 +1276,8 @@ def lidar_walks(
                 "stairs_down_m",
                 "escalator_up_m",
                 "escalator_down_m",
+                "along_m",
+                "platform_m",
                 "station",
             ]
         )
