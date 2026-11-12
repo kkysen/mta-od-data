@@ -46,7 +46,7 @@ from PIL import Image
 from scipy import ndimage
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import dijkstra
-from shapely import Polygon, contains_xy
+from shapely import MultiPoint, Polygon, contains_xy
 from typer import Option, Typer
 
 from mta_od_data import DATA
@@ -91,10 +91,20 @@ ESCALATOR_RISE_MIN = 2.0
 # A flight's rise where none is measured, in metres,
 # and its run, at 30 degrees.
 DEFAULT_RISE = 4.5
+DEFAULT_RUN = DEFAULT_RISE * 3**0.5
 # How near, on the full-size map, a stair found by color is to a table's,
 # at most, to be the same.
 MATCH_PX = 300
-DEFAULT_RUN = DEFAULT_RISE * 3**0.5
+# Paid floors are gray darker than this; lighter gray is outside the gates.
+PAID_MAX = 200
+# Dashed drop lines' gray, about 186, on maps drawing levels apart.
+DASH_GRAY = (175, 200)
+# On the reduced map: the gap between one dash and the next, at most,
+# how many dashes a drop line has, at least,
+# and how near its ends are to the floors they join, at most.
+DASH_GAP_PX = 40
+DASHES_MIN = 3
+DASH_REACH_PX = 25
 
 
 @dataclass(frozen=True, slots=True)
@@ -125,6 +135,9 @@ class StationMap:
     # Whether walks follow the map's floors (`corridor_walks`),
     # not a straight line between connectors, where corridors are long and bent.
     corridors: bool = False
+    # Whether the map draws levels apart, joined by dashed drop lines,
+    # which `corridor_walks` then follows up from each stair's top.
+    exploded: bool = False
     # Fare-controlled areas apart from the station's main one, as `(name, x_min)`:
     # a connector whose foot is right of `x_min` on the full-size map reaches
     # the first that it's right of.
@@ -182,7 +195,21 @@ COURT_SQ = StationMap(
     table=None,
     corridors=True,
 )
-MAPS = (TIMES_SQ, NEVINS_ST, COURT_SQ)
+BRYANT_PK = StationMap(
+    name="42 St-Bryant Pk/5 Av",
+    file="42nd Street–Bryant Park-Fifth Avenue (NYC subway station map).png",
+    main_rows=20117,
+    # Levels are OSM's.
+    platforms=(
+        MapPlatform("w907922928", "orange", "bdfm", -2, None),
+        MapPlatform("w907922927", "orange", "bdfm", -2, None),
+        MapPlatform("w903249946", "magenta", "7", -4, None),
+    ),
+    table=None,
+    corridors=True,
+    exploded=True,
+)
+MAPS = (TIMES_SQ, NEVINS_ST, COURT_SQ, BRYANT_PK)
 
 
 def colour_mask(img: np.ndarray, color: str) -> np.ndarray:
@@ -204,6 +231,8 @@ def colour_mask(img: np.ndarray, color: str) -> np.ndarray:
             blue = (b - r > 80) & (b > 120) & (g < 120)
             orange = (r > 200) & (r - b > 120) & (g > 70) & (g < 160)
             return ndimage.binary_closing(blue | orange, iterations=6)
+        case "orange":
+            return (r > 190) & (r - b > 110) & (g > 70) & (g < 150)
         case "green":
             return (g - r > 40) & (g - b > 40)
         case "magenta":
@@ -836,8 +865,13 @@ def corridor_walks(
     or one up and back down between platforms on one level,
     each climbed by `typical` stairs."""
     r, g, b = (img[..., i].astype(np.int16) for i in range(3))
-    grey = (abs(r - g) < 16) & (abs(g - b) < 16) & (r < 238)
-    walkable = ndimage.binary_opening(grey, np.ones((3, 3)))
+    grey = (abs(r - g) < 16) & (abs(g - b) < 16)
+    # Paid floors are darker; light gray is outside the gates, or closed.
+    dashes = grey & (r >= DASH_GRAY[0]) & (r < DASH_GRAY[1])
+    paid = grey & (r < PAID_MAX)
+    if m.exploded:
+        paid &= ~dashes
+    walkable = ndimage.binary_opening(paid, np.ones((3, 3)))
     masks = {}
     for piece, way in proj.pieces.items() | {
         (p.way, p.way) for p in m.platforms if not p.fit
@@ -852,6 +886,26 @@ def corridor_walks(
         near += ndimage.binary_dilation(mask, iterations=CONTACT_PX)
     # Floor right by two platforms is where they're drawn crossing, not a way between.
     walkable &= near < 2
+    # Floor drawn over a group's platforms and the gap between them,
+    # like Bryant Pk's 42 St Connection, is on another level, not a way across.
+    group_of = {p.way: p.group for p in m.platforms}
+    for group in set(group_of.values()) if m.exploded else ():
+        ways = [w for w in masks if group_of[w] == group]
+        if len(ways) < 2:
+            continue
+        ys, xs = np.nonzero(np.logical_or.reduce([masks[w] for w in ways]))
+        hull = MultiPoint(np.stack([xs, ys], 1)[:: max(1, len(xs) // 5000)]).convex_hull
+        lab, _ = ndimage.label(walkable)
+        touching = [
+            set(np.unique(lab[ndimage.binary_dilation(masks[w], iterations=3)])) - {0}
+            for w in ways
+        ]
+        across = set.intersection(*touching)
+        if not across:
+            continue
+        cy, cx = np.nonzero(np.isin(lab, list(across)))
+        inside = contains_xy(hull, cx, cy)
+        walkable[cy[inside], cx[inside]] = False
     idx = -np.ones(walkable.shape, np.int64)
     ys, xs = np.nonzero(walkable)
     idx[ys, xs] = np.arange(len(ys))
@@ -869,14 +923,36 @@ def corridor_walks(
             np.linalg.norm(np.linalg.solve(proj.a, [dx * REDUCE, dy * REDUCE]))
         )
         costs.append(np.full(ok.sum(), step))
+    if m.exploded:
+        page = (r >= 240) & (g >= 240) & (b >= 240)
+        a, c = drop_lines(walkable, dashes, page)
+        rows.append(idx[a])
+        cols.append(idx[c])
+        # The climb is timed by levels, not distance.
+        costs.append(np.full(len(rows[-1]), 1e-6))
     n = len(ys)
     graph = csr_matrix(
         (np.concatenate(costs), (np.concatenate(rows), np.concatenate(cols))), (n, n)
     )
-    seeds = {
-        way: idx[ndimage.binary_dilation(mask, iterations=2) & walkable]
+    starts = {
+        way: ndimage.binary_dilation(mask, iterations=2) & walkable
         for way, mask in masks.items()
     }
+    if m.exploded:
+        # Floor drawn touching a platform there may be a level up, like a passage
+        # drawn past its end: a walk starts up one of its own stairs.
+        steps, _ = ndimage.label(
+            ndimage.binary_opening(grey & (r >= 60) & (r < 215), np.ones((3, 3)))
+        )
+        sizes = np.bincount(steps.ravel())
+        for piece, way in proj.pieces.items():
+            stairs = np.zeros(walkable.shape, bool)
+            for _, _, px in feet(img, pieces[piece], masks[way]):
+                ids = steps[px[:, 1], px[:, 0]]
+                ids = ids[(ids > 0) & (sizes[ids] <= FLIGHT_MAX_PX)]
+                stairs |= np.isin(steps, np.unique(ids))
+            starts[way] &= stairs
+    seeds = {way: idx[start] for way, start in starts.items()}
     level = {p.way: p.level for p in m.platforms}
     out = []
     for a_way, b_way in permutations(masks, 2):
@@ -893,6 +969,65 @@ def corridor_walks(
         )
         out.append((a_way, b_way, walk))
     return out
+
+
+def drop_lines(
+    walkable: np.ndarray, dashes: np.ndarray, page: np.ndarray
+) -> tuple[tuple[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]]:
+    """Where a map drawing levels apart joins them: vertical dashed lines,
+    each from a stair or escalator's top on one level up the page to the floor above.
+    Each line's dashes are thin and upright, one under another a gap of `page` apart,
+    or passing behind whatever's drawn between, like another platform;
+    its ends join the walkable floor nearest them.
+    Returns the floor pixels at each line's bottom and top, as `(ys, xs)` each."""
+    lab, n = ndimage.label(dashes)
+    boxes = ndimage.find_objects(lab)
+    segs = []
+    for box in boxes:
+        h = box[0].stop - box[0].start
+        w = box[1].stop - box[1].start
+        if h >= 4 and w <= 12 and h > w:
+            segs.append(((box[1].start + box[1].stop) / 2, box[0].start, box[0].stop))
+    # Chain dashes one under another, by column.
+    segs.sort()
+    lines: list[list[tuple[float, int, int]]] = []
+    for x, y0, y1 in segs:
+        for line in lines:
+            lx, ly0, ly1 = line[-1]
+            gap = page[min(ly1, y1) : max(ly0, y0), int(x)].sum()
+            if abs(lx - x) <= 2 and gap <= DASH_GAP_PX:
+                line.append((x, min(y0, ly0), max(y1, ly1)))
+                break
+        else:
+            lines.append([(x, y0, y1)])
+    fy, fx = np.nonzero(walkable)
+    bottoms_y: list[int] = []
+    bottoms_x: list[int] = []
+    tops_y: list[int] = []
+    tops_x: list[int] = []
+    for line in lines:
+        x = line[-1][0]
+        top, bottom = line[-1][1], line[-1][2]
+        if len(line) < DASHES_MIN:
+            continue
+        ends = []
+        for y in (bottom, top):
+            d = np.hypot(fx - x, fy - y)
+            k = int(np.argmin(d))
+            if d[k] > DASH_REACH_PX:
+                break
+            ends.append((fy[k], fx[k]))
+        if len(ends) < 2:
+            continue
+        (by, bx), (ty, tx) = ends
+        bottoms_y.append(by)
+        bottoms_x.append(bx)
+        tops_y.append(ty)
+        tops_x.append(tx)
+    return (np.array(bottoms_y, int), np.array(bottoms_x, int)), (
+        np.array(tops_y, int),
+        np.array(tops_x, int),
+    )
 
 
 @app.command()
