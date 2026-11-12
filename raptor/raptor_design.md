@@ -196,14 +196,18 @@ Every version so far has none of either.
 times transfers by OSM's platforms instead, begun as Anita's rules:
 changing trains on one platform is free,
 at one stop or across an island to the other direction's;
-changing to another of the station's platforms, up and over, takes `up_and_over_secs`, 90s,
+changing to another of the station's platforms, up and over,
+takes a flight of stairs up, the walk across between the two stops, and a flight down,
 which Anita's model doesn't have (it makes every change within a station free).
+A flight is a level, 4.5 m, at 30 degrees: 9 m along its slope,
+at `speeds`' 1.1 mph up and 1.6 mph down (`raptor/assign.json5`), 31s up and down.
 Platforms are OSM's, from `platforms.csv` by each train's stops before and after,
 and a stop whose trains use several is split into one for each,
 as Penn's uptown 2, on the 3's express island by day and the 1's local platform late at night.
 Two stops whose platforms aren't both known are up and over.
-Platforms stacked one right over another take `stacked_secs_per_level`, 30s, a level instead,
-a flight of stairs each, whether in one station or a complex:
+Platforms stacked one right over another take a flight of stairs a level instead,
+halfway between up and down as which is higher isn't known, about 15s a level,
+whether in one station or a complex:
 OSM's on different levels and overlapping by at least half the smaller one,
 as 7 Av's on 53 St, 81 St's, or Jamaica Center's E over its J/Z, a level apart,
 W 4 St's, two, or the 6 over the 4/5 at 59 St on Lexington, three,
@@ -211,7 +215,7 @@ but not 59 St-Columbus Circle's 1 and A/B/C/D, crossing at an angle,
 nor 74 St-Broadway's 7, on the el over Jackson Hts-Roosevelt Av.
 `transfers.txt`'s footpaths between different stations are kept,
 and every other pair of a complex's stops gets a footpath
-of 60s plus their straight-line distance at 1.2 m/s.
+of 60s plus their straight-line distance at `speeds`' 3 mph walk.
 Cross-platform changes are free under both.
 
 `pathways.txt`, where a feed has it, comes first under either,
@@ -256,8 +260,8 @@ are in `raptor/passages.json5`, after the above under any transfers (`passages.r
 so far the 42 St Connection,
 from 42 St-Bryant Pk's B, D, F, and M platform up a level to Times Sq's shuttle platform.
 A passage is timed as a complex's other walks between platforms are under OSM's:
-its ends' straight-line distance at 1.2 m/s, platform middle to platform middle,
-plus `stacked_secs_per_level` a level, 230s for the 42 St Connection.
+its ends' straight-line distance at `speeds`' 3 mph walk, platform middle to platform middle,
+plus a flight of stairs a level, about 195s for the 42 St Connection.
 Every stop of either complex gets a footpath to every stop of the other through it,
 by its complex's own walks to and from the passage's ends,
 as RAPTOR takes one footpath a change.

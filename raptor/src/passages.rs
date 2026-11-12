@@ -6,7 +6,7 @@
 //! A passage runs from one stop's platform to another's,
 //! timed as a complex's other walks between platforms are under OSM transfers:
 //! the straight-line distance between their stops at the walking speed (`Speeds`),
-//! plus a flight of stairs a level between them.
+//! plus a flight of stairs a level between them, which way unknown.
 //! Every stop of either complex walks to every stop of the other through it,
 //! by its complex's own walks to and from the passage's ends,
 //! as RAPTOR takes one footpath a change.
@@ -54,16 +54,10 @@ pub fn load() -> Result<Vec<Passage>> {
 
 impl Timetable {
     /// Walks between `complexes` through each of `passages`,
-    /// climbing `secs_per_level` a level, while each is open.
+    /// a flight of stairs a level (`Speeds::levels_secs`), while each is open.
     /// A passage whose route doesn't run at its far end on this date is closed all day,
     /// and one with an end the timetable doesn't serve is left out.
-    pub fn use_passages(
-        &mut self,
-        passages: &[Passage],
-        complexes: &Complexes,
-        secs_per_level: Secs,
-        speeds: &Speeds,
-    ) {
+    pub fn use_passages(&mut self, passages: &[Passage], complexes: &Complexes, speeds: &Speeds) {
         for p in passages {
             let (from, to) = (
                 self.stops_at(&p.from).to_vec(),
@@ -72,7 +66,7 @@ impl Timetable {
             let Some(hours) = self.route_hours(&p.open_with_route, &to) else {
                 continue;
             };
-            let climb = secs_per_level * Secs::from(p.levels);
+            let climb = speeds.levels_secs(p.levels);
             // Through the passage between each end's stops, by their platforms' positions.
             let mut through: Vec<(StopIdx, StopIdx, Secs)> = Vec::new();
             for &f in &from {
@@ -82,7 +76,7 @@ impl Timetable {
                     else {
                         continue;
                     };
-                    through.push((f, t, climb + speeds.walk_secs(distance_m(a, b)) as Secs));
+                    through.push((f, t, (climb + speeds.walk_secs(distance_m(a, b))) as Secs));
                 }
             }
             let stops = |c: ComplexId| complexes.stops.get(&c).map_or(&[][..], Vec::as_slice);

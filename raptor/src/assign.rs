@@ -40,19 +40,12 @@ pub struct Config {
     /// Most rides in a journey.
     #[serde(default = "default_max_rides")]
     pub max_rides: usize,
-    /// Under OSM transfers, changing to another of a station's platforms:
-    /// up the stairs, over, and down, or down, under, and up.
-    #[serde(default = "default_up_and_over_secs")]
-    pub up_and_over_secs: Secs,
-    /// Under OSM transfers, changing between platforms stacked one right over another:
-    /// one flight of stairs a level apart.
-    #[serde(default = "default_stacked_secs_per_level")]
-    pub stacked_secs_per_level: Secs,
     /// Where pathways are, minutes added per walk out through the fare gates and back in,
     /// on top of its walk: paying again, or the bother of it.
     #[serde(default = "default_fare_gate_penalty_min")]
     pub fare_gate_penalty_min: f64,
-    /// Walking speeds inside stations.
+    /// Walking speeds inside stations,
+    /// which also time OSM transfers' and passages' flights of stairs.
     #[serde(default)]
     pub speeds: Speeds,
 }
@@ -63,19 +56,6 @@ fn default_fare_gate_penalty_min() -> f64 {
 
 /// A placeholder, as `logit_scale_per_min`: no source gives one.
 pub const DEFAULT_FARE_GATE_PENALTY_MIN: f64 = 10.0;
-
-fn default_stacked_secs_per_level() -> Secs {
-    DEFAULT_STACKED_SECS_PER_LEVEL
-}
-
-pub const DEFAULT_STACKED_SECS_PER_LEVEL: Secs = 30;
-
-fn default_up_and_over_secs() -> Secs {
-    DEFAULT_UP_AND_OVER_SECS
-}
-
-/// Anita's model has no such time; this one is a guess the user agreed to.
-pub const DEFAULT_UP_AND_OVER_SECS: Secs = 90;
 
 fn default_max_rides() -> usize {
     DEFAULT_MAX_RIDES
@@ -1358,8 +1338,6 @@ mod tests {
         logit_scale_per_min: 0.2,
         transfers: Transfers::Gtfs,
         max_rides: DEFAULT_MAX_RIDES,
-        up_and_over_secs: DEFAULT_UP_AND_OVER_SECS,
-        stacked_secs_per_level: DEFAULT_STACKED_SECS_PER_LEVEL,
         fare_gate_penalty_min: DEFAULT_FARE_GATE_PENALTY_MIN,
         speeds: Speeds {
             walk_mph: 3.0,

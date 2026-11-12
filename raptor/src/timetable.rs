@@ -413,6 +413,16 @@ impl Timetable {
 /// stairs, doors, overhead (Anita's `BASE_TRANSFER_TIME`).
 pub const BASE_WALK: Secs = 60;
 
+/// Up a flight of stairs, across between two stops, and down a flight,
+/// to another of a station's platforms.
+fn up_and_over(speeds: &Speeds, a: Option<(f64, f64)>, b: Option<(f64, f64)>) -> Secs {
+    let across = match (a, b) {
+        (Some(a), Some(b)) => speeds.walk_secs(distance_m(a, b)),
+        _ => 0.0,
+    };
+    (speeds.flights_secs(1, 1) + across).round() as Secs
+}
+
 impl Timetable {
     /// Splits each stop whose trains stop at more than one of `platforms`
     /// into a stop for each, as Penn's uptown 1 and 2 at night, and 2 and 3 by day,
@@ -487,11 +497,12 @@ impl Timetable {
 
     /// Transfers by OSM's platforms instead of `transfers.txt`'s at its word:
     /// changing trains on one platform is free, at one stop or across an island,
-    /// changing to another of the station's platforms takes `up_and_over`,
+    /// changing to another of the station's platforms goes up a flight, across,
+    /// and down (`up_and_over`),
     /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
     /// of `BASE_WALK` plus the straight-line distance at `speeds`' walk.
     /// Between `platforms` stacked one right over another,
-    /// any change takes `stacked_per_level` a level instead, a flight of stairs each,
+    /// any change is a flight of stairs a level instead, which way unknown,
     /// within a station or a complex.
     /// A stop's platform is from `split_platforms`;
     /// two stops whose platforms aren't both known are up and over.
@@ -499,8 +510,6 @@ impl Timetable {
         &mut self,
         complexes: impl Iterator<Item = &'a [StopIdx]>,
         platforms: &Platforms,
-        up_and_over: Secs,
-        stacked_per_level: Secs,
         speeds: &Speeds,
     ) {
         self.min_change.fill(0);
@@ -510,7 +519,11 @@ impl Timetable {
                 let b = &self.stops[*b as usize];
                 if a.station == b.station {
                     let same_platform = a.platform.is_some() && a.platform == b.platform;
-                    *walk = if same_platform { 0 } else { up_and_over };
+                    *walk = if same_platform {
+                        0
+                    } else {
+                        up_and_over(speeds, a.coords, b.coords)
+                    };
                 }
             }
         }
@@ -539,7 +552,7 @@ impl Timetable {
                 if let Some(b) = &self.stops[*b as usize].platform
                     && let Some(levels) = platforms.stacked(a, b)
                 {
-                    *walk = stacked_per_level * Secs::from(levels);
+                    *walk = speeds.levels_secs(levels).round() as Secs;
                 }
             }
         }
@@ -722,11 +735,10 @@ mod tests {
         tt.use_osm_transfers(
             std::iter::empty(),
             &Platforms::default(),
-            90,
-            30,
             &Speeds::default(),
         );
-        assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 90)]);
+        // Up a flight and down another, 9 m each along the slope, at 1.1 and 1.6 mph.
+        assert_eq!(tt.footpaths[0], [(2, 120), (3, 120), (1, 31)]);
     }
 
     /// Beta, where uptown 1s stop at the local platform, uptown 2s at the island,
@@ -780,10 +792,10 @@ mod tests {
             (180, 180, 180)
         );
 
-        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30, &Speeds::default());
+        tt.use_osm_transfers(std::iter::empty(), &platforms, &Speeds::default());
         // Across the island is free, whichever direction; up and over isn't.
         assert_eq!((walk(&tt, 5, 3), walk(&tt, 3, 5)), (0, 0));
-        assert_eq!((walk(&tt, 2, 5), walk(&tt, 2, 3)), (90, 90));
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 2, 3)), (31, 31));
         assert_eq!(tt.min_change[2], 0);
     }
 
@@ -791,7 +803,7 @@ mod tests {
     fn pathways_over_osm_transfers_but_not_between_copies() {
         let platforms = beta_platforms();
         let mut tt = beta_split(&platforms);
-        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30, &Speeds::default());
+        tt.use_osm_transfers(std::iter::empty(), &platforms, &Speeds::default());
         // Pathways reach Beta's uptown and downtown stops, and the uptown 2s' copy,
         // but can't tell the copy from the uptown stop it was split from.
         let walk_of = |from, to, secs| Walk {
@@ -807,7 +819,7 @@ mod tests {
             (40, 40, 40)
         );
         // From the island to the local platform, by OSM.
-        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (90, 90));
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (31, 31));
         // No pathway from downtown to the copy: none at all.
         assert!(!tt.footpaths[3].iter().any(|p| p.0 == 5));
     }
@@ -817,9 +829,10 @@ mod tests {
         // Beta's local platform right over its island, two levels up, as at W 4 St.
         let platforms = beta_platforms().with_stacked(&[("local", "island", 2)]);
         let mut tt = beta_split(&platforms);
-        tt.use_osm_transfers(std::iter::empty(), &platforms, 90, 30, &Speeds::default());
-        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (60, 60));
-        assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (60, 60));
+        tt.use_osm_transfers(std::iter::empty(), &platforms, &Speeds::default());
+        // Two flights, which way unknown: halfway between 37s up and 25s down.
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (31, 31));
+        assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (31, 31));
         // Across the island is still free.
         assert_eq!((walk(&tt, 5, 3), walk(&tt, 3, 5)), (0, 0));
     }
@@ -952,8 +965,6 @@ mod tests {
         tt.use_osm_transfers(
             std::iter::empty(),
             &Platforms::default(),
-            90,
-            30,
             &Speeds::default(),
         );
         let walks = crate::lidar::LidarWalks::from([(
@@ -976,8 +987,9 @@ mod tests {
         };
         // The mapped direction is LiDAR's; the other, and the uncovered pair, stay up and over.
         assert_eq!(walk(a, b), Some(20 + 10 + 10));
-        assert_eq!(walk(b, a), Some(90));
-        assert_eq!(walk(a, c), Some(90));
+        // Up and down a flight, 31s, and across 120 m and 240 m at 3 mph, 89s and 179s.
+        assert_eq!(walk(b, a), Some(121));
+        assert_eq!(walk(a, c), Some(210));
     }
 
     #[test]
@@ -1005,8 +1017,6 @@ mod tests {
         tt.use_osm_transfers(
             [[0, 1, 2].as_slice()].into_iter(),
             &Platforms::default(),
-            90,
-            30,
             &Speeds::default(),
         );
 
@@ -1085,8 +1095,6 @@ mod tests {
         tt.use_osm_transfers(
             std::iter::empty(),
             &Platforms::default(),
-            90,
-            30,
             &Speeds::default(),
         );
         assert_eq!(tt.min_change[0], 0);

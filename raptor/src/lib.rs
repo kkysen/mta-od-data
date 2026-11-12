@@ -218,8 +218,6 @@ pub fn assign_dates(
                 Transfers::Osm => tt.use_osm_transfers(
                     complexes.stops.values().map(Vec::as_slice),
                     platforms.as_ref().expect("loaded for osm"),
-                    config.up_and_over_secs,
-                    config.stacked_secs_per_level,
                     &config.speeds,
                 ),
             }
@@ -233,12 +231,7 @@ pub fn assign_dates(
             // LiDAR maps' walks over any other inside the gates,
             // before passages, which are walked from them.
             tt.use_lidar_walks(&lidar_walks, &config.speeds);
-            tt.use_passages(
-                &passages,
-                &complexes,
-                config.stacked_secs_per_level,
-                &config.speeds,
-            );
+            tt.use_passages(&passages, &complexes, &config.speeds);
             // Last, so as not to replace any walk there is.
             if let Some(all) = &street_walks {
                 let walks = Walks::for_feed(all, &[&tt], &[]);
