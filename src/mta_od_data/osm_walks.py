@@ -13,6 +13,10 @@ A walk is the quickest path over them
 from any node on one platform's level, on or in it,
 to any on or in another's, timed at `raptor`'s default speeds
 to pick it, the same as LiDAR walks (`lidar.Walk`).
+It's searched from each 20 m stretch of the first platform in turn,
+for every way off it, each from its foot, the last node on the platform,
+and its foot's spot along it, for `raptor` to spread riders along the train;
+a way never the quickest from any spot is left out (`lidar.useful`).
 
 It stays inside the fare gates: never through a turnstile, gate, or entrance node.
 A flight climbs as many levels as its `level` spans, each `lidar.DEFAULT_RISE`,
@@ -42,7 +46,7 @@ from shapely import STRtree, contains_xy
 from shapely.geometry import Point, Polygon
 from typer import Option, Typer
 
-from mta_od_data.lidar import DEFAULT_RISE, Walk
+from mta_od_data.lidar import DEFAULT_RISE, PlatformAxis, Walk, WayOff, useful
 from mta_od_data.platforms import DEFAULT_AREAS_OUT, DEFAULT_EXTRACT
 
 app = Typer()
@@ -55,6 +59,9 @@ NEAR_M = 400
 PAIR_M = 400
 # The longest walk kept, in metres on the level.
 MAX_WALK_M = 600
+# Each stretch of a platform this long is searched from on its own,
+# for every way off it, not just the quickest from anywhere on it.
+STRETCH_M = 20
 # How near an escalator runs another between the same levels to be its pair.
 ESCALATOR_PAIR_M = 30
 # Nodes a walk never passes, leaving the fare-controlled area.
@@ -335,7 +342,10 @@ def add(a: Walk, b: Walk) -> Walk:
 
 def platform_walks(
     outlines: dict[str, Polygon], platform_levels: dict[str, list[float]], ways: Ways
-) -> list[tuple[str, str, Walk]]:
+) -> list[tuple[str, str, WayOff]]:
+    """Every way between each two platforms near each other,
+    each from its foot, where it leaves the first,
+    found from each stretch of it in turn."""
     all_edges, level_of = edges(ways)
     es = [e for e in all_edges if e.a not in ways.blocked and e.b not in ways.blocked]
     ids = {n: i for i, n in enumerate(sorted({n for e in es for n in (e.a, e.b)}))}
@@ -376,21 +386,35 @@ def platform_walks(
         near = [names[i] for i in tree.query(centre[a].buffer(PAIR_M)) if names[i] != a]
         if not near:
             continue
-        dist, pred, _ = dijkstra(
-            graph, indices=seeds[a], min_only=True, return_predecessors=True
-        )
-        for b in near:
-            targets = seeds[b]
-            t = targets[np.argmin(dist[targets])]
-            if not np.isfinite(dist[t]):
-                continue
-            walk = Walk(0.0)
-            node = t
-            while pred[node] >= 0:
-                walk = add(walk, best[(int(pred[node]), int(node))])
-                node = pred[node]
-            if walk.metres <= MAX_WALK_M:
-                out.append((a, b, walk))
+        axis = PlatformAxis.of(outlines[a])
+        on_a = np.zeros(n, bool)
+        on_a[seeds[a]] = True
+        along = axis.along(coords[seeds[a]])
+        paths: dict[str, dict[int, WayOff]] = defaultdict(dict)
+        for stretch in np.unique((along // STRETCH_M).astype(int)):
+            starts = seeds[a][(along // STRETCH_M).astype(int) == stretch]
+            dist, pred, _ = dijkstra(
+                graph, indices=starts, min_only=True, return_predecessors=True
+            )
+            for b in near:
+                targets = seeds[b]
+                t = targets[np.argmin(dist[targets])]
+                if not np.isfinite(dist[t]):
+                    continue
+                # Back to where it leaves the platform: its foot.
+                walk = Walk(0.0)
+                node = t
+                while not on_a[node] and pred[node] >= 0:
+                    walk = add(walk, best[(int(pred[node]), int(node))])
+                    node = pred[node]
+                if walk.metres > MAX_WALK_M:
+                    continue
+                if node not in paths[b] or walk.secs() < paths[b][node].walk.secs():
+                    paths[b][node] = WayOff(
+                        walk, float(axis.along(coords[node])), axis.length
+                    )
+        for b, by_foot in paths.items():
+            out.extend((a, b, p) for p in useful(list(by_foot.values())))
     return out
 
 
@@ -427,8 +451,11 @@ def osm_walks(
                 "stairs_down_m",
                 "escalator_up_m",
                 "escalator_down_m",
+                "along_m",
+                "platform_m",
             ]
         )
         w.writerows(
-            (a, b, *walk.row()) for a, b, walk in sorted(walks, key=lambda t: t[:2])
+            (a, b, *path.row())
+            for a, b, path in sorted(walks, key=lambda t: (*t[:2], t[2].along or 0))
         )

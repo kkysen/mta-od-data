@@ -810,6 +810,61 @@ class Walk:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class PlatformAxis:
+    """A platform's length, along its outline's longest side, in metres,
+    from the end at `start`, in the direction `unit`."""
+
+    start: np.ndarray
+    unit: np.ndarray
+    length: float
+
+    @staticmethod
+    def of(outline: Polygon) -> PlatformAxis:
+        corners = np.asarray(outline.minimum_rotated_rectangle.exterior.coords)[:4]
+        sides = np.diff(np.vstack([corners, corners[:1]]), axis=0)
+        side = sides[np.argmax(np.linalg.norm(sides, axis=1))]
+        unit = side / np.linalg.norm(side)
+        t = np.asarray(outline.exterior.coords) @ unit
+        return PlatformAxis(unit * t.min(), unit, float(t.max() - t.min()))
+
+    def along(self, xy: np.ndarray) -> np.ndarray:
+        """How far along it points `xy` are, clipped to its ends."""
+        return np.clip((np.asarray(xy) - self.start) @ self.unit, 0, self.length)
+
+
+@dataclass(frozen=True, slots=True)
+class WayOff:
+    """One way from one platform to another, from its foot `along` the first,
+    of `length`, if known."""
+
+    walk: Walk
+    along: float | None = None
+    length: float | None = None
+
+    def row(self) -> tuple[float | str, ...]:
+        spot = (
+            (round(self.along, 1), round(self.length, 1))
+            if self.along is not None and self.length is not None
+            else ("", "")
+        )
+        return (*self.walk.row(), *spot)
+
+
+def useful(paths: list[WayOff]) -> list[WayOff]:
+    """`paths` but those never the quickest from any spot along the platform:
+    as quick to reach another's foot and take it."""
+    out = []
+    for p in sorted(paths, key=lambda p: p.walk.secs()):
+        if p.along is None or not any(
+            q.along is not None
+            and q.walk.secs() + abs(q.along - p.along) / WALK_M_PER_S <= p.walk.secs()
+            for q in out
+        ):
+            out.append(p)
+    return out
+
+
 def typical_flight(conns: list[Connector]) -> Flight:
     """A station's median measured stair, for a connector not measured,
     or `DEFAULT_RISE` where none is."""
