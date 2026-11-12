@@ -80,6 +80,8 @@ CONTACT_PX = 6
 # A stair or escalator's whole drawing, on the reduced map, at most:
 # any bigger is joined to a floor.
 FLIGHT_MAX_PX = 20_000
+# Smaller is a mark on a floor, like a stair's tread.
+FLIGHT_MIN_PX = 1_000
 # How strongly a stair's brightness repeats at its steps' spacing, at least,
 # to count them.
 STEP_SCORE_MIN = 30
@@ -477,6 +479,8 @@ class Flight:
 
     run: float
     rise: float
+    # Drawn from its foot to its top, in px on the full-size map, where measured.
+    page: tuple[float, float] = (0.0, 0.0)
 
 
 class Flights:
@@ -531,21 +535,31 @@ class Flights:
         return np.asarray(self.full.crop(box).convert("RGB")).astype(np.int16)
 
     def split(self, p: np.ndarray, axis_page: np.ndarray) -> Flight:
-        """A vector drawn up a flight, split into its run along the platform
-        whose axis on the page is `axis_page`, and its rise."""
+        """A vector drawn along a flight, split into its run on the level
+        that's `axis_page` on the page, and its rise."""
         u = np.linalg.solve(self.a, axis_page)
         u /= np.linalg.norm(u)
         run, rise = np.linalg.solve(np.column_stack([self.a @ u, [0, -self.v]]), p)
-        return Flight(abs(float(run)), float(rise))
+        if rise < 0:
+            p = -p
+        return Flight(abs(float(run)), abs(float(rise)), (float(p[0]), float(p[1])))
+
+    def run_across(self, edge: np.ndarray) -> np.ndarray:
+        """The run on the page of a stair whose risers' edges are drawn along `edge`:
+        a riser's edge is level, so the run is square to it on the ground."""
+        w = np.linalg.solve(self.a, edge)
+        return self.a @ np.array([-w[1], w[0]])
 
     def measure(
-        self, kind: str, px: np.ndarray, axis_page: np.ndarray
+        self, kind: str, px: np.ndarray, axis_page: np.ndarray | None
     ) -> Flight | None:
         if kind == "escalator":
             return self.escalator(px, axis_page)
         return self.stair(px, axis_page)
 
-    def stair(self, px: np.ndarray, axis_page: np.ndarray) -> Flight | None:
+    def stair(self, px: np.ndarray, axis_page: np.ndarray | None) -> Flight | None:
+        """The stair under `px`, its run along `axis_page`,
+        or, if `None`, square to its risers on the ground."""
         a = self.crop(self.stairs, px)
         if a is None:
             return None
@@ -610,11 +624,15 @@ class Flights:
         step = np.median(diffs, axis=0)
         if step[1] > 0:
             step = -step
+        if axis_page is None:
+            axis_page = self.run_across(nrm)
         flight = self.split(step * risers, axis_page)
         slope = np.degrees(np.arctan2(flight.rise, flight.run))
         return flight if STAIR_SLOPE[0] <= slope <= STAIR_SLOPE[1] else None
 
-    def escalator(self, px: np.ndarray, axis_page: np.ndarray) -> Flight | None:
+    def escalator(self, px: np.ndarray, axis_page: np.ndarray | None) -> Flight | None:
+        """The escalator under `px`, its run along `axis_page`,
+        or, if `None`, square on the ground to its ends' edges, which are level."""
         a = self.crop(self.escalators, px)
         if a is None:
             return None
@@ -632,6 +650,19 @@ class Flights:
         p = d * (np.percentile(t, 99.5) - np.percentile(t, 0.5))
         if p[1] > 0:
             p = -p
+        if axis_page is None:
+            hull = np.asarray(MultiPoint(pts).convex_hull.exterior.coords)
+            edges = np.diff(hull, axis=0)
+            lens = np.linalg.norm(edges, axis=1)
+            ends = abs(edges @ d) < 0.9 * lens
+            if not ends.any():
+                return None
+            # Its ends' edges, pointed one way, weighted by length.
+            e = (
+                edges[ends]
+                * np.where(edges[ends] @ np.array([-d[1], d[0]]) < 0, -1, 1)[:, None]
+            )
+            axis_page = self.run_across(e.sum(0))
         flight = self.split(p, axis_page)
         # Landings flatten it overall; a cut-off stub is too steep or too short.
         slope = np.degrees(np.arctan2(flight.rise, flight.run))
@@ -852,6 +883,7 @@ def corridor_walks(
     img: np.ndarray,
     pieces: dict[str, np.ndarray],
     proj: Projection,
+    flights: Flights,
     typical: Flight,
 ) -> list[tuple[str, str, Walk]]:
     """The shortest walk between every two platforms along the map's floors:
@@ -861,9 +893,14 @@ def corridor_walks(
     Each step is measured on the ground through the projection,
     which a level's offset up the page doesn't change.
     It starts and ends at any floor touching each platform: the car nearest it.
-    Levels are OSM's: as many as the platforms are apart,
-    or one up and back down between platforms on one level,
-    each climbed by `typical` stairs."""
+    Each stair the walk climbs whole is measured (`Flights.stair`),
+    up or down by which way the walk takes it, and its drawn length is left off
+    the walk on the level; it's climbed as one level of `typical` stairs if unmeasured.
+    An escalator is one level of `typical` stairs, as its run's direction is unknown,
+    up or down by which way the walk takes it up the page.
+    A walk with no stairs found falls back on OSM's levels:
+    as many as the platforms are apart,
+    or one up and back down between platforms on one level."""
     r, g, b = (img[..., i].astype(np.int16) for i in range(3))
     grey = (abs(r - g) < 16) & (abs(g - b) < 16)
     # Paid floors are darker; light gray is outside the gates, or closed.
@@ -956,19 +993,69 @@ def corridor_walks(
     level = {p.way: p.level for p in m.platforms}
     out = []
     for a_way, b_way in permutations(masks, 2):
-        dist = dijkstra(graph, directed=False, indices=seeds[a_way], min_only=True)
-        metres = float(dist[seeds[b_way]].min())
-        if not np.isfinite(metres):
-            continue
-        diff = level[b_way] - level[a_way]
-        walk = Walk(metres)
-        walk = (
-            walk.climb("stairs", diff, typical)
-            if diff
-            else walk.climb("stairs", 1, typical).climb("stairs", -1, typical)
+        dist, pred, _ = dijkstra(
+            graph,
+            directed=False,
+            indices=seeds[a_way],
+            min_only=True,
+            return_predecessors=True,
         )
+        end = seeds[b_way][np.argmin(dist[seeds[b_way]])]
+        if not np.isfinite(dist[end]):
+            continue
+        path = [end]
+        while pred[path[-1]] >= 0:
+            path.append(pred[path[-1]])
+        path = np.array(path[::-1])
+        diff = level[b_way] - level[a_way]
+        walk = climbs(path, dist, np.stack([xs, ys], 1), flights, typical, diff)
         out.append((a_way, b_way, walk))
     return out
+
+
+def climbs(
+    path: np.ndarray,
+    dist: np.ndarray,
+    pxy: np.ndarray,
+    flights: Flights,
+    typical: Flight,
+    levels: int,
+) -> Walk:
+    """A walk along `path`, nodes at `pxy` on the reduced map, `dist` metres along,
+    up and down each stair and escalator it takes end to end, as measured,
+    then as many `typical` stairs as are left of `levels` up, OSM's,
+    or, with nothing measured on one level, one up and back down."""
+    walk = Walk(float(dist[path[-1]]))
+    risen = 0.0
+    for kind, lab in (("stairs", flights.stairs), ("escalator", flights.escalators)):
+        on = lab[pxy[path, 1], pxy[path, 0]]
+        sizes = np.bincount(lab.ravel())
+        for comp in np.unique(on[on > 0]):
+            # Joined to a floor, so the floor, or too small to be a flight.
+            if not FLIGHT_MIN_PX <= sizes[comp] <= FLIGHT_MAX_PX:
+                continue
+            i = np.nonzero(on == comp)[0]
+            # On and off it, as one may be drawn passing over another.
+            first, last = i.min(), i.max()
+            flight = flights.measure(kind, pxy[path[first : last + 1]], None)
+            if flight is None:
+                continue
+            page = np.array(flight.page)
+            along = (pxy[path[last]] - pxy[path[first]]) * REDUCE @ page / (page @ page)
+            # Only clipped a corner of it.
+            if abs(along) < 0.5:
+                continue
+            up = 1 if along > 0 else -1
+            risen += up * flight.rise
+            walk = replace(
+                walk, metres=walk.metres - float(dist[path[last]] - dist[path[first]])
+            ).climb(kind, up, flight)
+    left = round(levels - risen / typical.rise)
+    if left:
+        return walk.climb("stairs", left, typical)
+    if not risen and walk == Walk(walk.metres):
+        return walk.climb("stairs", 1, typical).climb("stairs", -1, typical)
+    return walk
 
 
 def drop_lines(
@@ -1057,7 +1144,12 @@ def lidar_walks(
         if m.corridors:
             img = load_map(m)
             ws = corridor_walks(
-                m, img, split_by_colour(img, m), proj, typical_flight(conns)
+                m,
+                img,
+                split_by_colour(img, m),
+                proj,
+                Flights(m, img, proj),
+                typical_flight(conns),
             )
         else:
             ws = walks(m, conns)
