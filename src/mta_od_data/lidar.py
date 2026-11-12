@@ -772,6 +772,23 @@ def levels_climbed(c: Connector, level: int, typical: Flight) -> int:
     return c.reaches - level
 
 
+def rideable(c: Connector, up: int, conns: list[Connector]) -> bool:
+    """Whether `c` can be taken `up` levels, or down if negative.
+    A lone escalator between a platform and an area runs up;
+    of two or more, one runs each way, though which is unknown,
+    so either way is taken."""
+    if "escalator" not in c.kind or up > 0:
+        return True
+    return (
+        sum(
+            "escalator" in o.kind
+            and (o.way, o.reaches, o.area) == (c.way, c.reaches, c.area)
+            for o in conns
+        )
+        > 1
+    )
+
+
 def walks(m: StationMap, conns: list[Connector]) -> list[tuple[str, str, Walk]]:
     """The quickest walk between every two platforms, each way,
     over a connector off each: the straight line between their feet,
@@ -786,6 +803,8 @@ def walks(m: StationMap, conns: list[Connector]) -> list[tuple[str, str, Walk]]:
             for d in (d for d in conns if d.way == b and d.area == c.area):
                 up_c = levels_climbed(c, level[a], typical)
                 up_d = levels_climbed(d, level[b], typical)
+                if not (rideable(c, up_c, conns) and rideable(d, -up_d, conns)):
+                    continue
                 walk = (
                     Walk(float(np.hypot(c.east - d.east, c.north - d.north)))
                     .climb(c.kind, up_c, c.flight or typical)
@@ -907,7 +926,10 @@ def lidar_walks(
             )
         else:
             ws = walks(m, conns)
-        rows.extend((a, b, *w.row(), m.name) for a, b, w in ws)
+        # Sorted, as sets order Court Sq's platforms differently each run.
+        rows.extend(
+            (a, b, *w.row(), m.name) for a, b, w in sorted(ws, key=lambda t: t[:2])
+        )
     with open(out, "w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(
