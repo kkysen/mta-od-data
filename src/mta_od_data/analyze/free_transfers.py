@@ -36,6 +36,7 @@ from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import DatePaths, date_paths, read_manifest
 from mta_od_data.invocation import produced_by
 from mta_od_data.prepare import DEFAULT_COMPLEXES_CSV, DEFAULT_STATIONS_CSV
+from mta_od_data.ridership import load_names
 
 app = Typer()
 
@@ -118,11 +119,6 @@ class Totals:
 def _complex_of(stations: Path) -> dict[str, str]:
     with stations.open(newline="") as f:
         return {r["gtfs_stop_id"]: r["complex_id"] for r in DictReader(f)}
-
-
-def _names(complexes: Path) -> dict[str, str]:
-    with complexes.open(newline="") as f:
-        return {r["complex_id"]: r["display_name"] for r in DictReader(f)}
 
 
 def _one(db: DuckDBPyConnection, query: str) -> tuple[float, float]:
@@ -290,7 +286,7 @@ def free_transfers(
     and how much."""
     pairs_by_key, totals, days = compare(today, free, stations)
     pairs = sorted(pairs_by_key.values(), key=lambda p: (-p.saved, p.complexes))
-    names = _names(complexes)
+    names = load_names(stations, complexes).complex
     report = render_markdown(pairs, totals, names, top_n)
     print(report)
     if csv_out:
