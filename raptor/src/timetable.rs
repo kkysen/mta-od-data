@@ -502,7 +502,7 @@ impl Timetable {
     /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
     /// of `BASE_WALK` plus the straight-line distance at `speeds`' walk.
     /// Between `platforms` stacked one right over another,
-    /// any change is a flight of stairs a level instead, which way unknown,
+    /// any change is a flight of stairs a level instead, up or down,
     /// within a station or a complex.
     /// A stop's platform is from `split_platforms`;
     /// two stops whose platforms aren't both known are up and over.
@@ -552,7 +552,8 @@ impl Timetable {
                 if let Some(b) = &self.stops[*b as usize].platform
                     && let Some(levels) = platforms.stacked(a, b)
                 {
-                    *walk = speeds.levels_secs(levels).round() as Secs;
+                    let (up, down) = (levels.max(0), (-levels).max(0));
+                    *walk = speeds.flights_secs(up as u8, down as u8).round() as Secs;
                 }
             }
         }
@@ -827,12 +828,12 @@ mod tests {
     #[test]
     fn stacked_platforms_are_a_flight_a_level_apart() {
         // Beta's local platform right over its island, two levels up, as at W 4 St.
-        let platforms = beta_platforms().with_stacked(&[("local", "island", 2)]);
+        let platforms = beta_platforms().with_stacked(&[("island", "local", 2)]);
         let mut tt = beta_split(&platforms);
         tt.use_osm_transfers(std::iter::empty(), &platforms, &Speeds::default());
-        // Two flights, which way unknown: halfway between 37s up and 25s down.
-        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (31, 31));
-        assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (31, 31));
+        // Two flights down from the local platform, 25s, and up to it, 37s.
+        assert_eq!((walk(&tt, 2, 5), walk(&tt, 5, 2)), (25, 37));
+        assert_eq!((walk(&tt, 2, 3), walk(&tt, 3, 2)), (25, 37));
         // Across the island is still free.
         assert_eq!((walk(&tt, 5, 3), walk(&tt, 3, 5)), (0, 0));
     }

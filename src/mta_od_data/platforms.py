@@ -168,7 +168,8 @@ def stacked(
     platforms: list[str], pieces: dict[str, set[str]], locations: Locations
 ) -> list[tuple[str, str, int, float]]:
     """Each pair of `platforms` stacked one over another,
-    how many levels apart, and how much they overlap."""
+    how many levels the second is above the first, below if negative,
+    and how much they overlap."""
     shapes: dict[str, BaseGeometry] = {}
     for p in platforms:
         parts = pieces.get(p) or {p}
@@ -179,8 +180,8 @@ def stacked(
     pairs = []
     for i, j in zip(*tree.query([shapes[p] for p in names], "intersects"), strict=True):
         a, b = names[i], names[j]
-        levels = abs(locations.levels[a] - locations.levels[b])
-        if a >= b or levels < 1:
+        levels = locations.levels[b] - locations.levels[a]
+        if a >= b or abs(levels) < 1:
             continue
         overlap = shapes[a].intersection(shapes[b]).area / min(
             shapes[a].area, shapes[b].area
@@ -383,6 +384,6 @@ def fetch_platforms(
     pairs = stacked(platforms, pieces, locations)
     with stacked_out.open("w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["platform", "other", "levels", "overlap"])
+        writer.writerow(["platform", "other", "levels_up", "overlap"])
         writer.writerows((a, b, n, f"{o:.2f}") for a, b, n, o in pairs)
     print(f"wrote {stacked_out}: {len(pairs)} pairs of platforms stacked")

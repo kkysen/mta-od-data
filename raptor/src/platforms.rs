@@ -16,8 +16,8 @@ type Key = (String, String, String, String);
 pub struct Platforms {
     platforms: HashMap<Key, String>,
     /// Pairs of platforms one right over the other, each way round,
-    /// and how many levels apart.
-    stacked: HashMap<(String, String), u8>,
+    /// and how many levels the second is above the first.
+    stacked: HashMap<(String, String), i8>,
 }
 
 #[derive(Deserialize)]
@@ -33,7 +33,8 @@ struct Row {
 struct StackedRow {
     platform: String,
     other: String,
-    levels: u8,
+    /// How many levels `other` is above `platform`, below if negative.
+    levels_up: i8,
 }
 
 impl Platforms {
@@ -57,8 +58,8 @@ impl Platforms {
         for row in reader.deserialize() {
             let row: StackedRow =
                 row.with_context(|| format!("reading {}", stacked_path.display()))?;
-            stacked.insert((row.other.clone(), row.platform.clone()), row.levels);
-            stacked.insert((row.platform, row.other), row.levels);
+            stacked.insert((row.other.clone(), row.platform.clone()), -row.levels_up);
+            stacked.insert((row.platform, row.other), row.levels_up);
         }
         Ok(Self { platforms, stacked })
     }
@@ -69,8 +70,9 @@ impl Platforms {
         self.platforms.get(&key).map(String::as_str)
     }
 
-    /// How many levels apart platforms `a` and `b` are, if stacked one over the other.
-    pub fn stacked(&self, a: &str, b: &str) -> Option<u8> {
+    /// How many levels `b` is above `a`, below if negative,
+    /// if they're stacked one over the other.
+    pub fn stacked(&self, a: &str, b: &str) -> Option<i8> {
         self.stacked.get(&(a.into(), b.into())).copied()
     }
 }
@@ -78,10 +80,10 @@ impl Platforms {
 #[cfg(test)]
 impl Platforms {
     /// These platforms, with these pairs stacked, so many levels apart.
-    pub fn with_stacked(mut self, pairs: &[(&str, &str, u8)]) -> Self {
+    pub fn with_stacked(mut self, pairs: &[(&str, &str, i8)]) -> Self {
         for &(a, b, levels) in pairs {
             self.stacked.insert((a.into(), b.into()), levels);
-            self.stacked.insert((b.into(), a.into()), levels);
+            self.stacked.insert((b.into(), a.into()), -levels);
         }
         self
     }
