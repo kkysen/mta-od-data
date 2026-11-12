@@ -108,6 +108,10 @@ class Walk:
 # 42 St-Bryant Pk and 5 Av's, by the passage to Times Sq-42 St's.
 JOINED_COMPLEXES = {"609": "611"}
 
+# Entrances the MTA lists under the wrong station, by station and coordinates:
+# 86 St's (R) at 78 St, 870 m from its platforms and 80 m from 77 St's.
+WRONG_ENTRANCES = {("R44", 40.6302302, -74.0254577)}
+
 # Entrances reached by a long walk inside the station,
 # by the MTA's entrance coordinates.
 WALKS = {
@@ -344,6 +348,12 @@ def build(stations_csv: Path = DEFAULT_STATIONS_CSV) -> list[dict[str, object]]:
         if "YES" in (e["entry_allowed"], e["exit_allowed"])
         # An entrance a complex's stations share lists each of them.
         for gtfs_id in e["gtfs_stop_id"].split("; ")
+        if (
+            gtfs_id,
+            float(e["entrance_latitude"]),
+            float(e["entrance_longitude"]),
+        )
+        not in WRONG_ENTRANCES
     ]
     rows = _drop_misattributed(rows)
     # Stations the MTA lists no entrances for, at their own coordinates.
