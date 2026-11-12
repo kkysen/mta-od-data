@@ -1000,26 +1000,30 @@ mod tests {
         let walks = crate::lidar::LidarWalks::from([
             (
                 ("wA".to_owned(), "wB".to_owned()),
-                crate::lidar::LidarWalk {
+                vec![crate::lidar::LidarWalk {
                     metres: 26.8224,
                     stairs_up_m: 4.9175,
                     stairs_down_m: 7.1526,
                     escalator_up_m: 0.0,
                     escalator_down_m: 0.0,
-                },
+                    along_m: None,
+                    platform_m: None,
+                }],
             ),
             (
                 ("wB".to_owned(), "wD".to_owned()),
-                crate::lidar::LidarWalk {
+                vec![crate::lidar::LidarWalk {
                     metres: 1.0,
                     stairs_up_m: 0.0,
                     stairs_down_m: 0.0,
                     escalator_up_m: 0.0,
                     escalator_down_m: 0.0,
-                },
+                    along_m: None,
+                    platform_m: None,
+                }],
             ),
         ]);
-        tt.use_walks(&walks, &Speeds::default());
+        tt.use_walks(&walks, &Speeds::default(), &crate::cars::Cars::default());
 
         let walk = |x: usize, y: usize| {
             tt.footpaths[x]

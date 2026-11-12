@@ -52,6 +52,15 @@
     escalator_up_mph: 1.3,
     escalator_down_mph: 1.6,
   },
+  // Where on the train riders changing trains are, so how far along the platform
+  // they walk to the stairs or escalator (`raptor/src/cars.rs`):
+  // a share plan their car, in a bell curve around the quickest way off,
+  // so many metres either side, and the rest anywhere along the train.
+  // Placeholders: no source gives either.
+  cars: {
+    plan_share: 0.5,
+    plan_sigma_m: 18.0,
+  },
   // Most rides in a journey: riders take up to 4-ride trips,
   // and one more allows the rare fastest trip that takes 5.
   max_rides: 5,

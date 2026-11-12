@@ -4,6 +4,7 @@
 pub mod assign;
 pub mod batch;
 pub mod calendar;
+pub mod cars;
 pub mod gtfs;
 pub mod lidar;
 pub mod od;
@@ -223,7 +224,7 @@ pub fn assign_dates(
                 ),
             }
             // OSM's indoor ways' walks where it maps any, over OSM transfers' guesses.
-            tt.use_walks(&osm_walks, &config.speeds);
+            tt.use_walks(&osm_walks, &config.speeds, &config.cars);
             // Pathways, where a feed has them, over either.
             if !job.version.feed.pathways.is_empty() {
                 let gate_penalty = (config.fare_gate_penalty_min * 60.0).round() as Secs;
@@ -233,7 +234,7 @@ pub fn assign_dates(
             }
             // LiDAR maps' walks over any other inside the gates,
             // before passages, which are walked from them.
-            tt.use_walks(&lidar_walks, &config.speeds);
+            tt.use_walks(&lidar_walks, &config.speeds, &config.cars);
             tt.use_passages(&passages, &complexes, &config.speeds);
             // Last, so as not to replace any walk there is.
             if let Some(all) = &street_walks {

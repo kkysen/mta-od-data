@@ -230,6 +230,15 @@ may cross an unpaid mezzanine; free transfers are the MTA's complexes, and the p
 Only 94 of 1,226 pairs of platforms within 150 m are joined so far.
 Pathways come over those, and walks measured off LiDAR maps (`raptor/lidar_walks.csv`) over all.
 
+OSM's and LiDAR's walks may have several paths between two platforms,
+one for each way off the first, each with its foot's spot along it (`along_m`, of `platform_m`).
+Riders changing trains are a mix (`cars` in `raptor/assign.json5`, `raptor/src/cars.rs`):
+a share plan their car, in a bell curve around the quickest path's foot,
+and the rest are anywhere along the train, taken to fill the platform.
+From each spot a rider walks along the platform to whichever path is quickest from there,
+and the transfer takes the average, with no need to track which car each rider is in.
+A walk without its feet's spots is the quickest path from its foot, as if riders were right there.
+
 `pathways.txt`, where a feed has it, comes first under either,
 which the MTA's doesn't yet, so it's tested on the MBTA's.
 From each served stop, Dijkstra over every station's pathways at once

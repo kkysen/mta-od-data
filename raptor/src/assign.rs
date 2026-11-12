@@ -20,6 +20,7 @@ use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rustc_hash::FxHashMap;
 use serde::Deserialize;
 
+use crate::cars::Cars;
 use crate::gtfs::Secs;
 use crate::od::{ComplexId, Complexes, OdRow, Riders};
 use crate::raptor::{DEFAULT_MAX_RIDES, Journey, Leg, Legs, Router};
@@ -48,6 +49,10 @@ pub struct Config {
     /// which also time OSM transfers' and passages' flights of stairs.
     #[serde(default)]
     pub speeds: Speeds,
+    /// Where on the train riders changing trains are,
+    /// so how far they walk along the platform.
+    #[serde(default)]
+    pub cars: Cars,
 }
 
 fn default_fare_gate_penalty_min() -> f64 {
@@ -1345,6 +1350,10 @@ mod tests {
             stairs_down_mph: 1.6,
             escalator_up_mph: 1.3,
             escalator_down_mph: 1.6,
+        },
+        cars: Cars {
+            plan_share: 0.5,
+            plan_sigma_m: 18.0,
         },
     };
 

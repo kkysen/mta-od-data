@@ -12,12 +12,16 @@
 //! and how far up and down stairs and escalators, along their slopes,
 //! each flight measured off the map where its drawing shows it whole.
 //! It's timed here by `Speeds`.
+//! A pair of platforms may have several rows, one for each way off the first,
+//! each with its foot's spot along it, `along_m`, of `platform_m`:
+//! a transfer takes the average over riders' spots along the train (`Cars`).
 
 use std::collections::HashMap;
 
 use anyhow::{Context, Result};
 use serde::Deserialize;
 
+use crate::cars::{Cars, Path};
 use crate::gtfs::Secs;
 use crate::speeds::{Speeds, m_per_s};
 use crate::timetable::{StopIdx, Timetable};
@@ -30,6 +34,12 @@ pub struct LidarWalk {
     pub stairs_down_m: f64,
     pub escalator_up_m: f64,
     pub escalator_down_m: f64,
+    /// Where its foot is along the first platform, from one end, if known,
+    #[serde(default)]
+    pub along_m: Option<f64>,
+    /// of the first platform's length.
+    #[serde(default)]
+    pub platform_m: Option<f64>,
 }
 
 #[derive(Deserialize)]
@@ -40,8 +50,9 @@ struct Row {
     walk: LidarWalk,
 }
 
-/// Walks from one OSM platform to another, by their way IDs.
-pub type LidarWalks = HashMap<(String, String), LidarWalk>;
+/// Walks from one OSM platform to another, by their way IDs,
+/// each way off the first.
+pub type LidarWalks = HashMap<(String, String), Vec<LidarWalk>>;
 
 /// `raptor/lidar_walks.csv`'s walks, built in, so every run walks the same ones.
 pub fn load() -> Result<LidarWalks> {
@@ -60,29 +71,54 @@ fn parse(text: &str, name: &str) -> Result<LidarWalks> {
     let mut reader = csv::Reader::from_reader(text.as_bytes());
     for row in reader.deserialize() {
         let row: Row = row.with_context(|| format!("parsing {name}"))?;
-        walks.insert((row.from_platform, row.to_platform), row.walk);
+        walks
+            .entry((row.from_platform, row.to_platform))
+            .or_default()
+            .push(row.walk);
     }
     Ok(walks)
 }
 
 impl LidarWalk {
-    /// Its time, at `speeds`.
-    pub fn secs(&self, speeds: &Speeds) -> Secs {
+    /// Its time from its foot, at `speeds`.
+    pub fn secs(&self, speeds: &Speeds) -> f64 {
         let at = |metres: f64, mph: f64| metres / m_per_s(mph);
-        (at(self.metres, speeds.walk_mph)
+        at(self.metres, speeds.walk_mph)
             + at(self.stairs_up_m, speeds.stairs_up_mph)
             + at(self.stairs_down_m, speeds.stairs_down_mph)
             + at(self.escalator_up_m, speeds.escalator_up_mph)
-            + at(self.escalator_down_m, speeds.escalator_down_mph))
-        .round() as Secs
+            + at(self.escalator_down_m, speeds.escalator_down_mph)
     }
+}
+
+/// The time to change trains by any of `paths` off one platform:
+/// on average from riders' spots along the train if each path's foot is known,
+/// or else the quickest, from its foot.
+pub fn transfer_secs(paths: &[LidarWalk], speeds: &Speeds, cars: &Cars) -> Secs {
+    let feet: Option<Vec<Path>> = paths
+        .iter()
+        .map(|w| {
+            Some(Path {
+                along: w.along_m?,
+                secs: w.secs(speeds),
+            })
+        })
+        .collect();
+    let secs = match (feet, paths.first().and_then(|w| w.platform_m)) {
+        (Some(feet), Some(platform_m)) => cars.expected_secs(platform_m, &feet, speeds),
+        _ => paths
+            .iter()
+            .map(|w| w.secs(speeds))
+            .fold(f64::INFINITY, f64::min),
+    };
+    secs.round() as Secs
 }
 
 impl Timetable {
     /// `walks` between every two stops on platforms they join,
     /// replacing the footpath there was; none is added where there was none.
     /// Stops need their platforms from `split_platforms`.
-    pub fn use_walks(&mut self, walks: &LidarWalks, speeds: &Speeds) {
+    pub fn use_walks(&mut self, walks: &LidarWalks, speeds: &Speeds, cars: &Cars) {
         let on_mapped: Vec<(StopIdx, &str)> = self
             .stops
             .iter()
@@ -104,7 +140,7 @@ impl Timetable {
                 // OSM doesn't map fare gates, so a walk it finds between complexes
                 // may cross an unpaid mezzanine, not a free transfer.
                 if let Some((_, t)) = self.footpaths[a as usize].iter_mut().find(|(s, _)| *s == b) {
-                    *t = walk.secs(speeds);
+                    *t = transfer_secs(walk, speeds, cars);
                 }
             }
         }
@@ -118,8 +154,8 @@ mod tests {
     #[test]
     fn loads_times_square() {
         let walks = load().unwrap();
-        let up_to_down = walks[&("w513706097".to_owned(), "w513706098".to_owned())];
-        assert!(up_to_down.metres > 0.0);
+        let up_to_down = &walks[&("w513706097".to_owned(), "w513706098".to_owned())];
+        assert!(up_to_down[0].metres > 0.0);
         assert!(walks.contains_key(&("w513706084".to_owned(), "w513706097".to_owned())));
     }
 
@@ -131,8 +167,10 @@ mod tests {
             stairs_down_m: 7.1526,
             escalator_up_m: 5.8115,
             escalator_down_m: 0.0,
+            along_m: None,
+            platform_m: None,
         };
         // 20s at 3 mph, then 10s each up and down stairs, and on an escalator.
-        assert_eq!(walk.secs(&Speeds::default()), 50);
+        assert_eq!(walk.secs(&Speeds::default()).round(), 50.0);
     }
 }
