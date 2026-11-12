@@ -222,6 +222,9 @@ Cross-platform changes are free under both.
 Over these guesses, where OSM maps a station's insides well enough to join two platforms,
 the walk along OSM's indoor ways between them (`raptor/osm_walks.csv`, `mta-od-data osm-walks`)
 is taken as right; pairs OSM doesn't join keep the guesses.
+It only replaces a walk there already is, never adds one,
+as OSM doesn't map fare gates, so a walk it finds between complexes
+may cross an unpaid mezzanine; free transfers are the MTA's complexes, and the passages.
 Only 94 of 1,226 pairs of platforms within 150 m are joined so far.
 Pathways come over those, and walks measured off LiDAR maps (`raptor/lidar_walks.csv`) over all.
 

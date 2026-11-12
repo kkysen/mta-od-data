@@ -939,15 +939,18 @@ mod tests {
     #[test]
     fn lidar_walks_over_osm_transfers() {
         // A and B on mapped platforms, C on one the maps don't cover; one station.
+        // D, a station of its own, on a mapped platform.
         let stops = "stop_id,stop_name,stop_lat,stop_lon,parent_station\n\
-            P,P,40.0,-74.0,\nA,A,40.0,-74.0,P\nB,B,40.0,-73.99859,P\nC,C,40.002156,-74.0,P\n";
+            P,P,40.0,-74.0,\nA,A,40.0,-74.0,P\nB,B,40.0,-73.99859,P\nC,C,40.002156,-74.0,P\n\
+            D,D,40.0,-73.9986,\n";
         let files = HashMap::from([
             ("stops.txt", stops),
             ("trips.txt", "route_id,trip_id,service_id\n1,t,Weekday\n"),
             (
                 "stop_times.txt",
                 "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
-                 t,A,08:00:00,08:00:00,1\nt,B,08:10:00,08:10:00,2\nt,C,08:20:00,08:20:00,3\n",
+                 t,A,08:00:00,08:00:00,1\nt,B,08:10:00,08:10:00,2\nt,C,08:20:00,08:20:00,3\n\
+                 t,D,08:30:00,08:30:00,4\n",
             ),
             ("calendar.txt", CALENDAR),
             (
@@ -959,25 +962,38 @@ mod tests {
         let feed = Feed::load(&mut { files }).unwrap();
         let mut tt = Timetable::build(&feed, wednesday()).unwrap();
         let idx = |id: &str| tt.stops.iter().position(|s| s.id == id).unwrap();
-        let (a, b, c) = (idx("A"), idx("B"), idx("C"));
+        let (a, b, c, d) = (idx("A"), idx("B"), idx("C"), idx("D"));
         tt.stops[a].platform = Some("wA".into());
         tt.stops[b].platform = Some("wB".into());
         tt.stops[c].platform = Some("wC".into());
+        tt.stops[d].platform = Some("wD".into());
         tt.use_osm_transfers(
             std::iter::empty(),
             &Platforms::default(),
             &Speeds::default(),
         );
-        let walks = crate::lidar::LidarWalks::from([(
-            ("wA".to_owned(), "wB".to_owned()),
-            crate::lidar::LidarWalk {
-                metres: 26.8224,
-                stairs_up_m: 4.9175,
-                stairs_down_m: 7.1526,
-                escalator_up_m: 0.0,
-                escalator_down_m: 0.0,
-            },
-        )]);
+        let walks = crate::lidar::LidarWalks::from([
+            (
+                ("wA".to_owned(), "wB".to_owned()),
+                crate::lidar::LidarWalk {
+                    metres: 26.8224,
+                    stairs_up_m: 4.9175,
+                    stairs_down_m: 7.1526,
+                    escalator_up_m: 0.0,
+                    escalator_down_m: 0.0,
+                },
+            ),
+            (
+                ("wB".to_owned(), "wD".to_owned()),
+                crate::lidar::LidarWalk {
+                    metres: 1.0,
+                    stairs_up_m: 0.0,
+                    stairs_down_m: 0.0,
+                    escalator_up_m: 0.0,
+                    escalator_down_m: 0.0,
+                },
+            ),
+        ]);
         tt.use_walks(&walks, &Speeds::default());
 
         let walk = |x: usize, y: usize| {
@@ -991,6 +1007,8 @@ mod tests {
         // Up and down a flight, 23s, and across 120 m and 240 m at 3 mph, 89s and 179s.
         assert_eq!(walk(b, a), Some(112));
         assert_eq!(walk(a, c), Some(202));
+        // No walk is added where there was none: it may not be a free transfer.
+        assert_eq!(walk(b, d), None);
     }
 
     #[test]

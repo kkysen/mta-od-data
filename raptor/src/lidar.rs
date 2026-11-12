@@ -80,7 +80,7 @@ impl LidarWalk {
 
 impl Timetable {
     /// `walks` between every two stops on platforms they join,
-    /// replacing any footpath there was.
+    /// replacing the footpath there was; none is added where there was none.
     /// Stops need their platforms from `split_platforms`.
     pub fn use_walks(&mut self, walks: &LidarWalks, speeds: &Speeds) {
         let on_mapped: Vec<(StopIdx, &str)> = self
@@ -100,11 +100,11 @@ impl Timetable {
                 let Some(walk) = walks.get(&(pa.to_owned(), pb.to_owned())) else {
                     continue;
                 };
-                let secs = walk.secs(speeds);
-                let paths = &mut self.footpaths[a as usize];
-                match paths.iter_mut().find(|(s, _)| *s == b) {
-                    Some((_, t)) => *t = secs,
-                    None => paths.push((b, secs)),
+                // Only a walk there already is, between a complex's stops:
+                // OSM doesn't map fare gates, so a walk it finds between complexes
+                // may cross an unpaid mezzanine, not a free transfer.
+                if let Some((_, t)) = self.footpaths[a as usize].iter_mut().find(|(s, _)| *s == b) {
+                    *t = walk.secs(speeds);
                 }
             }
         }
