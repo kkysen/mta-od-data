@@ -228,7 +228,7 @@ It only replaces a walk there already is, never adds one,
 as OSM doesn't map fare gates, so a walk it finds between complexes
 may cross an unpaid mezzanine; free transfers are the MTA's complexes, and the passages.
 Only 94 of 1,226 pairs of platforms within 150 m are joined so far.
-Pathways come over those, and walks measured off LiDAR maps (`raptor/lidar_walks.csv`) over all.
+Pathways come over those, and walks measured off LiDAR maps and 3D models (`raptor/lidar_walks.csv`) over all.
 
 OSM's and LiDAR's walks may have several paths between two platforms,
 one for each way off the first, each with its foot's spot along it (`along_m`, of `platform_m`).

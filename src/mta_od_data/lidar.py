@@ -32,6 +32,11 @@ Each way off the first platform is kept, the quickest from each connector,
 with its foot's spot along the platform,
 but those never the quickest from any spot along it (`useful`),
 for `raptor` to spread riders along the train (`raptor/src/cars.rs`).
+
+Where she published no map but shared the 3D Blender model she drew it from,
+as 14 St-Union Sq's, walks follow the model's floors (`model_walks`),
+from its extract (`lidar_model`), fitted to OSM's platforms by turning and moving it,
+as it's to scale in metres.
 """
 
 import csv
@@ -40,7 +45,7 @@ from collections import defaultdict
 from dataclasses import dataclass, replace
 from itertools import permutations, product
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import numpy as np
 import osmium
@@ -50,7 +55,8 @@ from scipy import ndimage
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import dijkstra
 from scipy.spatial import KDTree
-from shapely import MultiPoint, Polygon, contains_xy
+from shapely import LineString, MultiPoint, Polygon, contains_xy
+from shapely.geometry.base import BaseGeometry
 from typer import Option, Typer
 
 from mta_od_data import DATA
@@ -119,6 +125,19 @@ DASH_GRAY = (175, 200)
 DASH_GAP_PX = 40
 DASHES_MIN = 3
 DASH_REACH_PX = 25
+# On a 3D model, in metres: floors are walked over a grid of points this far apart,
+# each joined to those this near it and this little above or below it.
+GRID_M = 0.5
+NEIGHBOUR_M = 0.75
+LEVEL_DZ_M = 0.25
+# A stair or escalator's foot and top join the nearest floor point this near them
+# on the level, and this near the height of its lowest or highest point.
+FLIGHT_REACH_M = 2.5
+FLIGHT_DZ_M = 0.6
+# How far apart outlines are sampled to fit a model to OSM: the model's and OSM's.
+MODEL_SAMPLE_M = 1.0
+OSM_SAMPLE_M = 0.5
+FIT_ITERATIONS = 50
 
 
 @dataclass(frozen=True, slots=True)
@@ -251,6 +270,35 @@ PORT_AUTHORITY = StationMap(
     cut_across=False,
 )
 MAPS = (TIMES_SQ, NEVINS_ST, COURT_SQ, BRYANT_PK, PORT_AUTHORITY)
+
+
+@dataclass(frozen=True, slots=True)
+class StationModel:
+    name: str
+    # Its extract, in `lidar_maps/`.
+    file: str
+    # Each platform's curve in the model, and its OSM way.
+    platforms: tuple[tuple[str, str], ...]
+    # Each escalator's mesh, and whether it runs up; other flights are stairs,
+    # meshes named `stairs ...`.
+    escalators: tuple[tuple[str, bool], ...]
+
+
+UNION_SQ = StationModel(
+    name="14 St-Union Sq",
+    file="union_square.json",
+    platforms=(
+        ("L", "w509025060"),
+        ("4 downtown", "w509025007"),
+        ("4 uptown", "w509025013"),
+        ("Q downtown", "w509025036"),
+        ("Q uptown", "w509025035"),
+    ),
+    # The L's two escalators, side by side, run one each way;
+    # which is which is assumed, not checked: flip these if 1 runs down.
+    escalators=(("L escalator 1", True), ("L escalator 2", False)),
+)
+MODELS = (UNION_SQ,)
 
 
 def colour_mask(img: np.ndarray, color: str) -> np.ndarray:
@@ -1294,6 +1342,292 @@ def drop_lines(
     )
 
 
+@dataclass(frozen=True, slots=True)
+class Floor:
+    """A model's floor: its outline, less any holes in it,
+    and its plane, `z = a x + b y + c`, tilted for a slope or ramp."""
+
+    name: str
+    shape: BaseGeometry
+    plane: np.ndarray
+
+    def z(self, xy: np.ndarray) -> np.ndarray:
+        return xy @ self.plane[:2] + self.plane[2]
+
+
+def model_floors(model: dict[str, Any]) -> dict[str, Floor]:
+    """A model's floors inside the fare gates, by name:
+    its curves but those outside them, named `outside` or `street`,
+    and things with modifiers left unapplied, like trash cans.
+    A curve's rings cut holes in one another, as Blender fills them,
+    and its plane is the least-squares fit to their points."""
+    floors = {}
+    for c in model["curves"]:
+        if c.get("unapplied") or any(w in c["name"] for w in ("outside", "street")):
+            continue
+        rings = [np.array(r) for r in c["rings"]]
+        shape = Polygon(rings[0][:, :2]).buffer(0)
+        for r in rings[1:]:
+            shape = shape.symmetric_difference(Polygon(r[:, :2]).buffer(0))
+        pts = np.vstack(rings)
+        plane, *_ = np.linalg.lstsq(
+            np.c_[pts[:, :2], np.ones(len(pts))], pts[:, 2], rcond=None
+        )
+        floors[c["name"]] = Floor(c["name"], shape, plane)
+    return floors
+
+
+# A walk's parts, as `Walk`'s fields, and the speeds `raptor` times them by.
+PARTS = ("metres", "stairs_up", "stairs_down", "escalator_up", "escalator_down")
+PART_M_PER_S = np.array(
+    [
+        WALK_M_PER_S,
+        STAIRS_UP_M_PER_S,
+        STAIRS_DOWN_M_PER_S,
+        ESCALATOR_UP_M_PER_S,
+        ESCALATOR_DOWN_M_PER_S,
+    ]
+)
+
+
+@dataclass(frozen=True, slots=True)
+class ModelGraph:
+    """Points on a model's floors, `(x, y, z)`, the floor each is on,
+    and the one-way steps between them, sorted by `(src, dst)`:
+    `length` metres along one part of a walk, `part`, an index into `PARTS`."""
+
+    points: np.ndarray
+    floor: np.ndarray
+    src: np.ndarray
+    dst: np.ndarray
+    length: np.ndarray
+    part: np.ndarray
+
+    def secs(self) -> np.ndarray:
+        return self.length / PART_M_PER_S[self.part]
+
+    def matrix(self) -> csr_matrix:
+        n = len(self.points)
+        return csr_matrix((self.secs(), (self.src, self.dst)), (n, n))
+
+    def steps(self, path: np.ndarray) -> np.ndarray:
+        """The steps along `path`, a list of points."""
+        n = len(self.points)
+        return np.searchsorted(self.src * n + self.dst, path[:-1] * n + path[1:])
+
+    def walk(self, steps: np.ndarray) -> Walk:
+        parts = np.bincount(
+            self.part[steps], weights=self.length[steps], minlength=len(PARTS)
+        )
+        return Walk(*(float(x) for x in parts))
+
+
+def nearest_at(
+    points: np.ndarray, tree: KDTree, xyz: list[float], z: float
+) -> int | None:
+    """The floor point nearest `xyz` on the level, within `FLIGHT_REACH_M`,
+    of those within `FLIGHT_DZ_M` of `z`."""
+    near = np.array(tree.query_ball_point(xyz[:2], FLIGHT_REACH_M), int)
+    near = near[abs(points[near, 2] - z) < FLIGHT_DZ_M]
+    if not len(near):
+        return None
+    return int(near[np.argmin(np.linalg.norm(points[near, :2] - xyz[:2], axis=1))])
+
+
+def highest_under(
+    points: np.ndarray, tree: KDTree, xyz: list[float], z: float
+) -> int | None:
+    """The highest floor point under `z`,
+    within `FLIGHT_REACH_M` of `xyz` on the level."""
+    near = np.array(tree.query_ball_point(xyz[:2], FLIGHT_REACH_M), int)
+    near = near[points[near, 2] < z]
+    return int(near[np.argmax(points[near, 2])]) if len(near) else None
+
+
+def model_graph(
+    model: dict[str, Any], floors: dict[str, Floor], escalators: dict[str, bool]
+) -> tuple[ModelGraph, list[str]]:
+    """A grid of points `GRID_M` apart on each floor, at its height,
+    each a step from those within `NEIGHBOUR_M`, on its floor or another
+    meeting it at about one height, as a ramp meets the floor at its foot.
+    Each stair's foot and top join the floor nearest them at their heights,
+    one step each way, the straight line between those points;
+    an escalator's too, one way, but its top, which takes in its balustrade,
+    joins the highest floor under it.
+    Also returns the flights joined to no floor at an end,
+    as those outside the gates."""
+    pts = []
+    names: list[str] = []
+    for f in floors.values():
+        x0, y0, x1, y1 = f.shape.bounds
+        gx, gy = np.meshgrid(np.arange(x0, x1, GRID_M), np.arange(y0, y1, GRID_M))
+        inside = contains_xy(f.shape, gx, gy)
+        xy = np.stack([gx[inside], gy[inside]], 1)
+        if not len(xy):
+            # Narrower than the grid.
+            xy = np.array(f.shape.representative_point().coords)
+        pts.append(np.c_[xy, f.z(xy)])
+        names += [f.name] * len(xy)
+    points = np.vstack(pts)
+    tree = KDTree(points[:, :2])
+    pairs = tree.query_pairs(NEIGHBOUR_M, output_type="ndarray")
+    pairs = pairs[abs(points[pairs[:, 0], 2] - points[pairs[:, 1], 2]) < LEVEL_DZ_M]
+    src = [pairs[:, 0], pairs[:, 1]]
+    dst = [pairs[:, 1], pairs[:, 0]]
+    part = [np.zeros(2 * len(pairs), int)]
+    unjoined = []
+    for mesh in model["meshes"]:
+        name = mesh["name"]
+        up = escalators.get(name)
+        if up is None and not name.lower().startswith("stairs "):
+            continue
+        foot = nearest_at(points, tree, mesh["foot"], mesh["min"][2])
+        top = (
+            nearest_at(points, tree, mesh["top"], mesh["max"][2])
+            if up is None
+            else highest_under(points, tree, mesh["top"], mesh["max"][2])
+        )
+        if foot is None or top is None:
+            unjoined.append(name)
+            continue
+        both = [(foot, top, "up"), (top, foot, "down")]
+        kind, ways = ("stairs", both) if up is None else ("escalator", [both[not up]])
+        for a, b, going in ways:
+            src.append(np.array([a]))
+            dst.append(np.array([b]))
+            part.append(np.array([PARTS.index(f"{kind}_{going}")]))
+    s, d, p = np.concatenate(src), np.concatenate(dst), np.concatenate(part)
+    length = np.linalg.norm(points[s] - points[d], axis=1)
+    # The quickest step between two points, as two flights may join the same ones.
+    n = len(points)
+    order = np.lexsort((length / PART_M_PER_S[p], s * n + d))
+    _, first = np.unique((s * n + d)[order], return_index=True)
+    keep = order[first]
+    graph = ModelGraph(points, np.array(names), s[keep], d[keep], length[keep], p[keep])
+    return graph, unjoined
+
+
+@dataclass(frozen=True, slots=True)
+class Placement:
+    """A model's place on the ground, in metres east and north of an origin:
+    turned by `turn` and moved by `shift`,
+    and how far each platform's outline lands from OSM's, RMS, by way."""
+
+    turn: np.ndarray
+    shift: np.ndarray
+    rms_m: dict[str, float]
+
+    def to_ground(self, xy: np.ndarray) -> np.ndarray:
+        return np.asarray(xy) @ self.turn.T + self.shift
+
+    def degrees(self) -> float:
+        return float(np.degrees(np.arctan2(self.turn[1, 0], self.turn[0, 0])))
+
+
+def rigid(src: np.ndarray, dst: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """The turn and shift taking points `src` nearest `dst`, least squares
+    (Umeyama's method, without scaling)."""
+    ms, md = src.mean(0), dst.mean(0)
+    u, _, vt = np.linalg.svd((dst - md).T @ (src - ms))
+    turn = u @ np.diag([1, np.sign(np.linalg.det(u @ vt))]) @ vt
+    return turn, md - turn @ ms
+
+
+def samples(ring: np.ndarray, step: float) -> np.ndarray:
+    """Points `step` apart around a closed ring."""
+    line = LineString(np.vstack([ring, ring[:1]]))
+    along = np.arange(int(line.length / step)) * step
+    return np.array([line.interpolate(t).coords[0] for t in along])
+
+
+def place(
+    rings: dict[str, list[np.ndarray]],
+    centroids: dict[str, np.ndarray],
+    ground: dict[str, Polygon],
+) -> Placement:
+    """The turn and shift best fitting a model's platforms, by way,
+    their `rings` and `centroids`, to OSM's outlines on the `ground`:
+    from the fit of their centroids, each platform's outline is matched,
+    point by point, to the nearest of OSM's for it, and fitted again,
+    `FIT_ITERATIONS` times (iterative closest points).
+    The model is to scale, so isn't scaled."""
+    ways = list(rings)
+    model = {w: np.vstack([samples(r, MODEL_SAMPLE_M) for r in rings[w]]) for w in ways}
+    osm = {
+        w: samples(np.asarray(ground[w].exterior.coords)[:-1], OSM_SAMPLE_M)
+        for w in ways
+    }
+    trees = {w: KDTree(osm[w]) for w in ways}
+    turn, shift = rigid(
+        np.array([centroids[w] for w in ways]),
+        np.array([ground[w].centroid.coords[0] for w in ways]),
+    )
+    for _ in range(FIT_ITERATIONS):
+        matched = [trees[w].query(model[w] @ turn.T + shift)[1] for w in ways]
+        turn, shift = rigid(
+            np.vstack([model[w] for w in ways]),
+            np.vstack([osm[w][i] for w, i in zip(ways, matched, strict=True)]),
+        )
+    rms = {
+        w: float(np.sqrt((trees[w].query(model[w] @ turn.T + shift)[0] ** 2).mean()))
+        for w in ways
+    }
+    return Placement(turn, shift, rms)
+
+
+def model_walks(
+    m: StationModel, outlines: dict[str, list[tuple[float, float]]]
+) -> tuple[list[tuple[str, str, WayOff]], Placement, list[str]]:
+    """Every way between every two platforms, each way round,
+    along a model's floors, stairs and escalators (`model_graph`):
+    from each point on the first platform a step leaves it,
+    the quickest walk from there to anywhere on the second,
+    searched back from the second, from all its points at once,
+    with that point's spot along the first, through the model's fit to OSM (`place`);
+    but those never the quickest from any spot along the first (`useful`).
+    Also returns the fit and the flights joined to no floor."""
+    model = json.loads((TABLES / m.file).read_text())
+    floors = model_floors(model)
+    graph, unjoined = model_graph(model, floors, dict(m.escalators))
+    origin = outlines[m.platforms[0][1]][0]
+    ground = {w: ground_outline(o, origin) for w, o in outlines.items()}
+    axes = {w: PlatformAxis.of(g) for w, g in ground.items()}
+    curves = {c["name"]: c for c in model["curves"]}
+    placement = place(
+        {w: [np.array(r)[:, :2] for r in curves[c]["rings"]] for c, w in m.platforms},
+        {w: np.array(floors[c].shape.centroid.coords[0]) for c, w in m.platforms},
+        ground,
+    )
+    backward = graph.matrix().T.tocsr()
+    secs = graph.secs()
+    out = []
+    for (a_curve, a), (b_curve, b) in permutations(m.platforms, 2):
+        dist, toward, _ = dijkstra(
+            backward,
+            indices=np.nonzero(graph.floor == b_curve)[0],
+            min_only=True,
+            return_predecessors=True,
+        )
+        leaving = np.nonzero(
+            (graph.floor[graph.src] == a_curve) & (graph.floor[graph.dst] != a_curve)
+        )[0]
+        total = secs[leaving] + dist[graph.dst[leaving]]
+        ways_off = []
+        for start in np.unique(graph.src[leaving]):
+            mine = graph.src[leaving] == start
+            first = leaving[mine][np.argmin(total[mine])]
+            if not np.isfinite(total[mine].min()):
+                continue
+            path = [int(graph.dst[first])]
+            while toward[path[-1]] >= 0:
+                path.append(int(toward[path[-1]]))
+            walk = graph.walk(np.r_[first, graph.steps(np.array(path))])
+            spot = axes[a].along(placement.to_ground(graph.points[start, :2]))
+            ways_off.append(WayOff(walk, float(spot), axes[a].length))
+        out.extend((a, b, w) for w in useful(ways_off))
+    return out, placement, unjoined
+
+
 @app.command()
 def lidar_walks(
     extract: Annotated[
@@ -1304,7 +1638,7 @@ def lidar_walks(
     ] = DEFAULT_OUT,
 ) -> None:
     """Measure walks between each mapped station's platforms
-    off Sabrina Mielke's LiDAR maps."""
+    off Sabrina Mielke's LiDAR maps and 3D models."""
     rows = []
     for m in MAPS:
         conns, proj, axes = connectors(m, extract)
@@ -1334,6 +1668,19 @@ def lidar_walks(
         # Sorted, as sets order Court Sq's platforms differently each run.
         rows.extend(
             (a, b, *w.row(), m.name)
+            for a, b, w in sorted(ws, key=lambda t: (*t[:2], t[2].along or 0))
+        )
+    for model in MODELS:
+        handler = Outlines({int(w[1:]) for _, w in model.platforms})
+        handler.apply_file(str(extract), locations=True)
+        ws, placement, unjoined = model_walks(model, handler.outlines)
+        rms = ", ".join(f"{w} {r:.2f} m" for w, r in placement.rms_m.items())
+        print(
+            f"{model.name}: fit to OSM turned {placement.degrees():.2f} degrees, "
+            f"within RMS {rms}; flights joined to no floor: {', '.join(unjoined)}"
+        )
+        rows.extend(
+            (a, b, *w.row(), model.name)
             for a, b, w in sorted(ws, key=lambda t: (*t[:2], t[2].along or 0))
         )
     with open(out, "w", newline="") as f:

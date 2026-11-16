@@ -1,5 +1,6 @@
 //! Walks between platforms measured off LiDAR station maps (`raptor/lidar_walks.csv`),
-//! made by `mta-od-data lidar-walks` from Sabrina Mielke's maps.
+//! made by `mta-od-data lidar-walks` from Sabrina Mielke's maps,
+//! and from the 3D models she drew some from, as 14 St-Union Sq's.
 //! They take precedence over every other walk inside the fare gates,
 //! from OSM, `transfers.txt`, or pathways, and passages are walked from them,
 //! as the maps are drawn from 3D scans of the stations themselves.
@@ -9,8 +10,9 @@
 //!
 //! The file holds geometry only, in metres:
 //! the straight line on the level between the connectors used,
+//! or the walk along the floors, where corridors are bent or measured off a model,
 //! and how far up and down stairs and escalators, along their slopes,
-//! each flight measured off the map where its drawing shows it whole.
+//! each flight measured off the map where its drawing shows it whole, or the model.
 //! It's timed here by `Speeds`.
 //! A pair of platforms may have several rows, one for each way off the first,
 //! each with its foot's spot along it, `along_m`, of `platform_m`:

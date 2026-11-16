@@ -4,7 +4,8 @@ the Blender models she fitted to her iPhone LiDAR scans
 and drew her station maps from (`lidar`).
 
 A model is in metres, `z` up, at true heights where its levels aren't drawn apart,
-in its own frame, not tied to the ground: `lidar` fits it to OSM.
+in its own frame, not tied to the ground: `lidar` fits it to OSM
+and walks its floors (`model_walks`).
 Its floors are filled outlines (Blender curves) at their heights,
 tilted for slopes and ramps,
 and its stairs and escalators are meshes, mostly one step repeated (Array modifiers).
