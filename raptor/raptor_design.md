@@ -297,6 +297,14 @@ looked up only from stops that have one.
 With `--street-walks`, trains change between complexes on the streets too,
 out through one entrance and in through another, with no fare (`walks.rs`, from `subway-sheds`):
 each entrance takes its time to the platforms (`data/station_access.csv`),
+or, where a 3D model measures them, as 14 St-Union Sq's,
+each platform its own from each entrance, in and out
+(`raptor/lidar_access.csv`, from `mta-od-data lidar-access`),
+through the fare gates in 3s:
+in, to wherever on the platform the stairs or escalator lands, where riders board;
+out, on average from riders' spots along the train, as a transfer off the platform.
+A platform's stops walk from its own entrance times,
+and only stops on platforms no model measures from their station's.
 and the streets are walked at 3 mph between stations within 15 minutes of each other,
 to every stop of each station reached,
 not just the closest on each pattern as R5 keeps them,

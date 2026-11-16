@@ -70,11 +70,13 @@ pub struct AssignSummary {
 
 /// Walks the streets between `access`'s stations' entrances (`walks::load_stations`)
 /// on `osm`'s, an `.osm.pbf`, and writes them to `out` (`StreetWalks::write`),
+/// timing walks measured inside stations by `config`'s speeds and cars,
 /// for `assign_dates` to change trains between complexes on.
 /// What it walked, to print.
-pub fn street_walks(osm: &Path, access: &Path, out: &Path) -> Result<String> {
+pub fn street_walks(osm: &Path, access: &Path, config: &Path, out: &Path) -> Result<String> {
     let start = Instant::now();
-    let stations = walks::load_stations(access)?;
+    let (config, _) = Config::load(config)?;
+    let stations = walks::load_stations(access, &config.speeds, &config.cars)?;
     let osm = streets::osm::Osm::read(osm)?;
     let graph = streets::Graph::build(&osm);
     drop(osm);
@@ -574,8 +576,14 @@ fn py_assign_dates(
 
 /// `street_walks`, without holding the GIL.
 #[pyfunction(name = "street_walks")]
-fn py_street_walks(py: Python<'_>, osm: PathBuf, access: PathBuf, out: PathBuf) -> Result<String> {
-    py.detach(|| street_walks(&osm, &access, &out))
+fn py_street_walks(
+    py: Python<'_>,
+    osm: PathBuf,
+    access: PathBuf,
+    config: PathBuf,
+    out: PathBuf,
+) -> Result<String> {
+    py.detach(|| street_walks(&osm, &access, &config, &out))
 }
 
 /// A summary of the feed zip at `feed`.

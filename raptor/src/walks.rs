@@ -1,7 +1,8 @@
 //! Walks between stations, and from origins to them, in seconds,
 //! on OpenStreetMap's streets (the `streets` crate),
 //! through stations' entrances, each with its own time between the street and the platforms
-//! (`mta-od-data fetch-station-access`'s `data/station_access.csv`).
+//! (`mta-od-data fetch-station-access`'s `data/station_access.csv`),
+//! or, where a 3D model measures them, each platform's own, in and out (`lidar::access`).
 //!
 //! The streets are walked once, for every feed's stations (`StreetWalks`),
 //! and each feed takes its own stops' walks from them (`Walks`).
@@ -13,7 +14,10 @@ use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIter
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use streets::{Graph, Mm, Search, Split};
 
+use crate::cars::Cars;
 use crate::gtfs::Secs;
+use crate::lidar;
+use crate::speeds::Speeds;
 use crate::timetable::{StopIdx, Timetable};
 
 /// Walking on the streets at 3 mph, as R5 does, in millimeters a second.
@@ -23,16 +27,31 @@ pub const WALKING_SPEED_MM_PER_S: Mm = 1341;
 /// about the 1000 m R5 walked between stops, as a time, entrances included.
 const TRANSFER_LIMIT: Secs = 15 * 60;
 
-/// A station's entrance: `(latitude, longitude, seconds between it and the platforms)`.
-pub type Entrance = (f64, f64, Secs);
+/// A station's entrance, and its time from the street to the platforms and back out.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Entrance {
+    pub lat: f64,
+    pub lon: f64,
+    pub in_secs: Secs,
+    pub out_secs: Secs,
+}
 
-/// A station: `(id, complex, entrances)`.
-pub type Station = (String, String, Vec<Entrance>);
+/// A station's entrances, or with `platform`, its OSM way's,
+/// for the station's stops on that platform alone.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Station {
+    pub id: String,
+    pub platform: Option<String>,
+    pub complex: String,
+    pub entrances: Vec<Entrance>,
+}
 
 /// Every walk, from origins and stations by their IDs, whatever feed has them.
 pub struct StreetWalks {
     /// Each station's ID, by its index here.
     stations: Vec<String>,
+    /// Each one's platform, if it's one platform's.
+    platforms: Vec<Option<String>>,
     /// Each station's complex, by its index.
     complexes: Vec<String>,
     /// From each origin to the stations' platforms it walks to, by index.
@@ -60,28 +79,30 @@ pub struct Walks {
     pub stations: Vec<Option<u32>>,
 }
 
-/// A station's entrances on the streets, each with its time to the platforms as a distance.
+/// A station's entrances on the streets,
+/// each with its times in to the platforms and out from them, as distances.
 struct Snapped {
-    entrances: Vec<(Split, Mm)>,
+    entrances: Vec<(Split, Mm, Mm)>,
 }
 
 impl Snapped {
-    /// The vertices to search from, starting on the platforms or, with `inside` false, the street.
+    /// The vertices to search from, starting on the platforms, going out,
+    /// or, with `inside` false, the street.
     fn sources(&self, inside: bool) -> Vec<(u32, Mm)> {
         self.entrances
             .iter()
-            .flat_map(|(split, cost)| {
-                let cost = if inside { *cost } else { 0 };
-                split.ends().map(|(v, d)| (v, d.saturating_add(cost)))
+            .flat_map(|&(ref split, _, out)| {
+                let cost = if inside { out } else { 0 };
+                split.ends().map(move |(v, d)| (v, d.saturating_add(cost)))
             })
             .collect()
     }
 
-    /// How far the latest search reached this station's platforms, through its entrances.
+    /// How far the latest search reached this station's platforms, in through its entrances.
     fn reached(&self, search: &Search) -> Option<Mm> {
         self.entrances
             .iter()
-            .filter_map(|(split, cost)| Some(search.to(split)?.saturating_add(*cost)))
+            .filter_map(|(split, into, _)| Some(search.to(split)?.saturating_add(*into)))
             .min()
     }
 }
@@ -102,10 +123,13 @@ impl StreetWalks {
         let mm = |s: Secs| speed.saturating_mul(s as Mm);
         let snapped: Vec<Snapped> = stations
             .iter()
-            .map(|(_, _, entrances)| Snapped {
-                entrances: entrances
+            .map(|station| Snapped {
+                entrances: station
+                    .entrances
                     .iter()
-                    .filter_map(|&(lat, lon, s)| Some((graph.snap(lat, lon)?, mm(s))))
+                    .filter_map(|e| {
+                        Some((graph.snap(e.lat, e.lon)?, mm(e.in_secs), mm(e.out_secs)))
+                    })
                     .collect(),
             })
             .collect();
@@ -133,10 +157,12 @@ impl StreetWalks {
             )
             .collect();
 
+        // An origin starts at its station's own entrances, not one platform's.
         let index: HashMap<&str, usize> = stations
             .iter()
             .enumerate()
-            .map(|(i, (id, ..))| (id.as_str(), i))
+            .filter(|(_, s)| s.platform.is_none())
+            .map(|(i, s)| (s.id.as_str(), i))
             .collect();
         let walk_limit = mm(max_secs);
         let from_origins: Vec<_> = origins
@@ -153,8 +179,9 @@ impl StreetWalks {
             )
             .collect();
         Self {
-            stations: stations.iter().map(|(id, ..)| id.clone()).collect(),
-            complexes: stations.iter().map(|(_, c, _)| c.clone()).collect(),
+            stations: stations.iter().map(|s| s.id.clone()).collect(),
+            platforms: stations.iter().map(|s| s.platform.clone()).collect(),
+            complexes: stations.iter().map(|s| s.complex.clone()).collect(),
             access: from_origins.into_iter().collect(),
             near,
         }
@@ -185,7 +212,7 @@ impl StreetWalks {
     }
 
     /// Writes these to `path`, to `read` back without walking the streets again,
-    /// all little-endian: each station's ID and complex,
+    /// all little-endian: each station's ID, platform, empty if none, and complex,
     /// each station's walks to others, and each origin's ID and its walks,
     /// each list after its length as a `u32`, and each string as its UTF-8 bytes.
     pub fn write(&self, path: &std::path::Path) -> anyhow::Result<()> {
@@ -203,8 +230,14 @@ impl StreetWalks {
             }
         };
         len(&mut out, self.stations.len());
-        for (id, complex) in self.stations.iter().zip(&self.complexes) {
+        for ((id, platform), complex) in self
+            .stations
+            .iter()
+            .zip(&self.platforms)
+            .zip(&self.complexes)
+        {
             string(&mut out, id);
+            string(&mut out, platform.as_deref().unwrap_or(""));
             string(&mut out, complex);
         }
         for near in &self.near {
@@ -230,9 +263,11 @@ impl StreetWalks {
         };
         let n = r.len()?;
         let mut stations = Vec::with_capacity(n);
+        let mut platforms = Vec::with_capacity(n);
         let mut complexes = Vec::with_capacity(n);
         for _ in 0..n {
             stations.push(r.string()?);
+            platforms.push(Some(r.string()?).filter(|p| !p.is_empty()));
             complexes.push(r.string()?);
         }
         let near = (0..n).map(|_| r.walks()).collect::<anyhow::Result<_>>()?;
@@ -245,6 +280,7 @@ impl StreetWalks {
         }
         Ok(Self {
             stations,
+            platforms,
             complexes,
             access,
             near,
@@ -262,8 +298,14 @@ struct AccessRow {
 }
 
 /// Each station's entrances in `mta-od-data fetch-station-access`'s `station_access.csv`,
-/// in the order it first lists them.
-pub fn load_stations(path: &std::path::Path) -> anyhow::Result<Vec<Station>> {
+/// in the order it first lists them,
+/// then each modeled platform's, its own station's complex's (`lidar::access`),
+/// timed at `speeds` with riders spread along the train by `cars`.
+pub fn load_stations(
+    path: &std::path::Path,
+    speeds: &Speeds,
+    cars: &Cars,
+) -> anyhow::Result<Vec<Station>> {
     use anyhow::Context;
     let mut reader =
         csv::Reader::from_path(path).with_context(|| format!("opening {}", path.display()))?;
@@ -272,10 +314,32 @@ pub fn load_stations(path: &std::path::Path) -> anyhow::Result<Vec<Station>> {
     for row in reader.deserialize() {
         let row: AccessRow = row?;
         let i = *index.entry(row.station.clone()).or_insert_with(|| {
-            stations.push((row.station.clone(), row.complex.clone(), Vec::new()));
+            stations.push(Station {
+                id: row.station.clone(),
+                platform: None,
+                complex: row.complex.clone(),
+                entrances: Vec::new(),
+            });
             stations.len() - 1
         });
-        stations[i].2.push((row.lat, row.lon, row.secs));
+        stations[i].entrances.push(Entrance {
+            lat: row.lat,
+            lon: row.lon,
+            in_secs: row.secs,
+            out_secs: row.secs,
+        });
+    }
+    for p in lidar::access(speeds, cars)? {
+        let complex = index
+            .get(&p.station)
+            .map(|&i| stations[i].complex.clone())
+            .with_context(|| format!("{} has no entrances in {}", p.station, path.display()))?;
+        stations.push(Station {
+            id: p.station,
+            platform: Some(p.platform),
+            complex,
+            entrances: p.entrances,
+        });
     }
     Ok(stations)
 }
@@ -353,17 +417,26 @@ impl Walks {
             .flat_map(|(a, b)| [(a, b), (b, a)])
             .collect();
         let tt = tts[0];
-        let index: HashMap<&str, u32> = all
+        let index: HashMap<(&str, Option<&str>), u32> = all
             .stations
             .iter()
+            .zip(&all.platforms)
             .enumerate()
-            .map(|(i, s)| (s.as_str(), i as u32))
+            .map(|(i, (s, p))| ((s.as_str(), p.as_deref()), i as u32))
             .collect();
-        // Each stop's station in `all`, if it has it.
+        // Each stop's station in `all`, if it has it:
+        // its platform's own entrances if measured, or else its station's, never both.
         let station: Vec<Option<u32>> = tt
             .stops
             .iter()
-            .map(|s| index.get(s.station.as_str()).copied())
+            .map(|s| {
+                let platform = s.platform.as_deref();
+                index
+                    .get(&(s.station.as_str(), platform))
+                    .filter(|_| platform.is_some())
+                    .or_else(|| index.get(&(s.station.as_str(), None)))
+                    .copied()
+            })
             .collect();
         // Each of `all`'s stations' stops.
         let mut stops: Vec<Vec<StopIdx>> = vec![Vec::new(); all.stations.len()];
@@ -445,6 +518,7 @@ mod tests {
     fn street_walks_read_back_as_written() {
         let walks = StreetWalks {
             stations: vec!["A01".to_owned(), "V01".to_owned()],
+            platforms: vec![Some("w1".to_owned()), None],
             complexes: vec!["1".to_owned(), "V01".to_owned()],
             access: [
                 ("V01".to_owned(), vec![(0, 300), (1, 0)]),
@@ -459,6 +533,7 @@ mod tests {
         let read = StreetWalks::read(&path).unwrap();
         std::fs::remove_file(&path).unwrap();
         assert_eq!(read.stations, walks.stations);
+        assert_eq!(read.platforms, walks.platforms);
         assert_eq!(read.complexes, walks.complexes);
         assert_eq!(read.access, walks.access);
         assert_eq!(read.near, walks.near);

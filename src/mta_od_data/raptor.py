@@ -289,8 +289,12 @@ def street_walks_(
         Option(help="Each station entrance's time to the platforms"),
     ] = street_walks.DEFAULT_ACCESS,
     out: Annotated[Path, Option(help="The walks")] = street_walks.DEFAULT_OUT,
+    config: Config = DEFAULT_CONFIG,
 ) -> None:
     """Walk the streets between stations, out one entrance and in another,
     for `assign --street-walks`."""
-    print(street_walks.write(extract, streets, stations, access, out), end="")
+    print(
+        street_walks.write(extract, streets, stations, access, out, config=config),
+        end="",
+    )
     print(f"wrote {out}")

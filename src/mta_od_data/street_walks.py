@@ -95,10 +95,14 @@ def write(
     stations: Path = DEFAULT_STATIONS_CSV,
     access: Path = DEFAULT_ACCESS,
     out: Path = DEFAULT_OUT,
+    *,
+    config: Path,
 ) -> str:
     """Cut the streets from `extract`, fetched if missing,
     unless `streets` is newer than it,
-    and walk them between `access`' stations to `out`. What it walked, to print."""
+    and walk them between `access`' stations to `out`,
+    timing walks measured inside stations by `config`'s speeds and cars.
+    What it walked, to print."""
     if not extract.exists():
         extract.parent.mkdir(parents=True, exist_ok=True)
         print(f"fetching {EXTRACT_URL}")
@@ -107,4 +111,4 @@ def write(
         kept = filter_streets(extract, streets, station_bounds(stations))
         print(f"cut {kept} ways to {streets}")
     out.parent.mkdir(parents=True, exist_ok=True)
-    return street_walks(streets, access, out)
+    return street_walks(streets, access, config, out)

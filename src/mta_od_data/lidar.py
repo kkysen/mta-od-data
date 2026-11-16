@@ -37,6 +37,10 @@ Where she published no map but shared the 3D Blender model she drew it from,
 as 14 St-Union Sq's, walks follow the model's floors (`model_walks`),
 from its extract (`lidar_model`), fitted to OSM's platforms by turning and moving it,
 as it's to scale in metres.
+A model also gives walks between each street entrance and each platform
+(`model_access`, `raptor/lidar_access.csv`),
+through the fare gates, on floors outside them too,
+for `raptor`'s walks on the streets between stations (`raptor/src/walks.rs`).
 """
 
 import csv
@@ -59,7 +63,7 @@ from shapely import LineString, MultiPoint, Polygon, contains_xy
 from shapely.geometry.base import BaseGeometry
 from typer import Option, Typer
 
-from mta_od_data import DATA
+from mta_od_data import DATA, access
 from mta_od_data.platforms import DEFAULT_EXTRACT
 
 app = Typer()
@@ -70,6 +74,7 @@ Image.MAX_IMAGE_PIXELS = None
 MAPS_DIR = DATA / "station-maps-lidar"
 TABLES = Path(__file__).parent / "lidar_maps"
 DEFAULT_OUT = Path(__file__).parents[2] / "raptor" / "lidar_walks.csv"
+DEFAULT_ACCESS_OUT = Path(__file__).parents[2] / "raptor" / "lidar_access.csv"
 CACHE = Path(__file__).parents[2] / "target" / "lidar"
 
 # `raptor`'s default speeds (`raptor/assign.json5`), in metres a second,
@@ -127,6 +132,8 @@ DASH_GRAY = (175, 200)
 DASH_GAP_PX = 40
 DASHES_MIN = 3
 DASH_REACH_PX = 25
+# A model's floors named with these are outside the fare gates.
+OUTSIDE = ("outside", "street")
 # On a 3D model, in metres: floors are walked over a grid of points this far apart,
 # each joined to those this near it and this little above or below it.
 GRID_M = 0.5
@@ -136,6 +143,12 @@ LEVEL_DZ_M = 0.25
 # on the level, and this near the height of its lowest or highest point.
 FLIGHT_REACH_M = 2.5
 FLIGHT_DZ_M = 0.6
+# Through a fare gate or turnstile, a tap and a push, as `raptor` times them.
+GATE_S = 3.0
+# A model's meshes that are fare gates and turnstiles.
+GATE_COLLECTIONS = ("Ticket gates", "Spin gates")
+# How near the MTA's coordinates for an entrance its street stairs are, at most.
+ENTRANCE_M = 8.0
 # How far apart outlines are sampled to fit a model to OSM: the model's and OSM's.
 MODEL_SAMPLE_M = 1.0
 OSM_SAMPLE_M = 0.5
@@ -282,8 +295,21 @@ class StationModel:
     # Each platform's curve in the model, and its OSM way.
     platforms: tuple[tuple[str, str], ...]
     # Each escalator's mesh, and whether it runs up; other flights are stairs,
-    # meshes named `stairs ...`.
+    # meshes named `stairs ...`,
     escalators: tuple[tuple[str, bool], ...]
+    # and these.
+    stairs: tuple[str, ...] = ()
+    # Each platform's GTFS station, by its OSM way, for its entrances' walks.
+    stations: tuple[tuple[str, str], ...] = ()
+    # Floors outside the fare gates, besides those named `outside` or `street`.
+    unpaid: tuple[str, ...] = ()
+    # Curves with modifiers left unapplied that are floors as they are.
+    drawn: tuple[str, ...] = ()
+    # Meshes standing in for fare gates the model leaves out.
+    gates: tuple[str, ...] = ()
+
+    def is_unpaid(self, floor: str) -> bool:
+        return any(w in floor for w in (*OUTSIDE, *self.unpaid))
 
 
 UNION_SQ = StationModel(
@@ -300,7 +326,33 @@ UNION_SQ = StationModel(
     # the right one, standing at the foot facing up, runs up.
     # The model's frame is right-handed, z up, and its fit to OSM doesn't mirror it,
     # so facing up the L's, toward +x, the right one is toward -y: 2, at y -35.7 m.
-    escalators=(("L escalator 1", False), ("L escalator 2", True)),
+    # At the 14 St east exit's north side, of three side by side,
+    # the right one facing up toward the east-southeast, 1, runs up,
+    # and the left one, 3, down;
+    # the middle one is taken as stairs,
+    # as SubwayNut describes two escalators and a wide staircase there.
+    escalators=(
+        ("L escalator 1", False),
+        ("L escalator 2", True),
+        ("14 St east-north escalator 1", True),
+        ("14 St east-north escalator 3", False),
+    ),
+    stairs=("14 St east-north escalator 2",),
+    stations=(
+        ("w509025060", "L03"),
+        ("w509025007", "635"),
+        ("w509025013", "635"),
+        ("w509025036", "R20"),
+        ("w509025035", "R20"),
+    ),
+    # Passages from the street stairs to the gates, at their own heights.
+    unpaid=("L-skinny corr exit", "15St corridor exit plat"),
+    # Its street floor, its stairs' landings cut from it.
+    drawn=("SW pavilion street",),
+    # The 15 St entrance's high turnstiles, in and out
+    # (https://subwaynut.com/ct/union_sqn4/, and the MTA lets riders in there),
+    # where the model has only an emergency door, with a ticket machine outside it.
+    gates=("emergency door black.004",),
 )
 MODELS = (UNION_SQ,)
 
@@ -1407,15 +1459,19 @@ class Floor:
         return xy @ self.plane[:2] + self.plane[2]
 
 
-def model_floors(model: dict[str, Any]) -> dict[str, Floor]:
-    """A model's floors inside the fare gates, by name:
+def model_floors(
+    model: dict[str, Any], unpaid: bool = False, drawn: tuple[str, ...] = ()
+) -> dict[str, Floor]:
+    """A model's floors inside the fare gates, by name, or with `unpaid` all of them:
     its curves but those outside them, named `outside` or `street`,
-    and things with modifiers left unapplied, like trash cans.
+    and things with modifiers left unapplied, like trash cans, but those `drawn`.
     A curve's rings cut holes in one another, as Blender fills them,
     and its plane is the least-squares fit to their points."""
     floors = {}
     for c in model["curves"]:
-        if c.get("unapplied") or any(w in c["name"] for w in ("outside", "street")):
+        if c.get("unapplied") and c["name"] not in drawn:
+            continue
+        if not unpaid and any(w in c["name"] for w in OUTSIDE):
             continue
         rings = [np.array(r) for r in c["rings"]]
         shape = Polygon(rings[0][:, :2]).buffer(0)
@@ -1497,12 +1553,16 @@ def highest_under(
 
 
 def model_graph(
-    model: dict[str, Any], floors: dict[str, Floor], escalators: dict[str, bool]
+    model: dict[str, Any],
+    floors: dict[str, Floor],
+    escalators: dict[str, bool],
+    stairs: tuple[str, ...] = (),
 ) -> tuple[ModelGraph, list[str]]:
     """A grid of points `GRID_M` apart on each floor, at its height,
     each a step from those within `NEIGHBOUR_M`, on its floor or another
     meeting it at about one height, as a ramp meets the floor at its foot.
-    Each stair's foot and top join the floor nearest them at their heights,
+    Each stair's foot and top, a mesh named `stairs ...` or one of `stairs`,
+    join the floor nearest them at their heights,
     one step each way, the straight line between those points;
     an escalator's too, one way, but its top, which takes in its balustrade,
     joins the highest floor under it.
@@ -1531,7 +1591,7 @@ def model_graph(
     for mesh in model["meshes"]:
         name = mesh["name"]
         up = escalators.get(name)
-        if up is None and not name.lower().startswith("stairs "):
+        if up is None and not (name.lower().startswith("stairs ") or name in stairs):
             continue
         foot = nearest_at(points, tree, mesh["foot"], mesh["min"][2])
         top = (
@@ -1640,7 +1700,7 @@ def model_walks(
     Also returns the fit and the flights joined to no floor."""
     model = json.loads((TABLES / m.file).read_text())
     floors = model_floors(model)
-    graph, unjoined = model_graph(model, floors, dict(m.escalators))
+    graph, unjoined = model_graph(model, floors, dict(m.escalators), m.stairs)
     origin = outlines[m.platforms[0][1]][0]
     ground = {w: ground_outline(o, origin) for w, o in outlines.items()}
     axes = {w: PlatformAxis.of(g) for w, g in ground.items()}
@@ -1678,6 +1738,244 @@ def model_walks(
             ways_off.append(WayOff(walk, float(spot), axes[a].length))
         out.extend((a, b, w) for w in useful(ways_off))
     return out, placement, unjoined
+
+
+@dataclass(frozen=True, slots=True)
+class AccessGraph:
+    """`model_graph` over every floor of a model, outside the fare gates too,
+    crossing between them only through the gates: `gate` is which steps do."""
+
+    graph: ModelGraph
+    gate: np.ndarray
+
+    def secs(self) -> np.ndarray:
+        return self.graph.secs() + GATE_S * self.gate
+
+    def matrix(self) -> csr_matrix:
+        n = len(self.graph.points)
+        return csr_matrix((self.secs(), (self.graph.src, self.graph.dst)), (n, n))
+
+    def walk(self, steps: np.ndarray) -> tuple[Walk, int]:
+        """The walk along `steps`, and how many gates it goes through."""
+        return self.graph.walk(steps), int(self.gate[steps].sum())
+
+
+def access_graph(m: StationModel, model: dict[str, Any]) -> AccessGraph:
+    """Every floor's grid, stairs and escalators (`model_graph`),
+    but no step across the fare line, outside to inside or back,
+    but through a gate: a mesh of `GATE_COLLECTIONS`, or one of `m.gates`,
+    each a step each way between the nearest points either side of it."""
+    floors = model_floors(model, unpaid=True, drawn=m.drawn)
+    g, _ = model_graph(model, floors, dict(m.escalators), m.stairs)
+    outside = np.array([m.is_unpaid(f) for f in g.floor])
+    keep = outside[g.src] == outside[g.dst]
+    src, dst, part = [g.src[keep]], [g.dst[keep]], [g.part[keep]]
+    tree = KDTree(g.points[:, :2])
+    gates = 0
+    for mesh in model["meshes"]:
+        if mesh.get("unapplied") or not (
+            mesh["name"] in m.gates
+            or any(c in GATE_COLLECTIONS for c in mesh["collections"])
+        ):
+            continue
+        lo, hi = np.array(mesh["min"]), np.array(mesh["max"])
+        middle = (lo[:2] + hi[:2]) / 2
+        reach = float(np.linalg.norm(hi[:2] - lo[:2]) / 2 + FLIGHT_REACH_M)
+        near = np.array(tree.query_ball_point(middle, reach), int)
+        near = near[abs(g.points[near, 2] - lo[2]) < FLIGHT_DZ_M]
+        sides = [near[outside[near] == side] for side in (True, False)]
+        if not all(len(s) for s in sides):
+            continue
+        a, b = (
+            int(s[np.argmin(np.linalg.norm(g.points[s, :2] - middle, axis=1))])
+            for s in sides
+        )
+        src += [np.array([a, b])]
+        dst += [np.array([b, a])]
+        part += [np.zeros(2, int)]
+        gates += 2
+    s, d, p = np.concatenate(src), np.concatenate(dst), np.concatenate(part)
+    gate = np.r_[np.zeros(len(s) - gates, bool), np.ones(gates, bool)]
+    # Sorted by `(src, dst)`, once each, as `ModelGraph` is.
+    n = len(g.points)
+    _, first = np.unique(s * n + d, return_index=True)
+    s, d, p, gate = s[first], d[first], p[first], gate[first]
+    length = np.linalg.norm(g.points[s] - g.points[d], axis=1)
+    return AccessGraph(ModelGraph(g.points, g.floor, s, d, length, p), gate)
+
+
+@dataclass(frozen=True, slots=True)
+class AccessWalk:
+    """A walk between a street entrance, at the MTA's `lat` and `lon` for it,
+    and a platform, by its OSM way, of a GTFS station:
+    `into` it from the street, to wherever on it is quickest, where riders board,
+    or out of it from one way off it, `off` it, by `gates` fare gates."""
+
+    station: str
+    platform: str
+    lat: str
+    lon: str
+    into: bool
+    off: WayOff
+    gates: int
+
+    def row(self) -> tuple[float | str, ...]:
+        return (
+            self.station,
+            self.platform,
+            self.lat,
+            self.lon,
+            "in" if self.into else "out",
+            *self.off.walk.row(),
+            self.gates,
+            *self.off.row()[len(PARTS) :],
+        )
+
+
+def entrances(
+    m: StationModel, g: ModelGraph, placement: Placement, origin: tuple[float, float]
+) -> dict[tuple[str, str], np.ndarray]:
+    """The points of each of the MTA's entrances to the station
+    (`access.TABLE`, by its `lat` and `lon`):
+    its street floors', those whose flights down land within `ENTRANCE_M` of it."""
+    lon0, lat0 = origin
+    east_m = 111_320 * np.cos(np.radians(lat0))
+    with access.TABLE.open(newline="") as f:
+        mta = [(r["lat"], r["lon"]) for r in csv.DictReader(f) if r["name"] == m.name]
+    mta_ground = np.array(
+        [
+            ((float(lon) - lon0) * east_m, (float(lat) - lat0) * 110_540)
+            for lat, lon in mta
+        ]
+    )
+    out: dict[tuple[str, str], list[int]] = defaultdict(list)
+    for name in sorted({f for f in g.floor if "street" in f}):
+        on = g.floor == name
+        tops = g.src[on[g.src] & ~on[g.dst] & (g.part != 0)]
+        if not len(tops):
+            continue
+        at = placement.to_ground(g.points[tops, :2]).mean(0)
+        off = np.linalg.norm(mta_ground - at, axis=1)
+        nearest = int(np.argmin(off))
+        if off[nearest] > ENTRANCE_M:
+            print(f"  {name}: no MTA entrance within {ENTRANCE_M} m")
+            continue
+        out[mta[nearest]] += list(np.nonzero(on)[0])
+    return {e: np.array(points) for e, points in out.items()}
+
+
+def model_access(
+    m: StationModel, outlines: dict[str, list[tuple[float, float]]]
+) -> list[AccessWalk]:
+    """Every walk between each street entrance and each platform of a model,
+    along its floors, stairs, escalators and fare gates (`access_graph`),
+    fitted to OSM as for `model_walks`:
+    in, the quickest from the street to anywhere on the platform;
+    out, from each point on the platform a step leaves it,
+    the quickest from there to the street, with that point's spot along it,
+    but those never the quickest from any spot along it (`useful`)."""
+    model = json.loads((TABLES / m.file).read_text())
+    ag = access_graph(m, model)
+    g = ag.graph
+    origin = outlines[m.platforms[0][1]][0]
+    ground = {w: ground_outline(o, origin) for w, o in outlines.items()}
+    axes = {w: PlatformAxis.of(gr) for w, gr in ground.items()}
+    paid = model_floors(model)
+    curves = {c["name"]: c for c in model["curves"]}
+    placement = place(
+        {w: [np.array(r)[:, :2] for r in curves[c]["rings"]] for c, w in m.platforms},
+        {w: np.array(paid[c].shape.centroid.coords[0]) for c, w in m.platforms},
+        ground,
+    )
+    stations = dict(m.stations)
+    forward = ag.matrix()
+    backward = forward.T.tocsr()
+    secs = ag.secs()
+    out = []
+    for (lat, lon), street in entrances(m, g, placement, origin).items():
+        dist, came, _ = dijkstra(
+            forward, indices=street, min_only=True, return_predecessors=True
+        )
+        toward_dist, toward, _ = dijkstra(
+            backward, indices=street, min_only=True, return_predecessors=True
+        )
+        for curve, way in m.platforms:
+            on = np.nonzero(g.floor == curve)[0]
+            end = int(on[np.argmin(dist[on])])
+            path = [end]
+            while came[path[-1]] >= 0:
+                path.append(int(came[path[-1]]))
+            walk, gates = ag.walk(g.steps(np.array(path[::-1])))
+            into = WayOff(walk)
+            out.append(AccessWalk(stations[way], way, lat, lon, True, into, gates))
+            leaving = np.nonzero((g.floor[g.src] == curve) & (g.floor[g.dst] != curve))[
+                0
+            ]
+            total = secs[leaving] + toward_dist[g.dst[leaving]]
+            ways_off = {}
+            for start in np.unique(g.src[leaving]):
+                mine = g.src[leaving] == start
+                if not np.isfinite(total[mine].min()):
+                    continue
+                first = leaving[mine][np.argmin(total[mine])]
+                path = [int(g.dst[first])]
+                while toward[path[-1]] >= 0:
+                    path.append(int(toward[path[-1]]))
+                walk, gates = ag.walk(np.r_[first, g.steps(np.array(path))])
+                spot = axes[way].along(placement.to_ground(g.points[start, :2]))
+                ways_off[WayOff(walk, float(spot), axes[way].length)] = gates
+            out.extend(
+                AccessWalk(stations[way], way, lat, lon, False, w, ways_off[w])
+                for w in useful(list(ways_off))
+            )
+    return out
+
+
+@app.command()
+def lidar_access(
+    extract: Annotated[
+        Path, Option(help="Geofabrik's New York OSM extract")
+    ] = DEFAULT_EXTRACT,
+    out: Annotated[
+        Path, Option(help="Walks between entrances and platforms, for `raptor`")
+    ] = DEFAULT_ACCESS_OUT,
+) -> None:
+    """Measure walks between each modeled station's street entrances and platforms
+    off Sabrina Mielke's 3D models."""
+    rows = []
+    for model in MODELS:
+        handler = Outlines({int(w[1:]) for _, w in model.platforms})
+        handler.apply_file(str(extract), locations=True)
+        ws = model_access(model, handler.outlines)
+        print(f"{model.name}: {len(ws)} walks")
+        rows.extend(
+            (*w.row(), model.name)
+            for w in sorted(
+                ws,
+                key=lambda w: (w.platform, w.lat, w.lon, not w.into, w.off.along or 0),
+            )
+        )
+    with open(out, "w", newline="") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(
+            [
+                "station",
+                "platform",
+                "lat",
+                "lon",
+                "way",
+                "metres",
+                "stairs_up_m",
+                "stairs_down_m",
+                "escalator_up_m",
+                "escalator_down_m",
+                "gates",
+                "along_m",
+                "platform_m",
+                "name",
+            ]
+        )
+        w.writerows(rows)
 
 
 @app.command()
