@@ -1,6 +1,7 @@
 # `mta-od-data analyze`: OD analyses
 
-These read only the OD Parquet from `mta-od-data prepare` (`data/mta_od_2025.parquet`),
+These read only the OD Parquet (`data/mta_od_2025.parquet`),
+built by `mta-od-data prepare` or downloaded when it's missing,
 so they run without any routing.
 Each takes `--csv-out` for row-level detail and `--markdown-out` for a report,
 and every committed report here has its own `Produced by` line with its exact invocation.
