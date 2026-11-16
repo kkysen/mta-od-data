@@ -1,11 +1,20 @@
 """
 How long it takes to get between the street and the platforms
-through each station entrance:
-climbing or riding the station's depth or height, through the fare gates,
-and along the platform to its middle, the station's GTFS coordinate,
-for changing trains between stations on the streets.
-Riders who know which car stops by the stairs walk less,
-but no data says how many do.
+through each station entrance,
+for changing trains between stations on the streets:
+climbing or riding the station's depth or height, and through the fare gates,
+in `secs`.
+`raptor` adds the walk along the platform, at `raptor/assign.json5`'s speeds:
+in, none, as riders board right where the stairs reach the platform;
+out, the average from riders' spots along the train to the stairs,
+some planning their car to be near them and the rest anywhere (`cars`),
+as for changing trains on a platform.
+Where the stairs reach the platform is taken as `platform_ft` from its middle,
+the station's GTFS coordinate, in a straight line from the entrance,
+or its end if that's farther than half the platform,
+and the rest is a corridor walked both ways.
+The platform's length is the longest of the station's platforms OpenStreetMap outlines,
+or else a full-length train's: 600 ft in the B Division, 510 ft in the A (IRT).
 
 The depth comes from, in order:
 the heights of the MTA's elevators and escalators,
@@ -16,10 +25,15 @@ and last the station's structure.
 
 Moved from `subway-sheds`, as it was there but for its planned stations,
 and since walking along the platform too.
+
+OSM's platforms are read from Geofabrik's New York extract
+(`platforms.DEFAULT_EXTRACT`),
+each station's as `platforms.csv` matches them to its stops.
 """
 
 import json
 import re
+from collections import defaultdict
 from csv import DictReader, DictWriter
 from dataclasses import dataclass
 from math import cos, hypot, isnan, nan, radians
@@ -29,10 +43,14 @@ from typing import Annotated, Any
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+import osmium
+from osmium.osm import Node, Way
 from typer import Option, Typer
 
 from mta_od_data import DATA
 from mta_od_data.analyze.common import CACHE
+from mta_od_data.platforms import DEFAULT_EXTRACT
+from mta_od_data.platforms import DEFAULT_OUT as DEFAULT_PLATFORMS
 from mta_od_data.prepare import DEFAULT_STATIONS_CSV
 
 app = Typer()
@@ -62,6 +80,8 @@ COLUMNS = [
     "depth_ft",
     "depth_source",
     "platform_ft",
+    "length_ft",
+    "length_source",
     "secs",
 ]
 
@@ -81,8 +101,14 @@ ELEVATOR_FT_PER_S = 2.0
 GATES_S = 15
 # Deeper than this, no one takes stairs: the station's escalators or elevators instead.
 DEEP_FT = 60
-# The walking speed of the street walks, for the walks inside a station.
+# The walking speed of the street walks, for the long walks inside a station (`WALKS`).
 WALK_FT_PER_S = 3 * 5280 / 3600
+# A platform's length where OSM outlines none of the station's:
+# a full-length train's, ten 60 ft cars in the B Division
+# and ten 51 ft cars in the A, the IRT's,
+# and the B Division's on the Staten Island Railway.
+B_DIVISION_FT = 600
+A_DIVISION_FT = 510
 
 # Depths the MTA's heights leave blank, as published, in feet to the platform.
 DEPTHS = {
@@ -260,18 +286,94 @@ def platform_ft(station: dict[str, str], lat: float, lon: float) -> float:
     return hypot(dx, dy) * 3.28084
 
 
+class _WayNodes(osmium.SimpleHandler):
+    """Each wanted way's nodes, by their IDs."""
+
+    def __init__(self, ways: set[int]) -> None:
+        super().__init__()
+        self.ways = ways
+        self.nodes: dict[str, list[int]] = {}
+
+    def way(self, w: Way) -> None:
+        if w.id in self.ways:
+            self.nodes[f"w{w.id}"] = [n.ref for n in w.nodes]
+
+
+class _NodeLocations(osmium.SimpleHandler):
+    """Each wanted node's `(lon, lat)`."""
+
+    def __init__(self, nodes: set[int]) -> None:
+        super().__init__()
+        self.wanted = nodes
+        self.at: dict[int, tuple[float, float]] = {}
+
+    def node(self, n: Node) -> None:
+        if n.id in self.wanted:
+            self.at[n.id] = (n.location.lon, n.location.lat)
+
+
+def osm_lengths(
+    extract: Path = DEFAULT_EXTRACT, platforms: Path = DEFAULT_PLATFORMS
+) -> dict[str, tuple[float, str]]:
+    """The length of each station's longest platform OSM outlines, in feet,
+    and its way, by GTFS stop ID.
+
+    The extract is read twice, for the ways' nodes and then their locations,
+    not with every node's location at hand, which takes over a gigabyte.
+    """
+    # `lidar` reads this module's table.
+    from mta_od_data.lidar import PlatformAxis, ground_outline
+
+    ways: dict[str, set[str]] = defaultdict(set)
+    for r in _rows(platforms):
+        if r["platform"].startswith("w"):
+            ways[r["stop"]].add(r["platform"])
+    wanted = {int(w[1:]) for ws in ways.values() for w in ws}
+    way_nodes = _WayNodes(wanted)
+    way_nodes.apply_file(str(extract))
+    locations = _NodeLocations({n for ns in way_nodes.nodes.values() for n in ns})
+    locations.apply_file(str(extract))
+    feet = {}
+    for way, nodes in way_nodes.nodes.items():
+        outline = [locations.at[n] for n in nodes if n in locations.at]
+        # Outlined, not mapped as a line or with nodes missing.
+        if len(outline) == len(nodes) > 3 and nodes[0] == nodes[-1]:
+            axis = PlatformAxis.of(ground_outline(outline, outline[0]))
+            feet[way] = axis.length / 0.3048
+    return {
+        stop: max((feet[w], w) for w in ws if w in feet)
+        for stop, ws in ways.items()
+        if any(w in feet for w in ws)
+    }
+
+
+def platform_length(
+    station: dict[str, str], osm: dict[str, tuple[float, str]]
+) -> tuple[float, str]:
+    """The station's platform length in feet, from OSM's `osm_lengths` if it has it,
+    or else a full-length train's in its division, and where it's from."""
+    if station["gtfs_stop_id"] in osm:
+        ft, way = osm[station["gtfs_stop_id"]]
+        return ft, f"OSM {way}"
+    match station["division"]:
+        case "IRT":
+            return A_DIVISION_FT, "A Division train"
+        case "SIR":
+            # Its route relations aren't the NYC Subway's, so `platforms.csv` has none.
+            return B_DIVISION_FT, "SIR, as a B Division train"
+        case _:
+            return B_DIVISION_FT, "B Division train"
+
+
 def entrance_secs(
-    kind: str,
-    depth_ft: float,
-    has_escalators: bool,
-    walk: Walk | None,
-    platform_ft: float = 0.0,
+    kind: str, depth_ft: float, has_escalators: bool, walk: Walk | None
 ) -> float:
-    """Seconds between the street and the middle of the platform
-    through an entrance of `kind`, `platform_ft` from it along the platforms."""
+    """Seconds between the street and where the stairs reach the platform
+    through an entrance of `kind`,
+    or to the platform's middle through a long walk inside the station."""
     if walk is not None:
         return walk.feet / WALK_FT_PER_S + walk.climb_ft / STAIRS_FT_PER_S + GATES_S
-    return platform_ft / WALK_FT_PER_S + _climb_secs(kind, depth_ft, has_escalators)
+    return _climb_secs(kind, depth_ft, has_escalators)
 
 
 def _climb_secs(kind: str, depth_ft: float, has_escalators: bool) -> float:
@@ -332,8 +434,11 @@ def depths(
     return out
 
 
-def build(stations_csv: Path = DEFAULT_STATIONS_CSV) -> list[dict[str, object]]:
-    """Every entrance's time between the street and its station's platforms."""
+def build(
+    stations_csv: Path = DEFAULT_STATIONS_CSV, extract: Path = DEFAULT_EXTRACT
+) -> list[dict[str, object]]:
+    """Every entrance's time between the street and its station's platforms,
+    without the walk along them."""
     entrances = _rows(_download(ENTRANCES_URL, DIR / "entrances.csv"))
     lifts = lift_depths(_rows(_download(LIFTS_URL, DIR / "lifts.csv")))
     osm = json.loads(
@@ -342,12 +447,15 @@ def build(stations_csv: Path = DEFAULT_STATIONS_CSV) -> list[dict[str, object]]:
         ).read_text()
     )
     by_id = depths(_rows(stations_csv), lifts, osm)
+    lengths = osm_lengths(extract)
 
     def row(gtfs_id: str, lat: float, lon: float, kind: str) -> dict[str, object]:
         depth = by_id[gtfs_id]
         complex_id = depth.station["complex_id"]
         walk = WALKS.get((lat, lon))
         along = 0.0 if walk else platform_ft(depth.station, lat, lon)
+        # Blank for a long walk inside the station, timed to the platform's middle.
+        length = None if walk else platform_length(depth.station, lengths)
         return {
             "station": gtfs_id,
             "complex": JOINED_COMPLEXES.get(complex_id, complex_id),
@@ -358,9 +466,9 @@ def build(stations_csv: Path = DEFAULT_STATIONS_CSV) -> list[dict[str, object]]:
             "depth_ft": round(depth.ft, 1),
             "depth_source": walk.note if walk else depth.source,
             "platform_ft": round(along),
-            "secs": round(
-                entrance_secs(kind, depth.ft, depth.has_escalators, walk, along)
-            ),
+            "length_ft": "" if length is None else round(length[0]),
+            "length_source": "" if length is None else length[1],
+            "secs": round(entrance_secs(kind, depth.ft, depth.has_escalators, walk)),
         }
 
     rows = [
@@ -451,12 +559,15 @@ def fetch_station_access(
     stations: Annotated[
         Path, Option(help="The station reference CSV")
     ] = DEFAULT_STATIONS_CSV,
+    extract: Annotated[
+        Path, Option(help="Geofabrik's New York extract, for OSM's platforms")
+    ] = DEFAULT_EXTRACT,
 ) -> None:
     """
     Rebuild each station entrance's time to the platforms, `data/station_access.csv`,
     from the MTA's and OSM's data now, to review and commit.
     """
-    rows = build(stations)
+    rows = build(stations, extract)
     TABLE.parent.mkdir(parents=True, exist_ok=True)
     with TABLE.open("w", newline="") as f:
         out = DictWriter(f, COLUMNS, lineterminator="\n")

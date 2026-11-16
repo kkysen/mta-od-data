@@ -14,7 +14,7 @@ use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIter
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use streets::{Graph, Mm, Search, Split};
 
-use crate::cars::Cars;
+use crate::cars::{Cars, Path};
 use crate::gtfs::Secs;
 use crate::lidar;
 use crate::speeds::Speeds;
@@ -294,11 +294,51 @@ struct AccessRow {
     complex: String,
     lat: f64,
     lon: f64,
+    /// From the street to where the stairs reach the platform, or for a long walk
+    /// inside the station, to its middle.
     secs: Secs,
+    /// How far from the platform's middle the stairs reach it, in feet,
+    /// past its end if more than half its length, by a corridor.
+    platform_ft: f64,
+    /// The platform's length in feet, or blank for a long walk inside the station,
+    /// all in `secs`.
+    length_ft: Option<f64>,
+}
+
+const METRES_PER_FOOT: f64 = 0.3048;
+
+impl AccessRow {
+    /// This estimate's times at `speeds`:
+    /// in, boarding where the stairs reach the platform;
+    /// out, on average from riders' spots along the train (`cars`) to there;
+    /// both by any corridor past the platform's end.
+    fn entrance(&self, speeds: &Speeds, cars: &Cars) -> Entrance {
+        let (in_secs, out_secs) = match self.length_ft {
+            None => (self.secs, self.secs),
+            Some(length_ft) => {
+                let length = length_ft * METRES_PER_FOOT;
+                let from_middle = self.platform_ft * METRES_PER_FOOT;
+                let half = length / 2.0;
+                let to_end = f64::from(self.secs) + speeds.walk_secs((from_middle - half).max(0.0));
+                let stairs = Path {
+                    along: half + from_middle.min(half),
+                    secs: to_end,
+                };
+                let out = cars.expected_secs(length, &[stairs], speeds);
+                (to_end.round() as Secs, out.round() as Secs)
+            }
+        };
+        Entrance {
+            lat: self.lat,
+            lon: self.lon,
+            in_secs,
+            out_secs,
+        }
+    }
 }
 
 /// Each station's entrances in `mta-od-data fetch-station-access`'s `station_access.csv`,
-/// in the order it first lists them,
+/// in the order it first lists them, timed by `AccessRow::entrance`,
 /// then each modeled platform's, its own station's complex's (`lidar::access`),
 /// timed at `speeds` with riders spread along the train by `cars`.
 pub fn load_stations(
@@ -322,12 +362,7 @@ pub fn load_stations(
             });
             stations.len() - 1
         });
-        stations[i].entrances.push(Entrance {
-            lat: row.lat,
-            lon: row.lon,
-            in_secs: row.secs,
-            out_secs: row.secs,
-        });
+        stations[i].entrances.push(row.entrance(speeds, cars));
     }
     for p in lidar::access(speeds, cars)? {
         let complex = index
@@ -537,5 +572,37 @@ mod tests {
         assert_eq!(read.complexes, walks.complexes);
         assert_eq!(read.access, walks.access);
         assert_eq!(read.near, walks.near);
+    }
+
+    #[test]
+    fn estimates_board_where_the_stairs_land_and_leave_from_along_the_train() {
+        let speeds = Speeds::default();
+        let cars = Cars {
+            plan_share: 0.0,
+            plan_sigma_m: 18.0,
+        };
+        let row = |platform_ft: f64, length_ft: Option<f64>| AccessRow {
+            station: "A01".to_owned(),
+            complex: "1".to_owned(),
+            lat: 40.7,
+            lon: -74.0,
+            secs: 40,
+            platform_ft,
+            length_ft,
+        };
+        let times = |r: AccessRow| {
+            let e = r.entrance(&speeds, &cars);
+            (e.in_secs, e.out_secs)
+        };
+        // At the middle of a 100 m platform: in, right there;
+        // out, 25 m on average from along the train, 19s at 3 mph.
+        let length = Some(100.0 / METRES_PER_FOOT);
+        assert_eq!(times(row(0.0, length)), (40, 59));
+        // At its end: 50 m on average, 37s.
+        assert_eq!(times(row(50.0 / METRES_PER_FOOT, length)), (40, 77));
+        // 20 m past its end, 15s by a corridor, both ways.
+        assert_eq!(times(row(70.0 / METRES_PER_FOOT, length)), (55, 92));
+        // A long walk inside the station, all in its time.
+        assert_eq!(times(row(0.0, None)), (40, 40));
     }
 }
