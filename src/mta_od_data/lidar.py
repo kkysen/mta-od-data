@@ -1158,34 +1158,15 @@ def corridor_walks(
         cy, cx = np.nonzero(np.isin(lab, list(across)))
         inside = contains_xy(hull, cx, cy)
         walkable[cy[inside], cx[inside]] = False
-    idx = -np.ones(walkable.shape, np.int64)
+    idx = np.full(walkable.shape, -1, np.int32)
     ys, xs = np.nonzero(walkable)
     idx[ys, xs] = np.arange(len(ys))
-    rows: list[np.ndarray] = []
-    cols: list[np.ndarray] = []
-    costs: list[np.ndarray] = []
-    h, w = idx.shape
-    for dx, dy in ((1, 0), (0, 1), (1, 1), (-1, 1)):
-        a = idx[: h - dy, max(0, -dx) : w - max(0, dx)]
-        c = idx[dy:, max(0, dx) : w - max(0, -dx)]
-        ok = (a >= 0) & (c >= 0)
-        rows.append(a[ok])
-        cols.append(c[ok])
-        step = float(
-            np.linalg.norm(np.linalg.solve(proj.a, [dx * REDUCE, dy * REDUCE]))
-        )
-        costs.append(np.full(ok.sum(), step))
-    if m.exploded:
-        page = (r >= 240) & (g >= 240) & (b >= 240)
-        a, c = drop_lines(walkable, dashes, page)
-        rows.append(idx[a])
-        cols.append(idx[c])
-        # The climb is timed by levels, not distance.
-        costs.append(np.full(len(rows[-1]), 1e-6))
-    n = len(ys)
-    graph = csr_matrix(
-        (np.concatenate(costs), (np.concatenate(rows), np.concatenate(cols))), (n, n)
+    drops = (
+        drop_lines(walkable, dashes, (r >= 240) & (g >= 240) & (b >= 240))
+        if m.exploded
+        else None
     )
+    graph = floor_graph(idx, proj, drops)
     starts = {
         way: ndimage.binary_dilation(mask, iterations=2) & walkable
         for way, mask in masks.items()
@@ -1315,6 +1296,41 @@ def climbs(
     if not risen and walk == Walk(walk.metres):
         return walk.climb("stairs", 1, typical).climb("stairs", -1, typical)
     return walk
+
+
+def floor_graph(
+    idx: np.ndarray,
+    proj: Projection,
+    drops: tuple[tuple[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]] | None,
+) -> csr_matrix:
+    """The steps between a map's walkable pixels, numbered by `idx`, -1 elsewhere:
+    to each of their 8 neighbours, measured on the ground through the projection,
+    and up each drop line in `drops` (`drop_lines`), timed by levels, not distance.
+    Its own function so the steps' lists, a gigabyte or so at Port Authority,
+    are freed once joined."""
+    rows: list[np.ndarray] = []
+    cols: list[np.ndarray] = []
+    costs: list[np.ndarray] = []
+    h, w = idx.shape
+    for dx, dy in ((1, 0), (0, 1), (1, 1), (-1, 1)):
+        a = idx[: h - dy, max(0, -dx) : w - max(0, dx)]
+        c = idx[dy:, max(0, dx) : w - max(0, -dx)]
+        ok = (a >= 0) & (c >= 0)
+        rows.append(a[ok])
+        cols.append(c[ok])
+        step = float(
+            np.linalg.norm(np.linalg.solve(proj.a, [dx * REDUCE, dy * REDUCE]))
+        )
+        costs.append(np.full(ok.sum(), step))
+    if drops is not None:
+        a, c = drops
+        rows.append(idx[a])
+        cols.append(idx[c])
+        costs.append(np.full(len(rows[-1]), 1e-6))
+    n = int(idx.max()) + 1
+    return csr_matrix(
+        (np.concatenate(costs), (np.concatenate(rows), np.concatenate(cols))), (n, n)
+    )
 
 
 def drop_lines(
