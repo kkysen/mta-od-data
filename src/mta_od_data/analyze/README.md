@@ -147,9 +147,8 @@ against routed with every walk between complexes on the streets free
 (`mta-od-data raptor assign-range --street-walks`).
 
 ```sh
-uv run mta-od-data raptor street-walks
 uv run mta-od-data raptor assign-range --from 2025-08-11 --to 2025-12-31 \
-  --street-walks data/street_walks.bin --out-dir data/raptor-street
+  --street-walks --out-dir data/raptor-street
 uv run mta-od-data analyze free-transfers
 ```
 

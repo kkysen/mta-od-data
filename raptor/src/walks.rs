@@ -194,97 +194,10 @@ impl StreetWalks {
         &self.stations
     }
 
-    /// Every walk between stations of different complexes, as `(from, to, seconds)`, by their IDs.
-    pub fn transfers(&self) -> Vec<(String, String, Secs)> {
-        self.near
-            .iter()
-            .enumerate()
-            .flat_map(|(s, near)| near.iter().map(move |&(t, walk)| (s, t as usize, walk)))
-            .filter(|&(s, t, _)| self.complexes[s] != self.complexes[t])
-            .map(|(s, t, walk)| (self.stations[s].clone(), self.stations[t].clone(), walk))
-            .collect()
-    }
-
     /// The complex of the station `id`, if it's one of these.
     pub fn complex(&self, id: &str) -> Option<&str> {
         let i = self.stations.iter().position(|s| s == id)?;
         Some(&self.complexes[i])
-    }
-
-    /// Writes these to `path`, to `read` back without walking the streets again,
-    /// all little-endian: each station's ID, platform, empty if none, and complex,
-    /// each station's walks to others, and each origin's ID and its walks,
-    /// each list after its length as a `u32`, and each string as its UTF-8 bytes.
-    pub fn write(&self, path: &std::path::Path) -> anyhow::Result<()> {
-        let mut out = Vec::new();
-        let len = |out: &mut Vec<u8>, n: usize| out.extend((n as u32).to_le_bytes());
-        let string = |out: &mut Vec<u8>, s: &str| {
-            len(out, s.len());
-            out.extend(s.as_bytes());
-        };
-        let walks = |out: &mut Vec<u8>, walks: &[(u32, Secs)]| {
-            len(out, walks.len());
-            for &(to, secs) in walks {
-                out.extend(to.to_le_bytes());
-                out.extend(secs.to_le_bytes());
-            }
-        };
-        len(&mut out, self.stations.len());
-        for ((id, platform), complex) in self
-            .stations
-            .iter()
-            .zip(&self.platforms)
-            .zip(&self.complexes)
-        {
-            string(&mut out, id);
-            string(&mut out, platform.as_deref().unwrap_or(""));
-            string(&mut out, complex);
-        }
-        for near in &self.near {
-            walks(&mut out, near);
-        }
-        // By origin, so the same walks always write the same bytes.
-        let mut origins: Vec<_> = self.access.iter().collect();
-        origins.sort_unstable_by_key(|(origin, _)| origin.as_str());
-        len(&mut out, origins.len());
-        for (origin, access) in origins {
-            string(&mut out, origin);
-            walks(&mut out, access);
-        }
-        Ok(std::fs::write(path, out)?)
-    }
-
-    /// Reads back what `write` wrote to `path`.
-    pub fn read(path: &std::path::Path) -> anyhow::Result<Self> {
-        let bytes = std::fs::read(path)?;
-        let mut r = Reader {
-            bytes: &bytes,
-            at: 0,
-        };
-        let n = r.len()?;
-        let mut stations = Vec::with_capacity(n);
-        let mut platforms = Vec::with_capacity(n);
-        let mut complexes = Vec::with_capacity(n);
-        for _ in 0..n {
-            stations.push(r.string()?);
-            platforms.push(Some(r.string()?).filter(|p| !p.is_empty()));
-            complexes.push(r.string()?);
-        }
-        let near = (0..n).map(|_| r.walks()).collect::<anyhow::Result<_>>()?;
-        let origins = r.len()?;
-        let access = (0..origins)
-            .map(|_| Ok((r.string()?, r.walks()?)))
-            .collect::<anyhow::Result<_>>()?;
-        if r.at != bytes.len() {
-            anyhow::bail!("{} has more than walks", path.display());
-        }
-        Ok(Self {
-            stations,
-            platforms,
-            complexes,
-            access,
-            near,
-        })
     }
 }
 
@@ -377,45 +290,6 @@ pub fn load_stations(
         });
     }
     Ok(stations)
-}
-
-/// Reads what `StreetWalks::write` writes, from the start of `bytes`.
-struct Reader<'a> {
-    bytes: &'a [u8],
-    at: usize,
-}
-
-impl<'a> Reader<'a> {
-    fn take<const N: usize>(&mut self) -> anyhow::Result<[u8; N]> {
-        let taken = self.bytes.get(self.at..self.at + N);
-        let taken = taken.ok_or_else(|| anyhow::anyhow!("walks end early"))?;
-        self.at += N;
-        Ok(taken.try_into()?)
-    }
-
-    fn len(&mut self) -> anyhow::Result<usize> {
-        Ok(u32::from_le_bytes(self.take()?) as usize)
-    }
-
-    fn string(&mut self) -> anyhow::Result<String> {
-        let n = self.len()?;
-        let s = self.bytes.get(self.at..self.at + n);
-        let s = s.ok_or_else(|| anyhow::anyhow!("walks end early"))?;
-        self.at += n;
-        Ok(std::str::from_utf8(s)?.to_owned())
-    }
-
-    fn walks(&mut self) -> anyhow::Result<Vec<(u32, Secs)>> {
-        let n = self.len()?;
-        (0..n)
-            .map(|_| {
-                Ok((
-                    u32::from_le_bytes(self.take()?),
-                    Secs::from_le_bytes(self.take()?),
-                ))
-            })
-            .collect()
-    }
 }
 
 /// Of `reached` stops, only the closest on each of `tts`' patterns, as R5 keeps
@@ -548,31 +422,6 @@ impl Timetable {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn street_walks_read_back_as_written() {
-        let walks = StreetWalks {
-            stations: vec!["A01".to_owned(), "V01".to_owned()],
-            platforms: vec![Some("w1".to_owned()), None],
-            complexes: vec!["1".to_owned(), "V01".to_owned()],
-            access: [
-                ("V01".to_owned(), vec![(0, 300), (1, 0)]),
-                ("A01".to_owned(), vec![(0, 0)]),
-            ]
-            .into_iter()
-            .collect(),
-            near: vec![vec![(1, 600)], vec![]],
-        };
-        let path = std::env::temp_dir().join(format!("street-walks-{}.bin", std::process::id()));
-        walks.write(&path).unwrap();
-        let read = StreetWalks::read(&path).unwrap();
-        std::fs::remove_file(&path).unwrap();
-        assert_eq!(read.stations, walks.stations);
-        assert_eq!(read.platforms, walks.platforms);
-        assert_eq!(read.complexes, walks.complexes);
-        assert_eq!(read.access, walks.access);
-        assert_eq!(read.near, walks.near);
-    }
 
     #[test]
     fn estimates_board_where_the_stairs_land_and_leave_from_along_the_train() {

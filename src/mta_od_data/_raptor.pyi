@@ -46,7 +46,7 @@ def assign_date(
     config: StrPath,
     out: StrPath,
     zstd_level: int,
-    street_walks: StrPath | None = None,
+    streets: tuple[StrPath, StrPath] | None = None,
 ) -> AssignSummary: ...
 def assign_dates(
     jobs: list[tuple[Version, date, StrPath]],
@@ -55,11 +55,8 @@ def assign_dates(
     platforms: StrPath,
     config: StrPath,
     zstd_level: int,
-    street_walks: StrPath | None = None,
+    streets: tuple[StrPath, StrPath] | None = None,
 ) -> list[AssignSummary]: ...
-def street_walks(
-    osm: StrPath, access: StrPath, config: StrPath, out: StrPath
-) -> str: ...
 def feed_report(feed: StrPath) -> str: ...
 def timetable_report(feed: StrPath, date: date) -> str: ...
 def route_report(

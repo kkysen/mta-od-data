@@ -295,7 +295,8 @@ looked up only from stops that have one.
 `ridership` takes the same passages' complexes as one virtual complex.
 
 With `--street-walks`, trains change between complexes on the streets too,
-out through one entrance and in through another, with no fare (`walks.rs`, from `subway-sheds`):
+out through one entrance and in through another, with no fare (`walks.rs`, from `subway-sheds`),
+walked each run, so always at its config's speeds and spread of riders along the train:
 each entrance takes its time to the platforms (`data/station_access.csv`):
 its climb by the station's depth and the fare gates,
 in, boarding right where the stairs reach the platform,

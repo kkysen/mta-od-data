@@ -11,7 +11,7 @@ from typing import Annotated
 
 from typer import BadParameter, Option, Typer
 
-from mta_od_data import DATA, ROOT, street_walks
+from mta_od_data import DATA, ROOT
 from mta_od_data._raptor import (
     DEFAULT_MAX_RIDES,
     Version,
@@ -25,9 +25,11 @@ from mta_od_data._raptor import (
     route_report,
     timetable_report,
 )
+from mta_od_data.access import TABLE as DEFAULT_ACCESS
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR
 from mta_od_data.platforms import DEFAULT_OUT as DEFAULT_PLATFORMS
 from mta_od_data.prepare import DEFAULT_PARQUET
+from mta_od_data.street_walks import DEFAULT_STREETS, cut
 
 app = Typer()
 
@@ -71,14 +73,31 @@ Platforms = Annotated[
     ),
 ]
 StreetWalks = Annotated[
-    Path | None,
+    bool,
     Option(
         help="Also change trains between complexes on the streets, "
         "out of the system and back in with no fare, "
-        "by these walks, from `mta-od-data raptor street-walks`, "
+        "walked each run at `--config`'s speeds, "
         "writing the transfers added beside each date's paths"
     ),
 ]
+Streets = Annotated[
+    Path,
+    Option(
+        help="The streets `--street-walks` walks on, "
+        "cut from Geofabrik's New York extract when missing or older than it"
+    ),
+]
+Access = Annotated[Path, Option(help="Each station entrance's time to the platforms")]
+
+
+def streets_to_walk(
+    street_walks: bool, streets: Path, access: Path, stations: Path
+) -> tuple[Path, Path] | None:
+    """With `street_walks`, the streets, cut if need be, and the entrances, to walk."""
+    return (cut(streets=streets, stations=stations), access) if street_walks else None
+
+
 ZSTD_LEVELS = {"fast": 1, "medium": 6, "slow": 9}
 
 
@@ -175,7 +194,9 @@ def assign(
     stations: Stations = DEFAULT_STATIONS,
     platforms: Platforms = DEFAULT_PLATFORMS,
     config: Config = DEFAULT_CONFIG,
-    street_walks: StreetWalks = None,
+    street_walks: StreetWalks = False,
+    streets: Streets = DEFAULT_STREETS,
+    access: Access = DEFAULT_ACCESS,
     out: Annotated[
         Path | None,
         Option(help="Output Parquet (default: data/raptor/paths-<date>.parquet)"),
@@ -194,7 +215,7 @@ def assign(
         config,
         out,
         parse_zstd_level(zstd_level),
-        street_walks,
+        streets_to_walk(street_walks, streets, access, stations),
     )
     print(summary.report, end="")
     print(f"wrote {out}")
@@ -215,7 +236,9 @@ def assign_range(
     stations: Stations = DEFAULT_STATIONS,
     platforms: Platforms = DEFAULT_PLATFORMS,
     config: Config = DEFAULT_CONFIG,
-    street_walks: StreetWalks = None,
+    street_walks: StreetWalks = False,
+    streets: Streets = DEFAULT_STREETS,
+    access: Access = DEFAULT_ACCESS,
     out_dir: Annotated[
         Path, Option(help="Where the path Parquets and manifest.csv go")
     ] = DEFAULT_OUT_DIR,
@@ -243,7 +266,7 @@ def assign_range(
         platforms,
         config,
         parse_zstd_level(zstd_level),
-        street_walks,
+        streets_to_walk(street_walks, streets, access, stations),
     )
     manifest_path = out_dir / "manifest.csv"
     with manifest_path.open("w", newline="") as f:
@@ -272,29 +295,3 @@ def assign_range(
                 }
             )
     print(f"wrote {manifest_path}")
-
-
-@app.command(name="street-walks")
-def street_walks_(
-    extract: Annotated[
-        Path, Option(help="Geofabrik's New York OSM extract, fetched if missing")
-    ] = street_walks.DEFAULT_EXTRACT,
-    streets: Annotated[
-        Path,
-        Option(help="The streets cut from it, cut again if older than it"),
-    ] = street_walks.DEFAULT_STREETS,
-    stations: Stations = DEFAULT_STATIONS,
-    access: Annotated[
-        Path,
-        Option(help="Each station entrance's time to the platforms"),
-    ] = street_walks.DEFAULT_ACCESS,
-    out: Annotated[Path, Option(help="The walks")] = street_walks.DEFAULT_OUT,
-    config: Config = DEFAULT_CONFIG,
-) -> None:
-    """Walk the streets between stations, out one entrance and in another,
-    for `assign --street-walks`."""
-    print(
-        street_walks.write(extract, streets, stations, access, out, config=config),
-        end="",
-    )
-    print(f"wrote {out}")

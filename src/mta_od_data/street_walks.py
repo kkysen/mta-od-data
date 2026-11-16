@@ -1,6 +1,6 @@
-"""Walks on the streets between stations, out one entrance and in another,
-for `mta-od-data raptor assign --street-walks` to change trains between complexes on
-(`raptor/src/walks.rs`).
+"""The streets `mta-od-data raptor assign --street-walks` walks between stations on,
+out one entrance and in another, to change trains between complexes on
+(`raptor/src/walks.rs`), each run, with its own config's speeds.
 
 The streets are cut from Geofabrik's New York extract
 to what's walked on near the stations,
@@ -16,13 +16,10 @@ import osmium
 import osmium.osm
 
 from mta_od_data import DATA
-from mta_od_data._raptor import street_walks
-from mta_od_data.access import TABLE as DEFAULT_ACCESS
 from mta_od_data.platforms import DEFAULT_EXTRACT, EXTRACT_URL
 from mta_od_data.prepare import DEFAULT_STATIONS_CSV
 
 DEFAULT_STREETS = DATA / "osm" / "nyc-streets.osm.pbf"
-DEFAULT_OUT = DATA / "street_walks.bin"
 
 # How far past the stations to keep streets, in degrees (about 2 km),
 # more than any walk between them (`TRANSFER_LIMIT`, 15 minutes) reaches.
@@ -89,20 +86,13 @@ def filter_streets(
     return kept
 
 
-def write(
+def cut(
     extract: Path = DEFAULT_EXTRACT,
     streets: Path = DEFAULT_STREETS,
     stations: Path = DEFAULT_STATIONS_CSV,
-    access: Path = DEFAULT_ACCESS,
-    out: Path = DEFAULT_OUT,
-    *,
-    config: Path,
-) -> str:
-    """Cut the streets from `extract`, fetched if missing,
-    unless `streets` is newer than it,
-    and walk them between `access`' stations to `out`,
-    timing walks measured inside stations by `config`'s speeds and cars.
-    What it walked, to print."""
+) -> Path:
+    """`streets`, cut from `extract`, fetched if missing,
+    unless `streets` is newer than it."""
     if not extract.exists():
         extract.parent.mkdir(parents=True, exist_ok=True)
         print(f"fetching {EXTRACT_URL}")
@@ -110,5 +100,4 @@ def write(
     if not streets.exists() or streets.stat().st_mtime < extract.stat().st_mtime:
         kept = filter_streets(extract, streets, station_bounds(stations))
         print(f"cut {kept} ways to {streets}")
-    out.parent.mkdir(parents=True, exist_ok=True)
-    return street_walks(streets, access, config, out)
+    return streets
