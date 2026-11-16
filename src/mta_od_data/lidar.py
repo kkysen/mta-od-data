@@ -296,9 +296,11 @@ UNION_SQ = StationModel(
         ("Q downtown", "w509025036"),
         ("Q uptown", "w509025035"),
     ),
-    # The L's two escalators, side by side, run one each way;
-    # which is which is assumed, not checked: flip these if 1 runs down.
-    escalators=(("L escalator 1", True), ("L escalator 2", False)),
+    # Which way escalators side by side run is assumed, not checked:
+    # the right one, standing at the foot facing up, runs up.
+    # The model's frame is right-handed, z up, and its fit to OSM doesn't mirror it,
+    # so facing up the L's, toward +x, the right one is toward -y: 2, at y -35.7 m.
+    escalators=(("L escalator 1", False), ("L escalator 2", True)),
 )
 MODELS = (UNION_SQ,)
 
