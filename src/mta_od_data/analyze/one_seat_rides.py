@@ -22,7 +22,9 @@ from mta_od_data.analyze.common import (
     complexes_of,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
+from mta_od_data.downloads import od_parquet
 from mta_od_data.invocation import produced_by
+from mta_od_data.prepare import DEFAULT_PARQUET
 
 app = Typer()
 
@@ -748,7 +750,9 @@ def render_notes(*, close_threshold_m: float) -> str:
 @app.command()
 def one_seat_rides(
     ctx: Context,
-    parquet: Annotated[Path, Option()] = DATA / "mta_od_2025.parquet",
+    parquet: Annotated[
+        Path, Option(help="The OD Parquet, built or downloaded if missing")
+    ] = DEFAULT_PARQUET,
     complexes_path: Annotated[Path, Option("--complexes")] = (DATA / "complexes.csv"),
     stations_path: Annotated[
         Path,
@@ -1108,6 +1112,7 @@ def one_seat_rides(
         '"Origin Station Complex ID" IN (' + ", ".join(str(i) for i in origin_ids) + ")"
     )
 
+    parquet = od_parquet(parquet)
     try:
         coverage = DayCoverage.query(parquet, day_filter_sql, day_params)
     except DayFilterError as e:

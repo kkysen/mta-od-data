@@ -1,11 +1,8 @@
 """What the reports read, built when they need it, through the cache (`artifacts`),
 so no command has to be run first, and none reads a stale earlier one's output.
 
-- Downloads, and the OD Parquet, are fetched or built when missing, and kept in `data/`:
-  the GTFS feed versions (`fetch-gtfs`), Geofabrik's extract,
-  the station ridership spreadsheet, and the OD Parquet (`prepare`).
-  The OD Parquet is built from the extract's CSV if it's in `data/`,
-  or else downloaded from the `od-data` release.
+- Downloads, and the OD Parquet, are fetched or built when missing, and kept in `data/`
+  (`downloads`, `street_walks.fetch_extract`, `scale_od.fetch_spreadsheet`).
 - What's derived from them is keyed on everything it's built from:
   the streets cut for walking (`streets`), `scale-od`'s factors (`od_factors`),
   and a routing run (`routed`).
@@ -21,18 +18,15 @@ the OD Parquet by size and modification time, too big to hash on each run,
 and its dates and flags.
 """
 
-import subprocess
 import tomllib
 from datetime import date
 from pathlib import Path
 
 from mta_od_data.access import TABLE as DEFAULT_ACCESS
 from mta_od_data.artifacts import CACHE, REPO, cached, files, key, modules
-from mta_od_data.gtfs import DEFAULT_GTFS_DIR, VERSIONS_FILE, fetch_version
-from mta_od_data.gtfs import load_versions as load_version_ids
+from mta_od_data.downloads import gtfs_feeds, od_parquet
 from mta_od_data.platforms import DEFAULT_EXTRACT
 from mta_od_data.platforms import DEFAULT_OUT as DEFAULT_PLATFORMS
-from mta_od_data.prepare import DEFAULT_CSV_GLOB, DEFAULT_PARQUET, convert_od_to_parquet
 from mta_od_data.raptor import DEFAULT_CONFIG, DEFAULT_STATIONS, ZSTD_LEVELS
 from mta_od_data.routing import route_range
 from mta_od_data.scale_od import MAPPING, fetch_spreadsheet, fit_factors
@@ -41,46 +35,7 @@ from mta_od_data.street_walks import fetch_extract, filter_streets, station_boun
 # The dates the reports route, as `assign-range` picks a weekday of each month in them.
 REPORT_FROM = date(2025, 8, 11)
 REPORT_TO = date(2025, 12, 31)
-# The release the OD Parquet is an asset of (see `README.md`).
-OD_RELEASE = "od-data"
 EXTENSION = "mta_od_data._raptor"
-
-
-def od_parquet(path: Path = DEFAULT_PARQUET) -> Path:
-    """The OD Parquet, built from the extract's CSV if missing,
-    or downloaded if the CSV isn't here either."""
-    if path.exists():
-        return path
-    if any(REPO.glob(DEFAULT_CSV_GLOB)):
-        convert_od_to_parquet([DEFAULT_CSV_GLOB], path, False, None)
-        return path
-    print(f"downloading {path.name} from the {OD_RELEASE} release")
-    part = path.with_name(f"{path.name}.part")
-    subprocess.run(
-        [
-            "gh",
-            "release",
-            "download",
-            OD_RELEASE,
-            "--pattern",
-            path.name,
-            "--output",
-            str(part),
-            "--clobber",
-        ],
-        check=True,
-    )
-    part.replace(path)
-    return path
-
-
-def gtfs_feeds(gtfs_dir: Path = DEFAULT_GTFS_DIR) -> Path:
-    """`gtfs_dir`, with every feed version in `gtfs_versions.json5` fetched into it."""
-    gtfs_dir.mkdir(parents=True, exist_ok=True)
-    for dataset_id in load_version_ids(VERSIONS_FILE):
-        if not (gtfs_dir / f"{dataset_id}.zip").exists():
-            fetch_version(dataset_id, gtfs_dir, force=False)
-    return gtfs_dir
 
 
 def streets(stations: Path = DEFAULT_STATIONS, extract: Path = DEFAULT_EXTRACT) -> Path:

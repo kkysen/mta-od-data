@@ -25,7 +25,9 @@ from mta_od_data.analyze.regions import (
     parse_bbox,
     region_from_preset,
 )
+from mta_od_data.downloads import od_parquet
 from mta_od_data.invocation import produced_by
+from mta_od_data.prepare import DEFAULT_PARQUET
 
 app = Typer()
 
@@ -195,7 +197,9 @@ def write_csv(path: Path, rows: list[FlowRow]) -> None:
 @app.command(name="regional-flow")
 def regional_flow(
     ctx: Context,
-    parquet: Annotated[Path, Option()] = DATA / "mta_od_2025.parquet",
+    parquet: Annotated[
+        Path, Option(help="The OD Parquet, built or downloaded if missing")
+    ] = DEFAULT_PARQUET,
     complexes_path: Annotated[Path, Option("--complexes")] = (DATA / "complexes.csv"),
     day_type: Annotated[DayType, Option()] = DayType.WEEKDAY,
     days: Annotated[
@@ -306,6 +310,7 @@ def regional_flow(
         else '"Day of Week" IN (' + ", ".join("?" for _ in days_list) + ")"
     )
 
+    parquet = od_parquet(parquet)
     try:
         coverage = DayCoverage.query(parquet, day_filter_sql, day_params)
     except DayFilterError as e:

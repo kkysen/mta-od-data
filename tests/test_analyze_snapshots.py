@@ -7,9 +7,9 @@ with the argv handed in rather than taken from `sys.argv`:
 `Produced by` line comes out as it would from a shell, and a run
 costs one parse rather than one interpreter.
 
-Skipped when the data a command reads is missing
-(`data/mta_od_2025.parquet`, and for `ridership`, the routed paths and OD factors):
-it's gitignored, so this can't run in CI.
+A command builds the OD Parquet itself when it's missing (`downloads.od_parquet`).
+Skipped when the routed paths and OD factors `free-transfers` and `ridership` read
+are missing: they're gitignored, so this can't run in CI.
 """
 
 import shlex
@@ -21,7 +21,6 @@ import pytest
 from mta_od_data import DATA, ROOT
 from mta_od_data.cli import app
 
-PARQUET = DATA / "mta_od_2025.parquet"
 ANALYZE_DIR = ROOT / "src" / "mta_od_data" / "analyze"
 RIDERSHIP_DIR = ROOT / "src" / "mta_od_data" / "ridership"
 # What `ridership` reads by default, besides the OD data's stations.
@@ -40,7 +39,7 @@ class Snapshot:
     cmd: list[str]
     path: Path
     # The gitignored data it reads, without which it's skipped.
-    needs: tuple[Path, ...] = (PARQUET,)
+    needs: tuple[Path, ...] = ()
 
 
 SNAPSHOTS = [
@@ -157,8 +156,7 @@ def test_snapshot_matches_fresh_run(
     if missing := [p for p in snapshot.needs if not p.exists()]:
         pytest.skip(
             f"{', '.join(str(p.relative_to(ROOT)) for p in missing)} not found "
-            "(run `uv run mta-od-data prepare` first, "
-            "and for `ridership`, `raptor assign-range` and `scale-od`)"
+            "(run `raptor assign-range` and `scale-od` first)"
         )
     tmp_out = tmp_path / snapshot.path.name
     prog, *args = snapshot.cmd
