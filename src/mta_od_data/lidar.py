@@ -82,6 +82,8 @@ ESCALATOR_UP_M_PER_S = 1.3 * MPH
 ESCALATOR_DOWN_M_PER_S = 1.6 * MPH
 # The maps are read at a quarter of their size: a pixel is still under 10 cm.
 REDUCE = 4
+# Rows of a full-size map copied at a time into its memory-mapped copy.
+FULL_STRIP_ROWS = 1024
 # How far apart, across them, a color's platforms at one station are
 # on the reduced map, at most.
 MAX_ISLAND_SPREAD = 400
@@ -344,6 +346,38 @@ def load_map(m: StationMap) -> np.ndarray:
     return img
 
 
+def full_map(m: StationMap) -> np.ndarray:
+    """The whole map at full size, RGB, memory-mapped from a copy in `target/lidar/`,
+    so cropping a flight reads only its part:
+    a PNG decodes only whole, 2.5 GB for Port Authority's in PIL,
+    so the copy is written once from one decode, a strip at a time."""
+    cached = CACHE / f"{Path(m.file).stem}.full.npy"
+    if not cached.exists():
+        CACHE.mkdir(parents=True, exist_ok=True)
+        partial = cached.with_suffix(".partial")
+        with Image.open(MAPS_DIR / m.file) as im, partial.open("wb") as f:
+            w, h = im.size
+            header = {"descr": "|u1", "fortran_order": False, "shape": (h, w, 3)}
+            np.lib.format.write_array_header_1_0(f, header)
+            for y in range(0, h, FULL_STRIP_ROWS):
+                strip = im.crop((0, y, w, min(h, y + FULL_STRIP_ROWS)))
+                f.write(strip.convert("RGB").tobytes())
+        partial.rename(cached)
+    return np.load(cached, mmap_mode="r")
+
+
+def crop(img: np.ndarray, box: tuple[int, int, int, int]) -> np.ndarray:
+    """`img`'s pixels in `box`, `(left, top, right, bottom)`, black past its edges,
+    as PIL crops."""
+    x0, y0, x1, y1 = box
+    out = np.zeros((y1 - y0, x1 - x0, img.shape[2]), img.dtype)
+    h, w = img.shape[:2]
+    cx0, cy0, cx1, cy1 = max(x0, 0), max(y0, 0), min(x1, w), min(y1, h)
+    if cx0 < cx1 and cy0 < cy1:
+        out[cy0 - y0 : cy1 - y0, cx0 - x0 : cx1 - x0] = img[cy0:cy1, cx0:cx1]
+    return out
+
+
 def axis(pts: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Mean, principal axis (pointing right),
     and cross axis (pointing down the page)."""
@@ -598,7 +632,7 @@ class Flights:
     the flat landings at either end add only run, not rise."""
 
     def __init__(self, m: StationMap, img: np.ndarray, proj: Projection) -> None:
-        self.full = Image.open(MAPS_DIR / m.file)
+        self.full = full_map(m)
         self.a = proj.a
         s = np.linalg.norm(self.a[0])
         k = np.linalg.norm(self.a[1]) / s
@@ -629,7 +663,7 @@ class Flights:
             xs.max() * REDUCE + 12,
             ys.max() * REDUCE + 12,
         )
-        return np.asarray(self.full.crop(box).convert("RGB")).astype(np.int16)
+        return crop(self.full, box).astype(np.int16)
 
     def split(self, p: np.ndarray, axis_page: np.ndarray) -> Flight:
         """A vector drawn along a flight, split into its run on the level
