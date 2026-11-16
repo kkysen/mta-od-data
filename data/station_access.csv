@@ -2016,72 +2016,72 @@ Q03,477,72 St,40.7669623,-73.9595894,Stair/Escalator,99.0,"about 99 ft: Wikipedi
 Q03,477,72 St,40.7672033,-73.9594195,Stair/Escalator,99.0,"about 99 ft: Wikipedia, subwaynut",643,608,OSM w907192926,134
 Q03,477,72 St,40.7685671,-73.9583424,Easement - Street,99.0,"about 99 ft: Wikipedia, subwaynut",87,608,OSM w907192926,134
 Q03,477,72 St,40.7691118,-73.9583566,Easement - Street,99.0,"about 99 ft: Wikipedia, subwaynut",116,608,OSM w907192926,134
-S31,501,St George,40.6441717,-74.0731753,Easement - Passage,14.8,OSM level -1,201,600,"SIR, as a B Division train",30
-S31,501,St George,40.6440768,-74.0729974,Easement - Passage,14.8,OSM level -1,215,600,"SIR, as a B Division train",30
-S30,502,Tompkinsville,40.6376665,-74.0750213,Station House,0.0,structure At Grade,267,600,"SIR, as a B Division train",15
-S29,503,Stapleton,40.6273214,-74.075095,Stair,30.0,structure Elevated,217,600,"SIR, as a B Division train",45
-S29,503,Stapleton,40.6286019,-74.0752482,Stair,30.0,structure Elevated,252,600,"SIR, as a B Division train",45
-S28,504,Clifton,40.6207463,-74.0710103,Stair,30.0,structure Elevated,235,600,"SIR, as a B Division train",45
-S28,504,Clifton,40.6216363,-74.0717437,Stair,30.0,structure Elevated,149,600,"SIR, as a B Division train",45
-S28,504,Clifton,40.6215752,-74.0717062,Stair,30.0,structure Elevated,126,600,"SIR, as a B Division train",45
-S28,504,Clifton,40.6218984,-74.0716411,Stair,30.0,structure Elevated,221,600,"SIR, as a B Division train",45
-S27,505,Grasmere,40.6036771,-74.0836629,Stair,20.0,structure Open Cut,236,600,"SIR, as a B Division train",35
-S26,506,Old Town,40.5963353,-74.0874145,Stair,15.0,structure Embankment,102,600,"SIR, as a B Division train",30
-S26,506,Old Town,40.5960874,-74.0875644,Stair,15.0,structure Embankment,199,600,"SIR, as a B Division train",30
-S26,506,Old Town,40.5961168,-74.087835,Stair,15.0,structure Embankment,222,600,"SIR, as a B Division train",30
-S25,507,Dongan Hills,40.5885359,-74.0963615,Ramp,15.0,structure Embankment,137,600,"SIR, as a B Division train",30
-S25,507,Dongan Hills,40.5886604,-74.0966051,Ramp,15.0,structure Embankment,158,600,"SIR, as a B Division train",30
-S25,507,Dongan Hills,40.5888984,-74.0961957,Stair,15.0,structure Embankment,34,600,"SIR, as a B Division train",30
-S25,507,Dongan Hills,40.5891445,-74.0958581,Stair,15.0,structure Embankment,125,600,"SIR, as a B Division train",30
-S25,507,Dongan Hills,40.5886609,-74.0961114,Stair,15.0,structure Embankment,69,600,"SIR, as a B Division train",30
-S25,507,Dongan Hills,40.5889957,-74.0956595,Stair,15.0,structure Embankment,131,600,"SIR, as a B Division train",30
-S24,508,Jefferson Av,40.5839541,-74.1027069,Stair,15.0,structure Embankment,219,600,"SIR, as a B Division train",30
-S24,508,Jefferson Av,40.5840621,-74.1029119,Stair,15.0,structure Embankment,208,600,"SIR, as a B Division train",30
-S23,509,Grant City,40.5790723,-74.109741,Overpass,20.0,structure Open Cut,40,600,"SIR, as a B Division train",35
-S23,509,Grant City,40.578932,-74.1095677,Overpass,20.0,structure Open Cut,40,600,"SIR, as a B Division train",35
-S23,509,Grant City,40.5794981,-74.1091261,Stair,20.0,structure Open Cut,252,600,"SIR, as a B Division train",35
-S23,509,Grant City,40.5794375,-74.1090141,Stair,20.0,structure Open Cut,257,600,"SIR, as a B Division train",35
-S22,510,New Dorp,40.5740313,-74.116692,Stair,20.0,structure Open Cut,247,600,"SIR, as a B Division train",35
-S22,510,New Dorp,40.5739452,-74.1165236,Stair,20.0,structure Open Cut,255,600,"SIR, as a B Division train",35
-S22,510,New Dorp,40.5737295,-74.11672,Elevator,20.0,structure Open Cut,163,600,"SIR, as a B Division train",65
-S22,510,New Dorp,40.5733062,-74.1176127,Stair,20.0,structure Open Cut,128,600,"SIR, as a B Division train",35
-S22,510,New Dorp,40.5730202,-74.11777,Stair,20.0,structure Open Cut,228,600,"SIR, as a B Division train",35
-S21,511,Oakwood Heights,40.5646184,-74.1268361,Stair,20.0,structure Open Cut,229,600,"SIR, as a B Division train",35
-S21,511,Oakwood Heights,40.5646862,-74.1269428,Stair,20.0,structure Open Cut,232,600,"SIR, as a B Division train",35
-S21,511,Oakwood Heights,40.565183,-74.1260393,Stair,20.0,structure Open Cut,82,600,"SIR, as a B Division train",35
-S21,511,Oakwood Heights,40.5653725,-74.1263119,Stair,20.0,structure Open Cut,96,600,"SIR, as a B Division train",35
-S20,512,Bay Terrace,40.5559377,-74.1374575,Underpass,15.0,structure Embankment,227,600,"SIR, as a B Division train",30
-S20,512,Bay Terrace,40.5568692,-74.1362968,Stair,15.0,structure Embankment,240,600,"SIR, as a B Division train",30
-S20,512,Bay Terrace,40.5560285,-74.1375685,Underpass,15.0,structure Embankment,228,600,"SIR, as a B Division train",30
-S19,513,Great Kills,40.5517017,-74.1506414,Stair,20.0,structure Open Cut,271,600,"SIR, as a B Division train",35
-S19,513,Great Kills,40.5515581,-74.1505732,Stair,20.0,structure Open Cut,258,600,"SIR, as a B Division train",35
-S19,513,Great Kills,40.5513411,-74.1514872,Stair/Ramp,20.0,structure Open Cut,47,600,"SIR, as a B Division train",35
-S19,513,Great Kills,40.5511093,-74.1513866,Stair/Ramp,20.0,structure Open Cut,44,600,"SIR, as a B Division train",35
-S18,514,Eltingville,40.5448229,-74.1645123,Stair,15.0,structure Embankment,82,600,"SIR, as a B Division train",30
-S18,514,Eltingville,40.5444177,-74.1652063,Stair,15.0,structure Embankment,189,600,"SIR, as a B Division train",30
-S18,514,Eltingville,40.5442311,-74.1650514,Stair,15.0,structure Embankment,190,600,"SIR, as a B Division train",30
-S17,515,Annadale,40.540231,-74.1787012,Stair,20.0,structure Open Cut,158,600,"SIR, as a B Division train",35
-S17,515,Annadale,40.5406763,-74.1774522,Stair,20.0,structure Open Cut,226,600,"SIR, as a B Division train",35
-S17,515,Annadale,40.5405775,-74.1774347,Stair,20.0,structure Open Cut,221,600,"SIR, as a B Division train",35
-S16,516,Huguenot,40.5331368,-74.1922904,Stair,20.0,structure Open Cut,239,600,"SIR, as a B Division train",35
-S16,516,Huguenot,40.5332341,-74.1923434,Stair,20.0,structure Open Cut,221,600,"SIR, as a B Division train",35
-S15,517,Prince's Bay,40.5251148,-74.200672,Stair,20.0,structure Open Cut,221,600,"SIR, as a B Division train",35
-S15,517,Prince's Bay,40.5254041,-74.2007462,Stair,20.0,structure Open Cut,193,600,"SIR, as a B Division train",35
-S15,517,Prince's Bay,40.5256747,-74.1995091,Stair,20.0,structure Open Cut,165,600,"SIR, as a B Division train",35
-S17,515,Annadale,40.5405641,-74.1784425,Stair,20.0,structure Open Cut,73,600,"SIR, as a B Division train",35
-S14,518,Pleasant Plains,40.522445,-74.2171263,Stair,15.0,structure Embankment,200,600,"SIR, as a B Division train",30
-S14,518,Pleasant Plains,40.5226659,-74.2171705,Stair,15.0,structure Embankment,209,600,"SIR, as a B Division train",30
-S13,519,Richmond Valley,40.5196294,-74.2295408,Stair,20.0,structure Open Cut,111,600,"SIR, as a B Division train",35
-S13,519,Richmond Valley,40.5194737,-74.2294915,Stair,20.0,structure Open Cut,113,600,"SIR, as a B Division train",35
-S13,519,Richmond Valley,40.5196676,-74.2286845,Stair,20.0,structure Open Cut,127,600,"SIR, as a B Division train",35
-S13,519,Richmond Valley,40.5197629,-74.2289145,Stair,20.0,structure Open Cut,79,600,"SIR, as a B Division train",35
-S11,523,Arthur Kill,40.5167299,-74.2420297,Stair/Ramp,0.0,structure At Grade,58,600,"SIR, as a B Division train",15
-S11,523,Arthur Kill,40.516807,-74.2418387,Ramp,0.0,structure At Grade,110,600,"SIR, as a B Division train",15
-S11,523,Arthur Kill,40.5165928,-74.2418934,Stair/Ramp/Walkway,0.0,structure At Grade,56,600,"SIR, as a B Division train",15
-S09,522,Tottenville,40.5132347,-74.2509716,Stair,0.0,structure At Grade,323,600,"SIR, as a B Division train",15
-S09,522,Tottenville,40.5133997,-74.2511586,Stair,0.0,structure At Grade,321,600,"SIR, as a B Division train",15
-S09,522,Tottenville,40.5121599,-74.2529363,Ramp,0.0,structure At Grade,349,600,"SIR, as a B Division train",15
-S09,522,Tottenville,40.5122061,-74.2528318,Stair,0.0,structure At Grade,316,600,"SIR, as a B Division train",15
+S31,501,St George,40.6441717,-74.0731753,Easement - Passage,14.8,OSM level -1,201,300,SIR train,30
+S31,501,St George,40.6440768,-74.0729974,Easement - Passage,14.8,OSM level -1,215,300,SIR train,30
+S30,502,Tompkinsville,40.6376665,-74.0750213,Station House,0.0,structure At Grade,267,300,SIR train,15
+S29,503,Stapleton,40.6273214,-74.075095,Stair,30.0,structure Elevated,217,300,SIR train,45
+S29,503,Stapleton,40.6286019,-74.0752482,Stair,30.0,structure Elevated,252,300,SIR train,45
+S28,504,Clifton,40.6207463,-74.0710103,Stair,30.0,structure Elevated,235,300,SIR train,45
+S28,504,Clifton,40.6216363,-74.0717437,Stair,30.0,structure Elevated,149,300,SIR train,45
+S28,504,Clifton,40.6215752,-74.0717062,Stair,30.0,structure Elevated,126,300,SIR train,45
+S28,504,Clifton,40.6218984,-74.0716411,Stair,30.0,structure Elevated,221,300,SIR train,45
+S27,505,Grasmere,40.6036771,-74.0836629,Stair,20.0,structure Open Cut,236,300,SIR train,35
+S26,506,Old Town,40.5963353,-74.0874145,Stair,15.0,structure Embankment,102,300,SIR train,30
+S26,506,Old Town,40.5960874,-74.0875644,Stair,15.0,structure Embankment,199,300,SIR train,30
+S26,506,Old Town,40.5961168,-74.087835,Stair,15.0,structure Embankment,222,300,SIR train,30
+S25,507,Dongan Hills,40.5885359,-74.0963615,Ramp,15.0,structure Embankment,137,300,SIR train,30
+S25,507,Dongan Hills,40.5886604,-74.0966051,Ramp,15.0,structure Embankment,158,300,SIR train,30
+S25,507,Dongan Hills,40.5888984,-74.0961957,Stair,15.0,structure Embankment,34,300,SIR train,30
+S25,507,Dongan Hills,40.5891445,-74.0958581,Stair,15.0,structure Embankment,125,300,SIR train,30
+S25,507,Dongan Hills,40.5886609,-74.0961114,Stair,15.0,structure Embankment,69,300,SIR train,30
+S25,507,Dongan Hills,40.5889957,-74.0956595,Stair,15.0,structure Embankment,131,300,SIR train,30
+S24,508,Jefferson Av,40.5839541,-74.1027069,Stair,15.0,structure Embankment,219,300,SIR train,30
+S24,508,Jefferson Av,40.5840621,-74.1029119,Stair,15.0,structure Embankment,208,300,SIR train,30
+S23,509,Grant City,40.5790723,-74.109741,Overpass,20.0,structure Open Cut,40,300,SIR train,35
+S23,509,Grant City,40.578932,-74.1095677,Overpass,20.0,structure Open Cut,40,300,SIR train,35
+S23,509,Grant City,40.5794981,-74.1091261,Stair,20.0,structure Open Cut,252,300,SIR train,35
+S23,509,Grant City,40.5794375,-74.1090141,Stair,20.0,structure Open Cut,257,300,SIR train,35
+S22,510,New Dorp,40.5740313,-74.116692,Stair,20.0,structure Open Cut,247,300,SIR train,35
+S22,510,New Dorp,40.5739452,-74.1165236,Stair,20.0,structure Open Cut,255,300,SIR train,35
+S22,510,New Dorp,40.5737295,-74.11672,Elevator,20.0,structure Open Cut,163,300,SIR train,65
+S22,510,New Dorp,40.5733062,-74.1176127,Stair,20.0,structure Open Cut,128,300,SIR train,35
+S22,510,New Dorp,40.5730202,-74.11777,Stair,20.0,structure Open Cut,228,300,SIR train,35
+S21,511,Oakwood Heights,40.5646184,-74.1268361,Stair,20.0,structure Open Cut,229,300,SIR train,35
+S21,511,Oakwood Heights,40.5646862,-74.1269428,Stair,20.0,structure Open Cut,232,300,SIR train,35
+S21,511,Oakwood Heights,40.565183,-74.1260393,Stair,20.0,structure Open Cut,82,300,SIR train,35
+S21,511,Oakwood Heights,40.5653725,-74.1263119,Stair,20.0,structure Open Cut,96,300,SIR train,35
+S20,512,Bay Terrace,40.5559377,-74.1374575,Underpass,15.0,structure Embankment,227,300,SIR train,30
+S20,512,Bay Terrace,40.5568692,-74.1362968,Stair,15.0,structure Embankment,240,300,SIR train,30
+S20,512,Bay Terrace,40.5560285,-74.1375685,Underpass,15.0,structure Embankment,228,300,SIR train,30
+S19,513,Great Kills,40.5517017,-74.1506414,Stair,20.0,structure Open Cut,271,300,SIR train,35
+S19,513,Great Kills,40.5515581,-74.1505732,Stair,20.0,structure Open Cut,258,300,SIR train,35
+S19,513,Great Kills,40.5513411,-74.1514872,Stair/Ramp,20.0,structure Open Cut,47,300,SIR train,35
+S19,513,Great Kills,40.5511093,-74.1513866,Stair/Ramp,20.0,structure Open Cut,44,300,SIR train,35
+S18,514,Eltingville,40.5448229,-74.1645123,Stair,15.0,structure Embankment,82,300,SIR train,30
+S18,514,Eltingville,40.5444177,-74.1652063,Stair,15.0,structure Embankment,189,300,SIR train,30
+S18,514,Eltingville,40.5442311,-74.1650514,Stair,15.0,structure Embankment,190,300,SIR train,30
+S17,515,Annadale,40.540231,-74.1787012,Stair,20.0,structure Open Cut,158,300,SIR train,35
+S17,515,Annadale,40.5406763,-74.1774522,Stair,20.0,structure Open Cut,226,300,SIR train,35
+S17,515,Annadale,40.5405775,-74.1774347,Stair,20.0,structure Open Cut,221,300,SIR train,35
+S16,516,Huguenot,40.5331368,-74.1922904,Stair,20.0,structure Open Cut,239,300,SIR train,35
+S16,516,Huguenot,40.5332341,-74.1923434,Stair,20.0,structure Open Cut,221,300,SIR train,35
+S15,517,Prince's Bay,40.5251148,-74.200672,Stair,20.0,structure Open Cut,221,300,SIR train,35
+S15,517,Prince's Bay,40.5254041,-74.2007462,Stair,20.0,structure Open Cut,193,300,SIR train,35
+S15,517,Prince's Bay,40.5256747,-74.1995091,Stair,20.0,structure Open Cut,165,300,SIR train,35
+S17,515,Annadale,40.5405641,-74.1784425,Stair,20.0,structure Open Cut,73,300,SIR train,35
+S14,518,Pleasant Plains,40.522445,-74.2171263,Stair,15.0,structure Embankment,200,300,SIR train,30
+S14,518,Pleasant Plains,40.5226659,-74.2171705,Stair,15.0,structure Embankment,209,300,SIR train,30
+S13,519,Richmond Valley,40.5196294,-74.2295408,Stair,20.0,structure Open Cut,111,300,SIR train,35
+S13,519,Richmond Valley,40.5194737,-74.2294915,Stair,20.0,structure Open Cut,113,300,SIR train,35
+S13,519,Richmond Valley,40.5196676,-74.2286845,Stair,20.0,structure Open Cut,127,300,SIR train,35
+S13,519,Richmond Valley,40.5197629,-74.2289145,Stair,20.0,structure Open Cut,79,300,SIR train,35
+S11,523,Arthur Kill,40.5167299,-74.2420297,Stair/Ramp,0.0,structure At Grade,58,300,SIR train,15
+S11,523,Arthur Kill,40.516807,-74.2418387,Ramp,0.0,structure At Grade,110,300,SIR train,15
+S11,523,Arthur Kill,40.5165928,-74.2418934,Stair/Ramp/Walkway,0.0,structure At Grade,56,300,SIR train,15
+S09,522,Tottenville,40.5132347,-74.2509716,Stair,0.0,structure At Grade,323,300,SIR train,15
+S09,522,Tottenville,40.5133997,-74.2511586,Stair,0.0,structure At Grade,321,300,SIR train,15
+S09,522,Tottenville,40.5121599,-74.2529363,Ramp,0.0,structure At Grade,349,300,SIR train,15
+S09,522,Tottenville,40.5122061,-74.2528318,Stair,0.0,structure At Grade,316,300,SIR train,15
 B12,59,9 Av,40.6464022,-73.9944751,Station House,14.8,OSM level -1,58,616,OSM w299892131,30
 B13,60,Fort Hamilton Pkwy,40.640185,-73.994423,Stair,29.5,OSM level 2,268,612,OSM w427044491,44
 B13,60,Fort Hamilton Pkwy,40.64136,-73.994411,Stair,29.5,OSM level 2,165,612,OSM w427044491,44

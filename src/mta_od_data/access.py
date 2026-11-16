@@ -14,7 +14,8 @@ the station's GTFS coordinate, in a straight line from the entrance,
 or its end if that's farther than half the platform,
 and the rest is a corridor walked both ways.
 The platform's length is the longest of the station's platforms OpenStreetMap outlines,
-or else a full-length train's: 600 ft in the B Division, 510 ft in the A (IRT).
+or else a full-length train's: 600 ft in the B Division, 510 ft in the A (IRT),
+and 300 ft on the Staten Island Railway, whose trains are half as long.
 
 The depth comes from, in order:
 the heights of the MTA's elevators and escalators,
@@ -105,10 +106,11 @@ DEEP_FT = 60
 WALK_FT_PER_S = 3 * 5280 / 3600
 # A platform's length where OSM outlines none of the station's:
 # a full-length train's, ten 60 ft cars in the B Division
-# and ten 51 ft cars in the A, the IRT's,
-# and the B Division's on the Staten Island Railway.
+# and ten 51 ft cars in the A, the IRT's;
+# the Staten Island Railway's trains are half a B Division one.
 B_DIVISION_FT = 600
 A_DIVISION_FT = 510
+SIR_FT = 300
 
 # Depths the MTA's heights leave blank, as published, in feet to the platform.
 DEPTHS = {
@@ -360,7 +362,7 @@ def platform_length(
             return A_DIVISION_FT, "A Division train"
         case "SIR":
             # Its route relations aren't the NYC Subway's, so `platforms.csv` has none.
-            return B_DIVISION_FT, "SIR, as a B Division train"
+            return SIR_FT, "SIR train"
         case _:
             return B_DIVISION_FT, "B Division train"
 

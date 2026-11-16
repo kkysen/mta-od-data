@@ -4,6 +4,7 @@ from mta_od_data.access import (
     A_DIVISION_FT,
     B_DIVISION_FT,
     GATES_S,
+    SIR_FT,
     Walk,
     entrance_secs,
     platform_length,
@@ -20,6 +21,8 @@ def test_platform_length_from_osm_or_a_full_train():
     assert platform_length(irt, osm)[0] == A_DIVISION_FT
     ind = {"gtfs_stop_id": "A01", "division": "IND"}
     assert platform_length(ind, osm)[0] == B_DIVISION_FT
+    sir = {"gtfs_stop_id": "S31", "division": "SIR"}
+    assert platform_length(sir, osm)[0] == SIR_FT
 
 
 def test_entrance_secs_stop_where_the_stairs_reach_the_platform():
