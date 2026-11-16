@@ -258,7 +258,7 @@ as pathways can't tell them apart.
 - Without a `traversal_time`, as 93% of the MBTA's,
   a walkway takes its length at 3 mph (1.34 m/s), on the level,
   stairs 0.6s a step (a guess), or their length at 1.2 m/s with no count,
-  an elevator 60s, and a gate 5s.
+  an elevator 60s, and a gate 3s.
 - A walk over walkways alone between two of a station's platforms is free:
   they're one platform, as an island's two sides or a row of Green Line berths,
   since anything else means crossing tracks.

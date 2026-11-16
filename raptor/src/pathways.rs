@@ -18,8 +18,8 @@ pub const STAIRS_LENGTH_SPEED: f64 = 1.2;
 pub const STEP_SECS: f64 = 0.6;
 /// An elevator without a `traversal_time`: waiting for it, and riding.
 pub const ELEVATOR_SECS: Secs = 60;
-/// A fare or exit gate without one.
-pub const GATE_SECS: Secs = 5;
+/// A fare or exit gate without one: a tap and a push through.
+pub const GATE_SECS: Secs = 3;
 /// A pathway with neither a time nor anything to estimate one from.
 pub const UNKNOWN_SECS: Secs = 30;
 /// No walk is longer than this on foot, fare gate penalty aside:
