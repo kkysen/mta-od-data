@@ -1,10 +1,9 @@
 """RAPTOR journey assignment of the OD data (see `raptor/raptor_design.md`).
 
 The routing is the `raptor` crate's, through `mta_od_data._raptor`;
-this drives it and writes the manifest of dates run.
+this is its command line, and `routing.py` routes a range of dates for `assign-range`.
 """
 
-from csv import DictWriter
 from datetime import date
 from pathlib import Path
 from typing import Annotated
@@ -16,11 +15,8 @@ from mta_od_data._raptor import (
     DEFAULT_MAX_RIDES,
     Version,
     assign_date,
-    assign_dates,
     feed_report,
-    load_versions,
     od_report,
-    pick_weekdays,
     profile_report,
     route_report,
     timetable_report,
@@ -29,6 +25,7 @@ from mta_od_data.access import TABLE as DEFAULT_ACCESS
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR
 from mta_od_data.platforms import DEFAULT_OUT as DEFAULT_PLATFORMS
 from mta_od_data.prepare import DEFAULT_PARQUET
+from mta_od_data.routing import route_range
 from mta_od_data.street_walks import DEFAULT_STREETS, cut
 
 app = Typer()
@@ -36,22 +33,6 @@ app = Typer()
 DEFAULT_STATIONS = DATA / "stations.csv"
 DEFAULT_CONFIG = ROOT / "raptor" / "assign.json5"
 DEFAULT_OUT_DIR = DATA / "raptor"
-MANIFEST_FIELDS = [
-    "date",
-    "year",
-    "month",
-    "day_of_week",
-    "days",
-    "feed",
-    "paths",
-    "path_texts",
-    "trips",
-    "riders_in",
-    "riders_assigned",
-    "unassigned_no_stops",
-    "unassigned_unreachable",
-    "unassigned_no_departure",
-]
 
 Feed = Annotated[Path, Option(help="A feed zip, from `mta-od-data fetch-gtfs`")]
 Day = Annotated[
@@ -253,45 +234,15 @@ def assign_range(
     Examples:
         mta-od-data raptor assign-range --from 2025-08-11 --to 2025-12-31
     """
-    picks = pick_weekdays(load_versions(gtfs_dir), start, end)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    outs = [out_dir / f"paths-{day}.parquet" for day, _, _ in picks]
-    summaries = assign_dates(
-        [
-            (version, day, out)
-            for (day, version, _), out in zip(picks, outs, strict=True)
-        ],
+    route_range(
+        start,
+        end,
+        gtfs_dir,
         od,
         stations,
         platforms,
         config,
         parse_zstd_level(zstd_level),
         streets_to_walk(street_walks, streets, access, stations),
+        out_dir,
     )
-    manifest_path = out_dir / "manifest.csv"
-    with manifest_path.open("w", newline="") as f:
-        manifest = DictWriter(f, MANIFEST_FIELDS)
-        manifest.writeheader()
-        for (day, version, days), out, s in zip(picks, outs, summaries, strict=True):
-            print(f"== {day} ({day:%A})")
-            print(s.report, end="")
-            manifest.writerow(
-                {
-                    "date": day,
-                    "year": day.year,
-                    "month": day.month,
-                    "day_of_week": f"{day:%A}",
-                    "days": days,
-                    "feed": version.path,
-                    "paths": out,
-                    "path_texts": s.path_texts,
-                    # Beside its paths, as `assign_dates` writes it (`trips_out`).
-                    "trips": out.with_name(f"trips-{day}.parquet"),
-                    "riders_in": s.riders_in,
-                    "riders_assigned": s.riders_assigned,
-                    "unassigned_no_stops": s.unassigned_no_stops,
-                    "unassigned_unreachable": s.unassigned_unreachable,
-                    "unassigned_no_departure": s.unassigned_no_departure,
-                }
-            )
-    print(f"wrote {manifest_path}")
