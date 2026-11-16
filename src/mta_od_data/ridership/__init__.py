@@ -25,20 +25,14 @@ all with fare evaders unless `--no-fare-evasion`.
 from collections import defaultdict
 from collections.abc import Iterable, Mapping, Sequence
 from csv import DictReader
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Annotated, Any
 
 import json5
 from typer import BadParameter, Context, Option, Typer
 
-from mta_od_data import DATA, ROOT
-from mta_od_data.analyze.common import (
-    Complex,
-    MissingComplex,
-    abbreviate_name,
-    display_station,
-)
+from mta_od_data import DATA
+from mta_od_data.analyze.common import COMBINED_COMPLEXES, Names, load_names
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import read_manifest
 from mta_od_data.invocation import produced_by
@@ -76,86 +70,6 @@ CAR_NOTE = (
     f"\\* A car is {CAR_FT} ft of train, about one B Division car's length, "
     "so routes with different train lengths compare (`train_lengths.json5`)."
 )
-
-
-@dataclass(frozen=True, slots=True)
-class Names:
-    """Stations' and complexes' names, and stations' complexes and directions."""
-
-    station: dict[str, str]
-    complex_of: dict[str, str]
-    complex: dict[str, str]
-    direction: dict[tuple[str, str], str] = field(default_factory=dict)
-    # Each station's name alone, without its routes.
-    stop: dict[str, str] = field(default_factory=dict)
-    # Each complex's virtual complexes it's also part of, and their names.
-    combined_of: dict[str, list[str]] = field(default_factory=dict)
-
-
-# Complexes the MTA lists apart but riders can walk between without a fare,
-# shown as one virtual complex as well as each on its own:
-# those of the passages routing walks between them, like the 42 St Connection
-# between Times Sq and 42 St-Bryant Pk/5 Av.
-PASSAGES = ROOT / "raptor" / "passages.json5"
-COMBINED_COMPLEXES = [
-    tuple(str(c) for c in p["complexes"])
-    for p in json5.loads(PASSAGES.read_text())["passages"]
-]
-
-
-def combined_name(names: Sequence[str]) -> str:
-    """Complexes' names as one, each part named once:
-    `Times Sq-42 St/PABT` and `42 St-Bryant Pk/5 Av`
-    are `Times Sq-42 St/PABT/Bryant Pk/5 Av`."""
-    seen: set[str] = set()
-    out: list[str] = []
-    for name in names:
-        for station in name.split("/"):
-            parts = [p for p in station.split("-") if p not in seen]
-            seen.update(parts)
-            if parts:
-                out.append("-".join(parts))
-    return "/".join(out)
-
-
-def load_names(stations: Path, complexes: Path) -> Names:
-    """Names as the `analyze` reports write them: `abbreviate_name`d,
-    with their routes as `display_station` lists them, `DeKalb Av (B,Q,R)`."""
-    with stations.open() as f:
-        rows = list(DictReader(f))
-    by_id = {
-        str(c.complex_id): c
-        for c in Complex.load_all(complexes)
-        if not isinstance(c, MissingComplex)
-    }
-    complex_names = {i: c.display() for i, c in by_id.items()}
-    combined_of: defaultdict[str, list[str]] = defaultdict(list)
-    for ids in COMBINED_COMPLEXES:
-        combined = "+".join(ids)
-        members = [by_id[i] for i in ids]
-        complex_names[combined] = display_station(
-            combined_name([c.name for c in members]),
-            frozenset().union(*(c.routes for c in members)),
-        )
-        for i in ids:
-            combined_of[i].append(combined)
-    return Names(
-        station={
-            r["gtfs_stop_id"]: display_station(
-                abbreviate_name(r["stop_name"]), frozenset(r["daytime_routes"].split())
-            )
-            for r in rows
-        },
-        complex_of={r["gtfs_stop_id"]: r["complex_id"] for r in rows},
-        stop={r["gtfs_stop_id"]: abbreviate_name(r["stop_name"]) for r in rows},
-        complex=complex_names,
-        combined_of=dict(combined_of),
-        direction={
-            (r["gtfs_stop_id"], d): r[f"{label}_direction_label"]
-            for r in rows
-            for d, label in [("N", "north"), ("S", "south")]
-        },
-    )
 
 
 def busiest(

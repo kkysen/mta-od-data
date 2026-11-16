@@ -31,12 +31,11 @@ from duckdb import DuckDBPyConnection
 from typer import Context, Option, Typer
 
 from mta_od_data import DATA
-from mta_od_data.analyze.common import connection
+from mta_od_data.analyze.common import connection, load_names
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import DatePaths, date_paths, read_manifest
 from mta_od_data.invocation import produced_by
 from mta_od_data.prepare import DEFAULT_COMPLEXES_CSV, DEFAULT_STATIONS_CSV
-from mta_od_data.ridership import load_names
 
 app = Typer()
 
