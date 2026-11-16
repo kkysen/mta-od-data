@@ -348,6 +348,36 @@ the journey still uses another round,
 and the cost model still charges a transfer penalty
 (smaller for cross-platform, per the MTA's transfer classes).
 
+#### Next steps for transfer times
+
+In order:
+
+1. Rename words the code invented for things that have plain names,
+   like a flight's "foot" for the bottom of the stairs.
+2. Give transfers with no known stairs an average walk along the platform,
+   as from riders spread along the train:
+   a quarter of the platform,
+   or 0.3 of it, as the measured transfers average.
+3. Fix OSM's over-long stairs,
+   checked against the measured stations and the depths measured by hand
+   (Lenox Av about 14 ft, St Nicholas Av's southbound 46 steps, about 24.5 ft).
+4. Climb OSM's levels, instead of a flat 60s,
+   for fallback transfers between a complex's stations.
+5. Measure the passage between 42 St-Port Authority and Times Sq,
+   and check it against a timed 164s, by a fast walker.
+6. Read Candy Chan's station drawings:
+   Grand Central first, then 96 St's underpass and overpass, and 4 Av-9 St.
+7. Check how much riders crowd near the stairs (`cars`, now half within about a car)
+   against timed transfers.
+
+Settled, so not to be asked again:
+
+- 42 St-Port Authority's transfer goes up and over a mezzanine of normal height.
+- Of escalators side by side whose directions are unknown,
+  the right one, standing at the bottom facing up, runs up.
+- An entrance's time takes in its street stairs.
+- Mielke's `.blend` model of 14 St-Union Sq stays local, not committed.
+
 ### rRAPTOR
 
 Range RAPTOR per (origin complex, hour):
