@@ -22,6 +22,7 @@ from mta_od_data._raptor import (
     timetable_report,
 )
 from mta_od_data.access import TABLE as DEFAULT_ACCESS
+from mta_od_data.downloads import gtfs_feeds, od_parquet
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR
 from mta_od_data.platforms import DEFAULT_OUT as DEFAULT_PLATFORMS
 from mta_od_data.prepare import DEFAULT_PARQUET
@@ -43,7 +44,7 @@ Stops = Annotated[
     Option(help="Parent stop ID, e.g. 127 (repeatable; several means any of them)"),
 ]
 MaxRides = Annotated[int, Option(min=1, max=255, help="Most rides in a journey")]
-Od = Annotated[Path, Option(help="The OD Parquet, from `mta-od-data prepare`")]
+Od = Annotated[Path, Option(help="The OD Parquet, built or downloaded if missing")]
 Stations = Annotated[Path, Option(help="The station reference CSV")]
 Config = Annotated[Path, Option(help="Generalized cost weights")]
 Platforms = Annotated[
@@ -164,7 +165,7 @@ def od(
     """Load the OD rows for a date's service day, 04:00 to 04:00:
     its (year, month, day of week)'s hours 4 to 23 and the next date's 0 to 3,
     and map their station complexes to the date's timetable."""
-    print(od_report(feed, date, od, stations), end="")
+    print(od_report(feed, date, od_parquet(od), stations), end="")
 
 
 @app.command()
@@ -190,7 +191,7 @@ def assign(
     summary = assign_date(
         Version.open(feed),
         date,
-        od,
+        od_parquet(od),
         stations,
         platforms,
         config,
@@ -211,7 +212,7 @@ def assign_range(
         date, Option("--to", parser=date.fromisoformat, help="Last date, inclusive")
     ],
     gtfs_dir: Annotated[
-        Path, Option(help="Feed version zips, from `mta-od-data fetch-gtfs`")
+        Path, Option(help="Feed version zips, those missing fetched into it")
     ] = DEFAULT_GTFS_DIR,
     od: Od = DEFAULT_PARQUET,
     stations: Stations = DEFAULT_STATIONS,
@@ -237,8 +238,8 @@ def assign_range(
     route_range(
         start,
         end,
-        gtfs_dir,
-        od,
+        gtfs_feeds(gtfs_dir),
+        od_parquet(od),
         stations,
         platforms,
         config,

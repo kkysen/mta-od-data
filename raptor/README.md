@@ -14,13 +14,13 @@ This explains what it produces and how to read it.
 ## Running it
 
 ```sh
-uv run mta-od-data fetch-gtfs                  # the GTFS versions, into data/gtfs/
 uv run mta-od-data raptor assign-range --from 2025-08-11 --to 2025-12-31
 uv run mta-od-data fetch-platforms             # each route's stops' OSM platforms
 uv run mta-od-data ridership --by route        # or any report's own `Produced by` line
 ```
 
-`assign-range` needs the OD Parquet from `mta-od-data prepare` (`data/mta_od_2025.parquet`).
+`assign-range` fetches the GTFS versions it's missing into `data/gtfs/` (as `mta-od-data fetch-gtfs` does),
+and builds or downloads the OD Parquet (`data/mta_od_2025.parquet`) if it's missing.
 The cost weights for splitting riders are in [`assign.json5`](assign.json5).
 
 ## The other `raptor` subcommands

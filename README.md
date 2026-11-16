@@ -120,6 +120,7 @@ Details: [why the Parquet is smaller](src/mta_od_data/README.md#prepare), and `-
 Downloads every static GTFS feed version listed in
 [`gtfs_versions.json5`](src/mta_od_data/gtfs_versions.json5) to `data/gtfs/`,
 the timetables `raptor` routes on and `fetch-platforms` maps.
+Those fetch any missing themselves, so this is only to fetch them ahead.
 
 ```sh
 uv run mta-od-data fetch-gtfs

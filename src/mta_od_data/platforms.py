@@ -58,6 +58,7 @@ from shapely.geometry.base import BaseGeometry
 from typer import Option, Typer
 
 from mta_od_data import DATA
+from mta_od_data.downloads import gtfs_feeds
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR
 from mta_od_data.ridership.service import Feed, load_feed
 
@@ -219,7 +220,7 @@ def fetch_platforms(
         Path, Option(help="Geofabrik's New York OSM extract, fetched if missing")
     ] = DEFAULT_EXTRACT,
     gtfs_dir: Annotated[
-        Path, Option(help="Feed versions, from `mta-od-data fetch-gtfs`")
+        Path, Option(help="Feed versions, those missing fetched into it")
     ] = DEFAULT_GTFS_DIR,
     out: Annotated[
         Path, Option(help="The platform of each route's stops")
@@ -265,7 +266,7 @@ def fetch_platforms(
     # and each one's direction there.
     trains: Counter[tuple[str, str, str, str]] = Counter()
     directions: dict[tuple[str, str, str, str], str] = {}
-    for feed_zip in sorted(gtfs_dir.glob("*.zip")):
+    for feed_zip in sorted(gtfs_feeds(gtfs_dir).glob("*.zip")):
         feed = load_feed(feed_zip)
         coords = stop_coords(feed_zip)
         served: defaultdict[str, set[str]] = defaultdict(set)
