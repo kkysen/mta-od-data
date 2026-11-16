@@ -14,6 +14,7 @@ the station's GTFS coordinate, in a straight line from the entrance,
 or its end if that's farther than half the platform,
 and the rest is a corridor walked both ways.
 The platform's length is the longest of the station's platforms OpenStreetMap outlines,
+each whole where OSM maps it in pieces, as Morris Park's,
 or else a full-length train's: 600 ft in the B Division, 510 ft in the A (IRT),
 and 300 ft on the Staten Island Railway, whose trains are half as long.
 
@@ -37,6 +38,7 @@ import re
 from collections import defaultdict
 from csv import DictReader, DictWriter
 from dataclasses import dataclass
+from functools import cached_property
 from math import cos, hypot, isnan, nan, radians
 from pathlib import Path
 from statistics import median
@@ -46,6 +48,7 @@ from urllib.request import Request, urlopen
 
 import osmium
 from osmium.osm import Node, Way
+from shapely import unary_union
 from typer import Option, Typer
 
 from mta_od_data import DATA
@@ -288,17 +291,45 @@ def platform_ft(station: dict[str, str], lat: float, lon: float) -> float:
     return hypot(dx, dy) * 3.28084
 
 
-class _WayNodes(osmium.SimpleHandler):
-    """Each wanted way's nodes, by their IDs."""
+class _PlatformWays(osmium.SimpleHandler):
+    """Every platform OSM outlines: its nodes, by its way's ID,
+    and its name and level, by which its pieces are told apart from other platforms."""
 
-    def __init__(self, ways: set[int]) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.ways = ways
         self.nodes: dict[str, list[int]] = {}
+        self.named: dict[str, tuple[str, str]] = {}
 
     def way(self, w: Way) -> None:
-        if w.id in self.ways:
-            self.nodes[f"w{w.id}"] = [n.ref for n in w.nodes]
+        if w.tags.get("railway") == "platform":
+            way = f"w{w.id}"
+            self.nodes[way] = [n.ref for n in w.nodes]
+            self.named[way] = (w.tags.get("name") or "", w.tags.get("level") or "")
+
+    @cached_property
+    def by_node(self) -> dict[int, set[str]]:
+        """The platforms each node outlines."""
+        by_node: dict[int, set[str]] = defaultdict(set)
+        for w, nodes in self.nodes.items():
+            for n in nodes:
+                by_node[n].add(w)
+        return by_node
+
+    def pieces(self, way: str) -> set[str]:
+        """The way, and the platform's other pieces, joined to it node to node.
+
+        OSM splits some platforms where they change from tunnel to embankment to bridge,
+        as at Morris Park, so the way `platforms.csv` matches is only part of it.
+        """
+        found = {way}
+        todo = [way]
+        while todo:
+            for n in self.nodes[todo.pop()]:
+                for w in self.by_node[n] - found:
+                    if self.named[w] == self.named[way]:
+                        found.add(w)
+                        todo.append(w)
+        return found
 
 
 class _NodeLocations(osmium.SimpleHandler):
@@ -320,6 +351,7 @@ def osm_lengths(
     """The length of each station's longest platform OSM outlines, in feet,
     and its way, by GTFS stop ID.
 
+    A platform OSM splits into pieces is measured whole.
     The extract is read twice, for the ways' nodes and then their locations,
     not with every node's location at hand, which takes over a gigabyte.
     """
@@ -330,18 +362,32 @@ def osm_lengths(
     for r in _rows(platforms):
         if r["platform"].startswith("w"):
             ways[r["stop"]].add(r["platform"])
-    wanted = {int(w[1:]) for ws in ways.values() for w in ws}
-    way_nodes = _WayNodes(wanted)
-    way_nodes.apply_file(str(extract))
-    locations = _NodeLocations({n for ns in way_nodes.nodes.values() for n in ns})
+    outlined = _PlatformWays()
+    outlined.apply_file(str(extract))
+    pieces = {
+        w: outlined.pieces(w) for ws in ways.values() for w in ws if w in outlined.nodes
+    }
+    locations = _NodeLocations(
+        {n for ps in pieces.values() for p in ps for n in outlined.nodes[p]}
+    )
     locations.apply_file(str(extract))
-    feet = {}
-    for way, nodes in way_nodes.nodes.items():
-        outline = [locations.at[n] for n in nodes if n in locations.at]
+
+    def outline(way: str) -> list[tuple[float, float]] | None:
+        nodes = outlined.nodes[way]
+        at = [locations.at[n] for n in nodes if n in locations.at]
         # Outlined, not mapped as a line or with nodes missing.
-        if len(outline) == len(nodes) > 3 and nodes[0] == nodes[-1]:
-            axis = PlatformAxis.of(ground_outline(outline, outline[0]))
-            feet[way] = axis.length / 0.3048
+        return at if len(at) == len(nodes) > 3 and nodes[0] == nodes[-1] else None
+
+    feet = {}
+    for way, ps in pieces.items():
+        outlines = [o for p in sorted(ps) if (o := outline(p))]
+        if outline(way) and outlines:
+            origin = outlines[0][0]
+            # Its pieces' hull, whose longest side is the whole platform's.
+            whole = unary_union(
+                [ground_outline(o, origin) for o in outlines]
+            ).convex_hull
+            feet[way] = PlatformAxis.of(whole).length / 0.3048
     return {
         stop: max((feet[w], w) for w in ws if w in feet)
         for stop, ws in ways.items()

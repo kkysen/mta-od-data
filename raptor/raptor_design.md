@@ -304,6 +304,7 @@ out, on average from riders' spots along the train to there (`cars`),
 the stairs reaching the platform as far from its middle as the entrance is,
 or at its end, with a corridor beyond walked both ways,
 on the longest of the station's platforms OSM outlines,
+whole where OSM maps one in pieces,
 or else a full-length train's, 600 ft in the B Division and 510 ft in the A;
 or, where a 3D model measures them, as 14 St-Union Sq's,
 each platform its own from each entrance, in and out
