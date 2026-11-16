@@ -86,6 +86,18 @@ def filter_streets(
     return kept
 
 
+def fetch_extract(extract: Path = DEFAULT_EXTRACT) -> Path:
+    """Geofabrik's New York extract, fetched if missing."""
+    if not extract.exists():
+        extract.parent.mkdir(parents=True, exist_ok=True)
+        print(f"fetching {EXTRACT_URL}")
+        # Beside it and renamed into place, so an interrupted fetch leaves no extract.
+        part = extract.with_name(f"{extract.name}.part")
+        urlretrieve(EXTRACT_URL, part)
+        part.replace(extract)
+    return extract
+
+
 def cut(
     extract: Path = DEFAULT_EXTRACT,
     streets: Path = DEFAULT_STREETS,
@@ -93,10 +105,7 @@ def cut(
 ) -> Path:
     """`streets`, cut from `extract`, fetched if missing,
     unless `streets` is newer than it."""
-    if not extract.exists():
-        extract.parent.mkdir(parents=True, exist_ok=True)
-        print(f"fetching {EXTRACT_URL}")
-        urlretrieve(EXTRACT_URL, extract)
+    fetch_extract(extract)
     if not streets.exists() or streets.stat().st_mtime < extract.stat().st_mtime:
         kept = filter_streets(extract, streets, station_bounds(stations))
         print(f"cut {kept} ways to {streets}")

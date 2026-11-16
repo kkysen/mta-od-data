@@ -129,3 +129,18 @@ def test_interrupted_build_leaves_no_entry(tmp_path: Path) -> None:
     # The next build writes over the partial one.
     assert cached_value(entry, lambda: 3) == 3
     assert cached_value(entry, lambda: 4) == 3
+
+
+def test_entry_read_by_content_not_its_key(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An entry built again, the same, under another key, leaves keys reading it."""
+    monkeypatch.setattr(artifacts, "CACHE", tmp_path)
+    (tmp_path / "streets").mkdir()
+    first = tmp_path / "streets" / "abc.osm.pbf"
+    again = tmp_path / "streets" / "def.osm.pbf"
+    first.write_bytes(b"ways")
+    again.write_bytes(b"ways")
+    assert key([first], [], ()) == key([again], [], ())
+    again.write_bytes(b"other ways")
+    assert key([first], [], ()) != key([again], [], ())

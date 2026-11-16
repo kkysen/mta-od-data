@@ -147,9 +147,24 @@ def scale_od(
         mta-od-data scale-od --year 2025 --to-counts \
             --out data/mta_od_2025_counted.factors.parquet
     """
+    fit_factors(year, out, od, od_year, fetch_spreadsheet(spreadsheet), to_counts)
+
+
+def fetch_spreadsheet(spreadsheet: Path = DEFAULT_SPREADSHEET) -> Path:
+    """The station ridership spreadsheet, fetched if missing."""
     if not spreadsheet.exists():
         print(f"fetching {SPREADSHEET_URL}")
-        urlretrieve(SPREADSHEET_URL, spreadsheet)
+        spreadsheet.parent.mkdir(parents=True, exist_ok=True)
+        part = spreadsheet.with_name(f"{spreadsheet.name}.part")
+        urlretrieve(SPREADSHEET_URL, part)
+        part.replace(spreadsheet)
+    return spreadsheet
+
+
+def fit_factors(
+    year: int, out: Path, od: Path, od_year: int, spreadsheet: Path, to_counts: bool
+) -> None:
+    """`scale-od`'s factors, written to `out`."""
     con = connection()
     con.execute(
         """
