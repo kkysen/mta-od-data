@@ -11,10 +11,10 @@ Produced by `mta-od-data analyze free-transfers --markdown-out src/mta_od_data/a
 | Measure | Value |
 | --- | ---: |
 | Riders on an average weekday | 4,054,989 |
-| Riders making a free transfer out of the system | (6.4%) 257,686 |
-| Rider time saved a day (h:mm) | 10,519:56 |
-| By riders making a free transfer | 7,088:54 |
-| By the rest, splitting differently (not attributed) | 3,431:02 |
+| Riders making a free transfer out of the system | (6.4%) 257,751 |
+| Rider time saved a day (h:mm) | 10,522:34 |
+| By riders making a free transfer | 7,091:44 |
+| By the rest, splitting differently (not attributed) | 3,430:50 |
 | Time saved per rider making one | 1:39 |
 
 ## The 50 transfers saving the most
@@ -23,21 +23,21 @@ Each way's riders are in the order the transfer names its complexes.
 
 | # | Transfer | Walk | Riders a day | Each way | Rider time saved a day (h:mm) | Time saved per rider |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | Fulton St (G) ↔ Atlantic Av (2,3,4,5,B,D,N,Q,R) | 5:58 | 12,402 | 5,615 / 6,787 | 763:59 | 3:42 |
+| 1 | Fulton St (G) ↔ Atlantic Av (2,3,4,5,B,D,N,Q,R) | 5:58 | 12,403 | 5,615 / 6,788 | 763:59 | 3:42 |
 | 2 | Broadway (G) ↔ Lorimer St (J,M) | 4:38 | 6,546 | 3,004 / 3,542 | 632:33 | 5:48 |
 | 3 | Hewes St (J,M) ↔ Broadway (G) | 4:36 | 4,983 | 1,310 / 3,673 | 557:23 | 6:43 |
 | 4 | Hunts Point Av (6) ↔ Simpson St (2,5) | 8:01 | 2,923 | 1,365 / 1,558 | 410:42 | 8:26 |
 | 5 | Hoyt-Schermerhorn Sts (A,C,G) ↔ Hoyt St (2,3) | 3:55 | 7,770 | 4,607 / 3,163 | 382:04 | 2:57 |
 | 6 | Whitlock Av (6) ↔ Freeman St (2,5) | 9:32 | 1,459 | 811 / 648 | 326:15 | 13:25 |
-| 7 | 59 St-Columbus Circle (1,A,B,C,D) ↔ 57 St-7 Av (N,Q,R,W) | 5:50 | 9,936 | 5,140 / 4,796 | 261:13 | 1:35 |
+| 7 | 59 St-Columbus Circle (1,A,B,C,D) ↔ 57 St-7 Av (N,Q,R,W) | 5:50 | 9,935 | 5,140 / 4,796 | 261:13 | 1:35 |
 | 8 | 50 St (C,E) ↔ 50 St (1) | 3:12 | 11,238 | 6,957 / 4,281 | 221:35 | 1:11 |
 | 9 | Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) ↔ Fulton St (2,3,4,5,A,C,J,Z) | 2:11 | 9,607 | 4,254 / 5,353 | 218:54 | 1:22 |
 | 10 | 116 St (B,C) ↔ 116 St (2,3) | 7:46 | 1,907 | 837 / 1,070 | 194:19 | 6:07 |
 | 11 | Chambers St (1,2,3) ↔ Chambers St/WTC/Park Pl/Cortlandt St (2,3,A,C,E,R,W) | 3:16 | 6,866 | 4,909 / 1,957 | 190:21 | 1:40 |
 | 12 | Lafayette Av (C) ↔ Atlantic Av (2,3,4,5,B,D,N,Q,R) | 6:02 | 5,326 | 2,621 / 2,705 | 178:58 | 2:01 |
-| 13 | 7 Av (B,D,E) ↔ 57 St-7 Av (N,Q,R,W) | 3:34 | 9,529 | 4,917 / 4,612 | 165:40 | 1:03 |
+| 13 | 7 Av (B,D,E) ↔ 57 St-7 Av (N,Q,R,W) | 3:34 | 9,515 | 4,917 / 4,598 | 165:26 | 1:03 |
 | 14 | 145 St (A,B,C,D) ↔ 145 St (1) | 8:09 | 4,215 | 2,245 / 1,971 | 165:24 | 2:21 |
-| 15 | 36 St (M,R) ↔ 39 Av-Dutch Kills (N,W) | 5:36 | 2,097 | 995 / 1,102 | 162:35 | 4:39 |
+| 15 | 36 St (M,R) ↔ 39 Av-Dutch Kills (N,W) | 5:36 | 2,078 | 995 / 1,083 | 162:14 | 4:41 |
 | 16 | Queens Plaza (E,F,R) ↔ Queensboro Plaza (7,N,W) | 4:54 | 5,771 | 3,298 / 2,473 | 149:33 | 1:33 |
 | 17 | 135 St (B,C) ↔ 135 St (2,3) | 9:43 | 1,871 | 831 / 1,040 | 138:01 | 4:26 |
 | 18 | 116 St (6) ↔ 116 St (2,3) | 10:56 | 2,509 | 923 / 1,586 | 134:53 | 3:14 |
@@ -48,10 +48,10 @@ Each way's riders are in the order the transfer names its complexes.
 | 23 | Hoyt St (2,3) ↔ Jay St-MetroTech (A,C,F,R) | 3:18 | 4,803 | 2,560 / 2,243 | 109:07 | 1:22 |
 | 24 | Fordham Rd (B,D) ↔ Fordham Rd (4) | 5:12 | 1,133 | 500 / 633 | 93:31 | 4:57 |
 | 25 | 110 St (6) ↔ 110 St-Malcolm X Plaza (2,3) | 11:57 | 1,849 | 885 / 964 | 87:59 | 2:51 |
-| 26 | Flushing Av (G) ↔ Lorimer St (J,M) | 8:49 | 800 | 74 / 726 | 87:19 | 6:33 |
+| 26 | Flushing Av (G) ↔ Lorimer St (J,M) | 8:50 | 800 | 74 / 726 | 87:19 | 6:33 |
 | 27 | Hoyt-Schermerhorn Sts (A,C,G) ↔ DeKalb Av (B,Q,R) | 6:30 | 5,856 | 3,648 / 2,208 | 81:23 | 0:50 |
 | 28 | Fulton St (G) ↔ Nevins St (2,3,4,5) | 6:57 | 1,215 | 829 / 386 | 80:38 | 3:59 |
-| 29 | Cathedral Pkwy (110 St) (B,C) ↔ 110 St-Malcolm X Plaza (2,3) | 8:49 | 741 | 494 / 248 | 78:41 | 6:22 |
+| 29 | Cathedral Pkwy (110 St) (B,C) ↔ 110 St-Malcolm X Plaza (2,3) | 8:48 | 741 | 494 / 248 | 78:41 | 6:22 |
 | 30 | Kingsbridge Rd (B,D) ↔ Kingsbridge Rd (4) | 5:23 | 742 | 286 / 457 | 76:12 | 6:10 |
 | 31 | 125 St (4,5,6) ↔ 125 St (2,3) | 11:23 | 1,759 | 1,131 / 628 | 75:16 | 2:34 |
 | 32 | Canal St (A,C,E) ↔ Canal St (1) | 3:21 | 2,291 | 1,359 / 931 | 74:21 | 1:57 |

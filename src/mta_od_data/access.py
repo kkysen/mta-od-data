@@ -15,6 +15,7 @@ or its end if that's farther than half the platform,
 and the rest is a corridor walked both ways.
 The platform's length is the longest of the station's platforms OpenStreetMap outlines,
 each whole where OSM maps it in pieces, as Morris Park's,
+measured along the edge trains stop at, so a curved one along the curve,
 or else a full-length train's: 600 ft in the B Division, 510 ft in the A (IRT),
 and 300 ft on the Staten Island Railway, whose trains are half as long.
 
@@ -39,16 +40,26 @@ from collections import defaultdict
 from csv import DictReader, DictWriter
 from dataclasses import dataclass
 from functools import cached_property
-from math import cos, hypot, isnan, nan, radians
+from itertools import pairwise
+from math import atan2, cos, hypot, isnan, nan, pi, radians
 from pathlib import Path
 from statistics import median
 from typing import Annotated, Any
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+import numpy as np
 import osmium
 from osmium.osm import Node, Way
-from shapely import unary_union
+from shapely import (
+    LineString,
+    MultiPolygon,
+    Point,
+    Polygon,
+    get_coordinates,
+    unary_union,
+)
+from shapely.ops import nearest_points, substring
 from typer import Option, Typer
 
 from mta_od_data import DATA
@@ -114,6 +125,24 @@ WALK_FT_PER_S = 3 * 5280 / 3600
 B_DIVISION_FT = 600
 A_DIVISION_FT = 510
 SIR_FT = 300
+# The ways OSM maps a platform's trains' tracks as.
+TRACKS = {"subway", "rail", "light_rail"}
+# How far a track beside a platform is from its outline, at most, in metres:
+# a train's side is about 1.6 m from its track's middle,
+# with room for OSM's tracks and outlines being a little off.
+BESIDE_M = 6.0
+# How much farther from a track than its nearest corner
+# a platform's corners along its track edge can be, in metres,
+# as where OSM draws the edge a little crooked.
+EDGE_M = 2.0
+# How far past a platform's ends its track is followed, in metres.
+PAST_M = 50.0
+# How far a track is run on straight past where OSM's ends,
+# as at a terminal's bumpers, in metres.
+RUN_ON_M = 100.0
+# The sharpest a track turns at one node, in degrees:
+# sharper is another track crossing it, or a way doubling back.
+MAX_TURN_DEG = 30.0
 
 # Depths the MTA's heights leave blank, as published, in feet to the platform.
 DEPTHS = {
@@ -293,18 +322,26 @@ def platform_ft(station: dict[str, str], lat: float, lon: float) -> float:
 
 class _PlatformWays(osmium.SimpleHandler):
     """Every platform OSM outlines: its nodes, by its way's ID,
-    and its name and level, by which its pieces are told apart from other platforms."""
+    and its name and level, by which its pieces are told apart from other platforms;
+    and the tracks: the nodes each track node is joined to."""
 
     def __init__(self) -> None:
         super().__init__()
         self.nodes: dict[str, list[int]] = {}
         self.named: dict[str, tuple[str, str]] = {}
+        self.joined: dict[int, set[int]] = defaultdict(set)
 
     def way(self, w: Way) -> None:
-        if w.tags.get("railway") == "platform":
+        railway = w.tags.get("railway")
+        if railway == "platform":
             way = f"w{w.id}"
             self.nodes[way] = [n.ref for n in w.nodes]
             self.named[way] = (w.tags.get("name") or "", w.tags.get("level") or "")
+        elif railway in TRACKS:
+            nodes = [n.ref for n in w.nodes]
+            for a, b in pairwise(nodes):
+                self.joined[a].add(b)
+                self.joined[b].add(a)
 
     @cached_property
     def by_node(self) -> dict[int, set[str]]:
@@ -345,12 +382,192 @@ class _NodeLocations(osmium.SimpleHandler):
             self.at[n.id] = (n.location.lon, n.location.lat)
 
 
+@dataclass(frozen=True, slots=True)
+class Tracks:
+    """Track nodes, at metres east and north of a platform,
+    and the nodes each is joined to by a track."""
+
+    at: dict[int, tuple[float, float]]
+    joined: dict[int, set[int]]
+
+
+def along_tracks(outline: Polygon | MultiPolygon, tracks: Tracks) -> float | None:
+    """A platform's length along its track edge, where trains stop, in metres,
+    or `None` if no track runs beside it.
+
+    Each track beside the platform is followed on past both its ends,
+    and the platform's track edge is measured along it.
+    An island has two track edges, and its longer is taken,
+    the outer where it curves.
+    A track beyond another, as an express track past a side platform's local,
+    isn't beside it.
+    The ends are measured, not the outline between them,
+    so a jagged or notched outline measures as a smooth one,
+    and a platform OSM outlines with a few corners as on the curve its track takes.
+    """
+    besides = sorted(
+        (d, a, b)
+        for a in tracks.at
+        for b in tracks.joined.get(a, set())
+        if a < b
+        and b in tracks.at
+        # Beside it, not under or over it.
+        and 0
+        < (d := LineString([tracks.at[a], tracks.at[b]]).distance(outline))
+        <= BESIDE_M
+    )
+    lines: list[LineString] = []
+    for d, a, b in besides:
+        middle = LineString([tracks.at[a], tracks.at[b]]).interpolate(
+            0.5, normalized=True
+        )
+        # Each track once, from its stretch nearest the platform.
+        if all(line.distance(middle) > 1 for line in lines):
+            lines.append(_follow(tracks, (a, b), outline, d))
+    # As OSM maps them, not run on.
+    mapped = [LineString(line.coords[1:-1]) for line in lines]
+
+    def beyond(line: LineString, across: LineString) -> bool:
+        """Whether another track is between `line` and the platform:
+        tracks side by side are about 3.5 m apart or more, middle to middle,
+        so a track nearer than half that is one joining it at a switch."""
+        return any(
+            other is not line
+            and across.intersects(track)
+            and across.intersection(track).distance(Point(across.coords[0])) > 1.75
+            for other, track in zip(lines, mapped, strict=True)
+        )
+
+    lengths = []
+    for line in lines:
+        if (edge := _edge(outline, line)) and not beyond(line, edge[1]):
+            lengths.append(edge[0])
+    return max(lengths, default=None)
+
+
+def _turn(
+    a: tuple[float, float], b: tuple[float, float], c: tuple[float, float]
+) -> float:
+    """How far a track from `a` to `b` turns at `b` toward `c`,
+    in radians, left positive."""
+    t = atan2(c[1] - b[1], c[0] - b[0]) - atan2(b[1] - a[1], b[0] - a[0])
+    return (t + pi) % (2 * pi) - pi
+
+
+def _follow(
+    tracks: Tracks, start: tuple[int, int], outline: Polygon | MultiPolygon, d: float
+) -> LineString:
+    """The track through `start`, a stretch `d` from the platform,
+    on past its ends, or run on straight past where OSM's track ends.
+
+    Where tracks fork beside the platform, it keeps to the one as far from it;
+    past it, to the straighter.
+    """
+    at = tracks.at
+
+    def apart(a: int, b: int) -> float:
+        return (
+            LineString([at[a], at[b]])
+            .interpolate(0.5, normalized=True)
+            .distance(outline)
+        )
+
+    def onward(path: list[int]) -> None:
+        while Point(at[path[-1]]).distance(outline) <= PAST_M:
+            prev, here = path[-2], path[-1]
+            ahead = [
+                n
+                for n in tracks.joined.get(here, set())
+                if n in at
+                and n not in path
+                and abs(_turn(at[prev], at[here], at[n])) < radians(MAX_TURN_DEG)
+            ]
+            if not ahead:
+                return
+            beside = [n for n in ahead if apart(here, n) <= d + EDGE_M]
+            path.append(
+                min(beside, key=lambda n: abs(apart(here, n) - d))
+                if beside
+                else min(ahead, key=lambda n: abs(_turn(at[prev], at[here], at[n])))
+            )
+
+    path = list(start)
+    onward(path)
+    path.reverse()
+    onward(path)
+    points = [at[n] for n in path]
+
+    def run_on(a: tuple[float, float], b: tuple[float, float]) -> tuple[float, float]:
+        k = RUN_ON_M / hypot(b[0] - a[0], b[1] - a[1])
+        return (b[0] + (b[0] - a[0]) * k, b[1] + (b[1] - a[1]) * k)
+
+    return LineString(
+        [run_on(points[1], points[0]), *points, run_on(points[-2], points[-1])]
+    )
+
+
+def _edge(
+    outline: Polygon | MultiPolygon, track: LineString
+) -> tuple[float, LineString] | None:
+    """The length of the platform's edge along `track`, in metres,
+    and the way across from the track to it at its middle,
+    or `None` if the track only touches it.
+
+    The edge's corners are those the track faces across no platform,
+    or as near it as its nearest, within `EDGE_M`,
+    and it runs between the two farthest apart along the track.
+    It's as long as the track between them,
+    less its distance from the track for each radian the track turns toward it,
+    or more, turning away.
+    """
+    corners = [Point(c) for c in get_coordinates(outline)]
+    apart = [track.distance(c) for c in corners]
+    nearest = min(apart)
+
+    def faces(c: Point) -> bool:
+        foot = track.interpolate(track.project(c))
+        return LineString([c, foot]).intersection(outline).length < 0.05
+
+    edge = [
+        (track.project(c), d)
+        for c, d in zip(corners, apart, strict=True)
+        if d <= nearest + EDGE_M or faces(c)
+    ]
+    start = min(s for s, _ in edge)
+    end = max(s for s, _ in edge)
+    if end - start < 1:
+        return None
+    bends = [
+        (float(x), float(y)) for x, y in get_coordinates(substring(track, start, end))
+    ]
+    # Without a corner twice over, which turns no way.
+    bends = bends[:1] + [b for a, b in pairwise(bends) if b != a]
+    turns = sum(
+        _turn(a, b, c) for a, b, c in zip(bends, bends[1:], bends[2:], strict=False)
+    )
+    # Which side of the track the platform is, at the edge's middle.
+    middle = track.interpolate((start + end) / 2)
+    ahead = track.interpolate((start + end) / 2 + 1)
+    _, toward = nearest_points(middle, outline)
+    left = (ahead.x - middle.x) * (toward.y - middle.y) > (ahead.y - middle.y) * (
+        toward.x - middle.x
+    )
+    offset = median(d for _, d in edge)
+    return (
+        end - start - (1 if left else -1) * offset * turns,
+        LineString([middle, toward]),
+    )
+
+
 def osm_lengths(
     extract: Path = DEFAULT_EXTRACT, platforms: Path = DEFAULT_PLATFORMS
 ) -> dict[str, tuple[float, str]]:
     """The length of each station's longest platform OSM outlines, in feet,
     and its way, by GTFS stop ID.
 
+    A platform is measured along its track edge by `along_tracks`,
+    so a curved one along the curve,
+    or, where OSM maps no track beside it, straight, along its outline's longest side.
     A platform OSM splits into pieces is measured whole.
     The extract is read twice, for the ways' nodes and then their locations,
     not with every node's location at hand, which takes over a gigabyte.
@@ -369,8 +586,11 @@ def osm_lengths(
     }
     locations = _NodeLocations(
         {n for ps in pieces.values() for p in ps for n in outlined.nodes[p]}
+        | set(outlined.joined)
     )
     locations.apply_file(str(extract))
+    track_nodes = [n for n in outlined.joined if n in locations.at]
+    track_at = np.array([locations.at[n] for n in track_nodes]).reshape(-1, 2)
 
     def outline(way: str) -> list[tuple[float, float]] | None:
         nodes = outlined.nodes[way]
@@ -378,16 +598,39 @@ def osm_lengths(
         # Outlined, not mapped as a line or with nodes missing.
         return at if len(at) == len(nodes) > 3 and nodes[0] == nodes[-1] else None
 
+    def tracks(origin: tuple[float, float]) -> Tracks:
+        """The tracks within about 600 m of `origin`, in metres from it,
+        as `ground_outline` puts a platform."""
+        near = np.flatnonzero(
+            (np.abs(track_at[:, 0] - origin[0]) < 0.008)
+            & (np.abs(track_at[:, 1] - origin[1]) < 0.006)
+        )
+        lon0, lat0 = origin
+        xy = np.stack(
+            [
+                (track_at[near, 0] - lon0) * 111_320 * cos(radians(lat0)),
+                (track_at[near, 1] - lat0) * 110_540,
+            ],
+            1,
+        )
+        return Tracks(
+            {
+                track_nodes[i]: (float(x), float(y))
+                for i, (x, y) in zip(near, xy, strict=True)
+            },
+            outlined.joined,
+        )
+
     feet = {}
     for way, ps in pieces.items():
         outlines = [o for p in sorted(ps) if (o := outline(p))]
         if outline(way) and outlines:
             origin = outlines[0][0]
-            # Its pieces' hull, whose longest side is the whole platform's.
-            whole = unary_union(
-                [ground_outline(o, origin) for o in outlines]
-            ).convex_hull
-            feet[way] = PlatformAxis.of(whole).length / 0.3048
+            whole = unary_union([ground_outline(o, origin) for o in outlines])
+            along = along_tracks(whole, tracks(origin))
+            # Or straight, along the longest side of its pieces' hull.
+            metres = along if along else PlatformAxis.of(whole.convex_hull).length
+            feet[way] = metres / 0.3048
     return {
         stop: max((feet[w], w) for w in ws if w in feet)
         for stop, ws in ways.items()
