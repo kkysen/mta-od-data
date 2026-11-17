@@ -53,11 +53,11 @@ from mta_od_data.ridership.trips import Train
 app = Typer()
 
 HERE = Path(__file__).parent
-DEFAULT_MANIFEST = DATA / "raptor" / "manifest.csv"
-# Scaled to 2019's counted entries (`scale-od --to-counts`), before the pandemic.
+# By default, scaled to 2019's counted entries (`scale-od --to-counts`),
+# before the pandemic.
 # Not also to the OD data's own year's: its trips are within ~1% of 2025's counts
 # systemwide, and 2% at 80% of stations, so that column barely differed.
-DEFAULT_OD_FACTORS = [DATA / "mta_od_2019_counted.factors.parquet"]
+DEFAULT_SCALED_TO = 2019
 DEFAULT_LINES = HERE / "lines.json5"
 DIRECTION_LABELS = HERE / "direction_labels.json5"
 # Each platform's area, from OpenStreetMap (`mta-od-data fetch-platforms`).
@@ -470,15 +470,21 @@ def ridership(
         ),
     ] = None,
     manifest: Annotated[
-        Path, Option(help="`mta-od-data raptor assign-range`'s manifest")
-    ] = DEFAULT_MANIFEST,
+        Path | None,
+        Option(
+            help=(
+                "`mta-od-data raptor assign-range`'s manifest; "
+                "by default the reports' dates, routed if they haven't been"
+            )
+        ),
+    ] = None,
     od_factors: Annotated[
         list[Path] | None,
         Option(
             help=(
                 "Count riders as if routed with OD data scaled by these factors "
                 "(repeatable, a column each), from `mta-od-data scale-od`; "
-                "by default 2019's counted entries"
+                "by default 2019's counted entries, fit if they haven't been"
             )
         ),
     ] = None,
@@ -506,9 +512,11 @@ def ridership(
     route, or line,
     over `mta-od-data raptor assign-range`'s dates.
     """
+    # Here, not at the top: `builds` imports `platforms`, which imports this package.
+    from mta_od_data.builds import od_factors as fit_od_factors
+    from mta_od_data.builds import routed
+
     route = route or []
-    if od_factors is None:
-        od_factors = DEFAULT_OD_FACTORS
     dims = set(by)
     if By.TRIP in dims and len(dims) > 1:
         raise BadParameter("trip goes alone", param_hint="--by")
@@ -524,6 +532,12 @@ def ridership(
             "optionally crossed with route",
             param_hint="--by",
         )
+    # Only once the arguments are good, as these can route for minutes.
+    if od_factors is None:
+        od_factors = [fit_od_factors(DEFAULT_SCALED_TO, to_counts=True)]
+    # A built manifest's path is the cache's, so the report names how it was routed.
+    routing = f"`{manifest}`" if manifest else "as `raptor assign-range` routes them"
+    manifest = manifest or routed()
     got = cached_compute(
         by, route, manifest, od_factors, unscaled, fare_evasion, lines, top
     )
@@ -560,7 +574,9 @@ def ridership(
                 ),
             ],
         )
-        report = render(ctx, by, route, manifest, days, [], fare_evasion, table, charts)
+        report = render(
+            ctx, by, route, manifest, routing, days, [], fare_evasion, table, charts
+        )
         write(report, markdown_out)
         return
     with_route = By.ROUTE in dims and len(dims) > 1
@@ -717,7 +733,9 @@ def ridership(
     charts = save_charts(
         markdown_out, table, keys, chart_subtitle(manifest, fare_evasion), specs
     )
-    report = render(ctx, by, route, manifest, days, cols, fare_evasion, table, charts)
+    report = render(
+        ctx, by, route, manifest, routing, days, cols, fare_evasion, table, charts
+    )
     write(report, markdown_out)
 
 
@@ -824,6 +842,7 @@ def render(
     by: Iterable[By],
     route: Sequence[str],
     manifest: Path,
+    routing: str,
     days: int,
     cols: Sequence[Column],
     fare_evasion: bool,
@@ -838,7 +857,7 @@ def render(
         "",
         f"Average weekday riders{evaders}, "
         f"over {days} weekdays from {dates[0]} to {dates[-1]} "
-        f"(`{manifest}`).",
+        f"({routing}).",
         *(
             f"The {c.label} column scales the OD data on these dates "
             f"to {c.scaled_to}'s counted station entries."

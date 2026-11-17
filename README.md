@@ -52,8 +52,8 @@ Run `uv run mta-od-data --help`, or any subcommand's `--help`, for every option.
 
 `data/mta_od_2025.parquet` is too big to commit (358MB for the 2025 extract),
 but small enough to download in seconds, so it lives as an asset on the `od-data` GitHub release.
-CI fetches it before `pytest`, which is what lets
-the `analyze` tests run there instead of skipping.
+Any command reading it downloads it when it's missing,
+in CI too, where `pytest` runs every report, routing included, and skips none.
 Anyone (including a fresh clone) can get it without rebuilding from the 27GB CSV:
 
 ```sh
@@ -87,17 +87,23 @@ gh release download od-data --pattern mta_od_2026.parquet --dir data
 ```text
 OD CSV ──prepare──> data/mta_od_2025.parquet ──analyze──> src/mta_od_data/analyze/*.md
                               │
-GTFS (fetch-gtfs) ──raptor assign-range──> data/raptor/ (routed paths)
+GTFS (fetch-gtfs) ──raptor assign-range──> routed paths
                                                   │
-entry counts ──scale-od──> data/*.factors.parquet │
+entry counts ──scale-od──> OD factors             │
 OSM (fetch-platforms) ──> platforms.csv           │
                          └──────────ridership──> src/mta_od_data/ridership/*.md
 ```
 
-Inputs and outputs live in the gitignored `data/`.
-Caches live on disk outside the repo:
-`~/.cache/mta-od-data/` holds `analyze`'s scans of the OD data and `ridership`'s computed rows,
-each keyed on what it was computed from,
+No step has to be run before another:
+each command builds what it reads when it's missing or out of date
+([`builds.py`](src/mta_od_data/builds.py)).
+Downloads, and the OD Parquet, are kept in the gitignored `data/` once fetched.
+What's derived from them, like the routing and the OD factors the reports read,
+is cached on disk outside the repo, in `~/.cache/mta-od-data/`,
+each keyed on everything it was built from,
+so it's built again only when one of those changes
+(about 5:00 for a routing run).
+`~/.cache/mta-od-data/` also holds `analyze`'s scans of the OD data and `ridership`'s computed rows,
 and `~/.cache/mta-od-scratch/` is DuckDB's spill directory.
 
 ## `prepare`
@@ -180,7 +186,8 @@ Fits factors, per complex and (month, weekday) slice,
 scaling the OD data's trips to another year's counted station entries
 (from mta.info's ridership spreadsheet),
 or with `--to-counts`, leveling it to its own year's counts.
-`ridership --od-factors` reads them, a column per factors file.
+`ridership --od-factors` reads them, a column per factors file;
+without it, `ridership` fits the ones it scales to 2019 by itself.
 
 ```sh
 uv run mta-od-data scale-od --year 2019 --out data/mta_od_scaled_to_2019.factors.parquet
@@ -194,6 +201,7 @@ Average weekday riders by where they actually ride,
 over `raptor assign-range`'s routed dates,
 `--by` complex, station, station direction, platform, route, line, or trip,
 with fare evaders added back and a column per OD scaling.
+It routes the reports' dates first if they haven't been on what routing reads now.
 
 ```sh
 uv run mta-od-data ridership --by line
@@ -207,7 +215,8 @@ e.g. [`by_line.md`](src/mta_od_data/ridership/by_line.md).
 Routes each OD row onto the journeys a rider could have taken
 (trains, transfers, walks) on that day's GTFS timetable, using RAPTOR,
 and splits its riders across them.
-`assign-range` routes a representative date per (month, weekday) into `data/raptor/`;
+`assign-range` routes a representative date per (month, weekday) into `data/raptor/`
+(the reports route their own, into the cache);
 the other subcommands inspect one step at a time.
 
 ```sh
@@ -263,10 +272,10 @@ and how much:
 routed as today, against with every walk between complexes on the streets free.
 
 ```sh
-uv run mta-od-data raptor assign-range --from 2025-08-11 --to 2025-12-31 \
-  --street-walks --out-dir data/raptor-street
 uv run mta-od-data analyze free-transfers
 ```
+
+Both routings are built first if they haven't been on what routing reads now.
 
 Details: [`analyze/README.md`](src/mta_od_data/analyze/README.md#free-transfers),
 e.g. [`free_transfers.md`](src/mta_od_data/analyze/free_transfers.md).
@@ -282,7 +291,6 @@ reruns every `analyze` and `ridership` report and diffs it against its committed
 Check-only, like every other hook here:
 it fails with a diff and the regen command
 rather than rewriting the snapshot itself.
-It skips, rather than fails, a report whose gitignored inputs are missing
-(e.g. `data/mta_od_2025.parquet`),
-so a fresh clone that hasn't downloaded the release asset
-still gets a passing suite.
+Each report builds what it reads, as its command does,
+so a commit changing what routes reruns the routing in the hook,
+two runs of about 5:00 each, and one changing nothing it reads reruns nothing.

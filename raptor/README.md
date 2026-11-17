@@ -16,8 +16,12 @@ This explains what it produces and how to read it.
 ```sh
 uv run mta-od-data raptor assign-range --from 2025-08-11 --to 2025-12-31
 uv run mta-od-data fetch-platforms             # each route's stops' OSM platforms
-uv run mta-od-data ridership --by route        # or any report's own `Produced by` line
 ```
+
+The reports don't read `data/raptor/`:
+`uv run mta-od-data ridership --by route`, or any report's own `Produced by` line,
+routes the reports' dates itself, into `~/.cache/mta-od-data/routing/`,
+if they haven't been on what routing reads now.
 
 `assign-range` fetches the GTFS versions it's missing into `data/gtfs/` (as `mta-od-data fetch-gtfs` does),
 and builds or downloads the OD Parquet (`data/mta_od_2025.parquet`) if it's missing.

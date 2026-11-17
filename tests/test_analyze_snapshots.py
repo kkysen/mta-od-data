@@ -7,9 +7,10 @@ with the argv handed in rather than taken from `sys.argv`:
 `Produced by` line comes out as it would from a shell, and a run
 costs one parse rather than one interpreter.
 
-A command builds the OD Parquet itself when it's missing (`downloads.od_parquet`).
-Skipped when the routed paths and OD factors `free-transfers` and `ridership` read
-are missing: they're gitignored, so this can't run in CI.
+Each command builds what it reads when it's missing or out of date:
+the OD Parquet (`downloads.od_parquet`), and for `free-transfers` and `ridership`,
+the routing and OD factors, through the cache (`builds.routed`, `builds.od_factors`).
+So a commit changing what routes reruns the routing here, about 5:00 a run.
 """
 
 import shlex
@@ -18,17 +19,11 @@ from pathlib import Path
 
 import pytest
 
-from mta_od_data import DATA, ROOT
+from mta_od_data import ROOT
 from mta_od_data.cli import app
 
 ANALYZE_DIR = ROOT / "src" / "mta_od_data" / "analyze"
 RIDERSHIP_DIR = ROOT / "src" / "mta_od_data" / "ridership"
-# What `ridership` reads by default, besides the OD data's stations.
-RIDERSHIP_DATA = (
-    DATA / "raptor" / "manifest.csv",
-    DATA / "mta_od_2025_counted.factors.parquet",
-    DATA / "mta_od_2019_counted.factors.parquet",
-)
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,8 +33,6 @@ class Snapshot:
     # Keep in sync with the snapshot file's own "Produced by" line.
     cmd: list[str]
     path: Path
-    # The gitignored data it reads, without which it's skipped.
-    needs: tuple[Path, ...] = ()
 
 
 SNAPSHOTS = [
@@ -123,17 +116,12 @@ SNAPSHOTS = [
         name="free-transfers",
         cmd=["mta-od-data", "analyze", "free-transfers"],
         path=ANALYZE_DIR / "free_transfers.md",
-        needs=(
-            DATA / "raptor" / "manifest.csv",
-            DATA / "raptor-street" / "manifest.csv",
-        ),
     ),
     *(
         Snapshot(
             name=f"ridership-by-{'-and-'.join(by)}",
             cmd=["mta-od-data", "ridership", *(a for b in by for a in ("--by", b))],
             path=RIDERSHIP_DIR / f"by_{'_and_'.join(by).replace('-', '_')}.md",
-            needs=RIDERSHIP_DATA,
         )
         for by in [
             ["complex"],
@@ -153,11 +141,6 @@ SNAPSHOTS = [
 def test_snapshot_matches_fresh_run(
     snapshot: Snapshot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    if missing := [p for p in snapshot.needs if not p.exists()]:
-        pytest.skip(
-            f"{', '.join(str(p.relative_to(ROOT)) for p in missing)} not found "
-            "(run `raptor assign-range` and `scale-od` first)"
-        )
     tmp_out = tmp_path / snapshot.path.name
     prog, *args = snapshot.cmd
     # `--csv-out` to the scratch directory too, not into `data/`:

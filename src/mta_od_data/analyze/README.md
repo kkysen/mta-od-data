@@ -146,10 +146,9 @@ and how much:
 the OD data routed as today, where the only free ones are what `transfers.txt` has,
 against routed with every walk between complexes on the streets free
 (`mta-od-data raptor assign-range --street-walks`).
+Both are routed first if they haven't been on what routing reads now.
 
 ```sh
-uv run mta-od-data raptor assign-range --from 2025-08-11 --to 2025-12-31 \
-  --street-walks --out-dir data/raptor-street
 uv run mta-od-data analyze free-transfers
 ```
 

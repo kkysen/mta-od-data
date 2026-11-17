@@ -5,9 +5,6 @@ on:
     branches: [main]
   pull_request:
 
-env:
-  OD_RELEASE_TAG: od-data
-
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -30,16 +27,11 @@ jobs:
       - name: pyrefly
         run: uv run pyrefly check
 
-      # The OD Parquet is too big to check in, so it lives as a release asset (see `README.md`).
-      # Without it the analyze tests skip themselves,
-      # so a missing or not-yet-published release leaves CI green but thinner.
-      - name: download the OD dataset
+      # Every report builds what it reads, as its command does:
+      # the OD Parquet from its release asset (see `README.md`, with `gh`, hence the token),
+      # the GTFS feeds and OSM extract, and the two routings (about 5:00 each).
+      # Nothing skips, so a missing input fails CI.
+      - name: pytest
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release download "$OD_RELEASE_TAG" \
-            --pattern mta_od_2025.parquet --dir data --clobber \
-          || echo "no $OD_RELEASE_TAG release asset; analyze tests will skip"
-
-      - name: pytest
         run: uv run pytest

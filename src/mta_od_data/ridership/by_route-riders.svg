@@ -33,155 +33,155 @@ text {
 <line class="grid" x1="691.8" x2="691.8" y1="84" y2="1142"/>
 <text x="691.8" y="1158.0" text-anchor="middle">800,000</text>
 <text x="29.2" y="109.0" class="label" text-anchor="end">6</text>
-<path class="s0" d="M37.2,92.0h449.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-449.9z"><title>6, Aug-Dec 2025: 554,737</title></path>
-<text x="495.1" y="102.0">554,737</text>
-<path class="s1" d="M37.2,106.0h600.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-600.1z"><title>6, 2019: 738,242</title></path>
-<text x="645.3" y="116.0">738,242</text>
+<path class="s0" d="M37.2,92.0h447.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-447.0z"><title>6, Aug-Dec 2025: 551,202</title></path>
+<text x="492.2" y="102.0">551,202</text>
+<path class="s1" d="M37.2,106.0h596.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-596.1z"><title>6, 2019: 733,451</title></path>
+<text x="641.3" y="116.0">733,451</text>
 <text x="29.2" y="143.0" class="label" text-anchor="end">F</text>
-<path class="s0" d="M37.2,126.0h423.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-423.8z"><title>F, Aug-Dec 2025: 522,858</title></path>
-<text x="469.0" y="136.0">522,858</text>
-<path class="s1" d="M37.2,140.0h543.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-543.2z"><title>F, 2019: 668,713</title></path>
-<text x="588.4" y="150.0">668,713</text>
-<text x="29.2" y="177.0" class="label" text-anchor="end">FL</text>
-<path class="s0" d="M37.2,160.0h418.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-418.6z"><title>FL, Aug-Dec 2025: 516,430</title></path>
-<text x="463.8" y="170.0">516,430</text>
-<path class="s1" d="M37.2,174.0h536.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-536.3z"><title>FL, 2019: 660,330</title></path>
-<text x="581.5" y="184.0">660,330</text>
-<text x="29.2" y="211.0" class="label" text-anchor="end">1</text>
-<path class="s0" d="M37.2,194.0h417.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-417.2z"><title>1, Aug-Dec 2025: 514,785</title></path>
-<text x="462.4" y="204.0">514,785</text>
-<path class="s1" d="M37.2,208.0h554.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-554.7z"><title>1, 2019: 682,754</title></path>
-<text x="599.9" y="218.0">682,754</text>
+<path class="s0" d="M37.2,126.0h420.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-420.6z"><title>F, Aug-Dec 2025: 518,923</title></path>
+<text x="465.8" y="136.0">518,923</text>
+<path class="s1" d="M37.2,140.0h539.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-539.1z"><title>F, 2019: 663,778</title></path>
+<text x="584.3" y="150.0">663,778</text>
+<text x="29.2" y="177.0" class="label" text-anchor="end">1</text>
+<path class="s0" d="M37.2,160.0h419.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-419.3z"><title>1, Aug-Dec 2025: 517,384</title></path>
+<text x="464.5" y="170.0">517,384</text>
+<path class="s1" d="M37.2,174.0h557.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-557.3z"><title>1, 2019: 686,005</title></path>
+<text x="602.5" y="184.0">686,005</text>
+<text x="29.2" y="211.0" class="label" text-anchor="end">FL</text>
+<path class="s0" d="M37.2,194.0h415.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-415.3z"><title>FL, Aug-Dec 2025: 512,459</title></path>
+<text x="460.5" y="204.0">512,459</text>
+<path class="s1" d="M37.2,208.0h532.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-532.2z"><title>FL, 2019: 655,337</title></path>
+<text x="577.4" y="218.0">655,337</text>
 <text x="29.2" y="245.0" class="label" text-anchor="end">7</text>
-<path class="s0" d="M37.2,228.0h401.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-401.8z"><title>7, Aug-Dec 2025: 495,958</title></path>
-<text x="447.0" y="238.0">495,958</text>
-<path class="s1" d="M37.2,242.0h462.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-462.7z"><title>7, 2019: 570,334</title></path>
-<text x="507.9" y="252.0">570,334</text>
+<path class="s0" d="M37.2,228.0h405.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-405.8z"><title>7, Aug-Dec 2025: 500,819</title></path>
+<text x="451.0" y="238.0">500,819</text>
+<path class="s1" d="M37.2,242.0h468.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-468.0z"><title>7, 2019: 576,837</title></path>
+<text x="513.2" y="252.0">576,837</text>
 <text x="29.2" y="279.0" class="label" text-anchor="end">A</text>
-<path class="s0" d="M37.2,262.0h358.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-358.2z"><title>A, Aug-Dec 2025: 442,621</title></path>
-<text x="403.4" y="272.0">442,621</text>
-<path class="s1" d="M37.2,276.0h495.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-495.8z"><title>A, 2019: 610,822</title></path>
-<text x="541.0" y="286.0">610,822</text>
+<path class="s0" d="M37.2,262.0h354.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-354.0z"><title>A, Aug-Dec 2025: 437,528</title></path>
+<text x="399.2" y="272.0">437,528</text>
+<path class="s1" d="M37.2,276.0h491.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-491.1z"><title>A, 2019: 605,034</title></path>
+<text x="536.3" y="286.0">605,034</text>
 <text x="29.2" y="313.0" class="label" text-anchor="end">6L</text>
-<path class="s0" d="M37.2,296.0h339.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-339.8z"><title>6L, Aug-Dec 2025: 420,131</title></path>
-<text x="385.0" y="306.0">420,131</text>
-<path class="s1" d="M37.2,310.0h450.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-450.7z"><title>6L, 2019: 555,731</title></path>
-<text x="495.9" y="320.0">555,731</text>
-<text x="29.2" y="347.0" class="label" text-anchor="end">E</text>
-<path class="s0" d="M37.2,330.0h338.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-338.6z"><title>E, Aug-Dec 2025: 418,711</title></path>
-<text x="383.8" y="340.0">418,711</text>
-<path class="s1" d="M37.2,344.0h434.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-434.6z"><title>E, 2019: 535,988</title></path>
-<text x="479.8" y="354.0">535,988</text>
-<text x="29.2" y="381.0" class="label" text-anchor="end">4</text>
-<path class="s0" d="M37.2,364.0h332.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-332.4z"><title>4, Aug-Dec 2025: 411,064</title></path>
-<text x="377.6" y="374.0">411,064</text>
-<path class="s1" d="M37.2,378.0h460.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-460.2z"><title>4, 2019: 567,251</title></path>
-<text x="505.4" y="388.0">567,251</text>
-<text x="29.2" y="415.0" class="label" text-anchor="end">7L</text>
-<path class="s0" d="M37.2,398.0h326.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-326.4z"><title>7L, Aug-Dec 2025: 403,808</title></path>
-<text x="371.6" y="408.0">403,808</text>
-<path class="s1" d="M37.2,412.0h376.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-376.6z"><title>7L, 2019: 465,154</title></path>
-<text x="421.8" y="422.0">465,154</text>
+<path class="s0" d="M37.2,296.0h338.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-338.1z"><title>6L, Aug-Dec 2025: 418,080</title></path>
+<text x="383.3" y="306.0">418,080</text>
+<path class="s1" d="M37.2,310.0h448.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-448.5z"><title>6L, 2019: 552,988</title></path>
+<text x="493.7" y="320.0">552,988</text>
+<text x="29.2" y="347.0" class="label" text-anchor="end">4</text>
+<path class="s0" d="M37.2,330.0h333.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-333.2z"><title>4, Aug-Dec 2025: 412,097</title></path>
+<text x="378.4" y="340.0">412,097</text>
+<path class="s1" d="M37.2,344.0h460.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-460.9z"><title>4, 2019: 568,164</title></path>
+<text x="506.1" y="354.0">568,164</text>
+<text x="29.2" y="381.0" class="label" text-anchor="end">7L</text>
+<path class="s0" d="M37.2,364.0h329.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-329.8z"><title>7L, Aug-Dec 2025: 407,929</title></path>
+<text x="375.0" y="374.0">407,929</text>
+<path class="s1" d="M37.2,378.0h380.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-380.9z"><title>7L, 2019: 470,442</title></path>
+<text x="426.1" y="388.0">470,442</text>
+<text x="29.2" y="415.0" class="label" text-anchor="end">E</text>
+<path class="s0" d="M37.2,398.0h329.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-329.5z"><title>E, Aug-Dec 2025: 407,603</title></path>
+<text x="374.7" y="408.0">407,603</text>
+<path class="s1" d="M37.2,412.0h422.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-422.7z"><title>E, 2019: 521,483</title></path>
+<text x="467.9" y="422.0">521,483</text>
 <text x="29.2" y="449.0" class="label" text-anchor="end">R</text>
-<path class="s0" d="M37.2,432.0h309.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-309.1z"><title>R, Aug-Dec 2025: 382,628</title></path>
-<text x="354.3" y="442.0">382,628</text>
-<path class="s1" d="M37.2,446.0h406.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-406.8z"><title>R, 2019: 502,030</title></path>
-<text x="452.0" y="456.0">502,030</text>
+<path class="s0" d="M37.2,432.0h309.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-309.3z"><title>R, Aug-Dec 2025: 382,928</title></path>
+<text x="354.5" y="442.0">382,928</text>
+<path class="s1" d="M37.2,446.0h406.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-406.9z"><title>R, 2019: 502,206</title></path>
+<text x="452.1" y="456.0">502,206</text>
 <text x="29.2" y="483.0" class="label" text-anchor="end">L</text>
-<path class="s0" d="M37.2,466.0h299.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-299.1z"><title>L, Aug-Dec 2025: 370,379</title></path>
-<text x="344.3" y="476.0">370,379</text>
-<path class="s1" d="M37.2,480.0h337.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-337.3z"><title>L, 2019: 417,108</title></path>
-<text x="382.5" y="490.0">417,108</text>
-<text x="29.2" y="517.0" class="label" text-anchor="end">2</text>
-<path class="s0" d="M37.2,500.0h288.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-288.7z"><title>2, Aug-Dec 2025: 357,694</title></path>
-<text x="333.9" y="510.0">357,694</text>
-<path class="s1" d="M37.2,514.0h407.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-407.1z"><title>2, 2019: 502,367</title></path>
-<text x="452.3" y="524.0">502,367</text>
-<text x="29.2" y="551.0" class="label" text-anchor="end">Q</text>
-<path class="s0" d="M37.2,534.0h284.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-284.4z"><title>Q, Aug-Dec 2025: 352,492</title></path>
-<text x="329.6" y="544.0">352,492</text>
-<path class="s1" d="M37.2,548.0h374.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-374.6z"><title>Q, 2019: 462,753</title></path>
-<text x="419.8" y="558.0">462,753</text>
+<path class="s0" d="M37.2,466.0h305.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-305.6z"><title>L, Aug-Dec 2025: 378,402</title></path>
+<text x="350.8" y="476.0">378,402</text>
+<path class="s1" d="M37.2,480.0h345.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-345.9z"><title>L, 2019: 427,580</title></path>
+<text x="391.1" y="490.0">427,580</text>
+<text x="29.2" y="517.0" class="label" text-anchor="end">Q</text>
+<path class="s0" d="M37.2,500.0h297.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-297.3z"><title>Q, Aug-Dec 2025: 368,248</title></path>
+<text x="342.5" y="510.0">368,248</text>
+<path class="s1" d="M37.2,514.0h390.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-390.9z"><title>Q, 2019: 482,592</title></path>
+<text x="436.1" y="524.0">482,592</text>
+<text x="29.2" y="551.0" class="label" text-anchor="end">2</text>
+<path class="s0" d="M37.2,534.0h290.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-290.8z"><title>2, Aug-Dec 2025: 360,270</title></path>
+<text x="336.0" y="544.0">360,270</text>
+<path class="s1" d="M37.2,548.0h409.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-409.9z"><title>2, 2019: 505,792</title></path>
+<text x="455.1" y="558.0">505,792</text>
 <text x="29.2" y="585.0" class="label" text-anchor="end">D</text>
-<path class="s0" d="M37.2,568.0h245.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-245.7z"><title>D, Aug-Dec 2025: 305,189</title></path>
-<text x="290.9" y="578.0">305,189</text>
-<path class="s1" d="M37.2,582.0h340.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-340.8z"><title>D, 2019: 421,342</title></path>
-<text x="386.0" y="592.0">421,342</text>
+<path class="s0" d="M37.2,568.0h246.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-246.1z"><title>D, Aug-Dec 2025: 305,647</title></path>
+<text x="291.3" y="578.0">305,647</text>
+<path class="s1" d="M37.2,582.0h341.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-341.1z"><title>D, 2019: 421,795</title></path>
+<text x="386.3" y="592.0">421,795</text>
 <text x="29.2" y="619.0" class="label" text-anchor="end">5</text>
-<path class="s0" d="M37.2,602.0h242.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-242.6z"><title>5, Aug-Dec 2025: 301,367</title></path>
-<text x="287.8" y="612.0">301,367</text>
-<path class="s1" d="M37.2,616.0h333.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-333.7z"><title>5, 2019: 412,709</title></path>
-<text x="378.9" y="626.0">412,709</text>
+<path class="s0" d="M37.2,602.0h241.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-241.7z"><title>5, Aug-Dec 2025: 300,272</title></path>
+<text x="286.9" y="612.0">300,272</text>
+<path class="s1" d="M37.2,616.0h332.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-332.8z"><title>5, 2019: 411,584</title></path>
+<text x="378.0" y="626.0">411,584</text>
 <text x="29.2" y="653.0" class="label" text-anchor="end">N</text>
-<path class="s0" d="M37.2,636.0h228.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-228.2z"><title>N, Aug-Dec 2025: 283,774</title></path>
-<text x="273.4" y="646.0">283,774</text>
-<path class="s1" d="M37.2,650.0h274.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-274.7z"><title>N, 2019: 340,599</title></path>
-<text x="319.9" y="660.0">340,599</text>
+<path class="s0" d="M37.2,636.0h239.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-239.9z"><title>N, Aug-Dec 2025: 298,069</title></path>
+<text x="285.1" y="646.0">298,069</text>
+<path class="s1" d="M37.2,650.0h289.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-289.2z"><title>N, 2019: 358,365</title></path>
+<text x="334.4" y="660.0">358,365</text>
 <text x="29.2" y="687.0" class="label" text-anchor="end">B</text>
-<path class="s0" d="M37.2,670.0h201.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-201.1z"><title>B, Aug-Dec 2025: 250,673</title></path>
-<text x="246.3" y="680.0">250,673</text>
-<path class="s1" d="M37.2,684.0h272.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-272.0z"><title>B, 2019: 337,362</title></path>
-<text x="317.2" y="694.0">337,362</text>
+<path class="s0" d="M37.2,670.0h202.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-202.3z"><title>B, Aug-Dec 2025: 252,139</title></path>
+<text x="247.5" y="680.0">252,139</text>
+<path class="s1" d="M37.2,684.0h273.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-273.4z"><title>B, 2019: 339,001</title></path>
+<text x="318.6" y="694.0">339,001</text>
 <text x="29.2" y="721.0" class="label" text-anchor="end">3</text>
-<path class="s0" d="M37.2,704.0h195.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-195.8z"><title>3, Aug-Dec 2025: 244,204</title></path>
-<text x="241.0" y="714.0">244,204</text>
-<path class="s1" d="M37.2,718.0h272.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-272.7z"><title>3, 2019: 338,194</title></path>
-<text x="317.9" y="728.0">338,194</text>
+<path class="s0" d="M37.2,704.0h200.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-200.0z"><title>3, Aug-Dec 2025: 249,257</title></path>
+<text x="245.2" y="714.0">249,257</text>
+<path class="s1" d="M37.2,718.0h278.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-278.3z"><title>3, 2019: 345,012</title></path>
+<text x="323.5" y="728.0">345,012</text>
 <text x="29.2" y="755.0" class="label" text-anchor="end">M</text>
-<path class="s0" d="M37.2,738.0h195.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-195.7z"><title>M, Aug-Dec 2025: 244,072</title></path>
-<text x="240.9" y="748.0">244,072</text>
-<path class="s1" d="M37.2,752.0h260.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-260.0z"><title>M, 2019: 322,615</title></path>
-<text x="305.2" y="762.0">322,615</text>
+<path class="s0" d="M37.2,738.0h195.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-195.8z"><title>M, Aug-Dec 2025: 244,231</title></path>
+<text x="241.0" y="748.0">244,231</text>
+<path class="s1" d="M37.2,752.0h260.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-260.7z"><title>M, 2019: 323,442</title></path>
+<text x="305.9" y="762.0">323,442</text>
 <text x="29.2" y="789.0" class="label" text-anchor="end">C</text>
-<path class="s0" d="M37.2,772.0h192.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-192.0z"><title>C, Aug-Dec 2025: 239,544</title></path>
-<text x="237.2" y="782.0">239,544</text>
-<path class="s1" d="M37.2,786.0h250.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-250.1z"><title>C, 2019: 310,483</title></path>
-<text x="295.3" y="796.0">310,483</text>
+<path class="s0" d="M37.2,772.0h192.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-192.5z"><title>C, Aug-Dec 2025: 240,196</title></path>
+<text x="237.7" y="782.0">240,196</text>
+<path class="s1" d="M37.2,786.0h251.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-251.0z"><title>C, 2019: 311,686</title></path>
+<text x="296.2" y="796.0">311,686</text>
 <text x="29.2" y="823.0" class="label" text-anchor="end">J</text>
-<path class="s0" d="M37.2,806.0h122.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-122.1z"><title>J, Aug-Dec 2025: 154,146</title></path>
-<text x="167.3" y="816.0">154,146</text>
-<path class="s1" d="M37.2,820.0h167.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-167.1z"><title>J, 2019: 209,060</title></path>
-<text x="212.3" y="830.0">209,060</text>
+<path class="s0" d="M37.2,806.0h123.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-123.0z"><title>J, Aug-Dec 2025: 155,150</title></path>
+<text x="168.2" y="816.0">155,150</text>
+<path class="s1" d="M37.2,820.0h168.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-168.2z"><title>J, 2019: 210,488</title></path>
+<text x="213.4" y="830.0">210,488</text>
 <text x="29.2" y="857.0" class="label" text-anchor="end">W</text>
-<path class="s0" d="M37.2,840.0h119.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-119.4z"><title>W, Aug-Dec 2025: 150,862</title></path>
-<text x="164.6" y="850.0">150,862</text>
-<path class="s1" d="M37.2,854.0h155.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-155.7z"><title>W, 2019: 195,157</title></path>
-<text x="200.9" y="864.0">195,157</text>
+<path class="s0" d="M37.2,840.0h122.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-122.6z"><title>W, Aug-Dec 2025: 154,770</title></path>
+<text x="167.8" y="850.0">154,770</text>
+<path class="s1" d="M37.2,854.0h159.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-159.7z"><title>W, 2019: 200,094</title></path>
+<text x="204.9" y="864.0">200,094</text>
 <text x="29.2" y="891.0" class="label" text-anchor="end">G</text>
-<path class="s0" d="M37.2,874.0h118.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-118.9z"><title>G, Aug-Dec 2025: 150,213</title></path>
-<text x="164.1" y="884.0">150,213</text>
-<path class="s1" d="M37.2,888.0h139.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.8z"><title>G, 2019: 175,730</title></path>
-<text x="185.0" y="898.0">175,730</text>
+<path class="s0" d="M37.2,874.0h119.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-119.9z"><title>G, Aug-Dec 2025: 151,390</title></path>
+<text x="165.1" y="884.0">151,390</text>
+<path class="s1" d="M37.2,888.0h141.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-141.3z"><title>G, 2019: 177,551</title></path>
+<text x="186.5" y="898.0">177,551</text>
 <text x="29.2" y="925.0" class="label" text-anchor="end">6X</text>
-<path class="s0" d="M37.2,908.0h112.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-112.4z"><title>6X, Aug-Dec 2025: 142,267</title></path>
-<text x="157.6" y="918.0">142,267</text>
-<path class="s1" d="M37.2,922.0h154.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-154.2z"><title>6X, 2019: 193,337</title></path>
-<text x="199.4" y="932.0">193,337</text>
+<path class="s0" d="M37.2,908.0h111.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.6z"><title>6X, Aug-Dec 2025: 141,300</title></path>
+<text x="156.8" y="918.0">141,300</text>
+<path class="s1" d="M37.2,922.0h153.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-153.1z"><title>6X, 2019: 191,995</title></path>
+<text x="198.3" y="932.0">191,995</text>
 <text x="29.2" y="959.0" class="label" text-anchor="end">7X</text>
-<path class="s0" d="M37.2,942.0h74.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.5z"><title>7X, Aug-Dec 2025: 95,962</title></path>
-<text x="119.7" y="952.0">95,962</text>
-<path class="s1" d="M37.2,956.0h85.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-85.9z"><title>7X, 2019: 109,876</title></path>
-<text x="131.1" y="966.0">109,876</text>
+<path class="s0" d="M37.2,942.0h76.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.1z"><title>7X, Aug-Dec 2025: 97,916</title></path>
+<text x="121.3" y="952.0">97,916</text>
+<path class="s1" d="M37.2,956.0h88.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-88.0z"><title>7X, 2019: 112,399</title></path>
+<text x="133.2" y="966.0">112,399</text>
 <text x="29.2" y="993.0" class="label" text-anchor="end">GS</text>
-<path class="s0" d="M37.2,976.0h47.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.4z"><title>GS, Aug-Dec 2025: 62,778</title></path>
-<text x="92.6" y="986.0">62,778</text>
-<path class="s1" d="M37.2,990.0h64.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.9z"><title>GS, 2019: 84,192</title></path>
-<text x="110.1" y="1000.0">84,192</text>
+<path class="s0" d="M37.2,976.0h42.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.9z"><title>GS, Aug-Dec 2025: 57,285</title></path>
+<text x="88.1" y="986.0">57,285</text>
+<path class="s1" d="M37.2,990.0h59.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.0z"><title>GS, 2019: 77,045</title></path>
+<text x="104.2" y="1000.0">77,045</text>
 <text x="29.2" y="1027.0" class="label" text-anchor="end">FS</text>
-<path class="s0" d="M37.2,1010.0h7.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.4z"><title>FS, Aug-Dec 2025: 13,901</title></path>
-<text x="52.6" y="1020.0">13,901</text>
-<path class="s1" d="M37.2,1024.0h11.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-11.2z"><title>FS, 2019: 18,531</title></path>
-<text x="56.4" y="1034.0">18,531</text>
+<path class="s0" d="M37.2,1010.0h7.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.3z"><title>FS, Aug-Dec 2025: 13,766</title></path>
+<text x="52.5" y="1020.0">13,766</text>
+<path class="s1" d="M37.2,1024.0h11.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-11.0z"><title>FS, 2019: 18,357</title></path>
+<text x="56.2" y="1034.0">18,357</text>
 <text x="29.2" y="1061.0" class="label" text-anchor="end">Z</text>
-<path class="s0" d="M37.2,1044.0h4.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-4.4z"><title>Z, Aug-Dec 2025: 10,279</title></path>
-<text x="49.6" y="1054.0">10,279</text>
-<path class="s1" d="M37.2,1058.0h7.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.4z"><title>Z, 2019: 13,986</title></path>
-<text x="52.6" y="1068.0">13,986</text>
+<path class="s0" d="M37.2,1044.0h4.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-4.6z"><title>Z, Aug-Dec 2025: 10,463</title></path>
+<text x="49.8" y="1054.0">10,463</text>
+<path class="s1" d="M37.2,1058.0h7.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.7z"><title>Z, 2019: 14,243</title></path>
+<text x="52.9" y="1068.0">14,243</text>
 <text x="29.2" y="1095.0" class="label" text-anchor="end">FX</text>
-<path class="s0" d="M37.2,1078.0h1.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-1.5z"><title>FX, Aug-Dec 2025: 6,666</title></path>
-<text x="46.7" y="1088.0">6,666</text>
-<path class="s1" d="M37.2,1092.0h3.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-3.1z"><title>FX, 2019: 8,703</title></path>
-<text x="48.3" y="1102.0">8,703</text>
+<path class="s0" d="M37.2,1078.0h1.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-1.5z"><title>FX, Aug-Dec 2025: 6,705</title></path>
+<text x="46.7" y="1088.0">6,705</text>
+<path class="s1" d="M37.2,1092.0h3.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-3.2z"><title>FX, 2019: 8,763</title></path>
+<text x="48.4" y="1102.0">8,763</text>
 <text x="29.2" y="1129.0" class="label" text-anchor="end">H</text>
 <path class="s0" d="M37.2,1112.0h0.0a2.2714619999999996,2.2714619999999996 0 0 1 2.2714619999999996,2.2714619999999996v7.5a2.2714619999999996,2.2714619999999996 0 0 1 -2.2714619999999996,2.2714619999999996h-0.0z"><title>H, Aug-Dec 2025: 2,776</title></path>
 <text x="43.5" y="1122.0">2,776</text>

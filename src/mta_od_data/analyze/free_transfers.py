@@ -30,7 +30,6 @@ from typing import Annotated
 from duckdb import DuckDBPyConnection
 from typer import Context, Option, Typer
 
-from mta_od_data import DATA
 from mta_od_data.analyze.common import connection, load_names
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import DatePaths, date_paths, read_manifest
@@ -38,9 +37,6 @@ from mta_od_data.invocation import produced_by
 from mta_od_data.prepare import DEFAULT_COMPLEXES_CSV, DEFAULT_STATIONS_CSV
 
 app = Typer()
-
-DEFAULT_TODAY = DATA / "raptor" / "manifest.csv"
-DEFAULT_FREE = DATA / "raptor-street" / "manifest.csv"
 
 
 def street_transfers(d: DatePaths) -> Path:
@@ -264,13 +260,19 @@ CSV_FIELDS = [
 def free_transfers(
     ctx: Context,
     today: Annotated[
-        Path,
-        Option(help="`assign-range`'s manifest as today, without `--street-walks`"),
-    ] = DEFAULT_TODAY,
+        Path | None,
+        Option(
+            help="`assign-range`'s manifest as today, without `--street-walks`; "
+            "by default the reports' dates, routed if they haven't been"
+        ),
+    ] = None,
     free: Annotated[
-        Path,
-        Option(help="`assign-range --street-walks`' manifest, over the same dates"),
-    ] = DEFAULT_FREE,
+        Path | None,
+        Option(
+            help="`assign-range --street-walks`' manifest, over the same dates; "
+            "by default the reports', routed if they haven't been"
+        ),
+    ] = None,
     stations: Annotated[
         Path, Option(help="The station reference CSV")
     ] = DEFAULT_STATIONS_CSV,
@@ -283,6 +285,12 @@ def free_transfers(
 ) -> None:
     """Which transfers out of the system would save riders the most time if free,
     and how much."""
+    # Here, not at the top: `builds` imports `scale_od`,
+    # which imports `analyze.common`, and so this package.
+    from mta_od_data.builds import routed
+
+    today = today or routed()
+    free = free or routed(street_walks=True)
     pairs_by_key, totals, days = compare(today, free, stations)
     pairs = sorted(pairs_by_key.values(), key=lambda p: (-p.saved, p.complexes))
     names = load_names(stations, complexes).complex
