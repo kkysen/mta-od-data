@@ -144,3 +144,24 @@ def test_entry_read_by_content_not_its_key(
     assert key([first], [], ()) == key([again], [], ())
     again.write_bytes(b"other ways")
     assert key([first], [], ()) != key([again], [], ())
+
+
+def test_linked_data_is_named_as_in_its_own_checkout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A worktree links the big inputs in the main checkout's `data/`,
+    and a key must be the same as in the main checkout."""
+    main = tmp_path / "main"
+    (main / "data" / "gtfs").mkdir(parents=True)
+    feed = main / "data" / "gtfs" / "feed.zip"
+    feed.write_bytes(b"zip")
+    worktree = tmp_path / "worktree"
+    (worktree / "data").mkdir(parents=True)
+    (worktree / "data" / "gtfs").symlink_to(main / "data" / "gtfs")
+    monkeypatch.setattr(artifacts, "REPO", worktree)
+    assert artifacts.label(feed) == "data/gtfs/feed.zip"
+    assert artifacts.label(worktree / "data" / "gtfs" / "feed.zip") == (
+        "data/gtfs/feed.zip"
+    )
+    other = main / "elsewhere.zip"
+    assert artifacts.label(other) == str(other)

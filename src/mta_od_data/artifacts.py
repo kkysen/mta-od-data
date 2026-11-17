@@ -111,12 +111,18 @@ def stat(path: Path) -> tuple[str, int, int]:
 
 def label(path: Path) -> str:
     """A file's name in a key: relative to the package, or else the repository,
-    so the key is the same wherever the repository is,
+    or to the `data/` entry it's the target of a link from,
+    so the key is the same wherever the repository is, and in a worktree,
     or for another entry, only what built it, not its key,
     so one built again the same leaves this key as it was."""
     for base in (PACKAGE, REPO):
         if path.is_relative_to(base):
             return str(path.relative_to(base))
+    # A big input in another checkout's `data/`, linked into this one's:
+    # named as in that checkout, where it's in `data/` itself.
+    for link in sorted((REPO / "data").glob("*")):
+        if link.is_symlink() and path.is_relative_to(target := link.resolve()):
+            return str(Path("data", link.name, path.relative_to(target)))
     if path.is_relative_to(CACHE):
         return f"{path.relative_to(CACHE).parts[0]}/{path.suffix}"
     return str(path)
