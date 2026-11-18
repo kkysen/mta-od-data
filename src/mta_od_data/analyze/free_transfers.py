@@ -285,17 +285,24 @@ def free_transfers(
     ctx: Context,
     top_n: Annotated[int, Option(help="Transfers to list in the report")] = 50,
     csv_out: Annotated[Path | None, Option(help="Every transfer, as CSV")] = None,
+    month: Annotated[
+        str | None,
+        Option(help="Route only this month's dates, YYYY-MM, not all the reports'"),
+    ] = None,
     markdown_out: Annotated[Path | None, Option(help="The report")] = None,
 ) -> None:
     """Which transfers out of the system would save riders the most time if free,
     and how much."""
     # Here, not at the top: `builds` imports `scale_od`,
     # which imports `analyze.common`, and so this package.
-    from mta_od_data.builds import routed
+    from mta_od_data.builds import report_dates, routed
 
+    start, end = report_dates(month)
     stations = stations_csv()
     pairs_by_key, totals, days = cached_compare(
-        routed(), routed(street_walks=True), stations
+        routed(start=start, end=end),
+        routed(street_walks=True, start=start, end=end),
+        stations,
     )
     pairs = sorted(pairs_by_key.values(), key=lambda p: (-p.saved, p.complexes))
     names = load_names(stations, complexes_csv()).complex

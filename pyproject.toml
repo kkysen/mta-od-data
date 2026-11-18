@@ -61,6 +61,7 @@ dev = [
 [tool.pytest.ini_options]
 markers = [
     "e2e: end-to-end tests that run reports through the CLI, can route, and take very long",
+    "full: e2e tests of reports that route, over all their dates, checked before each push",
 ]
 
 [tool.ruff.lint]

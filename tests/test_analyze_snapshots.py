@@ -10,7 +10,13 @@ costs one parse rather than one interpreter.
 Each command builds what it reads when it's missing or out of date:
 the OD Parquet (`downloads.od_parquet`), and for `free-transfers` and `ridership`,
 the routing and OD factors, through the cache (`builds.routed`, `builds.od_factors`).
-So a commit changing what routes reruns the routing here, about 5:00 a run.
+So a commit changing what routes reruns the routing here.
+
+The reports that route are checked on every commit for one month, `MONTH`,
+from a copy of each report for it in a folder named for it beside the full one,
+as a fifth of the routing, so a commit still shows how it moves their numbers.
+Their full reports, over all of `builds.report_dates`, are marked `full`,
+and checked by the `pytest-full` hook before each push instead.
 """
 
 import shlex
@@ -26,6 +32,8 @@ from mta_od_data.cli import app
 # minutes to hours, so commits on agent worktrees skip them (`SKIP=pytest-e2e`).
 pytestmark = pytest.mark.e2e
 
+# The one month the reports that route are checked for on each commit.
+MONTH = "2025-09"
 ANALYZE_DIR = ROOT / "src" / "mta_od_data" / "analyze"
 RIDERSHIP_DIR = ROOT / "src" / "mta_od_data" / "ridership"
 
@@ -37,6 +45,20 @@ class Snapshot:
     # Keep in sync with the snapshot file's own "Produced by" line.
     cmd: list[str]
     path: Path
+    # Checked before each push rather than on each commit (see the docstring).
+    full: bool = False
+
+
+def routed_snapshots(name: str, cmd: list[str], path: Path) -> list[Snapshot]:
+    """A report that routes: in full, and for `MONTH` alone, in its own folder."""
+    return [
+        Snapshot(name, cmd, path, full=True),
+        Snapshot(
+            f"{name}-{MONTH}",
+            [*cmd, "--month", MONTH],
+            path.parent / MONTH / path.name,
+        ),
+    ]
 
 
 SNAPSHOTS = [
@@ -116,17 +138,13 @@ SNAPSHOTS = [
         cmd=["mta-od-data", "analyze", "deinterlining", "--category", "F/M Swap"],
         path=ANALYZE_DIR / "fm_swap_deinterlining.md",
     ),
-    Snapshot(
-        name="free-transfers",
-        cmd=["mta-od-data", "analyze", "free-transfers"],
-        path=ANALYZE_DIR / "free_transfers.md",
+    *routed_snapshots(
+        "free-transfers",
+        ["mta-od-data", "analyze", "free-transfers"],
+        ANALYZE_DIR / "free_transfers.md",
     ),
     *(
-        Snapshot(
-            name=f"ridership-by-{'-and-'.join(by)}",
-            cmd=["mta-od-data", "ridership", *(a for b in by for a in ("--by", b))],
-            path=RIDERSHIP_DIR / f"by_{'_and_'.join(by).replace('-', '_')}.md",
-        )
+        snapshot
         for by in [
             ["complex"],
             ["station"],
@@ -137,11 +155,20 @@ SNAPSHOTS = [
             ["line", "route"],
             ["trip"],
         ]
+        for snapshot in routed_snapshots(
+            f"ridership-by-{'-and-'.join(by)}",
+            ["mta-od-data", "ridership", *(a for b in by for a in ("--by", b))],
+            RIDERSHIP_DIR / f"by_{'_and_'.join(by).replace('-', '_')}.md",
+        )
     ),
 ]
 
 
-@pytest.mark.parametrize("snapshot", SNAPSHOTS, ids=lambda s: s.name)
+@pytest.mark.parametrize(
+    "snapshot",
+    [pytest.param(s, marks=[pytest.mark.full] if s.full else []) for s in SNAPSHOTS],
+    ids=lambda s: s.name,
+)
 def test_snapshot_matches_fresh_run(
     snapshot: Snapshot, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

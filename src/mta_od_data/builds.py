@@ -22,6 +22,8 @@ import tomllib
 from datetime import date
 from pathlib import Path
 
+from typer import BadParameter
+
 from mta_od_data.access import EDGES
 from mta_od_data.access import TABLE as DEFAULT_ACCESS
 from mta_od_data.artifacts import CACHE, REPO, cached, files, key, modules
@@ -37,6 +39,21 @@ from mta_od_data.street_walks import filter_streets, station_bounds
 REPORT_FROM = date(2025, 8, 11)
 REPORT_TO = date(2025, 12, 31)
 EXTENSION = "mta_od_data._raptor"
+
+
+def report_dates(month: str | None) -> tuple[date, date]:
+    """The dates a report routes: `month`'s (`YYYY-MM`), or else all the reports',
+    for the snapshot tests to check one month on each commit, a fifth of the routing."""
+    if month is None:
+        return REPORT_FROM, REPORT_TO
+    try:
+        first = date.fromisoformat(f"{month}-01")
+    except ValueError:
+        raise BadParameter(
+            f"{month!r} isn't a YYYY-MM month", param_hint="--month"
+        ) from None
+    after = date(first.year + first.month // 12, first.month % 12 + 1, 1)
+    return first, date.fromordinal(after.toordinal() - 1)
 
 
 def streets(stations: Path = DEFAULT_STATIONS, extract: Path = DEFAULT_EXTRACT) -> Path:

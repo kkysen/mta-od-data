@@ -1,3 +1,8 @@
+# `pre-commit install` sets up both, for `pytest-full` before each push.
+default_install_hook_types: [pre-commit, pre-push]
+# And every hook runs on commit, but `pytest-full`, which says otherwise.
+default_stages: [pre-commit]
+
 repos:
   - repo: local
     hooks:
@@ -43,10 +48,20 @@ repos:
 
       - id: pytest-e2e
         name: pytest (e2e)
-        entry: uv run pytest -m e2e
+        entry: uv run pytest -m "e2e and not full"
         language: system
         pass_filenames: false
         always_run: true
+
+      # The reports that route, over all their dates, five times the routing
+      # of the one month `pytest-e2e` checks them for: before each push instead.
+      - id: pytest-full
+        name: pytest (full reports)
+        entry: uv run pytest -m full
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
 
   - repo: local
     hooks:

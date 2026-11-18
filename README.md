@@ -297,3 +297,10 @@ Those snapshot tests are marked `e2e` (see `pytest.ini_options` in [`pyproject.t
 because they can route, which takes very long.
 They are their own hook, `pytest-e2e`, beside `pytest` for every other test (`-m "not e2e"`),
 so `SKIP=pytest-e2e git commit` runs only the cheap tests.
+
+The reports that route, `ridership`'s and `free-transfers`',
+are checked on each commit for September 2025 alone (`--month 2025-09`),
+from copies of them in a `2025-09/` folder beside each:
+a fifth of the routing, and still a record of how each commit moves their numbers.
+Their full reports are checked by `pytest-full` (`-m full`) before each push instead,
+which `pre-commit install` sets up beside the commit hooks.

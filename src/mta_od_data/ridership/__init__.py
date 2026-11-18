@@ -485,6 +485,10 @@ def ridership(
     top: Annotated[
         int, Option(help="--by trip: each route's this many most crowded trains")
     ] = 1,
+    month: Annotated[
+        str | None,
+        Option(help="Route only this month's dates, YYYY-MM, not all the reports'"),
+    ] = None,
     markdown_out: Annotated[
         Path | None, Option(help="Write the report here, not to stdout")
     ] = None,
@@ -495,8 +499,9 @@ def ridership(
     """
     # Here, not at the top: `builds` imports `platforms`, which imports this package.
     from mta_od_data.builds import od_factors as fit_od_factors
-    from mta_od_data.builds import routed
+    from mta_od_data.builds import report_dates, routed
 
+    start, end = report_dates(month)
     route = route or []
     dims = set(by)
     if By.TRIP in dims and len(dims) > 1:
@@ -516,7 +521,7 @@ def ridership(
     # Only once the arguments are good, as these can route for minutes.
     od_factors = [fit_od_factors(DEFAULT_SCALED_TO, to_counts=True)]
     routing = "as `raptor assign-range` routes them"
-    manifest = routed()
+    manifest = routed(start=start, end=end)
     got = cached_compute(
         by, route, manifest, od_factors, unscaled, fare_evasion, lines, top
     )
