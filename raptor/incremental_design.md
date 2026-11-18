@@ -18,7 +18,9 @@ Measured in this session (2026-11-18):
 
 So a change that reaches the routing costs routing plus recounting,
 and recounting is now the bigger part on a September commit.
-Both stages below matter.
+Stage 1 below was measured on two real changes and dropped:
+it would save at most about a fifth of the routing.
+Stage 2 is the plan.
 
 ## How routing is split today
 
@@ -43,6 +45,8 @@ and that origin's own OD rows.
 Its departure times are already inside the unit, as one range query.
 
 ## Stage 1: reroute only the origins a change can affect
+
+Dropped, as measured below (Measured): kept as the record of what it would take.
 
 ### What to keep from the previous run
 
@@ -94,6 +98,29 @@ and the date's `trips` and `platform-waits` are recomputed from the loads,
 as the sum of every origin's riders on each train,
 or updated by the changed origins' old and new riders.
 
+### Measured
+
+The most stage 1 can save on a change is the origins whose paths don't change.
+Counted on two real changes, each between two cached September routing runs (5 dates),
+comparing each date's path rows, per (hour, origin, destination, path text,
+riders rounded to 0.001), between the two runs' `paths-<date>.parquet`
+joined to their `path-texts-<date>.parquet`
+(`.scratch/changed_origins.py` in the main checkout, not committed):
+
+- New OSM indoor walks (at Atlantic Av, Broadway Jct, and others):
+  423 of 424 origins' paths changed on each of the 5 dates, about 10% of path rows.
+- Only South Ferry/Whitehall St's fallback transfer changed (`79544f0`'s level climbs):
+  about 330 of 424 origins (78%) changed,
+  but only about 1% of path rows (62,555 of 6,820,930 on 2025-09-22,
+  much the same on the other 4 dates).
+
+Even a change to one transfer reaches most origins,
+since riders split across paths by their cost:
+a path a little cheaper or dearer shifts riders on every OD row that has it as a choice.
+So rerouting by origin would save at most about a fifth of the routing,
+for all the summaries and bounds above, and stage 1 is dropped.
+The changed rows, though, are few, which is what stage 2 needs.
+
 ## Stage 2: recount only the changed rows
 
 `ridership`'s `compute` and `free-transfers`' `compare` read every date's paths.
@@ -139,14 +166,17 @@ so every result must be byte-identical to a full run's.
    count the origins whose paths actually changed, per date.
    That's the most stage 1 can save on that change,
    and shows whether it's worth building.
-2. **Stage 2 for OD-only and report-only changes first**,
-   where the changed rows are easy to find,
-   and for the `ridership` recount, now the larger cost on a September commit.
-3. **Stage 1 for removed or longer walks**, the exact case.
-4. **Stage 1 for added or shorter walks**, with the bound, measuring how many origins it keeps.
-5. **Timetable changes within a feed version.**
+   Done: most origins change (stage 1's Measured), so stage 1 is dropped.
+2. **Stage 2 for the `ridership` recount**, now the larger cost on a September commit,
+   from the rows that changed between the previous routing run of the same dates and the new one.
+   Then OD-only and report-only changes, where the changed rows are easy to find.
+3. ~~**Stage 1 for removed or longer walks**, the exact case.~~ Dropped with stage 1.
+4. ~~**Stage 1 for added or shorter walks**, with the bound, measuring how many origins it keeps.~~ Dropped with stage 1.
+5. ~~**Timetable changes within a feed version.**~~ Dropped with stage 1.
 
 ## Open questions
+
+These were all stage 1's, moot now it's dropped.
 
 - How many origins the added-walk bound rules out in practice:
   if it keeps most of them, stage 1 needs exact per-departure labels instead,
