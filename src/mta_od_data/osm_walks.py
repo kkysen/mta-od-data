@@ -27,6 +27,10 @@ so a flight drawn wholly inside a platform still climbs from it.
 An escalator runs the way its `conveying` says; where that's only `yes`,
 a lone one between two levels nearby runs up, and of two or more,
 either way, as one runs each way.
+Two indoor floors a level apart that share a side and don't overlap
+join along it, as OSM draws a passage sloping down from one level to the next,
+as the one from 42 St-Port Authority to Times Sq:
+crossing it climbs a level straight up, its run walked across the floors.
 """
 
 import csv
@@ -180,6 +184,8 @@ def edges(ways: Ways) -> tuple[list[Edge], dict[int, float]]:
     An area's outline nodes are copies on its level, joined to the node itself
     only where a way on that level runs through it,
     as a platform and the mezzanine over it may share a node.
+    Two indoor floors a level apart sharing a side, and not overlapping,
+    are joined at that side's nodes, a level's climb (`level_changes`).
     Returns the edges, and the level of each node on one."""
     areas = [
         (t, nodes[:-1], Polygon([ways.at[n] for n in nodes]).buffer(0))
@@ -306,7 +312,37 @@ def edges(ways: Ways) -> tuple[list[Edge], dict[int, float]]:
             for k, a in enumerate(across)
             for b in across[k + 1 :]
         )
+    for n, low, high in level_changes(areas):
+        out.append(Edge(copy(n, low), copy(n, high), 0.0, 1.0))
     return out, level_of
+
+
+def level_changes(
+    areas: list[tuple[dict[str, str], list[int], Polygon]],
+) -> list[tuple[int, float, float]]:
+    """Each node of a side two indoor floors a level apart share,
+    not overlapping, with the lower floor's level and the upper's,
+    as OSM draws a passage sloping down from one level to the next."""
+    sides: dict[frozenset[int], list[int]] = defaultdict(list)
+    level: dict[int, float] = {}
+    for i, (t, ring, _) in enumerate(areas):
+        lv = levels(t.get("level"))
+        if t.get("indoor") not in AREAS or len(lv) != 1:
+            continue
+        if t.get("railway") == "platform" or t.get("public_transport") == "platform":
+            continue
+        level[i] = lv[0]
+        for a, b in pairwise([*ring, ring[0]]):
+            sides[frozenset((a, b))].append(i)
+    out = []
+    for side, on in sides.items():
+        for k, i in enumerate(on):
+            for j in on[k + 1 :]:
+                low, high = sorted((level[i], level[j]))
+                overlap = areas[i][2].intersection(areas[j][2]).area
+                if high - low == 1 and overlap <= 1.0:
+                    out.extend((n, low, high) for n in side)
+    return out
 
 
 def walk_of(e: Edge, forward: bool) -> Walk:
