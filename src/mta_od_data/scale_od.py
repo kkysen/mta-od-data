@@ -28,7 +28,6 @@ from typer import Option, Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import connection
 from mta_od_data.downloads import od_parquet
-from mta_od_data.prepare import DEFAULT_PARQUET
 
 app = Typer()
 
@@ -112,13 +111,7 @@ def scale_od(
             )
         ),
     ],
-    od: Annotated[
-        Path, Option(help="The OD Parquet, built or downloaded if missing")
-    ] = DEFAULT_PARQUET,
     od_year: Annotated[int, Option(help="The OD data's year to scale")] = 2025,
-    spreadsheet: Annotated[
-        Path, Option(help="The MTA station ridership spreadsheet (fetched if missing)")
-    ] = DEFAULT_SPREADSHEET,
     to_counts: Annotated[
         bool,
         Option(
@@ -150,9 +143,7 @@ def scale_od(
         mta-od-data scale-od --year 2025 --to-counts \
             --out data/mta_od_2025_counted.factors.parquet
     """
-    fit_factors(
-        year, out, od_parquet(od), od_year, fetch_spreadsheet(spreadsheet), to_counts
-    )
+    fit_factors(year, out, od_parquet(), od_year, fetch_spreadsheet(), to_counts)
 
 
 def fetch_spreadsheet(spreadsheet: Path = DEFAULT_SPREADSHEET) -> Path:
