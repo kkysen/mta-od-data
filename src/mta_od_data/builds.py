@@ -12,6 +12,8 @@ A routing run is keyed on its code and everything it reads:
 all of the `raptor` crate and the crates it depends on by path
 but their tests, docs, and builds (`crate_sources`),
 `pyproject.toml`, for how `maturin` builds it,
+and the built extension itself (`extension_file`),
+as a stale build, or one built differently, routes differently from the same sources,
 the stations, the platform CSVs, the GTFS feed versions,
 and with `street_walks`, the streets and each entrance's time, all by content,
 the OD Parquet by size and modification time, too big to hash on each run,
@@ -20,6 +22,7 @@ and its dates and flags.
 
 import tomllib
 from datetime import date
+from importlib.util import find_spec
 from pathlib import Path
 
 from typer import BadParameter
@@ -105,6 +108,13 @@ def crate_sources(crate: Path = REPO / "raptor") -> list[Path]:
     return sorted(set(found))
 
 
+def extension_file() -> Path:
+    """The `raptor` extension this process loads, built from `crate_sources`."""
+    spec = find_spec(EXTENSION)
+    assert spec is not None and spec.origin is not None, f"{EXTENSION} isn't built"
+    return Path(spec.origin)
+
+
 def routed(
     street_walks: bool = False,
     start: date = REPORT_FROM,
@@ -123,6 +133,7 @@ def routed(
     walks = (streets(stations).resolve(), access) if street_walks else None
     contents = [
         *modules("mta_od_data.routing", {EXTENSION: crate_sources()}),
+        extension_file(),
         stations,
         # And the platforms `raptor` reads beside it.
         *sorted(platforms.parent.glob("*.csv")),
