@@ -5,12 +5,33 @@ from urllib.request import urlretrieve
 import duckdb
 from typer import Option, Typer
 
-from mta_od_data import DATA, ROOT
+from mta_od_data import DATA
 
 app = Typer()
 
-DEFAULT_CSV_GLOB = "data/MTA_Subway_Origin-Destination_Ridership_Estimate__2025_*.csv"
-DEFAULT_PARQUET = DATA / "mta_od_2025.parquet"
+
+# The data.ny.gov dataset holding each year's OD extract.
+# 2026's is the one "Beginning 2026", which later years are appended to.
+OD_DATASETS = {
+    2021: "rapa-97zv",
+    2022: "nqnz-e9z9",
+    2023: "uhf3-t34z",
+    2024: "jsu2-fbtj",
+    2025: "y2qv-fytt",
+    2026: "28vm-gjqr",
+}
+DEFAULT_YEAR = 2025
+
+
+def od_csv(year: int) -> Path:
+    return DATA / f"mta_od_{year}.csv"
+
+
+def od_parquet(year: int) -> Path:
+    return DATA / f"mta_od_{year}.parquet"
+
+
+DEFAULT_PARQUET = od_parquet(DEFAULT_YEAR)
 DEFAULT_COMPLEXES_CSV = DATA / "complexes.csv"
 DEFAULT_STATIONS_CSV = DATA / "stations.csv"
 COMPLEXES_URL = "https://data.ny.gov/resource/5f5g-n3cz.csv?$limit=1000"
@@ -47,8 +68,24 @@ def fetch_csv(url: str, out: Path, *, force: bool) -> None:
     print(f"wrote {out} ({n} rows)")
 
 
+def fetch_od_csv(year: int) -> Path:
+    """The year's OD extract, downloaded to `od_csv(year)` when missing."""
+    out = od_csv(year)
+    if out.exists():
+        return out
+    dataset = OD_DATASETS[year]
+    url = f"https://data.ny.gov/api/views/{dataset}/rows.csv?accessType=DOWNLOAD"
+    print(f"fetching {url} (large: up to ~16GB)")
+    # Written beside `out` and renamed, so an interrupted download is never
+    # mistaken for the finished file.
+    partial = out.with_suffix(".csv.part")
+    urlretrieve(url, partial)
+    partial.rename(out)
+    return out
+
+
 def convert_od_to_parquet(
-    csv_patterns: list[str],
+    csv: Path,
     out: Path,
     force: bool,
     ridership_decimals: int | None,
@@ -56,8 +93,7 @@ def convert_od_to_parquet(
     if out.exists() and not force:
         print(f"skip: {out} already exists (use --force to reconvert)")
         return
-    resolved = [str(ROOT / p) if not Path(p).is_absolute() else p for p in csv_patterns]
-    print(f"converting {resolved} -> {out}")
+    print(f"converting {csv} -> {out}")
     # Two constant `SELECT`s chosen by a branch, with the precision bound as a
     # parameter: nothing the caller controls is ever interpolated into the SQL.
     if ridership_decimals is None:
@@ -82,7 +118,7 @@ def convert_od_to_parquet(
         f"""
         COPY (
             SELECT {select}
-            FROM read_csv($csv_patterns, union_by_name=true, thousands=',')
+            FROM read_csv($csv, union_by_name=true, thousands=',')
             -- Sorted so `analyze`'s row-group statistics can skip data
             -- rather than scan the whole file: every analysis so far
             -- scopes to some set of origins, and filters by day of week.
@@ -97,7 +133,7 @@ def convert_od_to_parquet(
             PARQUET_VERSION v2
         )
         """,
-        {"csv_patterns": resolved, "out": str(out)}
+        {"csv": str(csv), "out": str(out)}
         | ({} if ridership_decimals is None else {"decimals": ridership_decimals}),
     )
     result: tuple[int, int, int] | None = con.execute(
@@ -114,16 +150,21 @@ def convert_od_to_parquet(
 
 @app.command()
 def prepare(
-    csv: Annotated[
-        list[str] | None,
+    year: Annotated[
+        int,
         Option(
+            min=min(OD_DATASETS),
+            max=max(OD_DATASETS),
             help=(
-                "Source OD CSV path(s)/glob(s), relative to the project root "
-                f"(repeatable; default: {DEFAULT_CSV_GLOB})"
+                "Which year's OD extract to convert, downloaded from data.ny.gov "
+                "to `data/mta_od_<year>.csv` when missing"
             ),
         ),
+    ] = DEFAULT_YEAR,
+    out: Annotated[
+        Path | None,
+        Option(help="Output Parquet path (default: `data/mta_od_<year>.parquet`)"),
     ] = None,
-    out: Annotated[Path, Option(help="Output Parquet path")] = DEFAULT_PARQUET,
     force: Annotated[
         bool, Option(help="Reconvert even if --out already exists")
     ] = False,
@@ -161,17 +202,16 @@ def prepare(
         ),
     ] = False,
 ) -> None:
-    """Fetch station reference data and convert MTA OD CSV extract(s) to Parquet.
+    """Fetch station reference data and convert a year's MTA OD CSV to Parquet.
 
-    Re-runnable as new monthly/yearly OD extracts are released: point --csv at
-    the new file(s) (globs are fine) and/or --out at a new Parquet path.
+    Downloads the year's extract from data.ny.gov when `data/` lacks it.
+    To pick up months released since, delete `data/mta_od_<year>.csv`
+    and run again with --force.
 
     \b
     Examples:
         mta-od-data prepare
-        mta-od-data prepare \\
-            --csv 'data/MTA_Subway_Origin-Destination_Ridership_Estimate__2024_*.csv' \\
-            --out data/mta_od_2024.parquet
+        mta-od-data prepare --year 2024
         mta-od-data prepare --force-stations
         mta-od-data prepare --stations-only
         mta-od-data prepare --ridership-decimals 2
@@ -183,5 +223,5 @@ def prepare(
     if stations_only:
         return
     convert_od_to_parquet(
-        csv if csv else [DEFAULT_CSV_GLOB], out, force, ridership_decimals
+        fetch_od_csv(year), out or od_parquet(year), force, ridership_decimals
     )

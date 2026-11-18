@@ -13,18 +13,18 @@ don't import all that routing does.
 import subprocess
 from pathlib import Path
 
-from mta_od_data.artifacts import REPO
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR, VERSIONS_FILE, fetch_version
 from mta_od_data.gtfs import load_versions as load_version_ids
 from mta_od_data.prepare import (
     COMPLEXES_URL,
     DEFAULT_COMPLEXES_CSV,
-    DEFAULT_CSV_GLOB,
     DEFAULT_PARQUET,
     DEFAULT_STATIONS_CSV,
+    DEFAULT_YEAR,
     STATIONS_URL,
     convert_od_to_parquet,
     fetch_csv,
+    od_csv,
 )
 
 # The release the OD Parquet is an asset of (see `README.md`).
@@ -36,8 +36,8 @@ def od_parquet(path: Path = DEFAULT_PARQUET) -> Path:
     or else downloaded from the release, which has each year's by its name."""
     if path.exists():
         return path
-    if path == DEFAULT_PARQUET and any(REPO.glob(DEFAULT_CSV_GLOB)):
-        convert_od_to_parquet([DEFAULT_CSV_GLOB], path, False, None)
+    if path == DEFAULT_PARQUET and od_csv(DEFAULT_YEAR).exists():
+        convert_od_to_parquet(od_csv(DEFAULT_YEAR), path, False, None)
         return path
     print(f"downloading {path.name} from the {OD_RELEASE} release")
     part = path.with_name(f"{path.name}.part")

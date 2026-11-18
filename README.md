@@ -34,10 +34,8 @@ Run `uv run mta-od-data --help`, or any subcommand's `--help`, for every option.
   (not committed here, see [`.gitignore`](.gitignore): it's a 27GB CSV).
   Each row is an (origin station complex, destination station complex, date, hour)
   with an estimated rider count.
-  Get it from
-  [data.ny.gov](https://data.ny.gov/Transportation/MTA-Subway-Origin-Destination-Ridership-Estimate-2/jsu2-fbtj)
-  (2025 vintage used here; there's a separate dataset per year)
-  and drop the CSV (or its `.xz`) in `data/`,
+  `prepare` downloads it from data.ny.gov to `data/mta_od_<year>.csv` when missing
+  (2025 vintage used here; there's a separate dataset per year, 2021 on),
   or skip it and download the Parquet `prepare` builds from it (below).
 - **Station reference data**: fetched automatically from data.ny.gov by `prepare`.
   The "Subway Stations and Complexes" dataset
@@ -74,9 +72,7 @@ Other years' extracts are assets beside it, each built to its own Parquet,
 e.g. 2026's (January to August, 242MB, from a 16GB CSV):
 
 ```sh
-uv run mta-od-data prepare \
-    --csv 'data/MTA_Subway_Origin-Destination_Ridership_Estimate__2026_*.csv' \
-    --out data/mta_od_2026.parquet
+uv run mta-od-data prepare --year 2026
 gh release upload od-data data/mta_od_2026.parquet --clobber
 
 gh release download od-data --pattern mta_od_2026.parquet --dir data
@@ -109,10 +105,11 @@ and `~/.cache/mta-od-scratch/` is DuckDB's spill directory.
 ## `prepare`
 
 Fetches the station reference CSVs
-and converts the OD CSV(s) into Parquet (`data/mta_od_2025.parquet`)
+and converts a year's OD CSV into Parquet (`data/mta_od_<year>.parquet`)
 for fast repeated querying.
-Re-runnable as new OD extracts are released:
-point `--csv` at the new file(s) (globs work) and/or `--out` at a new Parquet path.
+`--year` picks the year (default 2025, 2021 on),
+and the CSV is downloaded to `data/mta_od_<year>.csv` when missing;
+`--out` moves the Parquet.
 To skip it, download its output instead ([above](#the-prepared-parquet-as-a-release-asset)).
 
 ```sh
