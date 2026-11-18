@@ -2,6 +2,7 @@
 //! on OpenStreetMap's streets (the `streets` crate),
 //! through stations' entrances, each with its own time between the street and the platforms
 //! (`mta-od-data fetch-station-access`'s `data/station_access.csv`),
+//! timed for the edge of the platform each stop's trains stop at (`platform_edges.csv`),
 //! or, where a 3D model measures them, each platform's own, in and out (`lidar::access`).
 //!
 //! The streets are walked once, for every feed's stations (`StreetWalks`),
@@ -37,10 +38,13 @@ pub struct Entrance {
 }
 
 /// A station's entrances, or with `platform`, its OSM way's,
-/// for the station's stops on that platform alone.
+/// for the station's stops on that platform alone,
+/// or with `stop` too, for that GTFS stop's alone,
+/// timed for the edge of the platform its trains stop at.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Station {
     pub id: String,
+    pub stop: Option<String>,
     pub platform: Option<String>,
     pub complex: String,
     pub entrances: Vec<Entrance>,
@@ -50,6 +54,8 @@ pub struct Station {
 pub struct StreetWalks {
     /// Each station's ID, by its index here.
     stations: Vec<String>,
+    /// Each one's GTFS stop, if it's one stop's at one platform.
+    stops: Vec<Option<String>>,
     /// Each one's platform, if it's one platform's.
     platforms: Vec<Option<String>>,
     /// Each station's complex, by its index.
@@ -180,6 +186,7 @@ impl StreetWalks {
             .collect();
         Self {
             stations: stations.iter().map(|s| s.id.clone()).collect(),
+            stops: stations.iter().map(|s| s.stop.clone()).collect(),
             platforms: stations.iter().map(|s| s.platform.clone()).collect(),
             complexes: stations.iter().map(|s| s.complex.clone()).collect(),
             access: from_origins.into_iter().collect(),
@@ -201,7 +208,7 @@ impl StreetWalks {
     }
 }
 
-#[derive(serde::Deserialize)]
+#[derive(Clone, serde::Deserialize)]
 struct AccessRow {
     station: String,
     complex: String,
@@ -213,10 +220,23 @@ struct AccessRow {
     /// How far from the platform's middle the stairs reach it, in feet,
     /// past its end if more than half its length, by a corridor.
     platform_ft: f64,
-    /// The platform's length in feet, or blank for a long walk inside the station,
-    /// all in `secs`.
+    /// The platform's length in feet, the station's longest edge,
+    /// or blank for a long walk inside the station, all in `secs`.
     length_ft: Option<f64>,
 }
+
+/// A row of `platform_edges.csv`, beside `station_access.csv`:
+/// the length of the edge of `platform`, an OSM way,
+/// that the GTFS stop `stop`, as `127N`, has its trains stop at.
+#[derive(serde::Deserialize)]
+struct EdgeRow {
+    stop: String,
+    platform: String,
+    length_ft: f64,
+}
+
+/// The file beside `station_access.csv` with each stop's platform edge.
+const EDGES: &str = "platform_edges.csv";
 
 const METRES_PER_FOOT: f64 = 0.3048;
 
@@ -251,8 +271,12 @@ impl AccessRow {
 }
 
 /// Each station's entrances in `mta-od-data fetch-station-access`'s `station_access.csv`,
-/// in the order it first lists them, timed by `AccessRow::entrance`,
+/// in the order it first lists them, timed by `AccessRow::entrance`;
+/// then again, as its own, for each stop `platform_edges.csv` beside it lists
+/// at an edge of its platform other than as long as the station's,
+/// timed for that edge;
 /// then each modeled platform's, its own station's complex's (`lidar::access`),
+/// instead of its stops' there,
 /// timed at `speeds` with riders spread along the train by `cars`.
 pub fn load_stations(
     path: &std::path::Path,
@@ -262,28 +286,76 @@ pub fn load_stations(
     use anyhow::Context;
     let mut reader =
         csv::Reader::from_path(path).with_context(|| format!("opening {}", path.display()))?;
-    let mut stations: Vec<Station> = Vec::new();
+    let mut rows: Vec<(String, Vec<AccessRow>)> = Vec::new();
     let mut index: HashMap<String, usize> = HashMap::default();
     for row in reader.deserialize() {
         let row: AccessRow = row?;
         let i = *index.entry(row.station.clone()).or_insert_with(|| {
-            stations.push(Station {
-                id: row.station.clone(),
-                platform: None,
-                complex: row.complex.clone(),
-                entrances: Vec::new(),
-            });
-            stations.len() - 1
+            rows.push((row.station.clone(), Vec::new()));
+            rows.len() - 1
         });
-        stations[i].entrances.push(row.entrance(speeds, cars));
+        rows[i].1.push(row);
     }
-    for p in lidar::access(speeds, cars)? {
+    let station = |id: &str, stop: Option<String>, platform: Option<String>, length_ft| {
+        let rows = &rows[index[id]].1;
+        Station {
+            id: id.to_owned(),
+            stop,
+            platform,
+            complex: rows[0].complex.clone(),
+            entrances: rows
+                .iter()
+                .map(|r| match (r.length_ft, length_ft) {
+                    (Some(_), Some(ft)) => AccessRow {
+                        length_ft: Some(ft),
+                        ..r.clone()
+                    },
+                    _ => r.clone(),
+                })
+                .map(|r| r.entrance(speeds, cars))
+                .collect(),
+        }
+    };
+    let mut stations: Vec<Station> = rows
+        .iter()
+        .map(|(id, _)| station(id, None, None, None))
+        .collect();
+    let modeled: Vec<lidar::PlatformAccess> = lidar::access(speeds, cars)?;
+    let is_modeled: HashSet<(&str, &str)> = modeled
+        .iter()
+        .map(|m| (m.station.as_str(), m.platform.as_str()))
+        .collect();
+    let edges = path.with_file_name(EDGES);
+    let mut reader =
+        csv::Reader::from_path(&edges).with_context(|| format!("opening {}", edges.display()))?;
+    for row in reader.deserialize() {
+        let row: EdgeRow = row?;
+        // A GTFS stop's station is its ID but its direction.
+        let id = row.stop[..row.stop.len() - 1].to_owned();
+        let id = id.as_str();
+        let Some(&i) = index.get(id) else { continue };
+        let longest = rows[i].1.iter().find_map(|r| r.length_ft);
+        // A modeled platform's stops take its model's, not their edge's estimate.
+        if longest.is_none_or(|ft| ft == row.length_ft)
+            || is_modeled.contains(&(id, row.platform.as_str()))
+        {
+            continue;
+        }
+        stations.push(station(
+            id,
+            Some(row.stop),
+            Some(row.platform),
+            Some(row.length_ft),
+        ));
+    }
+    for p in modeled {
         let complex = index
             .get(&p.station)
-            .map(|&i| stations[i].complex.clone())
+            .map(|&i| rows[i].1[0].complex.clone())
             .with_context(|| format!("{} has no entrances in {}", p.station, path.display()))?;
         stations.push(Station {
             id: p.station,
+            stop: None,
             platform: Some(p.platform),
             complex,
             entrances: p.entrances,
@@ -326,24 +398,31 @@ impl Walks {
             .flat_map(|(a, b)| [(a, b), (b, a)])
             .collect();
         let tt = tts[0];
-        let index: HashMap<(&str, Option<&str>), u32> = all
+        let index: HashMap<(&str, Option<&str>, Option<&str>), u32> = all
             .stations
             .iter()
+            .zip(&all.stops)
             .zip(&all.platforms)
             .enumerate()
-            .map(|(i, (s, p))| ((s.as_str(), p.as_deref()), i as u32))
+            .map(|(i, ((s, stop), p))| ((s.as_str(), stop.as_deref(), p.as_deref()), i as u32))
             .collect();
         // Each stop's station in `all`, if it has it:
-        // its platform's own entrances if measured, or else its station's, never both.
+        // its platform's own entrances if measured,
+        // or else its own, timed for the edge of its platform it's at,
+        // or else its station's, never more than one.
         let station: Vec<Option<u32>> = tt
             .stops
             .iter()
             .map(|s| {
+                let station = s.station.as_str();
                 let platform = s.platform.as_deref();
-                index
-                    .get(&(s.station.as_str(), platform))
-                    .filter(|_| platform.is_some())
-                    .or_else(|| index.get(&(s.station.as_str(), None)))
+                platform
+                    .and_then(|p| {
+                        index
+                            .get(&(station, None, Some(p)))
+                            .or_else(|| index.get(&(station, Some(s.id.as_str()), Some(p))))
+                    })
+                    .or_else(|| index.get(&(station, None, None)))
                     .copied()
             })
             .collect();
@@ -453,5 +532,50 @@ mod tests {
         assert_eq!(times(row(70.0 / METRES_PER_FOOT, length)), (55, 92));
         // A long walk inside the station, all in its time.
         assert_eq!(times(row(0.0, None)), (40, 40));
+    }
+
+    #[test]
+    fn stops_walk_as_their_platform_model_their_edge_or_their_station() {
+        // A's two directions at an island, `wI`, B's at a modeled platform, `wM`.
+        let stops = "stop_id,stop_name,location_type,parent_station\n\
+            A,Alpha,1,\nAN,Alpha,,A\nAS,Alpha,,A\nB,Beta,1,\nBN,Beta,,B\nBS,Beta,,B\n";
+        let files = std::collections::HashMap::from([
+            ("stops.txt", stops),
+            ("trips.txt", "route_id,trip_id,service_id\n1,t,Weekday\n"),
+            (
+                "stop_times.txt",
+                "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+                 t,AN,08:00:00,08:00:00,1\nt,BN,08:10:00,08:10:00,2\n",
+            ),
+            (
+                "calendar.txt",
+                "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,\
+                 start_date,end_date\nWeekday,1,1,1,1,1,0,0,20250811,20251101\n",
+            ),
+        ]);
+        let feed = crate::gtfs::Feed::load(&mut { files }).unwrap();
+        let mut tt = Timetable::build(&feed, jiff::civil::date(2025, 9, 3)).unwrap();
+        let idx = |id: &str| tt.stops.iter().position(|s| s.id == id).unwrap();
+        let (an, a_s, bn, bs) = (idx("AN"), idx("AS"), idx("BN"), idx("BS"));
+        for i in [an, a_s] {
+            tt.stops[i].platform = Some("wI".into());
+        }
+        tt.stops[bn].platform = Some("wM".into());
+        let some = |s: &str| Some(s.to_owned());
+        let all = StreetWalks {
+            stations: ["A", "A", "B", "B"].map(str::to_owned).to_vec(),
+            // AS at the island's shorter edge; AN at its longer, the station's.
+            stops: vec![None, some("AS"), None, None],
+            platforms: vec![None, some("wI"), None, some("wM")],
+            complexes: ["1", "1", "2", "2"].map(str::to_owned).to_vec(),
+            access: HashMap::default(),
+            near: vec![Vec::new(); 4],
+        };
+        let walks = Walks::for_feed(&all, &[&tt], &[]);
+        assert_eq!(walks.stations[an], Some(0));
+        assert_eq!(walks.stations[a_s], Some(1));
+        assert_eq!(walks.stations[bn], Some(3));
+        // Its platform unknown: its station's.
+        assert_eq!(walks.stations[bs], Some(2));
     }
 }

@@ -13,10 +13,16 @@ Where the stairs reach the platform is taken as `platform_ft` from its middle,
 the station's GTFS coordinate, in a straight line from the entrance,
 or its end if that's farther than half the platform,
 and the rest is a corridor walked both ways.
-The platform's length is the longest of the station's platforms OpenStreetMap outlines,
-each whole where OSM maps it in pieces, as Morris Park's,
-measured along the edge trains stop at, so a curved one along the curve,
-or else a full-length train's: 600 ft in the B Division, 510 ft in the A (IRT),
+The platform's length is that of the edge of the platform OpenStreetMap outlines
+where a stop's trains stop, each direction's its own,
+as an island's two edges differ where it curves,
+measured along the edge, so a curved one along the curve,
+and whole where OSM maps the platform in pieces, as Morris Park's.
+Each GTFS stop's edge, by direction and platform, is in `platform_edges.csv`,
+and each entrance's `length_ft` is the station's longest,
+for its stops whose platform isn't known.
+Where OSM outlines none of the station's platforms, it's a full-length train's:
+600 ft in the B Division, 510 ft in the A (IRT),
 and 300 ft on the Staten Island Railway, whose trains are half as long.
 
 The depth comes from, in order:
@@ -36,7 +42,7 @@ each station's as `platforms.csv` matches them to its stops.
 
 import json
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 from csv import DictReader, DictWriter
 from dataclasses import dataclass
 from functools import cached_property
@@ -65,7 +71,7 @@ from typer import Typer
 from mta_od_data import DATA
 from mta_od_data.analyze.common import CACHE
 from mta_od_data.downloads import stations_csv as fetch_stations
-from mta_od_data.platforms import DEFAULT_EXTRACT, fetch_extract
+from mta_od_data.platforms import DEFAULT_EXTRACT, Relations, fetch_extract
 from mta_od_data.platforms import DEFAULT_OUT as DEFAULT_PLATFORMS
 from mta_od_data.prepare import DEFAULT_STATIONS_CSV
 
@@ -86,6 +92,9 @@ out tags center;"""
 # so that what the MTA or OSM change doesn't change routing
 # until it's rebuilt and reviewed.
 TABLE = DATA / "station_access.csv"
+# Each stop's edge, by direction and platform, beside it, as `raptor` reads it.
+EDGES = TABLE.with_name("platform_edges.csv")
+EDGE_COLUMNS = ["stop", "platform", "length_ft"]
 COLUMNS = [
     "station",
     "complex",
@@ -321,10 +330,11 @@ def platform_ft(station: dict[str, str], lat: float, lon: float) -> float:
     return hypot(dx, dy) * 3.28084
 
 
-class _PlatformWays(osmium.SimpleHandler):
+class _PlatformWays(Relations):
     """Every platform OSM outlines: its nodes, by its way's ID,
     and its name and level, by which its pieces are told apart from other platforms;
-    and the tracks: the nodes each track node is joined to."""
+    the tracks: the nodes each track node is joined to;
+    and the NYC Subway's route relations, whose stops are on the tracks they stop on."""
 
     def __init__(self) -> None:
         super().__init__()
@@ -392,14 +402,22 @@ class Tracks:
     joined: dict[int, set[int]]
 
 
-def along_tracks(outline: Polygon | MultiPolygon, tracks: Tracks) -> float | None:
-    """A platform's length along its track edge, where trains stop, in metres,
-    or `None` if no track runs beside it.
+@dataclass(frozen=True, slots=True)
+class TrackEdge:
+    """A platform's edge where trains stop: its length in metres,
+    and the track beside it, as OSM maps it."""
+
+    metres: float
+    track: LineString
+
+
+def track_edges(outline: Polygon | MultiPolygon, tracks: Tracks) -> list[TrackEdge]:
+    """A platform's edges where trains stop, measured along their tracks:
+    a side platform's one, an island's two, which differ where it curves;
+    none if no track runs beside it.
 
     Each track beside the platform is followed on past both its ends,
-    and the platform's track edge is measured along it.
-    An island has two track edges, and its longer is taken,
-    the outer where it curves.
+    and the platform's edge along it is measured along it.
     A track beyond another, as an express track past a side platform's local,
     isn't beside it.
     The ends are measured, not the outline between them,
@@ -439,11 +457,11 @@ def along_tracks(outline: Polygon | MultiPolygon, tracks: Tracks) -> float | Non
             for other, track in zip(lines, mapped, strict=True)
         )
 
-    lengths = []
-    for line in lines:
-        if (edge := _edge(outline, line)) and not beyond(line, edge[1]):
-            lengths.append(edge[0])
-    return max(lengths, default=None)
+    return [
+        TrackEdge(edge[0], track)
+        for line, track in zip(lines, mapped, strict=True)
+        if (edge := _edge(outline, line)) and not beyond(line, edge[1])
+    ]
 
 
 def _turn(
@@ -560,34 +578,78 @@ def _edge(
     )
 
 
-def osm_lengths(
-    extract: Path = DEFAULT_EXTRACT, platforms: Path = DEFAULT_PLATFORMS
-) -> dict[str, tuple[float, str]]:
-    """The length of each station's longest platform OSM outlines, in feet,
-    and its way, by GTFS stop ID.
+@dataclass(frozen=True, slots=True)
+class OsmLengths:
+    """OSM's platform lengths, in feet.
 
-    A platform is measured along its track edge by `along_tracks`,
-    so a curved one along the curve,
+    `longest`: each station's longest edge where trains stop, and its platform's way,
+    by GTFS stop ID, for its stops whose platform isn't known.
+    `edges`: the length of the edge each direction's trains stop at
+    on each of its platforms,
+    by GTFS stop, as `127N`, and platform way.
+    """
+
+    longest: dict[str, tuple[float, str]]
+    edges: dict[tuple[str, str], float]
+
+
+def osm_lengths(
+    extract: Path = DEFAULT_EXTRACT,
+    platforms: Path = DEFAULT_PLATFORMS,
+    stations: Path = DEFAULT_STATIONS_CSV,
+) -> OsmLengths:
+    """The length of each platform OSM outlines, along each of its edges,
+    by `track_edges`, so a curved one along the curve,
     or, where OSM maps no track beside it, straight, along its outline's longest side.
     A platform OSM splits into pieces is measured whole.
+
+    Each of `platforms.csv`'s stops is at the edge beside the track
+    its route's OSM relation stops on there, going the same way,
+    by the relation's stop on that track:
+    the most trains' where a stop's trains stop at both edges of an island,
+    as locals and expresses at an island between them,
+    or the platform's longest edge where no relation's stop is on either.
+
     The extract is read twice, for the ways' nodes and then their locations,
     not with every node's location at hand, which takes over a gigabyte.
     """
     # `lidar` reads this module's table.
     from mta_od_data.lidar import PlatformAxis, ground_outline
 
-    ways: dict[str, set[str]] = defaultdict(set)
-    for r in _rows(platforms):
-        if r["platform"].startswith("w"):
-            ways[r["stop"]].add(r["platform"])
+    rows = [r for r in _rows(platforms) if r["platform"].startswith("w")]
+    coords = {
+        s["gtfs_stop_id"]: (float(s["gtfs_longitude"]), float(s["gtfs_latitude"]))
+        for s in _rows(stations)
+    }
     outlined = _PlatformWays()
     outlined.apply_file(str(extract))
     pieces = {
-        w: outlined.pieces(w) for ws in ways.values() for w in ws if w in outlined.nodes
+        w: outlined.pieces(w)
+        for w in {r["platform"] for r in rows}
+        if w in outlined.nodes
     }
+    # Each route's stops at each platform, by the relations:
+    # its stop on the track, and the stops before and after it.
+    stops_at: dict[tuple[str, str], list[_RelationStop]] = defaultdict(list)
+    for route, members in outlined.relations:
+        listed = _relation_stops(members)
+        for i, (node, platform) in enumerate(listed):
+            stops_at[route, platform].append(
+                _RelationStop(
+                    node,
+                    listed[i - 1][0] if i > 0 else node,
+                    listed[i + 1][0] if i + 1 < len(listed) else node,
+                )
+            )
     locations = _NodeLocations(
         {n for ps in pieces.values() for p in ps for n in outlined.nodes[p]}
         | set(outlined.joined)
+        | {
+            n
+            for ss in stops_at.values()
+            for s in ss
+            for n in (s.node, s.before, s.after)
+        }
     )
     locations.apply_file(str(extract))
     track_nodes = [n for n in outlined.joined if n in locations.at]
@@ -606,14 +668,7 @@ def osm_lengths(
             (np.abs(track_at[:, 0] - origin[0]) < 0.008)
             & (np.abs(track_at[:, 1] - origin[1]) < 0.006)
         )
-        lon0, lat0 = origin
-        xy = np.stack(
-            [
-                (track_at[near, 0] - lon0) * 111_320 * cos(radians(lat0)),
-                (track_at[near, 1] - lat0) * 110_540,
-            ],
-            1,
-        )
+        xy = _metres(track_at[near], origin)
         return Tracks(
             {
                 track_nodes[i]: (float(x), float(y))
@@ -622,21 +677,96 @@ def osm_lengths(
             outlined.joined,
         )
 
-    feet = {}
+    # Each platform's edges, and where it's measured from.
+    measured: dict[str, tuple[list[TrackEdge], tuple[float, float]]] = {}
     for way, ps in pieces.items():
         outlines = [o for p in sorted(ps) if (o := outline(p))]
         if outline(way) and outlines:
             origin = outlines[0][0]
             whole = unary_union([ground_outline(o, origin) for o in outlines])
-            along = along_tracks(whole, tracks(origin))
             # Or straight, along the longest side of its pieces' hull.
-            metres = along if along else PlatformAxis.of(whole.convex_hull).length
-            feet[way] = metres / 0.3048
-    return {
-        stop: max((feet[w], w) for w in ws if w in feet)
-        for stop, ws in ways.items()
-        if any(w in feet for w in ws)
-    }
+            edges = track_edges(whole, tracks(origin)) or [
+                TrackEdge(PlatformAxis.of(whole.convex_hull).length, LineString())
+            ]
+            measured[way] = (edges, origin)
+
+    def edge(r: dict[str, str]) -> int | None:
+        """Which of its platform's edges the stop `r` of `platforms.csv` is at."""
+        edges, origin = measured[r["platform"]]
+        here = coords.get(r["stop"])
+        before = coords.get(r["prev_stop"], here)
+        after = coords.get(r["next_stop"], here)
+        if len(edges) == 1 or here is None or before is None or after is None:
+            return 0
+        going = _metres(np.array([after]), before)[0]
+        for s in stops_at.get((r["route"], r["platform"]), []):
+            if not {s.node, s.before, s.after} <= locations.at.keys():
+                continue
+            travel = _metres(np.array([locations.at[s.after]]), locations.at[s.before])[
+                0
+            ]
+            if travel @ going <= 0:
+                continue
+            node = Point(_metres(np.array([locations.at[s.node]]), origin)[0])
+            apart, i = min((e.track.distance(node), i) for i, e in enumerate(edges))
+            # On its track, not another.
+            if apart < 1:
+                return i
+        return None
+
+    trains: dict[tuple[str, str], Counter[int]] = defaultdict(Counter)
+    for r in rows:
+        if r["platform"] in measured and (i := edge(r)) is not None:
+            trains[r["stop"] + r["direction"], r["platform"]][i] += int(r["trains"])
+    feet: dict[tuple[str, str], float] = {}
+    longest: dict[str, tuple[float, str]] = {}
+    for r in rows:
+        if r["platform"] not in measured:
+            continue
+        edges, _ = measured[r["platform"]]
+        key = (r["stop"] + r["direction"], r["platform"])
+        most = trains[key].most_common(1)
+        ft = max(e.metres for e in edges) / 0.3048
+        feet[key] = edges[most[0][0]].metres / 0.3048 if most else ft
+        longest[r["stop"]] = max(longest.get(r["stop"], (0.0, "")), (ft, r["platform"]))
+    return OsmLengths(longest, feet)
+
+
+@dataclass(frozen=True, slots=True)
+class _RelationStop:
+    """A route relation's stop at a platform, a node on its track,
+    and its stops before and after, or itself where it has none."""
+
+    node: int
+    before: int
+    after: int
+
+
+def _relation_stops(members: list[tuple[str, int, str]]) -> list[tuple[int, str]]:
+    """A route relation's stops on the tracks, each with the platform after it,
+    as `platforms.fetch_platforms` pairs them."""
+    out = []
+    stop = None
+    for kind, ref, role in members:
+        if role.startswith("stop"):
+            stop = ref if kind == "n" else None
+        elif role.startswith("platform") and stop is not None:
+            out.append((stop, f"{kind}{ref}"))
+            stop = None
+    return out
+
+
+def _metres(points: np.ndarray, origin: tuple[float, float]) -> np.ndarray:
+    """`(lon, lat)` points in metres east and north of `origin`,
+    as `ground_outline` puts a platform."""
+    lon0, lat0 = origin
+    return np.stack(
+        [
+            (points[:, 0] - lon0) * 111_320 * cos(radians(lat0)),
+            (points[:, 1] - lat0) * 110_540,
+        ],
+        1,
+    )
 
 
 def platform_length(
@@ -728,9 +858,11 @@ def depths(
 
 def build(
     stations_csv: Path = DEFAULT_STATIONS_CSV, extract: Path = DEFAULT_EXTRACT
-) -> list[dict[str, object]]:
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
     """Every entrance's time between the street and its station's platforms,
-    without the walk along them."""
+    without the walk along them,
+    and the length of the edge of each platform each stop's trains stop at,
+    by direction."""
     entrances = _rows(_download(ENTRANCES_URL, DIR / "entrances.csv"))
     lifts = lift_depths(_rows(_download(LIFTS_URL, DIR / "lifts.csv")))
     osm = json.loads(
@@ -739,7 +871,7 @@ def build(
         ).read_text()
     )
     by_id = depths(_rows(stations_csv), lifts, osm)
-    lengths = osm_lengths(extract)
+    lengths = osm_lengths(extract, stations=stations_csv)
 
     def row(gtfs_id: str, lat: float, lon: float, kind: str) -> dict[str, object]:
         depth = by_id[gtfs_id]
@@ -747,7 +879,7 @@ def build(
         walk = WALKS.get((lat, lon))
         along = 0.0 if walk else platform_ft(depth.station, lat, lon)
         # Blank for a long walk inside the station, timed to the platform's middle.
-        length = None if walk else platform_length(depth.station, lengths)
+        length = None if walk else platform_length(depth.station, lengths.longest)
         return {
             "station": gtfs_id,
             "complex": JOINED_COMPLEXES.get(complex_id, complex_id),
@@ -794,7 +926,11 @@ def build(
         for gtfs_id, d in by_id.items()
         if gtfs_id not in listed
     ]
-    return rows
+    edges: list[dict[str, object]] = [
+        {"stop": stop, "platform": way, "length_ft": round(ft)}
+        for (stop, way), ft in sorted(lengths.edges.items())
+    ]
+    return rows, edges
 
 
 STREET = "Easement - Street"
@@ -850,12 +986,17 @@ def _drop_misattributed(rows: list[dict[str, object]]) -> list[dict[str, object]
 def fetch_station_access() -> None:
     """
     Rebuild each station entrance's time to the platforms, `data/station_access.csv`,
+    and each stop's platform edge's length, `data/platform_edges.csv`,
     from the MTA's and OSM's data now, to review and commit.
     """
-    rows = build(fetch_stations(), fetch_extract())
+    rows, edges = build(fetch_stations(), fetch_extract())
     TABLE.parent.mkdir(parents=True, exist_ok=True)
-    with TABLE.open("w", newline="") as f:
-        out = DictWriter(f, COLUMNS, lineterminator="\n")
-        out.writeheader()
-        out.writerows(rows)
-    print(f"{len(rows)} entrances of {len({r['station'] for r in rows})} stations")
+    for path, columns, table in [(TABLE, COLUMNS, rows), (EDGES, EDGE_COLUMNS, edges)]:
+        with path.open("w", newline="") as f:
+            out = DictWriter(f, columns, lineterminator="\n")
+            out.writeheader()
+            out.writerows(table)
+    print(
+        f"{len(rows)} entrances of {len({r['station'] for r in rows})} stations,"
+        f" and {len(edges)} stops' platform edges"
+    )

@@ -22,6 +22,7 @@ import tomllib
 from datetime import date
 from pathlib import Path
 
+from mta_od_data.access import EDGES
 from mta_od_data.access import TABLE as DEFAULT_ACCESS
 from mta_od_data.artifacts import CACHE, REPO, cached, files, key, modules
 from mta_od_data.downloads import gtfs_feeds, od_parquet
@@ -111,6 +112,8 @@ def routed(
         config,
         *files(gtfs_dir),
         *(walks or ()),
+        # And the stops' platform edges `raptor` reads beside the entrances.
+        *([access.with_name(EDGES.name)] if walks else []),
     ]
     level = ZSTD_LEVELS[zstd_level]
     entry = key(

@@ -154,7 +154,8 @@ Details: [`raptor/README.md`](raptor/README.md).
 
 Times each station entrance between the street and the platforms,
 for changing trains between complexes on the streets,
-writing the checked-in [`station_access.csv`](data/station_access.csv) to review:
+writing the checked-in [`station_access.csv`](data/station_access.csv) to review,
+and [`platform_edges.csv`](data/platform_edges.csv), each stop's length of platform edge:
 the climb from the MTA's [entrances](https://data.ny.gov/d/i9wp-a4ja)
 and the heights of its [elevators and escalators](https://data.ny.gov/d/94fv-bak7),
 depths published elsewhere where those are blank,

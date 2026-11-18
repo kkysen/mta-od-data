@@ -11,10 +11,10 @@ from mta_od_data.access import (
     SIR_FT,
     Tracks,
     Walk,
-    along_tracks,
     entrance_secs,
     osm_lengths,
     platform_length,
+    track_edges,
 )
 from mta_od_data.lidar import PlatformAxis
 
@@ -82,10 +82,16 @@ def test_osm_lengths_measure_a_platform_mapped_in_pieces_whole(tmp_path: Path):
     extract = tmp_path / "platforms.osm"
     _platform_osm(extract, ways)
     platforms = tmp_path / "platforms.csv"
-    platforms.write_text("stop,platform\n505,w2\n506,w6\n")
-    lengths = osm_lengths(extract, platforms)
-    assert lengths["505"] == (approx(150 / 0.3048, rel=1e-3), "w2")
-    assert lengths["506"] == (approx(50 / 0.3048, rel=1e-3), "w6")
+    platforms.write_text(
+        "route,prev_stop,stop,next_stop,direction,platform,trains\n"
+        "5,504,505,506,N,w2,100\n5,505,506,,N,w6,100\n"
+    )
+    stations = tmp_path / "stations.csv"
+    stations.write_text("gtfs_stop_id,gtfs_latitude,gtfs_longitude\n")
+    lengths = osm_lengths(extract, platforms, stations)
+    assert lengths.longest["505"] == (approx(150 / 0.3048, rel=1e-3), "w2")
+    assert lengths.longest["506"] == (approx(50 / 0.3048, rel=1e-3), "w6")
+    assert lengths.edges["505N", "w2"] == approx(150 / 0.3048, rel=1e-3)
 
 
 def _tracks(*lines: list[tuple[float, float]]) -> Tracks:
@@ -115,15 +121,22 @@ def _arc(r: float, a0: float, a1: float, n: int) -> list[tuple[float, float]]:
     ]
 
 
-def test_along_tracks_measure_a_straight_platform_end_to_end():
+def _lengths(outline: Polygon, tracks: Tracks) -> list[float]:
+    """`track_edges`' lengths, shortest first."""
+    return sorted(e.metres for e in track_edges(outline, tracks))
+
+
+def test_track_edges_measure_a_straight_platform_end_to_end():
     # 150 m by 4 m, its track 1.6 m to the east.
     rectangle = Polygon([(0, 0), (4, 0), (4, 150), (0, 150)])
-    assert along_tracks(rectangle, _tracks(_straight(5.6))) == approx(150)
-    # No track beside it, but one across the way: no length along tracks.
-    assert along_tracks(rectangle, _tracks(_straight(30))) is None
+    assert _lengths(rectangle, _tracks(_straight(5.6))) == [approx(150)]
+    # No track beside it, but one across the way: no edge along a track.
+    assert _lengths(rectangle, _tracks(_straight(30))) == []
+    # An express track beyond its local, not beside it.
+    assert _lengths(rectangle, _tracks(_straight(5.6), _straight(9.3))) == [approx(150)]
 
 
-def test_along_tracks_measure_a_curved_platform_along_its_track_edge():
+def test_track_edges_measure_a_curved_platform_along_its_track_edge():
     # A side platform a 60 degree arc of a 150 m curve, 4 m wide outside it,
     # its track 1.6 m inside, on past both ends.
     theta = pi / 3
@@ -131,11 +144,11 @@ def test_along_tracks_measure_a_curved_platform_along_its_track_edge():
     tracks = _tracks(_arc(148.4, -0.5, theta + 0.5, 80))
     # Along the edge the trains stop at, the inner, 157 m,
     # not straight end to end, 154 m.
-    assert along_tracks(strip, tracks) == approx(150 * theta, rel=0.002)
+    assert _lengths(strip, tracks) == [approx(150 * theta, rel=0.002)]
     assert PlatformAxis.of(strip).length == approx(154)
 
 
-def test_along_tracks_measure_a_jagged_outline_as_a_smooth_one():
+def test_track_edges_measure_a_jagged_outline_as_a_smooth_one():
     # 150 m by 4 m, its track edge notched 1 m deep every 10 m,
     # and stairs cut 2 m into the back, as OSM draws some.
     edge = [
@@ -149,10 +162,10 @@ def test_along_tracks_measure_a_jagged_outline_as_a_smooth_one():
         for p in [(0, y), (2, y - 5), (2, y - 15), (0, y - 20)]
     ]
     jagged = Polygon([(0, 0), (4, 0), *edge, (4, 150), (0, 150), *back])
-    assert along_tracks(jagged, _tracks(_straight(5.6))) == approx(150)
+    assert _lengths(jagged, _tracks(_straight(5.6))) == [approx(150)]
 
 
-def test_along_tracks_take_an_island_platforms_outer_edge():
+def test_track_edges_measure_each_of_an_island_platforms_edges():
     # An island 8 m wide on a 60 degree arc of a 150 m curve,
     # a track 1.6 m from each edge.
     theta = pi / 3
@@ -160,16 +173,114 @@ def test_along_tracks_take_an_island_platforms_outer_edge():
     tracks = _tracks(
         _arc(148.4, -0.5, theta + 0.5, 80), _arc(159.6, -0.5, theta + 0.5, 80)
     )
-    assert along_tracks(island, tracks) == approx(158 * theta, rel=0.002)
-    # Each edge measured on its own: the inner.
-    inner = _tracks(_arc(148.4, -0.5, theta + 0.5, 80))
-    assert along_tracks(island, inner) == approx(150 * theta, rel=0.002)
+    # The inner edge, along the curve, shorter than the outer.
+    assert _lengths(island, tracks) == [
+        approx(150 * theta, rel=0.002),
+        approx(158 * theta, rel=0.002),
+    ]
 
 
-def test_along_tracks_run_on_past_a_terminals_bumpers():
+def test_track_edges_run_on_past_a_terminals_bumpers():
     # The track ends 10 m short of the platform's far end.
     rectangle = Polygon([(0, 0), (4, 0), (4, 150), (0, 150)])
-    assert along_tracks(rectangle, _tracks(_straight(5.6)[:25])) == approx(150)
+    assert _lengths(rectangle, _tracks(_straight(5.6)[:25])) == [approx(150)]
+
+
+LAT0, LON0 = 40.85, -73.86
+
+
+def _lon_lat(x: float, y: float) -> tuple[float, float]:
+    """The point `x` m east and `y` m north of `LAT0`, `LON0`."""
+    return LON0 + x / (111_320 * cos(radians(LAT0))), LAT0 + y / 110_540
+
+
+def test_osm_lengths_give_each_direction_its_islands_edge(tmp_path: Path):
+    # B's island, a 60 degree arc of a 150 m curve 8 m wide,
+    # its tracks 1.6 m inside and outside it;
+    # northbound, counterclockwise, on the outer, as its route's relation stops,
+    # and southbound on the inner. A and C are the stations before and after.
+    theta = pi / 3
+    nodes: list[tuple[float, float]] = []
+
+    def at(x: float, y: float) -> int:
+        nodes.append((x, y))
+        return len(nodes)
+
+    def arc(r: float, a0: float, a1: float, n: int) -> list[int]:
+        return [at(x, y) for x, y in _arc(r, a0, a1, n)]
+
+    island = arc(150, 0, theta, 31) + arc(158, theta, 0, 31)
+    outer = arc(159.6, -0.6, theta + 0.6, 121)
+    inner = arc(148.4, -0.6, theta + 0.6, 121)
+    # C's platforms, a stretch on, each beside its track's last node.
+    beyond = {
+        track[-1]: [at(x + dx, y + dy) for dx, dy in [(0, 0), (1, 0), (1, 1), (0, 1)]]
+        for track in (outer, inner)
+        for x, y in [nodes[track[-1] - 1]]
+    }
+
+    def way(i: int, ns: list[int], tags: dict[str, str]) -> str:
+        return (
+            f'<way id="{i}" version="1">'
+            + "".join(f'<nd ref="{n}"/>' for n in ns)
+            + "".join(f'<tag k="{k}" v="{v}"/>' for k, v in tags.items())
+            + "</way>"
+        )
+
+    def route(i: int, stops: list[tuple[int, int]]) -> str:
+        return (
+            f'<relation id="{i}" version="1">'
+            + "".join(
+                f'<member type="node" ref="{n}" role="stop"/>'
+                f'<member type="way" ref="{w}" role="platform"/>'
+                for n, w in stops
+            )
+            + '<tag k="type" v="route"/><tag k="route" v="subway"/>'
+            '<tag k="network" v="NYC Subway"/><tag k="ref" v="1"/></relation>'
+        )
+
+    platform = {"railway": "platform", "name": "B"}
+    middle = 60  # Of each track's 121 nodes, at 30 degrees.
+    elements = [
+        way(1, [*island, island[0]], platform),
+        way(2, outer, {"railway": "subway"}),
+        way(3, inner, {"railway": "subway"}),
+        *(
+            way(4 + i, [*ns, ns[0]], {"railway": "platform", "name": "C"})
+            for i, ns in enumerate(beyond.values())
+        ),
+        route(1, [(outer[middle], 1), (outer[-1], 4)]),
+        route(2, [(inner[-1], 5), (inner[middle], 1)]),
+    ]
+    extract = tmp_path / "platforms.osm"
+    extract.write_text(
+        '<?xml version="1.0"?><osm version="0.6">'
+        + "".join(
+            f'<node id="{i}" version="1" lat="{lat:.8f}" lon="{lon:.8f}"/>'
+            for i, (lon, lat) in enumerate((_lon_lat(x, y) for x, y in nodes), start=1)
+        )
+        + "".join(elements)
+        + "</osm>"
+    )
+    platforms = tmp_path / "platforms.csv"
+    platforms.write_text(
+        "route,prev_stop,stop,next_stop,direction,platform,trains\n"
+        "1,A,B,C,N,w1,100\n1,C,B,A,S,w1,100\n"
+    )
+    stations = tmp_path / "stations.csv"
+    stations.write_text(
+        "gtfs_stop_id,gtfs_latitude,gtfs_longitude\n"
+        + "".join(
+            f"{s},{lat},{lon}\n"
+            for s, a in [("A", -0.4), ("B", theta / 2), ("C", theta + 0.4)]
+            for lon, lat in [_lon_lat(154 * cos(a), 154 * sin(a))]
+        )
+    )
+    lengths = osm_lengths(extract, platforms, stations)
+    assert lengths.edges["BN", "w1"] == approx(158 * theta / 0.3048, rel=0.003)
+    assert lengths.edges["BS", "w1"] == approx(150 * theta / 0.3048, rel=0.003)
+    # For its stops whose platform isn't known, its longest.
+    assert lengths.longest["B"] == (approx(158 * theta / 0.3048, rel=0.003), "w1")
 
 
 def test_entrance_secs_stop_where_the_stairs_reach_the_platform():

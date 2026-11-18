@@ -16,7 +16,7 @@ def runs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> list[Path]:
     (inputs / "gtfs").mkdir(parents=True)
     (inputs / "gtfs" / "feed.zip").write_bytes(b"feed")
     (inputs / "od.parquet").write_bytes(b"od")
-    for name in ["stations.csv", "access.csv", "streets.osm.pbf"]:
+    for name in ["stations.csv", "access.csv", "platform_edges.csv", "streets.osm.pbf"]:
         (inputs / name).write_text(name)
     # Alone, as `raptor` reads the platform CSVs beside it.
     (inputs / "platforms").mkdir()
