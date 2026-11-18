@@ -89,15 +89,13 @@ def services_on(feed: ZipFile, day: date) -> set[str]:
 
 @app.command()
 def fetch_mbta(
-    feed: Annotated[
-        Path, Option(help="The pinned MBTA GTFS version, fetched if missing")
-    ] = DEFAULT_FEED,
     fixture: Annotated[
         Path, Option(help="Where the subset for `cargo test` goes")
     ] = DEFAULT_FIXTURE,
 ) -> None:
     """Fetch the pinned MBTA GTFS version,
     and cut from it the fixture RAPTOR's pathways tests read."""
+    feed = DEFAULT_FEED
     if not feed.exists():
         feed.parent.mkdir(parents=True, exist_ok=True)
         print(f"fetching {URL}")
