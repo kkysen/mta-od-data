@@ -31,8 +31,9 @@ class DayType(StrEnum):
 
 WEEKDAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 
-# DuckDB's spill directory: on disk, since `/tmp` here is tmpfs (RAM).
-SCRATCH = Path.home() / ".cache" / "mta-od-scratch"
+# DuckDB's spill directory: on disk, since `/tmp` here is tmpfs (RAM),
+# and in the repo's scratch folder, not a cache, as spills aren't results to keep.
+SCRATCH = ROOT / ".scratch" / "duckdb"
 # Results kept to be read back, keyed by what they're computed from.
 CACHE = Path.home() / ".cache" / "mta-od-data"
 DAY_TYPE_PRESETS: dict[DayType, tuple[str, ...] | None] = {

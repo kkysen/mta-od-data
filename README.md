@@ -100,7 +100,7 @@ each keyed on everything it was built from,
 so it's built again only when one of those changes
 (about 5:00 for a routing run).
 `~/.cache/mta-od-data/` also holds `analyze`'s scans of the OD data and `ridership`'s computed rows,
-and `~/.cache/mta-od-scratch/` is DuckDB's spill directory.
+and `.scratch/duckdb/`, in the repo, is DuckDB's spill directory.
 
 ## `prepare`
 

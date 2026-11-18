@@ -29,8 +29,8 @@ if [[ -z "$profdata" ]]; then
     exit 1
 fi
 
-# On disk, not in `/tmp` (tmpfs, RAM).
-work="$HOME/.cache/mta-od-pgo"
+# On disk, not in `/tmp` (tmpfs, RAM), in the repo's scratch folder.
+work="$root/.scratch/pgo"
 rm -rf "$work"
 mkdir -p "$work/profiles"
 

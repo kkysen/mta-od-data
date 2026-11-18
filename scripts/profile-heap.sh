@@ -4,7 +4,7 @@
 # Usage: scripts/profile-heap.sh [--date <date>]
 #
 # Builds the extension with the `dhat-heap` feature (`dhat`'s allocator, not `mimalloc`),
-# assigns the date, and writes `dhat-heap.json` to `~/.cache/mta-od-dhat/`,
+# assigns the date, and writes `dhat-heap.json` to `.scratch/dhat/`,
 # viewable in DHAT's viewer (https://nnethercote.github.io/dh_view/dh_view.html).
 # Then rebuilds the extension as usual.
 #
@@ -22,8 +22,8 @@ while (($#)); do
     esac
 done
 
-# On disk, not in `/tmp` (tmpfs, RAM).
-out="$HOME/.cache/mta-od-dhat"
+# On disk, not in `/tmp` (tmpfs, RAM), in the repo's scratch folder.
+out="$root/.scratch/dhat"
 mkdir -p "$out"
 
 cd "$root"
