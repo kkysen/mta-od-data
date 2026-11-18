@@ -10,7 +10,7 @@ so no command has to be run first, and none reads a stale earlier one's output.
 A routing run is keyed on its code and everything it reads:
 `routing.py` and the package modules it imports,
 all of the `raptor` crate and the crates it depends on by path
-but their tests, docs, and builds (`crate_sources`),
+but their tests and docs, as git sees them, so not their builds (`crate_sources`),
 `pyproject.toml`, for how `maturin` builds it,
 and the built extension itself (`extension_file`),
 as a stale build, or one built differently, routes differently from the same sources,
@@ -29,7 +29,7 @@ from typer import BadParameter
 
 from mta_od_data.access import EDGES
 from mta_od_data.access import TABLE as DEFAULT_ACCESS
-from mta_od_data.artifacts import CACHE, REPO, cached, files, key, modules
+from mta_od_data.artifacts import CACHE, REPO, cached, files, git_files, key, modules
 from mta_od_data.downloads import gtfs_feeds, od_parquet
 from mta_od_data.platforms import DEFAULT_EXTRACT, fetch_extract
 from mta_od_data.platforms import DEFAULT_OUT as DEFAULT_PLATFORMS
@@ -96,15 +96,19 @@ def od_factors(
 def crate_sources(crate: Path = REPO / "raptor") -> list[Path]:
     """What `crate` is built from: its files but its tests, docs, and builds,
     and the same of every crate it depends on by path, with the workspace's."""
-    skip = [crate / d for d in ("target", "tests", "examples", "benches")]
-    found = [f for f in files(crate, skip) if f.suffix != ".md"]
+    skip = [crate / d for d in ("tests", "examples", "benches")]
+    found = [
+        f
+        for f in git_files(crate)
+        if f.suffix != ".md" and not any(s in f.parents for s in skip)
+    ]
     manifest = tomllib.loads((crate / "Cargo.toml").read_text())
     for dep in manifest.get("dependencies", {}).values():
         if isinstance(dep, dict) and "path" in dep:
             found += crate_sources((crate / dep["path"]).resolve())
     if crate == REPO / "raptor":
         found += [REPO / "Cargo.toml", REPO / "Cargo.lock", REPO / "pyproject.toml"]
-        found += files(REPO / ".cargo")
+        found += git_files(REPO / ".cargo")
     return sorted(set(found))
 
 

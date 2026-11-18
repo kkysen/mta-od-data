@@ -23,6 +23,7 @@ Entries are never deleted: one whose inputs changed is just never read again.
 import ast
 import os
 import pickle
+import subprocess
 import sys
 from collections.abc import Callable, Collection, Iterable, Mapping, Sequence
 from fcntl import LOCK_EX, flock
@@ -48,6 +49,21 @@ def files(root: Path, skip: Collection[Path] = ()) -> list[Path]:
         )
         found += (Path(parent) / n for n in sorted(names))
     return [f for f in found if not any(s in f.parents for s in skip)]
+
+
+def git_files(root: Path) -> list[Path]:
+    """Every file under `root` git would see, in a set order:
+    tracked, or untracked but not ignored, like a new source not yet added,
+    so `.gitignore` leaves out builds such as `target/` without listing them here."""
+    out = subprocess.run(
+        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
+        cwd=root,
+        capture_output=True,
+        check=True,
+    ).stdout
+    # `--cached` lists a tracked file deleted from the working tree too.
+    found = (root / name for name in out.decode().split("\0") if name)
+    return sorted(f for f in found if f.is_file())
 
 
 def module_file(name: str) -> Path | None:
