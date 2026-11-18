@@ -4,7 +4,7 @@ The routing is the `raptor` crate's, through `mta_od_data._raptor`;
 this is its command line, and `routing.py` routes a range of dates for `assign-range`.
 """
 
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Annotated
 
@@ -16,6 +16,7 @@ from mta_od_data._raptor import (
     Version,
     assign_date,
     feed_report,
+    load_versions,
     od_report,
     profile_report,
     route_report,
@@ -23,11 +24,9 @@ from mta_od_data._raptor import (
 )
 from mta_od_data.access import TABLE as DEFAULT_ACCESS
 from mta_od_data.downloads import gtfs_feeds, od_parquet
-from mta_od_data.gtfs import DEFAULT_GTFS_DIR
 from mta_od_data.platforms import DEFAULT_OUT as DEFAULT_PLATFORMS
-from mta_od_data.prepare import DEFAULT_PARQUET
 from mta_od_data.routing import route_range
-from mta_od_data.street_walks import DEFAULT_STREETS, cut
+from mta_od_data.street_walks import cut
 
 app = Typer()
 
@@ -35,7 +34,6 @@ DEFAULT_STATIONS = DATA / "stations.csv"
 DEFAULT_CONFIG = ROOT / "raptor" / "assign.json5"
 DEFAULT_OUT_DIR = DATA / "raptor"
 
-Feed = Annotated[Path, Option(help="A feed zip, from `mta-od-data fetch-gtfs`")]
 Day = Annotated[
     date, Option(parser=date.fromisoformat, help="The service date, e.g. 2025-09-17")
 ]
@@ -44,16 +42,7 @@ Stops = Annotated[
     Option(help="Parent stop ID, e.g. 127 (repeatable; several means any of them)"),
 ]
 MaxRides = Annotated[int, Option(min=1, max=255, help="Most rides in a journey")]
-Od = Annotated[Path, Option(help="The OD Parquet, built or downloaded if missing")]
-Stations = Annotated[Path, Option(help="The station reference CSV")]
 Config = Annotated[Path, Option(help="Generalized cost weights")]
-Platforms = Annotated[
-    Path,
-    Option(
-        help="Each route's stops' platforms, for OSM transfers, "
-        "with `stacked_platforms.csv` beside it"
-    ),
-]
 StreetWalks = Annotated[
     bool,
     Option(
@@ -63,21 +52,24 @@ StreetWalks = Annotated[
         "writing the transfers added beside each date's paths"
     ),
 ]
-Streets = Annotated[
-    Path,
-    Option(
-        help="The streets `--street-walks` walks on, "
-        "cut from Geofabrik's New York extract when missing or older than it"
-    ),
-]
-Access = Annotated[Path, Option(help="Each station entrance's time to the platforms")]
 
 
-def streets_to_walk(
-    street_walks: bool, streets: Path, access: Path, stations: Path
-) -> tuple[Path, Path] | None:
+def streets_to_walk(street_walks: bool) -> tuple[Path, Path] | None:
     """With `street_walks`, the streets, cut if need be, and the entrances, to walk."""
-    return (cut(streets=streets, stations=stations), access) if street_walks else None
+    return (cut(), DEFAULT_ACCESS) if street_walks else None
+
+
+def feed_for(day: date) -> Path:
+    """The latest-fetched feed version covering `day` and both its neighbors,
+    so its overnight trips from the previous date and early ones from the next
+    are there, with every version in `gtfs_versions.json5` fetched when missing."""
+    one = timedelta(days=1)
+    covering = [
+        v
+        for v in load_versions(gtfs_feeds())
+        if v.start <= day - one and day + one <= v.end
+    ]
+    return covering[-1].path
 
 
 ZSTD_LEVELS = {"fast": 1, "medium": 6, "slow": 9}
@@ -112,20 +104,19 @@ ZstdLevel = Annotated[
 
 
 @app.command()
-def feed(feed: Feed) -> None:
-    """Load a static GTFS feed zip and summarize it."""
-    print(feed_report(feed), end="")
+def feed() -> None:
+    """Load the latest static GTFS feed version and summarize it."""
+    print(feed_report(load_versions(gtfs_feeds())[-1].path), end="")
 
 
 @app.command()
-def timetable(feed: Feed, date: Day) -> None:
+def timetable(date: Day) -> None:
     """Build one service date's timetable and report what it found."""
-    print(timetable_report(feed, date), end="")
+    print(timetable_report(feed_for(date), date), end="")
 
 
 @app.command()
 def route(
-    feed: Feed,
     date: Day,
     origin: Stops,
     destination: Stops,
@@ -135,12 +126,14 @@ def route(
     max_rides: MaxRides = DEFAULT_MAX_RIDES,
 ) -> None:
     """Earliest-arrival journeys between two stops, one per number of rides."""
-    print(route_report(feed, date, origin, destination, depart, max_rides), end="")
+    print(
+        route_report(feed_for(date), date, origin, destination, depart, max_rides),
+        end="",
+    )
 
 
 @app.command()
 def profile(
-    feed: Feed,
     date: Day,
     origin: Stops,
     destination: Stops,
@@ -150,35 +143,29 @@ def profile(
 ) -> None:
     """Every Pareto-optimal journey between two stops departing in a window."""
     print(
-        profile_report(feed, date, origin, destination, after, before, max_rides),
+        profile_report(
+            feed_for(date), date, origin, destination, after, before, max_rides
+        ),
         end="",
     )
 
 
 @app.command()
-def od(
-    feed: Feed,
-    date: Day,
-    od: Od = DEFAULT_PARQUET,
-    stations: Stations = DEFAULT_STATIONS,
-) -> None:
+def od(date: Day) -> None:
     """Load the OD rows for a date's service day, 04:00 to 04:00:
     its (year, month, day of week)'s hours 4 to 23 and the next date's 0 to 3,
     and map their station complexes to the date's timetable."""
-    print(od_report(feed, date, od_parquet(od), stations), end="")
+    print(
+        od_report(feed_for(date), date, od_parquet(), DEFAULT_STATIONS),
+        end="",
+    )
 
 
 @app.command()
 def assign(
-    feed: Feed,
     date: Day,
-    od: Od = DEFAULT_PARQUET,
-    stations: Stations = DEFAULT_STATIONS,
-    platforms: Platforms = DEFAULT_PLATFORMS,
     config: Config = DEFAULT_CONFIG,
     street_walks: StreetWalks = False,
-    streets: Streets = DEFAULT_STREETS,
-    access: Access = DEFAULT_ACCESS,
     out: Annotated[
         Path | None,
         Option(help="Output Parquet (default: data/raptor/paths-<date>.parquet)"),
@@ -189,15 +176,15 @@ def assign(
     out = out or DEFAULT_OUT_DIR / f"paths-{date}.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)
     summary = assign_date(
-        Version.open(feed),
+        Version.open(feed_for(date)),
         date,
-        od_parquet(od),
-        stations,
-        platforms,
+        od_parquet(),
+        DEFAULT_STATIONS,
+        DEFAULT_PLATFORMS,
         config,
         out,
         parse_zstd_level(zstd_level),
-        streets_to_walk(street_walks, streets, access, stations),
+        streets_to_walk(street_walks),
     )
     print(summary.report, end="")
     print(f"wrote {out}")
@@ -211,16 +198,8 @@ def assign_range(
     end: Annotated[
         date, Option("--to", parser=date.fromisoformat, help="Last date, inclusive")
     ],
-    gtfs_dir: Annotated[
-        Path, Option(help="Feed version zips, those missing fetched into it")
-    ] = DEFAULT_GTFS_DIR,
-    od: Od = DEFAULT_PARQUET,
-    stations: Stations = DEFAULT_STATIONS,
-    platforms: Platforms = DEFAULT_PLATFORMS,
     config: Config = DEFAULT_CONFIG,
     street_walks: StreetWalks = False,
-    streets: Streets = DEFAULT_STREETS,
-    access: Access = DEFAULT_ACCESS,
     out_dir: Annotated[
         Path, Option(help="Where the path Parquets and manifest.csv go")
     ] = DEFAULT_OUT_DIR,
@@ -238,12 +217,12 @@ def assign_range(
     route_range(
         start,
         end,
-        gtfs_feeds(gtfs_dir),
-        od_parquet(od),
-        stations,
-        platforms,
+        gtfs_feeds(),
+        od_parquet(),
+        DEFAULT_STATIONS,
+        DEFAULT_PLATFORMS,
         config,
         parse_zstd_level(zstd_level),
-        streets_to_walk(street_walks, streets, access, stations),
+        streets_to_walk(street_walks),
         out_dir,
     )

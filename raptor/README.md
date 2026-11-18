@@ -33,7 +33,7 @@ The cost weights for splitting riders are in [`assign.json5`](assign.json5).
 The rest are for inspecting a step of it, one date or one pair of stops at a time
 (`uv run mta-od-data raptor <subcommand> --help` for their options):
 
-- `feed`: load a static GTFS feed zip and summarize it.
+- `feed`: load the latest static GTFS feed version and summarize it.
 - `timetable`: build one service date's timetable and report what it found.
 - `route`: earliest-arrival journeys between two stops, one per number of rides.
 - `profile`: every Pareto-optimal journey between two stops departing in a window.

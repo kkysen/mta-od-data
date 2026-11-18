@@ -17,7 +17,6 @@ cd "$root"
 
 # A date the feed covers, and its OD rows.
 date=2025-09-16
-feed=data/gtfs/mdb-516-202510180014.zip
 od=data/mta_od_2025.parquet
 
 # `$RUSTFLAGS` replaces `.cargo/config.toml`'s flags rather than adding to them.
@@ -60,9 +59,27 @@ RUSTFLAGS="$native -C profile-generate=$work/profiles" \
     uv sync --quiet --reinstall-package mta-od-data
 
 echo "training on the sample"
-.venv/bin/mta-od-data raptor assign \
-    --feed "$feed" --date "$date" --od "$work/od.parquet" --out "$work/paths.parquet" \
-    > /dev/null
+# Through the Rust function itself, as `raptor assign` takes no OD path.
+.venv/bin/python - "$date" "$work/od.parquet" "$work/paths.parquet" > /dev/null <<'EOF'
+import sys
+from datetime import date
+
+from mta_od_data._raptor import Version, assign_date
+from mta_od_data.platforms import DEFAULT_OUT as PLATFORMS
+from mta_od_data.raptor import DEFAULT_CONFIG, DEFAULT_STATIONS, feed_for
+
+day = date.fromisoformat(sys.argv[1])
+assign_date(
+    Version.open(feed_for(day)),
+    day,
+    sys.argv[2],
+    DEFAULT_STATIONS,
+    PLATFORMS,
+    DEFAULT_CONFIG,
+    sys.argv[3],
+    1,
+)
+EOF
 
 "$profdata" merge -o "$work/merged.profdata" "$work/profiles"
 
