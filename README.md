@@ -292,3 +292,8 @@ rather than rewriting the snapshot itself.
 Each report builds what it reads, as its command does,
 so a commit changing what routes reruns the routing in the hook,
 two runs of about 5:00 each, and one changing nothing it reads reruns nothing.
+
+Those snapshot tests are marked `e2e` (see `pytest.ini_options` in [`pyproject.toml`](pyproject.toml)),
+because they can route, which takes very long.
+They are their own hook, `pytest-e2e`, beside `pytest` for every other test (`-m "not e2e"`),
+so `SKIP=pytest-e2e git commit` runs only the cheap tests.

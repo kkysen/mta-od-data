@@ -53,6 +53,11 @@ dev = [
     "ty>=0.0.91",
 ]
 
+[tool.pytest.ini_options]
+markers = [
+    "e2e: end-to-end tests that run reports through the CLI, can route, and take very long",
+]
+
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 

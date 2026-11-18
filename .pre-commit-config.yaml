@@ -32,9 +32,18 @@ repos:
 
   - repo: local
     hooks:
+      # Split so that commits on agent worktrees can run
+      # `SKIP=pytest-e2e git commit` and still run every cheap test.
       - id: pytest
         name: pytest
-        entry: uv run pytest
+        entry: uv run pytest -m "not e2e"
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: pytest-e2e
+        name: pytest (e2e)
+        entry: uv run pytest -m e2e
         language: system
         pass_filenames: false
         always_run: true

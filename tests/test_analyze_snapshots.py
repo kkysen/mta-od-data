@@ -22,6 +22,10 @@ import pytest
 from mta_od_data import ROOT
 from mta_od_data.cli import app
 
+# Every case reruns a report through the CLI, which can route on a cache miss:
+# minutes to hours, so commits on agent worktrees skip them (`SKIP=pytest-e2e`).
+pytestmark = pytest.mark.e2e
+
 ANALYZE_DIR = ROOT / "src" / "mta_od_data" / "analyze"
 RIDERSHIP_DIR = ROOT / "src" / "mta_od_data" / "ridership"
 
