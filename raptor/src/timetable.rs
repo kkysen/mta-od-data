@@ -409,11 +409,7 @@ impl Timetable {
     }
 }
 
-/// Fixed time to walk between a complex's stops, on top of the distance:
-/// stairs, doors, overhead (Anita's `BASE_TRANSFER_TIME`).
-pub const BASE_WALK: Secs = 60;
-
-/// Across between two stops, to another of a station's platforms,
+/// Across between two stops, to another of a station's or a complex's platforms,
 /// up and down as many flights as it's `levels_up` above, or below if negative,
 /// or, on the same level or unknown, up a flight and back down.
 fn up_and_over(
@@ -510,7 +506,8 @@ impl Timetable {
     /// changing to another of the station's platforms goes up a flight, across,
     /// and down (`up_and_over`), or up or down the levels between them by OSM's `level`s,
     /// and every pair of a complex's stops without a `transfers.txt` footpath gets one
-    /// of `BASE_WALK` plus the straight-line distance at `speeds`' walk.
+    /// the same way, across between them and up or down the levels between their platforms,
+    /// or up a flight and down where those are on one level or unknown.
     /// Between `platforms` stacked one right over another,
     /// any change is a flight of stairs a level instead, up or down,
     /// within a station or a complex.
@@ -523,16 +520,17 @@ impl Timetable {
         speeds: &Speeds,
     ) {
         self.min_change.fill(0);
+        let levels_up = |a: &Stop, b: &Stop| match (&a.platform, &b.platform) {
+            (Some(pa), Some(pb)) => platforms.levels_up(pa, pb),
+            _ => None,
+        };
         for (a, paths) in self.footpaths.iter_mut().enumerate() {
             let a = &self.stops[a];
             for (b, walk) in paths {
                 let b = &self.stops[*b as usize];
                 if a.station == b.station {
                     let same_platform = a.platform.is_some() && a.platform == b.platform;
-                    let levels_up = match (&a.platform, &b.platform) {
-                        (Some(pa), Some(pb)) => platforms.levels_up(pa, pb),
-                        _ => None,
-                    };
+                    let levels_up = levels_up(a, b);
                     *walk = if same_platform {
                         0
                     } else {
@@ -548,12 +546,11 @@ impl Timetable {
                     if a == b || has_path {
                         continue;
                     }
-                    let (Some(from), Some(to)) =
-                        (self.stops[a as usize].coords, self.stops[b as usize].coords)
-                    else {
+                    let (from, to) = (&self.stops[a as usize], &self.stops[b as usize]);
+                    if from.coords.is_none() || to.coords.is_none() {
                         continue;
-                    };
-                    let walk = BASE_WALK + speeds.walk_secs(distance_m(from, to)) as Secs;
+                    }
+                    let walk = up_and_over(speeds, from.coords, to.coords, levels_up(from, to));
                     self.footpaths[a as usize].push((b, walk));
                 }
             }
@@ -1070,11 +1067,46 @@ mod tests {
 
         assert_eq!(tt.min_change, [0, 0, 0]);
         let walk = |a: usize, b: StopIdx| tt.footpaths[a].iter().find(|p| p.0 == b).unwrap().1;
-        // `transfers.txt`'s stays; the rest are 60s plus the distance at 3 mph.
+        // `transfers.txt`'s stays; the rest are the distance at 3 mph,
+        // up a flight and down, 23s, as their levels are unknown.
         assert_eq!(walk(0, 1), 300);
-        assert_eq!(walk(1, 0), 60 + 89);
-        assert_eq!(walk(0, 2), 60 + 178);
-        assert_eq!(walk(2, 1), 60 + 200);
+        assert_eq!(walk(1, 0), 23 + 89);
+        assert_eq!(walk(0, 2), 23 + 179);
+        assert_eq!(walk(2, 1), 23 + 200);
+    }
+
+    #[test]
+    fn osm_transfers_between_stations_climb_levels() {
+        // A a level over B, 120m away, and C 240m away on a level unknown; one complex.
+        let stops = "stop_id,stop_name,stop_lat,stop_lon\n\
+            A,A,40.0,-74.0\nB,B,40.0,-73.99859\nC,C,40.002156,-74.0\n";
+        let files = HashMap::from([
+            ("stops.txt", stops),
+            ("trips.txt", "route_id,trip_id,service_id\n1,t,Weekday\n"),
+            (
+                "stop_times.txt",
+                "trip_id,stop_id,arrival_time,departure_time,stop_sequence\n\
+                 t,A,08:00:00,08:00:00,1\nt,B,08:10:00,08:10:00,2\nt,C,08:20:00,08:20:00,3\n",
+            ),
+            ("calendar.txt", CALENDAR),
+        ]);
+        let feed = Feed::load(&mut { files }).unwrap();
+        let mut tt = Timetable::build(&feed, wednesday()).unwrap();
+        for (s, p) in tt.stops.iter_mut().zip(["a", "b", "c"]) {
+            s.platform = Some(p.into());
+        }
+        let platforms = Platforms::default().with_levels(&[("a", -1.0), ("b", -2.0)]);
+        tt.use_osm_transfers(
+            [[0, 1, 2].as_slice()].into_iter(),
+            &platforms,
+            &Speeds::default(),
+        );
+
+        let walk = |a: usize, b: StopIdx| tt.footpaths[a].iter().find(|p| p.0 == b).unwrap().1;
+        // Down a flight from A to B, 9s, and up one back, 13s, across 90s.
+        assert_eq!((walk(0, 1), walk(1, 0)), (9 + 90, 13 + 90));
+        // C's level is unknown: up a flight and down.
+        assert_eq!((walk(0, 2), walk(2, 0)), (23 + 179, 23 + 179));
     }
 
     #[test]

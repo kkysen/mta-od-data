@@ -80,14 +80,14 @@ text {
 <path class="s0" d="M373.8,388.0h256.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-256.4z"><title>59 St (4,5,6), Uptown 4,5, Sep 2025: 108.5</title></path>
 <text x="638.2" y="398.0">108.5</text>
 <text x="365.8" y="418.0" class="label" text-anchor="end">96 St (1,2,3), Uptown</text>
-<path class="s0" d="M373.8,408.0h242.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-242.5z"><title>96 St (1,2,3), Uptown, Sep 2025: 102.7</title></path>
-<text x="624.3" y="418.0">102.7</text>
+<path class="s0" d="M373.8,408.0h242.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-242.2z"><title>96 St (1,2,3), Uptown, Sep 2025: 102.6</title></path>
+<text x="624.0" y="418.0">102.6</text>
 <text x="365.8" y="438.0" class="label" text-anchor="end">47-50 Sts-Rockefeller Ctr (B,D,F,M), Downtown</text>
 <path class="s0" d="M373.8,428.0h240.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-240.3z"><title>47-50 Sts-Rockefeller Ctr (B,D,F,M), Downtown, Sep 2025: 101.8</title></path>
 <text x="622.1" y="438.0">101.8</text>
 <text x="365.8" y="458.0" class="label" text-anchor="end">14 St-Union Sq (N,Q,R,W), Downtown</text>
-<path class="s0" d="M373.8,448.0h239.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-239.4z"><title>14 St-Union Sq (N,Q,R,W), Downtown, Sep 2025: 101.4</title></path>
-<text x="621.2" y="458.0">101.4</text>
+<path class="s0" d="M373.8,448.0h239.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-239.1z"><title>14 St-Union Sq (N,Q,R,W), Downtown, Sep 2025: 101.3</title></path>
+<text x="620.9" y="458.0">101.3</text>
 <text x="365.8" y="478.0" class="label" text-anchor="end">51 St (6), Downtown</text>
 <path class="s0" d="M373.8,468.0h235.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-235.3z"><title>51 St (6), Downtown, Sep 2025: 99.7</title></path>
 <text x="617.1" y="478.0">99.7</text>
@@ -95,8 +95,8 @@ text {
 <path class="s0" d="M373.8,488.0h234.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-234.1z"><title>Jay St-MetroTech (A,C,F), Manhattan, Sep 2025: 99.2</title></path>
 <text x="615.9" y="498.0">99.2</text>
 <text x="365.8" y="518.0" class="label" text-anchor="end">6 Av (L)</text>
-<path class="s0" d="M373.8,508.0h233.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-233.6z"><title>6 Av (L), Sep 2025: 99.0</title></path>
-<text x="615.4" y="518.0">99.0</text>
+<path class="s0" d="M373.8,508.0h233.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-233.4z"><title>6 Av (L), Sep 2025: 98.9</title></path>
+<text x="615.2" y="518.0">98.9</text>
 <text x="365.8" y="538.0" class="label" text-anchor="end">Times Sq-42 St (7)</text>
 <path class="s0" d="M373.8,528.0h232.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-232.9z"><title>Times Sq-42 St (7), Sep 2025: 98.7</title></path>
 <text x="614.7" y="538.0">98.7</text>
@@ -131,8 +131,8 @@ text {
 <path class="s0" d="M373.8,728.0h203.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-203.6z"><title>Jay St-MetroTech (A,C,F), Outbound, Sep 2025: 86.5</title></path>
 <text x="585.4" y="738.0">86.5</text>
 <text x="365.8" y="758.0" class="label" text-anchor="end">Times Sq-42 St (N,Q,R,W), Uptown</text>
-<path class="s0" d="M373.8,748.0h199.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-199.8z"><title>Times Sq-42 St (N,Q,R,W), Uptown, Sep 2025: 84.9</title></path>
-<text x="581.6" y="758.0">84.9</text>
+<path class="s0" d="M373.8,748.0h199.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-199.5z"><title>Times Sq-42 St (N,Q,R,W), Uptown, Sep 2025: 84.8</title></path>
+<text x="581.3" y="758.0">84.8</text>
 <text x="365.8" y="778.0" class="label" text-anchor="end">Fulton St (4,5), Downtown</text>
 <path class="s0" d="M373.8,768.0h189.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-189.9z"><title>Fulton St (4,5), Downtown, Sep 2025: 80.8</title></path>
 <text x="571.7" y="778.0">80.8</text>
@@ -140,8 +140,8 @@ text {
 <path class="s0" d="M373.8,788.0h184.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-184.6z"><title>42 St-Bryant Pk (B,D,F,M), Downtown, Sep 2025: 78.6</title></path>
 <text x="566.4" y="798.0">78.6</text>
 <text x="365.8" y="818.0" class="label" text-anchor="end">14 St (1,2,3), Uptown</text>
-<path class="s0" d="M373.8,808.0h184.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-184.6z"><title>14 St (1,2,3), Uptown, Sep 2025: 78.6</title></path>
-<text x="566.4" y="818.0">78.6</text>
+<path class="s0" d="M373.8,808.0h184.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-184.4z"><title>14 St (1,2,3), Uptown, Sep 2025: 78.5</title></path>
+<text x="566.2" y="818.0">78.5</text>
 <text x="365.8" y="838.0" class="label" text-anchor="end">34 St-Herald Sq (N,Q,R,W), Uptown</text>
 <path class="s0" d="M373.8,828.0h184.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-184.2z"><title>34 St-Herald Sq (N,Q,R,W), Uptown, Sep 2025: 78.4</title></path>
 <text x="566.0" y="838.0">78.4</text>
@@ -161,8 +161,8 @@ text {
 <path class="s0" d="M373.8,928.0h177.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-177.4z"><title>Wall St (2,3), Sep 2025: 75.6</title></path>
 <text x="559.2" y="938.0">75.6</text>
 <text x="365.8" y="958.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Manhattan &amp; Outbound</text>
-<path class="s0" d="M373.8,948.0h176.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-176.7z"><title>Atlantic Av (2,3,4,5), Manhattan &amp; Outbound, Sep 2025: 75.3</title></path>
-<text x="558.5" y="958.0">75.3</text>
+<path class="s0" d="M373.8,948.0h177.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-177.0z"><title>Atlantic Av (2,3,4,5), Manhattan &amp; Outbound, Sep 2025: 75.4</title></path>
+<text x="558.8" y="958.0">75.4</text>
 <text x="365.8" y="978.0" class="label" text-anchor="end">59 St-Columbus Circle (A,B,C,D), Uptown</text>
 <path class="s0" d="M373.8,968.0h173.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-173.4z"><title>59 St-Columbus Circle (A,B,C,D), Uptown, Sep 2025: 73.9</title></path>
 <text x="555.2" y="978.0">73.9</text>
@@ -185,8 +185,8 @@ text {
 <path class="s0" d="M373.8,1088.0h167.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-167.4z"><title>Times Sq-42 St (S), Sep 2025: 71.4</title></path>
 <text x="549.2" y="1098.0">71.4</text>
 <text x="365.8" y="1118.0" class="label" text-anchor="end">Fulton St (A,C)</text>
-<path class="s0" d="M373.8,1108.0h167.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-167.1z"><title>Fulton St (A,C), Sep 2025: 71.3</title></path>
-<text x="548.9" y="1118.0">71.3</text>
+<path class="s0" d="M373.8,1108.0h166.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-166.9z"><title>Fulton St (A,C), Sep 2025: 71.2</title></path>
+<text x="548.7" y="1118.0">71.2</text>
 <text x="365.8" y="1138.0" class="label" text-anchor="end">Bedford Av (L)</text>
 <path class="s0" d="M373.8,1128.0h166.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-166.6z"><title>Bedford Av (L), Sep 2025: 71.1</title></path>
 <text x="548.4" y="1138.0">71.1</text>
@@ -205,30 +205,30 @@ text {
 <text x="365.8" y="1238.0" class="label" text-anchor="end">47-50 Sts-Rockefeller Ctr (B,D,F,M), Uptown</text>
 <path class="s0" d="M373.8,1228.0h160.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-160.6z"><title>47-50 Sts-Rockefeller Ctr (B,D,F,M), Uptown, Sep 2025: 68.6</title></path>
 <text x="542.4" y="1238.0">68.6</text>
-<text x="365.8" y="1258.0" class="label" text-anchor="end">Chambers St (1,2,3), Uptown</text>
-<path class="s0" d="M373.8,1248.0h160.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-160.4z"><title>Chambers St (1,2,3), Uptown, Sep 2025: 68.5</title></path>
-<text x="542.2" y="1258.0">68.5</text>
-<text x="365.8" y="1278.0" class="label" text-anchor="end">Queensboro Plaza (7), Outbound &amp; Astoria</text>
-<path class="s0" d="M373.8,1268.0h159.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-159.7z"><title>Queensboro Plaza (7), Outbound &amp; Astoria, Sep 2025: 68.2</title></path>
+<text x="365.8" y="1258.0" class="label" text-anchor="end">Queensboro Plaza (7), Outbound &amp; Astoria</text>
+<path class="s0" d="M373.8,1248.0h159.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-159.7z"><title>Queensboro Plaza (7), Outbound &amp; Astoria, Sep 2025: 68.2</title></path>
+<text x="541.5" y="1258.0">68.2</text>
+<text x="365.8" y="1278.0" class="label" text-anchor="end">7 Av (B,D,E), Outbound</text>
+<path class="s0" d="M373.8,1268.0h159.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-159.7z"><title>7 Av (B,D,E), Outbound, Sep 2025: 68.2</title></path>
 <text x="541.5" y="1278.0">68.2</text>
-<text x="365.8" y="1298.0" class="label" text-anchor="end">7 Av (B,D,E), Outbound</text>
-<path class="s0" d="M373.8,1288.0h159.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-159.7z"><title>7 Av (B,D,E), Outbound, Sep 2025: 68.2</title></path>
-<text x="541.5" y="1298.0">68.2</text>
-<text x="365.8" y="1318.0" class="label" text-anchor="end">W 4 St-Wash Sq (A,C,E), Uptown</text>
-<path class="s0" d="M373.8,1308.0h159.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-159.4z"><title>W 4 St-Wash Sq (A,C,E), Uptown, Sep 2025: 68.1</title></path>
-<text x="541.2" y="1318.0">68.1</text>
+<text x="365.8" y="1298.0" class="label" text-anchor="end">W 4 St-Wash Sq (A,C,E), Uptown</text>
+<path class="s0" d="M373.8,1288.0h159.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-159.4z"><title>W 4 St-Wash Sq (A,C,E), Uptown, Sep 2025: 68.1</title></path>
+<text x="541.2" y="1298.0">68.1</text>
+<text x="365.8" y="1318.0" class="label" text-anchor="end">Chambers St (1,2,3), Uptown</text>
+<path class="s0" d="M373.8,1308.0h158.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-158.7z"><title>Chambers St (1,2,3), Uptown, Sep 2025: 67.8</title></path>
+<text x="540.5" y="1318.0">67.8</text>
 <text x="365.8" y="1338.0" class="label" text-anchor="end">Lexington Av/63 St (M,Q), Uptown &amp; Queens</text>
 <path class="s0" d="M373.8,1328.0h158.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-158.5z"><title>Lexington Av/63 St (M,Q), Uptown &amp; Queens, Sep 2025: 67.7</title></path>
 <text x="540.3" y="1338.0">67.7</text>
 <text x="365.8" y="1358.0" class="label" text-anchor="end">14 St (1,2,3), Downtown</text>
-<path class="s0" d="M373.8,1348.0h154.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-154.2z"><title>14 St (1,2,3), Downtown, Sep 2025: 65.9</title></path>
-<text x="536.0" y="1358.0">65.9</text>
+<path class="s0" d="M373.8,1348.0h153.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-153.9z"><title>14 St (1,2,3), Downtown, Sep 2025: 65.8</title></path>
+<text x="535.7" y="1358.0">65.8</text>
 <text x="365.8" y="1378.0" class="label" text-anchor="end">59 St-Columbus Circle (1), Downtown</text>
 <path class="s0" d="M373.8,1368.0h153.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-153.2z"><title>59 St-Columbus Circle (1), Downtown, Sep 2025: 65.5</title></path>
 <text x="535.0" y="1378.0">65.5</text>
 <text x="365.8" y="1398.0" class="label" text-anchor="end">Atlantic Av (B,Q)</text>
-<path class="s0" d="M373.8,1388.0h153.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-153.0z"><title>Atlantic Av (B,Q), Sep 2025: 65.4</title></path>
-<text x="534.8" y="1398.0">65.4</text>
+<path class="s0" d="M373.8,1388.0h152.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-152.7z"><title>Atlantic Av (B,Q), Sep 2025: 65.3</title></path>
+<text x="534.5" y="1398.0">65.3</text>
 <text x="365.8" y="1418.0" class="label" text-anchor="end">74 St-Broadway (7), Manhattan</text>
 <path class="s0" d="M373.8,1408.0h152.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-152.2z"><title>74 St-Broadway (7), Manhattan, Sep 2025: 65.1</title></path>
 <text x="534.0" y="1418.0">65.1</text>
@@ -239,8 +239,8 @@ text {
 <path class="s0" d="M373.8,1448.0h149.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-149.8z"><title>34 St-Herald Sq (N,Q,R,W), Downtown, Sep 2025: 64.1</title></path>
 <text x="531.6" y="1458.0">64.1</text>
 <text x="365.8" y="1478.0" class="label" text-anchor="end">Brooklyn Bridge-City Hall (4,5,6), Uptown</text>
-<path class="s0" d="M373.8,1468.0h149.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-149.8z"><title>Brooklyn Bridge-City Hall (4,5,6), Uptown, Sep 2025: 64.1</title></path>
-<text x="531.6" y="1478.0">64.1</text>
+<path class="s0" d="M373.8,1468.0h149.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-149.6z"><title>Brooklyn Bridge-City Hall (4,5,6), Uptown, Sep 2025: 64.0</title></path>
+<text x="531.4" y="1478.0">64.0</text>
 <text x="365.8" y="1498.0" class="label" text-anchor="end">DeKalb Av (B,Q,R), Manhattan</text>
 <path class="s0" d="M373.8,1488.0h148.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-148.9z"><title>DeKalb Av (B,Q,R), Manhattan, Sep 2025: 63.7</title></path>
 <text x="530.7" y="1498.0">63.7</text>
@@ -250,15 +250,15 @@ text {
 <text x="365.8" y="1538.0" class="label" text-anchor="end">59 St (4,5,6), Downtown 6</text>
 <path class="s0" d="M373.8,1528.0h144.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-144.6z"><title>59 St (4,5,6), Downtown 6, Sep 2025: 61.9</title></path>
 <text x="526.4" y="1538.0">61.9</text>
-<text x="365.8" y="1558.0" class="label" text-anchor="end">Chambers St (1,2,3), Downtown</text>
-<path class="s0" d="M373.8,1548.0h143.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.8z"><title>Chambers St (1,2,3), Downtown, Sep 2025: 61.6</title></path>
-<text x="525.6" y="1558.0">61.6</text>
-<text x="365.8" y="1578.0" class="label" text-anchor="end">Atlantic Av (D,N,R), SB</text>
-<path class="s0" d="M373.8,1568.0h143.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.1z"><title>Atlantic Av (D,N,R), SB, Sep 2025: 61.3</title></path>
+<text x="365.8" y="1558.0" class="label" text-anchor="end">Atlantic Av (D,N,R), SB</text>
+<path class="s0" d="M373.8,1548.0h143.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.1z"><title>Atlantic Av (D,N,R), SB, Sep 2025: 61.3</title></path>
+<text x="524.9" y="1558.0">61.3</text>
+<text x="365.8" y="1578.0" class="label" text-anchor="end">Chambers St (1,2,3), Downtown</text>
+<path class="s0" d="M373.8,1568.0h143.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.1z"><title>Chambers St (1,2,3), Downtown, Sep 2025: 61.3</title></path>
 <text x="524.9" y="1578.0">61.3</text>
 <text x="365.8" y="1598.0" class="label" text-anchor="end">Fulton St (2,3)</text>
-<path class="s0" d="M373.8,1588.0h143.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.1z"><title>Fulton St (2,3), Sep 2025: 61.3</title></path>
-<text x="524.9" y="1598.0">61.3</text>
+<path class="s0" d="M373.8,1588.0h142.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-142.6z"><title>Fulton St (2,3), Sep 2025: 61.1</title></path>
+<text x="524.4" y="1598.0">61.1</text>
 <text x="365.8" y="1618.0" class="label" text-anchor="end">34 St-Herald Sq (B,D,F,M), Uptown</text>
 <path class="s0" d="M373.8,1608.0h141.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-141.9z"><title>34 St-Herald Sq (B,D,F,M), Uptown, Sep 2025: 60.8</title></path>
 <text x="523.7" y="1618.0">60.8</text>
@@ -274,15 +274,15 @@ text {
 <text x="365.8" y="1698.0" class="label" text-anchor="end">Myrtle-Wyckoff Avs (L)</text>
 <path class="s0" d="M373.8,1688.0h129.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.2z"><title>Myrtle-Wyckoff Avs (L), Sep 2025: 55.5</title></path>
 <text x="511.0" y="1698.0">55.5</text>
-<text x="365.8" y="1718.0" class="label" text-anchor="end">Brooklyn Bridge-City Hall (4,5,6), Downtown</text>
-<path class="s0" d="M373.8,1708.0h127.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-127.8z"><title>Brooklyn Bridge-City Hall (4,5,6), Downtown, Sep 2025: 54.9</title></path>
+<text x="365.8" y="1718.0" class="label" text-anchor="end">Bleecker St (6), Uptown</text>
+<path class="s0" d="M373.8,1708.0h127.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-127.8z"><title>Bleecker St (6), Uptown, Sep 2025: 54.9</title></path>
 <text x="509.6" y="1718.0">54.9</text>
-<text x="365.8" y="1738.0" class="label" text-anchor="end">Bleecker St (6), Uptown</text>
-<path class="s0" d="M373.8,1728.0h127.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-127.5z"><title>Bleecker St (6), Uptown, Sep 2025: 54.8</title></path>
-<text x="509.3" y="1738.0">54.8</text>
+<text x="365.8" y="1738.0" class="label" text-anchor="end">Brooklyn Bridge-City Hall (4,5,6), Downtown</text>
+<path class="s0" d="M373.8,1728.0h127.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-127.8z"><title>Brooklyn Bridge-City Hall (4,5,6), Downtown, Sep 2025: 54.9</title></path>
+<text x="509.6" y="1738.0">54.9</text>
 <text x="365.8" y="1758.0" class="label" text-anchor="end">Chambers St (A,C)</text>
-<path class="s0" d="M373.8,1748.0h125.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-125.8z"><title>Chambers St (A,C), Sep 2025: 54.1</title></path>
-<text x="507.6" y="1758.0">54.1</text>
+<path class="s0" d="M373.8,1748.0h125.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-125.6z"><title>Chambers St (A,C), Sep 2025: 54.0</title></path>
+<text x="507.4" y="1758.0">54.0</text>
 <text x="365.8" y="1778.0" class="label" text-anchor="end">59 St-Columbus Circle (1), Uptown</text>
 <path class="s0" d="M373.8,1768.0h124.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-124.9z"><title>59 St-Columbus Circle (1), Uptown, Sep 2025: 53.7</title></path>
 <text x="506.7" y="1778.0">53.7</text>
@@ -302,8 +302,8 @@ text {
 <path class="s0" d="M373.8,1868.0h119.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-119.1z"><title>Forest Hills-71 Av (E,F,M,R), Manhattan, Sep 2025: 51.3</title></path>
 <text x="500.9" y="1878.0">51.3</text>
 <text x="365.8" y="1898.0" class="label" text-anchor="end">14 St (F,M), Uptown</text>
-<path class="s0" d="M373.8,1888.0h117.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-117.9z"><title>14 St (F,M), Uptown, Sep 2025: 50.8</title></path>
-<text x="499.7" y="1898.0">50.8</text>
+<path class="s0" d="M373.8,1888.0h117.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-117.7z"><title>14 St (F,M), Uptown, Sep 2025: 50.7</title></path>
+<text x="499.5" y="1898.0">50.7</text>
 <text x="365.8" y="1918.0" class="label" text-anchor="end">Sutphin Blvd-Archer Av-JFK Airport (E,J,Z), E</text>
 <path class="s0" d="M373.8,1908.0h117.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-117.4z"><title>Sutphin Blvd-Archer Av-JFK Airport (E,J,Z), E, Sep 2025: 50.6</title></path>
 <text x="499.2" y="1918.0">50.6</text>
@@ -317,8 +317,8 @@ text {
 <path class="s0" d="M373.8,1968.0h115.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-115.5z"><title>34 St-Herald Sq (B,D,F,M), Downtown, Sep 2025: 49.8</title></path>
 <text x="497.3" y="1978.0">49.8</text>
 <text x="365.8" y="1998.0" class="label" text-anchor="end">Jay St-MetroTech (R)</text>
-<path class="s0" d="M373.8,1988.0h114.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-114.8z"><title>Jay St-MetroTech (R), Sep 2025: 49.5</title></path>
-<text x="496.6" y="1998.0">49.5</text>
+<path class="s0" d="M373.8,1988.0h115.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-115.0z"><title>Jay St-MetroTech (R), Sep 2025: 49.6</title></path>
+<text x="496.8" y="1998.0">49.6</text>
 <text x="365.8" y="2018.0" class="label" text-anchor="end">Franklin Av (S)</text>
 <path class="s0" d="M373.8,2008.0h114.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-114.6z"><title>Franklin Av (S), Sep 2025: 49.4</title></path>
 <text x="496.4" y="2018.0">49.4</text>
@@ -332,14 +332,14 @@ text {
 <path class="s0" d="M373.8,2068.0h112.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-112.6z"><title>1 Av (L), Brooklyn, Sep 2025: 48.6</title></path>
 <text x="494.4" y="2078.0">48.6</text>
 <text x="365.8" y="2098.0" class="label" text-anchor="end">34 St-Penn Station (1,2,3), Uptown</text>
-<path class="s0" d="M373.8,2088.0h112.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-112.2z"><title>34 St-Penn Station (1,2,3), Uptown, Sep 2025: 48.4</title></path>
-<text x="494.0" y="2098.0">48.4</text>
-<text x="365.8" y="2118.0" class="label" text-anchor="end">Park Pl (2,3)</text>
-<path class="s0" d="M373.8,2108.0h111.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.9z"><title>Park Pl (2,3), Sep 2025: 48.3</title></path>
+<path class="s0" d="M373.8,2088.0h112.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-112.4z"><title>34 St-Penn Station (1,2,3), Uptown, Sep 2025: 48.5</title></path>
+<text x="494.2" y="2098.0">48.5</text>
+<text x="365.8" y="2118.0" class="label" text-anchor="end">135 St (2,3), Downtown</text>
+<path class="s0" d="M373.8,2108.0h111.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.9z"><title>135 St (2,3), Downtown, Sep 2025: 48.3</title></path>
 <text x="493.7" y="2118.0">48.3</text>
-<text x="365.8" y="2138.0" class="label" text-anchor="end">135 St (2,3), Downtown</text>
-<path class="s0" d="M373.8,2128.0h111.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.9z"><title>135 St (2,3), Downtown, Sep 2025: 48.3</title></path>
-<text x="493.7" y="2138.0">48.3</text>
+<text x="365.8" y="2138.0" class="label" text-anchor="end">Park Pl (2,3)</text>
+<path class="s0" d="M373.8,2128.0h111.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.7z"><title>Park Pl (2,3), Sep 2025: 48.2</title></path>
+<text x="493.5" y="2138.0">48.2</text>
 <text x="365.8" y="2158.0" class="label" text-anchor="end">14 St (A,C,E), Uptown</text>
 <path class="s0" d="M373.8,2148.0h111.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-111.4z"><title>14 St (A,C,E), Uptown, Sep 2025: 48.1</title></path>
 <text x="493.2" y="2158.0">48.1</text>
@@ -358,18 +358,18 @@ text {
 <text x="365.8" y="2258.0" class="label" text-anchor="end">68 St-Hunter College (6), Downtown</text>
 <path class="s0" d="M373.8,2248.0h110.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-110.0z"><title>68 St-Hunter College (6), Downtown, Sep 2025: 47.5</title></path>
 <text x="491.8" y="2258.0">47.5</text>
-<text x="365.8" y="2278.0" class="label" text-anchor="end">Forest Hills-71 Av (E,F,M,R), Outbound</text>
-<path class="s0" d="M373.8,2268.0h107.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-107.6z"><title>Forest Hills-71 Av (E,F,M,R), Outbound, Sep 2025: 46.5</title></path>
-<text x="489.4" y="2278.0">46.5</text>
-<text x="365.8" y="2298.0" class="label" text-anchor="end">68 St-Hunter College (6), Uptown</text>
-<path class="s0" d="M373.8,2288.0h106.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-106.9z"><title>68 St-Hunter College (6), Uptown, Sep 2025: 46.2</title></path>
-<text x="488.7" y="2298.0">46.2</text>
-<text x="365.8" y="2318.0" class="label" text-anchor="end">77 St (6), Downtown</text>
-<path class="s0" d="M373.8,2308.0h105.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-105.0z"><title>77 St (6), Downtown, Sep 2025: 45.4</title></path>
-<text x="486.8" y="2318.0">45.4</text>
-<text x="365.8" y="2338.0" class="label" text-anchor="end">South Ferry (1)</text>
-<path class="s0" d="M373.8,2328.0h104.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-104.5z"><title>South Ferry (1), Sep 2025: 45.2</title></path>
-<text x="486.3" y="2338.0">45.2</text>
+<text x="365.8" y="2278.0" class="label" text-anchor="end">South Ferry (1)</text>
+<path class="s0" d="M373.8,2268.0h108.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-108.6z"><title>South Ferry (1), Sep 2025: 46.9</title></path>
+<text x="490.4" y="2278.0">46.9</text>
+<text x="365.8" y="2298.0" class="label" text-anchor="end">Forest Hills-71 Av (E,F,M,R), Outbound</text>
+<path class="s0" d="M373.8,2288.0h107.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-107.6z"><title>Forest Hills-71 Av (E,F,M,R), Outbound, Sep 2025: 46.5</title></path>
+<text x="489.4" y="2298.0">46.5</text>
+<text x="365.8" y="2318.0" class="label" text-anchor="end">68 St-Hunter College (6), Uptown</text>
+<path class="s0" d="M373.8,2308.0h106.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-106.9z"><title>68 St-Hunter College (6), Uptown, Sep 2025: 46.2</title></path>
+<text x="488.7" y="2318.0">46.2</text>
+<text x="365.8" y="2338.0" class="label" text-anchor="end">77 St (6), Downtown</text>
+<path class="s0" d="M373.8,2328.0h105.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-105.0z"><title>77 St (6), Downtown, Sep 2025: 45.4</title></path>
+<text x="486.8" y="2338.0">45.4</text>
 <text x="365.8" y="2358.0" class="label" text-anchor="end">149 St-Hostos (2,5), Manhattan</text>
 <path class="s0" d="M373.8,2348.0h104.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-104.2z"><title>149 St-Hostos (2,5), Manhattan, Sep 2025: 45.1</title></path>
 <text x="486.0" y="2358.0">45.1</text>
@@ -506,8 +506,8 @@ text {
 <path class="s0" d="M373.8,3228.0h77.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.1z"><title>Court Sq-23 St (E,F), Outbound, Sep 2025: 33.8</title></path>
 <text x="458.9" y="3238.0">33.8</text>
 <text x="365.8" y="3258.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Outbound</text>
-<path class="s0" d="M373.8,3248.0h76.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.4z"><title>Atlantic Av (2,3,4,5), Outbound, Sep 2025: 33.5</title></path>
-<text x="458.2" y="3258.0">33.5</text>
+<path class="s0" d="M373.8,3248.0h76.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.2z"><title>Atlantic Av (2,3,4,5), Outbound, Sep 2025: 33.4</title></path>
+<text x="458.0" y="3258.0">33.4</text>
 <text x="365.8" y="3278.0" class="label" text-anchor="end">Clark St (2,3)</text>
 <path class="s0" d="M373.8,3268.0h75.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.9z"><title>Clark St (2,3), Sep 2025: 33.3</title></path>
 <text x="457.7" y="3278.0">33.3</text>
@@ -529,15 +529,15 @@ text {
 <text x="365.8" y="3398.0" class="label" text-anchor="end">168 St (A,C), Downtown</text>
 <path class="s0" d="M373.8,3388.0h71.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.8z"><title>168 St (A,C), Downtown, Sep 2025: 31.6</title></path>
 <text x="453.6" y="3398.0">31.6</text>
-<text x="365.8" y="3418.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Manhattan</text>
-<path class="s0" d="M373.8,3408.0h71.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.6z"><title>Atlantic Av (2,3,4,5), Manhattan, Sep 2025: 31.5</title></path>
-<text x="453.4" y="3418.0">31.5</text>
-<text x="365.8" y="3438.0" class="label" text-anchor="end">Vernon Blvd-Jackson Av (7), Manhattan</text>
-<path class="s0" d="M373.8,3428.0h71.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.4z"><title>Vernon Blvd-Jackson Av (7), Manhattan, Sep 2025: 31.4</title></path>
-<text x="453.2" y="3438.0">31.4</text>
-<text x="365.8" y="3458.0" class="label" text-anchor="end">Grand St (B,D), Brooklyn</text>
-<path class="s0" d="M373.8,3448.0h71.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.1z"><title>Grand St (B,D), Brooklyn, Sep 2025: 31.3</title></path>
-<text x="452.9" y="3458.0">31.3</text>
+<text x="365.8" y="3418.0" class="label" text-anchor="end">Vernon Blvd-Jackson Av (7), Manhattan</text>
+<path class="s0" d="M373.8,3408.0h71.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.4z"><title>Vernon Blvd-Jackson Av (7), Manhattan, Sep 2025: 31.4</title></path>
+<text x="453.2" y="3418.0">31.4</text>
+<text x="365.8" y="3438.0" class="label" text-anchor="end">Grand St (B,D), Brooklyn</text>
+<path class="s0" d="M373.8,3428.0h71.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.1z"><title>Grand St (B,D), Brooklyn, Sep 2025: 31.3</title></path>
+<text x="452.9" y="3438.0">31.3</text>
+<text x="365.8" y="3458.0" class="label" text-anchor="end">Atlantic Av (2,3,4,5), Manhattan</text>
+<path class="s0" d="M373.8,3448.0h70.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-70.9z"><title>Atlantic Av (2,3,4,5), Manhattan, Sep 2025: 31.2</title></path>
+<text x="452.7" y="3458.0">31.2</text>
 <text x="365.8" y="3478.0" class="label" text-anchor="end">Grand St (B,D), Uptown</text>
 <path class="s0" d="M373.8,3468.0h70.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-70.2z"><title>Grand St (B,D), Uptown, Sep 2025: 30.9</title></path>
 <text x="452.0" y="3478.0">30.9</text>
@@ -557,14 +557,14 @@ text {
 <path class="s0" d="M373.8,3568.0h68.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.0z"><title>Grand Central-42 St (S), Sep 2025: 30.0</title></path>
 <text x="449.8" y="3578.0">30.0</text>
 <text x="365.8" y="3598.0" class="label" text-anchor="end">WTC Cortlandt (1), Uptown</text>
-<path class="s0" d="M373.8,3588.0h67.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.8z"><title>WTC Cortlandt (1), Uptown, Sep 2025: 29.9</title></path>
-<text x="449.6" y="3598.0">29.9</text>
-<text x="365.8" y="3618.0" class="label" text-anchor="end">Flatbush Av-Brooklyn College (2,5)</text>
-<path class="s0" d="M373.8,3608.0h67.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.8z"><title>Flatbush Av-Brooklyn College (2,5), Sep 2025: 29.9</title></path>
+<path class="s0" d="M373.8,3588.0h68.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.0z"><title>WTC Cortlandt (1), Uptown, Sep 2025: 30.0</title></path>
+<text x="449.8" y="3598.0">30.0</text>
+<text x="365.8" y="3618.0" class="label" text-anchor="end">Canal St (6), Uptown</text>
+<path class="s0" d="M373.8,3608.0h67.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.8z"><title>Canal St (6), Uptown, Sep 2025: 29.9</title></path>
 <text x="449.6" y="3618.0">29.9</text>
-<text x="365.8" y="3638.0" class="label" text-anchor="end">Canal St (6), Uptown</text>
-<path class="s0" d="M373.8,3628.0h67.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.5z"><title>Canal St (6), Uptown, Sep 2025: 29.8</title></path>
-<text x="449.3" y="3638.0">29.8</text>
+<text x="365.8" y="3638.0" class="label" text-anchor="end">Flatbush Av-Brooklyn College (2,5)</text>
+<path class="s0" d="M373.8,3628.0h67.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.8z"><title>Flatbush Av-Brooklyn College (2,5), Sep 2025: 29.9</title></path>
+<text x="449.6" y="3638.0">29.9</text>
 <text x="365.8" y="3658.0" class="label" text-anchor="end">96 St (6), The Bronx</text>
 <path class="s0" d="M373.8,3648.0h67.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.3z"><title>96 St (6), The Bronx, Sep 2025: 29.7</title></path>
 <text x="449.1" y="3658.0">29.7</text>
@@ -590,8 +590,8 @@ text {
 <path class="s0" d="M373.8,3788.0h64.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.6z"><title>3 Av-149 St (2,5), NB, Sep 2025: 28.6</title></path>
 <text x="446.4" y="3798.0">28.6</text>
 <text x="365.8" y="3818.0" class="label" text-anchor="end">WTC Cortlandt (1), Downtown</text>
-<path class="s0" d="M373.8,3808.0h64.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.6z"><title>WTC Cortlandt (1), Downtown, Sep 2025: 28.6</title></path>
-<text x="446.4" y="3818.0">28.6</text>
+<path class="s0" d="M373.8,3808.0h64.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.2z"><title>WTC Cortlandt (1), Downtown, Sep 2025: 28.4</title></path>
+<text x="446.0" y="3818.0">28.4</text>
 <text x="365.8" y="3838.0" class="label" text-anchor="end">46 St-Bliss St (7), Manhattan</text>
 <path class="s0" d="M373.8,3828.0h63.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.9z"><title>46 St-Bliss St (7), Manhattan, Sep 2025: 28.3</title></path>
 <text x="445.7" y="3838.0">28.3</text>
@@ -670,14 +670,14 @@ text {
 <text x="365.8" y="4338.0" class="label" text-anchor="end">High St (A,C)</text>
 <path class="s0" d="M373.8,4328.0h57.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.2z"><title>High St (A,C), Sep 2025: 25.5</title></path>
 <text x="439.0" y="4338.0">25.5</text>
-<text x="365.8" y="4358.0" class="label" text-anchor="end">Canal St (J,Z)</text>
-<path class="s0" d="M373.8,4348.0h57.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.2z"><title>Canal St (J,Z), Sep 2025: 25.5</title></path>
-<text x="439.0" y="4358.0">25.5</text>
-<text x="365.8" y="4378.0" class="label" text-anchor="end">Broadway Junction (A,C), Manhattan</text>
-<path class="s0" d="M373.8,4368.0h57.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.0z"><title>Broadway Junction (A,C), Manhattan, Sep 2025: 25.4</title></path>
+<text x="365.8" y="4358.0" class="label" text-anchor="end">Broadway Junction (A,C), Manhattan</text>
+<path class="s0" d="M373.8,4348.0h57.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.0z"><title>Broadway Junction (A,C), Manhattan, Sep 2025: 25.4</title></path>
+<text x="438.8" y="4358.0">25.4</text>
+<text x="365.8" y="4378.0" class="label" text-anchor="end">Houston St (1), Uptown</text>
+<path class="s0" d="M373.8,4368.0h57.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.0z"><title>Houston St (1), Uptown, Sep 2025: 25.4</title></path>
 <text x="438.8" y="4378.0">25.4</text>
-<text x="365.8" y="4398.0" class="label" text-anchor="end">Houston St (1), Uptown</text>
-<path class="s0" d="M373.8,4388.0h57.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.0z"><title>Houston St (1), Uptown, Sep 2025: 25.4</title></path>
+<text x="365.8" y="4398.0" class="label" text-anchor="end">Canal St (J,Z)</text>
+<path class="s0" d="M373.8,4388.0h57.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.0z"><title>Canal St (J,Z), Sep 2025: 25.4</title></path>
 <text x="438.8" y="4398.0">25.4</text>
 <text x="365.8" y="4418.0" class="label" text-anchor="end">Sutphin Blvd-Archer Av-JFK Airport (E,J,Z), J,Z</text>
 <path class="s0" d="M373.8,4408.0h56.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-56.7z"><title>Sutphin Blvd-Archer Av-JFK Airport (E,J,Z), J,Z, Sep 2025: 25.3</title></path>
@@ -727,14 +727,14 @@ text {
 <text x="365.8" y="4718.0" class="label" text-anchor="end">Woodhaven Blvd (M,R), Outbound</text>
 <path class="s0" d="M373.8,4708.0h53.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.1z"><title>Woodhaven Blvd (M,R), Outbound, Sep 2025: 23.8</title></path>
 <text x="434.9" y="4718.0">23.8</text>
-<text x="365.8" y="4738.0" class="label" text-anchor="end">World Trade Center (E)</text>
-<path class="s0" d="M373.8,4728.0h52.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.6z"><title>World Trade Center (E), Sep 2025: 23.6</title></path>
-<text x="434.4" y="4738.0">23.6</text>
-<text x="365.8" y="4758.0" class="label" text-anchor="end">Borough Hall (4,5), Manhattan</text>
-<path class="s0" d="M373.8,4748.0h52.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.6z"><title>Borough Hall (4,5), Manhattan, Sep 2025: 23.6</title></path>
+<text x="365.8" y="4738.0" class="label" text-anchor="end">Borough Hall (4,5), Outbound</text>
+<path class="s0" d="M373.8,4728.0h52.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.9z"><title>Borough Hall (4,5), Outbound, Sep 2025: 23.7</title></path>
+<text x="434.7" y="4738.0">23.7</text>
+<text x="365.8" y="4758.0" class="label" text-anchor="end">World Trade Center (E)</text>
+<path class="s0" d="M373.8,4748.0h52.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.6z"><title>World Trade Center (E), Sep 2025: 23.6</title></path>
 <text x="434.4" y="4758.0">23.6</text>
-<text x="365.8" y="4778.0" class="label" text-anchor="end">Borough Hall (4,5), Outbound</text>
-<path class="s0" d="M373.8,4768.0h52.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.6z"><title>Borough Hall (4,5), Outbound, Sep 2025: 23.6</title></path>
+<text x="365.8" y="4778.0" class="label" text-anchor="end">Borough Hall (4,5), Manhattan</text>
+<path class="s0" d="M373.8,4768.0h52.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.6z"><title>Borough Hall (4,5), Manhattan, Sep 2025: 23.6</title></path>
 <text x="434.4" y="4778.0">23.6</text>
 <text x="365.8" y="4798.0" class="label" text-anchor="end">Grand Av-Newtown (M,R), Outbound</text>
 <path class="s0" d="M373.8,4788.0h52.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.4z"><title>Grand Av-Newtown (M,R), Outbound, Sep 2025: 23.5</title></path>
@@ -800,8 +800,8 @@ text {
 <path class="s0" d="M373.8,5188.0h48.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.3z"><title>110 St (6), Downtown, Sep 2025: 21.8</title></path>
 <text x="430.1" y="5198.0">21.8</text>
 <text x="365.8" y="5218.0" class="label" text-anchor="end">28 St (1), Uptown</text>
-<path class="s0" d="M373.8,5208.0h47.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.6z"><title>28 St (1), Uptown, Sep 2025: 21.5</title></path>
-<text x="429.4" y="5218.0">21.5</text>
+<path class="s0" d="M373.8,5208.0h47.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.8z"><title>28 St (1), Uptown, Sep 2025: 21.6</title></path>
+<text x="429.6" y="5218.0">21.6</text>
 <text x="365.8" y="5238.0" class="label" text-anchor="end">Church Av (F,G), NB</text>
 <path class="s0" d="M373.8,5228.0h47.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.6z"><title>Church Av (F,G), NB, Sep 2025: 21.5</title></path>
 <text x="429.4" y="5238.0">21.5</text>
@@ -892,42 +892,42 @@ text {
 <text x="365.8" y="5818.0" class="label" text-anchor="end">Prospect Park (B,Q,S), NB &amp; SB</text>
 <path class="s0" d="M373.8,5808.0h43.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.0z"><title>Prospect Park (B,Q,S), NB &amp; SB, Sep 2025: 19.6</title></path>
 <text x="424.8" y="5818.0">19.6</text>
-<text x="365.8" y="5838.0" class="label" text-anchor="end">Christopher St-Stonewall (1), Uptown</text>
-<path class="s0" d="M373.8,5828.0h43.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.0z"><title>Christopher St-Stonewall (1), Uptown, Sep 2025: 19.6</title></path>
+<text x="365.8" y="5838.0" class="label" text-anchor="end">Whitehall St-South Ferry (R,W), Uptown</text>
+<path class="s0" d="M373.8,5828.0h43.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.0z"><title>Whitehall St-South Ferry (R,W), Uptown, Sep 2025: 19.6</title></path>
 <text x="424.8" y="5838.0">19.6</text>
-<text x="365.8" y="5858.0" class="label" text-anchor="end">3 Av-138 St (6), Manhattan</text>
-<path class="s0" d="M373.8,5848.0h43.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.0z"><title>3 Av-138 St (6), Manhattan, Sep 2025: 19.6</title></path>
+<text x="365.8" y="5858.0" class="label" text-anchor="end">Christopher St-Stonewall (1), Uptown</text>
+<path class="s0" d="M373.8,5848.0h43.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.0z"><title>Christopher St-Stonewall (1), Uptown, Sep 2025: 19.6</title></path>
 <text x="424.8" y="5858.0">19.6</text>
-<text x="365.8" y="5878.0" class="label" text-anchor="end">Prince St (R,W), Downtown</text>
-<path class="s0" d="M373.8,5868.0h42.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.8z"><title>Prince St (R,W), Downtown, Sep 2025: 19.5</title></path>
-<text x="424.6" y="5878.0">19.5</text>
-<text x="365.8" y="5898.0" class="label" text-anchor="end">3 Av-138 St (6), NB</text>
-<path class="s0" d="M373.8,5888.0h42.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.3z"><title>3 Av-138 St (6), NB, Sep 2025: 19.3</title></path>
-<text x="424.1" y="5898.0">19.3</text>
-<text x="365.8" y="5918.0" class="label" text-anchor="end">Queens Plaza (E,F,R), Outbound</text>
-<path class="s0" d="M373.8,5908.0h42.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.1z"><title>Queens Plaza (E,F,R), Outbound, Sep 2025: 19.2</title></path>
-<text x="423.9" y="5918.0">19.2</text>
-<text x="365.8" y="5938.0" class="label" text-anchor="end">50 St (1), Downtown</text>
-<path class="s0" d="M373.8,5928.0h41.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.8z"><title>50 St (1), Downtown, Sep 2025: 19.1</title></path>
-<text x="423.6" y="5938.0">19.1</text>
-<text x="365.8" y="5958.0" class="label" text-anchor="end">30 Av (N,W), Manhattan</text>
-<path class="s0" d="M373.8,5948.0h41.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.8z"><title>30 Av (N,W), Manhattan, Sep 2025: 19.1</title></path>
-<text x="423.6" y="5958.0">19.1</text>
-<text x="365.8" y="5978.0" class="label" text-anchor="end">28 St (R,W), Uptown</text>
-<path class="s0" d="M373.8,5968.0h41.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.8z"><title>28 St (R,W), Uptown, Sep 2025: 19.1</title></path>
+<text x="365.8" y="5878.0" class="label" text-anchor="end">3 Av-138 St (6), Manhattan</text>
+<path class="s0" d="M373.8,5868.0h43.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.0z"><title>3 Av-138 St (6), Manhattan, Sep 2025: 19.6</title></path>
+<text x="424.8" y="5878.0">19.6</text>
+<text x="365.8" y="5898.0" class="label" text-anchor="end">Prince St (R,W), Downtown</text>
+<path class="s0" d="M373.8,5888.0h42.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.8z"><title>Prince St (R,W), Downtown, Sep 2025: 19.5</title></path>
+<text x="424.6" y="5898.0">19.5</text>
+<text x="365.8" y="5918.0" class="label" text-anchor="end">3 Av-138 St (6), NB</text>
+<path class="s0" d="M373.8,5908.0h42.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.3z"><title>3 Av-138 St (6), NB, Sep 2025: 19.3</title></path>
+<text x="424.1" y="5918.0">19.3</text>
+<text x="365.8" y="5938.0" class="label" text-anchor="end">Queens Plaza (E,F,R), Outbound</text>
+<path class="s0" d="M373.8,5928.0h42.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.1z"><title>Queens Plaza (E,F,R), Outbound, Sep 2025: 19.2</title></path>
+<text x="423.9" y="5938.0">19.2</text>
+<text x="365.8" y="5958.0" class="label" text-anchor="end">28 St (R,W), Uptown</text>
+<path class="s0" d="M373.8,5948.0h42.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.1z"><title>28 St (R,W), Uptown, Sep 2025: 19.2</title></path>
+<text x="423.9" y="5958.0">19.2</text>
+<text x="365.8" y="5978.0" class="label" text-anchor="end">50 St (1), Downtown</text>
+<path class="s0" d="M373.8,5968.0h41.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.8z"><title>50 St (1), Downtown, Sep 2025: 19.1</title></path>
 <text x="423.6" y="5978.0">19.1</text>
-<text x="365.8" y="5998.0" class="label" text-anchor="end">Nassau Av (G), Queens</text>
-<path class="s0" d="M373.8,5988.0h41.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.6z"><title>Nassau Av (G), Queens, Sep 2025: 19.0</title></path>
-<text x="423.4" y="5998.0">19.0</text>
-<text x="365.8" y="6018.0" class="label" text-anchor="end">33 St-Rawson St (7), Manhattan</text>
-<path class="s0" d="M373.8,6008.0h41.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.4z"><title>33 St-Rawson St (7), Manhattan, Sep 2025: 18.9</title></path>
-<text x="423.2" y="6018.0">18.9</text>
-<text x="365.8" y="6038.0" class="label" text-anchor="end">Nassau Av (G), SB</text>
-<path class="s0" d="M373.8,6028.0h41.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.4z"><title>Nassau Av (G), SB, Sep 2025: 18.9</title></path>
+<text x="365.8" y="5998.0" class="label" text-anchor="end">30 Av (N,W), Manhattan</text>
+<path class="s0" d="M373.8,5988.0h41.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.8z"><title>30 Av (N,W), Manhattan, Sep 2025: 19.1</title></path>
+<text x="423.6" y="5998.0">19.1</text>
+<text x="365.8" y="6018.0" class="label" text-anchor="end">Nassau Av (G), Queens</text>
+<path class="s0" d="M373.8,6008.0h41.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.6z"><title>Nassau Av (G), Queens, Sep 2025: 19.0</title></path>
+<text x="423.4" y="6018.0">19.0</text>
+<text x="365.8" y="6038.0" class="label" text-anchor="end">33 St-Rawson St (7), Manhattan</text>
+<path class="s0" d="M373.8,6028.0h41.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.4z"><title>33 St-Rawson St (7), Manhattan, Sep 2025: 18.9</title></path>
 <text x="423.2" y="6038.0">18.9</text>
-<text x="365.8" y="6058.0" class="label" text-anchor="end">Whitehall St-South Ferry (R,W), Uptown</text>
-<path class="s0" d="M373.8,6048.0h41.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.1z"><title>Whitehall St-South Ferry (R,W), Uptown, Sep 2025: 18.8</title></path>
-<text x="422.9" y="6058.0">18.8</text>
+<text x="365.8" y="6058.0" class="label" text-anchor="end">Nassau Av (G), SB</text>
+<path class="s0" d="M373.8,6048.0h41.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.4z"><title>Nassau Av (G), SB, Sep 2025: 18.9</title></path>
+<text x="423.2" y="6058.0">18.9</text>
 <text x="365.8" y="6078.0" class="label" text-anchor="end">125 St (1), Uptown</text>
 <path class="s0" d="M373.8,6068.0h41.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.1z"><title>125 St (1), Uptown, Sep 2025: 18.8</title></path>
 <text x="422.9" y="6078.0">18.8</text>
@@ -1033,15 +1033,15 @@ text {
 <text x="365.8" y="6758.0" class="label" text-anchor="end">86 St (1), Downtown</text>
 <path class="s0" d="M373.8,6748.0h35.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.4z"><title>86 St (1), Downtown, Sep 2025: 16.4</title></path>
 <text x="417.2" y="6758.0">16.4</text>
-<text x="365.8" y="6778.0" class="label" text-anchor="end">63 Dr-Rego Park (M,R), Outbound</text>
-<path class="s0" d="M373.8,6768.0h35.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.4z"><title>63 Dr-Rego Park (M,R), Outbound, Sep 2025: 16.4</title></path>
+<text x="365.8" y="6778.0" class="label" text-anchor="end">Whitehall St-South Ferry (R,W), Downtown</text>
+<path class="s0" d="M373.8,6768.0h35.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.4z"><title>Whitehall St-South Ferry (R,W), Downtown, Sep 2025: 16.4</title></path>
 <text x="417.2" y="6778.0">16.4</text>
-<text x="365.8" y="6798.0" class="label" text-anchor="end">Myrtle-Wyckoff Avs (M), Middle Village</text>
-<path class="s0" d="M373.8,6788.0h35.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.4z"><title>Myrtle-Wyckoff Avs (M), Middle Village, Sep 2025: 16.4</title></path>
+<text x="365.8" y="6798.0" class="label" text-anchor="end">63 Dr-Rego Park (M,R), Outbound</text>
+<path class="s0" d="M373.8,6788.0h35.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.4z"><title>63 Dr-Rego Park (M,R), Outbound, Sep 2025: 16.4</title></path>
 <text x="417.2" y="6798.0">16.4</text>
-<text x="365.8" y="6818.0" class="label" text-anchor="end">Whitehall St-South Ferry (R,W), Downtown</text>
-<path class="s0" d="M373.8,6808.0h34.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-34.6z"><title>Whitehall St-South Ferry (R,W), Downtown, Sep 2025: 16.1</title></path>
-<text x="416.4" y="6818.0">16.1</text>
+<text x="365.8" y="6818.0" class="label" text-anchor="end">Myrtle-Wyckoff Avs (M), Middle Village</text>
+<path class="s0" d="M373.8,6808.0h35.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.4z"><title>Myrtle-Wyckoff Avs (M), Middle Village, Sep 2025: 16.4</title></path>
+<text x="417.2" y="6818.0">16.4</text>
 <text x="365.8" y="6838.0" class="label" text-anchor="end">Steinway St (M,R), Outbound</text>
 <path class="s0" d="M373.8,6828.0h34.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-34.6z"><title>Steinway St (M,R), Outbound, Sep 2025: 16.1</title></path>
 <text x="416.4" y="6838.0">16.1</text>
@@ -1154,14 +1154,14 @@ text {
 <path class="s0" d="M373.8,7548.0h30.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-30.3z"><title>96 St (B,C), Downtown, Sep 2025: 14.3</title></path>
 <text x="412.1" y="7558.0">14.3</text>
 <text x="365.8" y="7578.0" class="label" text-anchor="end">Rector St (1), Uptown</text>
-<path class="s0" d="M373.8,7568.0h30.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-30.1z"><title>Rector St (1), Uptown, Sep 2025: 14.2</title></path>
-<text x="411.9" y="7578.0">14.2</text>
-<text x="365.8" y="7598.0" class="label" text-anchor="end">Botanic Garden (S), Franklin Av</text>
-<path class="s0" d="M373.8,7588.0h29.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.6z"><title>Botanic Garden (S), Franklin Av, Sep 2025: 14.0</title></path>
+<path class="s0" d="M373.8,7568.0h30.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-30.3z"><title>Rector St (1), Uptown, Sep 2025: 14.3</title></path>
+<text x="412.1" y="7578.0">14.3</text>
+<text x="365.8" y="7598.0" class="label" text-anchor="end">Court St (R)</text>
+<path class="s0" d="M373.8,7588.0h29.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.6z"><title>Court St (R), Sep 2025: 14.0</title></path>
 <text x="411.4" y="7598.0">14.0</text>
-<text x="365.8" y="7618.0" class="label" text-anchor="end">Court St (R)</text>
-<path class="s0" d="M373.8,7608.0h29.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.4z"><title>Court St (R), Sep 2025: 13.9</title></path>
-<text x="411.2" y="7618.0">13.9</text>
+<text x="365.8" y="7618.0" class="label" text-anchor="end">Botanic Garden (S), Franklin Av</text>
+<path class="s0" d="M373.8,7608.0h29.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.6z"><title>Botanic Garden (S), Franklin Av, Sep 2025: 14.0</title></path>
+<text x="411.4" y="7618.0">14.0</text>
 <text x="365.8" y="7638.0" class="label" text-anchor="end">Halsey St (L), Manhattan</text>
 <path class="s0" d="M373.8,7628.0h29.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.4z"><title>Halsey St (L), Manhattan, Sep 2025: 13.9</title></path>
 <text x="411.2" y="7638.0">13.9</text>
@@ -1240,12 +1240,12 @@ text {
 <text x="365.8" y="8138.0" class="label" text-anchor="end">103 St (1), Downtown</text>
 <path class="s0" d="M373.8,8128.0h27.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.2z"><title>103 St (1), Downtown, Sep 2025: 13.0</title></path>
 <text x="409.0" y="8138.0">13.0</text>
-<text x="365.8" y="8158.0" class="label" text-anchor="end">Avenue J (Q), Manhattan</text>
-<path class="s0" d="M373.8,8148.0h27.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.2z"><title>Avenue J (Q), Manhattan, Sep 2025: 13.0</title></path>
+<text x="365.8" y="8158.0" class="label" text-anchor="end">Canal St (R,W), Downtown</text>
+<path class="s0" d="M373.8,8148.0h27.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.2z"><title>Canal St (R,W), Downtown, Sep 2025: 13.0</title></path>
 <text x="409.0" y="8158.0">13.0</text>
-<text x="365.8" y="8178.0" class="label" text-anchor="end">Canal St (R,W), Downtown</text>
-<path class="s0" d="M373.8,8168.0h27.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.0z"><title>Canal St (R,W), Downtown, Sep 2025: 12.9</title></path>
-<text x="408.8" y="8178.0">12.9</text>
+<text x="365.8" y="8178.0" class="label" text-anchor="end">Avenue J (Q), Manhattan</text>
+<path class="s0" d="M373.8,8168.0h27.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.2z"><title>Avenue J (Q), Manhattan, Sep 2025: 13.0</title></path>
+<text x="409.0" y="8178.0">13.0</text>
 <text x="365.8" y="8198.0" class="label" text-anchor="end">Fordham Rd (4), NB</text>
 <path class="s0" d="M373.8,8188.0h27.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.0z"><title>Fordham Rd (4), NB, Sep 2025: 12.9</title></path>
 <text x="408.8" y="8198.0">12.9</text>
@@ -1261,20 +1261,20 @@ text {
 <text x="365.8" y="8278.0" class="label" text-anchor="end">Avenue M (Q), SB</text>
 <path class="s0" d="M373.8,8268.0h26.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.7z"><title>Avenue M (Q), SB, Sep 2025: 12.8</title></path>
 <text x="408.5" y="8278.0">12.8</text>
-<text x="365.8" y="8298.0" class="label" text-anchor="end">Borough Hall (2,3), Manhattan</text>
-<path class="s0" d="M373.8,8288.0h26.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.5z"><title>Borough Hall (2,3), Manhattan, Sep 2025: 12.7</title></path>
+<text x="365.8" y="8298.0" class="label" text-anchor="end">72 St (B,C), Uptown</text>
+<path class="s0" d="M373.8,8288.0h26.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.5z"><title>72 St (B,C), Uptown, Sep 2025: 12.7</title></path>
 <text x="408.3" y="8298.0">12.7</text>
-<text x="365.8" y="8318.0" class="label" text-anchor="end">72 St (B,C), Uptown</text>
-<path class="s0" d="M373.8,8308.0h26.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.5z"><title>72 St (B,C), Uptown, Sep 2025: 12.7</title></path>
+<text x="365.8" y="8318.0" class="label" text-anchor="end">7 Av (B,Q), Manhattan</text>
+<path class="s0" d="M373.8,8308.0h26.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.5z"><title>7 Av (B,Q), Manhattan, Sep 2025: 12.7</title></path>
 <text x="408.3" y="8318.0">12.7</text>
-<text x="365.8" y="8338.0" class="label" text-anchor="end">7 Av (B,Q), Manhattan</text>
-<path class="s0" d="M373.8,8328.0h26.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.5z"><title>7 Av (B,Q), Manhattan, Sep 2025: 12.7</title></path>
+<text x="365.8" y="8338.0" class="label" text-anchor="end">Gates Av (J,Z), Manhattan</text>
+<path class="s0" d="M373.8,8328.0h26.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.5z"><title>Gates Av (J,Z), Manhattan, Sep 2025: 12.7</title></path>
 <text x="408.3" y="8338.0">12.7</text>
-<text x="365.8" y="8358.0" class="label" text-anchor="end">Gates Av (J,Z), Manhattan</text>
-<path class="s0" d="M373.8,8348.0h26.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.5z"><title>Gates Av (J,Z), Manhattan, Sep 2025: 12.7</title></path>
-<text x="408.3" y="8358.0">12.7</text>
-<text x="365.8" y="8378.0" class="label" text-anchor="end">Greenpoint Av (G), Queens</text>
-<path class="s0" d="M373.8,8368.0h26.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.2z"><title>Greenpoint Av (G), Queens, Sep 2025: 12.6</title></path>
+<text x="365.8" y="8358.0" class="label" text-anchor="end">Greenpoint Av (G), Queens</text>
+<path class="s0" d="M373.8,8348.0h26.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.2z"><title>Greenpoint Av (G), Queens, Sep 2025: 12.6</title></path>
+<text x="408.0" y="8358.0">12.6</text>
+<text x="365.8" y="8378.0" class="label" text-anchor="end">Borough Hall (2,3), Manhattan</text>
+<path class="s0" d="M373.8,8368.0h26.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.2z"><title>Borough Hall (2,3), Manhattan, Sep 2025: 12.6</title></path>
 <text x="408.0" y="8378.0">12.6</text>
 <text x="365.8" y="8398.0" class="label" text-anchor="end">53 St (R), Manhattan</text>
 <path class="s0" d="M373.8,8388.0h26.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.2z"><title>53 St (R), Manhattan, Sep 2025: 12.6</title></path>
@@ -1315,14 +1315,14 @@ text {
 <text x="365.8" y="8638.0" class="label" text-anchor="end">Bedford-Nostrand Avs (G), Queens</text>
 <path class="s0" d="M373.8,8628.0h25.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-25.3z"><title>Bedford-Nostrand Avs (G), Queens, Sep 2025: 12.2</title></path>
 <text x="407.1" y="8638.0">12.2</text>
-<text x="365.8" y="8658.0" class="label" text-anchor="end">Rector St (1), Downtown</text>
-<path class="s0" d="M373.8,8648.0h25.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-25.0z"><title>Rector St (1), Downtown, Sep 2025: 12.1</title></path>
+<text x="365.8" y="8658.0" class="label" text-anchor="end">Newkirk Av-Little Haiti (2,5), Manhattan</text>
+<path class="s0" d="M373.8,8648.0h25.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-25.0z"><title>Newkirk Av-Little Haiti (2,5), Manhattan, Sep 2025: 12.1</title></path>
 <text x="406.8" y="8658.0">12.1</text>
-<text x="365.8" y="8678.0" class="label" text-anchor="end">Newkirk Av-Little Haiti (2,5), Manhattan</text>
-<path class="s0" d="M373.8,8668.0h25.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-25.0z"><title>Newkirk Av-Little Haiti (2,5), Manhattan, Sep 2025: 12.1</title></path>
-<text x="406.8" y="8678.0">12.1</text>
-<text x="365.8" y="8698.0" class="label" text-anchor="end">7 Av (B,Q), SB</text>
-<path class="s0" d="M373.8,8688.0h24.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.8z"><title>7 Av (B,Q), SB, Sep 2025: 12.0</title></path>
+<text x="365.8" y="8678.0" class="label" text-anchor="end">7 Av (B,Q), SB</text>
+<path class="s0" d="M373.8,8668.0h24.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.8z"><title>7 Av (B,Q), SB, Sep 2025: 12.0</title></path>
+<text x="406.6" y="8678.0">12.0</text>
+<text x="365.8" y="8698.0" class="label" text-anchor="end">Rector St (1), Downtown</text>
+<path class="s0" d="M373.8,8688.0h24.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.8z"><title>Rector St (1), Downtown, Sep 2025: 12.0</title></path>
 <text x="406.6" y="8698.0">12.0</text>
 <text x="365.8" y="8718.0" class="label" text-anchor="end">Avenue U (Q), Manhattan</text>
 <path class="s0" d="M373.8,8708.0h24.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.8z"><title>Avenue U (Q), Manhattan, Sep 2025: 12.0</title></path>
@@ -1438,26 +1438,26 @@ text {
 <text x="365.8" y="9458.0" class="label" text-anchor="end">170 St (4), Manhattan</text>
 <path class="s0" d="M373.8,9448.0h21.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.4z"><title>170 St (4), Manhattan, Sep 2025: 10.6</title></path>
 <text x="403.2" y="9458.0">10.6</text>
-<text x="365.8" y="9478.0" class="label" text-anchor="end">Franklin St (1), Downtown</text>
-<path class="s0" d="M373.8,9468.0h21.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.4z"><title>Franklin St (1), Downtown, Sep 2025: 10.6</title></path>
+<text x="365.8" y="9478.0" class="label" text-anchor="end">Kosciuszko St (J), Manhattan</text>
+<path class="s0" d="M373.8,9468.0h21.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.4z"><title>Kosciuszko St (J), Manhattan, Sep 2025: 10.6</title></path>
 <text x="403.2" y="9478.0">10.6</text>
-<text x="365.8" y="9498.0" class="label" text-anchor="end">Kosciuszko St (J), Manhattan</text>
-<path class="s0" d="M373.8,9488.0h21.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.4z"><title>Kosciuszko St (J), Manhattan, Sep 2025: 10.6</title></path>
-<text x="403.2" y="9498.0">10.6</text>
-<text x="365.8" y="9518.0" class="label" text-anchor="end">Prospect Park (B,Q,S), SB</text>
-<path class="s0" d="M373.8,9508.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>Prospect Park (B,Q,S), SB, Sep 2025: 10.5</title></path>
+<text x="365.8" y="9498.0" class="label" text-anchor="end">Prospect Park (B,Q,S), SB</text>
+<path class="s0" d="M373.8,9488.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>Prospect Park (B,Q,S), SB, Sep 2025: 10.5</title></path>
+<text x="403.0" y="9498.0">10.5</text>
+<text x="365.8" y="9518.0" class="label" text-anchor="end">Brighton Beach (B,Q), SB</text>
+<path class="s0" d="M373.8,9508.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>Brighton Beach (B,Q), SB, Sep 2025: 10.5</title></path>
 <text x="403.0" y="9518.0">10.5</text>
-<text x="365.8" y="9538.0" class="label" text-anchor="end">Brighton Beach (B,Q), SB</text>
-<path class="s0" d="M373.8,9528.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>Brighton Beach (B,Q), SB, Sep 2025: 10.5</title></path>
+<text x="365.8" y="9538.0" class="label" text-anchor="end">Roosevelt Island (M), Queens</text>
+<path class="s0" d="M373.8,9528.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>Roosevelt Island (M), Queens, Sep 2025: 10.5</title></path>
 <text x="403.0" y="9538.0">10.5</text>
-<text x="365.8" y="9558.0" class="label" text-anchor="end">Roosevelt Island (M), Queens</text>
-<path class="s0" d="M373.8,9548.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>Roosevelt Island (M), Queens, Sep 2025: 10.5</title></path>
+<text x="365.8" y="9558.0" class="label" text-anchor="end">Grand St (L), Manhattan</text>
+<path class="s0" d="M373.8,9548.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>Grand St (L), Manhattan, Sep 2025: 10.5</title></path>
 <text x="403.0" y="9558.0">10.5</text>
-<text x="365.8" y="9578.0" class="label" text-anchor="end">Grand St (L), Manhattan</text>
-<path class="s0" d="M373.8,9568.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>Grand St (L), Manhattan, Sep 2025: 10.5</title></path>
+<text x="365.8" y="9578.0" class="label" text-anchor="end">3 Av (L), West Side</text>
+<path class="s0" d="M373.8,9568.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>3 Av (L), West Side, Sep 2025: 10.5</title></path>
 <text x="403.0" y="9578.0">10.5</text>
-<text x="365.8" y="9598.0" class="label" text-anchor="end">3 Av (L), West Side</text>
-<path class="s0" d="M373.8,9588.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>3 Av (L), West Side, Sep 2025: 10.5</title></path>
+<text x="365.8" y="9598.0" class="label" text-anchor="end">Franklin St (1), Downtown</text>
+<path class="s0" d="M373.8,9588.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>Franklin St (1), Downtown, Sep 2025: 10.5</title></path>
 <text x="403.0" y="9598.0">10.5</text>
 <text x="365.8" y="9618.0" class="label" text-anchor="end">Franklin St (1), Uptown</text>
 <path class="s0" d="M373.8,9608.0h21.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-21.2z"><title>Franklin St (1), Uptown, Sep 2025: 10.5</title></path>
@@ -1957,24 +1957,24 @@ text {
 <text x="365.8" y="12918.0" class="label" text-anchor="end">Van Siclen Av (J,Z)</text>
 <path class="s0" d="M373.8,12908.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>Van Siclen Av (J,Z), Sep 2025: 6.8</title></path>
 <text x="394.1" y="12918.0">6.8</text>
-<text x="365.8" y="12938.0" class="label" text-anchor="end">Classon Av (G), SB</text>
-<path class="s0" d="M373.8,12928.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>Classon Av (G), SB, Sep 2025: 6.8</title></path>
+<text x="365.8" y="12938.0" class="label" text-anchor="end">Rector St (R,W), Uptown</text>
+<path class="s0" d="M373.8,12928.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>Rector St (R,W), Uptown, Sep 2025: 6.8</title></path>
 <text x="394.1" y="12938.0">6.8</text>
-<text x="365.8" y="12958.0" class="label" text-anchor="end">Ralph Av (C), Outbound</text>
-<path class="s0" d="M373.8,12948.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>Ralph Av (C), Outbound, Sep 2025: 6.8</title></path>
+<text x="365.8" y="12958.0" class="label" text-anchor="end">Classon Av (G), SB</text>
+<path class="s0" d="M373.8,12948.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>Classon Av (G), SB, Sep 2025: 6.8</title></path>
 <text x="394.1" y="12958.0">6.8</text>
-<text x="365.8" y="12978.0" class="label" text-anchor="end">20 Av (N), Coney Island</text>
-<path class="s0" d="M373.8,12968.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>20 Av (N), Coney Island, Sep 2025: 6.8</title></path>
+<text x="365.8" y="12978.0" class="label" text-anchor="end">Ralph Av (C), Outbound</text>
+<path class="s0" d="M373.8,12968.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>Ralph Av (C), Outbound, Sep 2025: 6.8</title></path>
 <text x="394.1" y="12978.0">6.8</text>
-<text x="365.8" y="12998.0" class="label" text-anchor="end">75 St-Elderts Ln (J,Z), Jamaica</text>
-<path class="s0" d="M373.8,12988.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>75 St-Elderts Ln (J,Z), Jamaica, Sep 2025: 6.8</title></path>
+<text x="365.8" y="12998.0" class="label" text-anchor="end">20 Av (N), Coney Island</text>
+<path class="s0" d="M373.8,12988.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>20 Av (N), Coney Island, Sep 2025: 6.8</title></path>
 <text x="394.1" y="12998.0">6.8</text>
-<text x="365.8" y="13018.0" class="label" text-anchor="end">85 St-Forest Pkwy (J), Jamaica</text>
-<path class="s0" d="M373.8,13008.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>85 St-Forest Pkwy (J), Jamaica, Sep 2025: 6.8</title></path>
+<text x="365.8" y="13018.0" class="label" text-anchor="end">75 St-Elderts Ln (J,Z), Jamaica</text>
+<path class="s0" d="M373.8,13008.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>75 St-Elderts Ln (J,Z), Jamaica, Sep 2025: 6.8</title></path>
 <text x="394.1" y="13018.0">6.8</text>
-<text x="365.8" y="13038.0" class="label" text-anchor="end">Rector St (R,W), Uptown</text>
-<path class="s0" d="M373.8,13028.0h12.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.1z"><title>Rector St (R,W), Uptown, Sep 2025: 6.7</title></path>
-<text x="393.9" y="13038.0">6.7</text>
+<text x="365.8" y="13038.0" class="label" text-anchor="end">85 St-Forest Pkwy (J), Jamaica</text>
+<path class="s0" d="M373.8,13028.0h12.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.3z"><title>85 St-Forest Pkwy (J), Jamaica, Sep 2025: 6.8</title></path>
+<text x="394.1" y="13038.0">6.8</text>
 <text x="365.8" y="13058.0" class="label" text-anchor="end">Jamaica-Van Wyck (E)</text>
 <path class="s0" d="M373.8,13048.0h11.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-11.8z"><title>Jamaica-Van Wyck (E), Sep 2025: 6.6</title></path>
 <text x="393.6" y="13058.0">6.6</text>

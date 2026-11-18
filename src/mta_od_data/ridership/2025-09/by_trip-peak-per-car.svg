@@ -175,9 +175,9 @@ text {
 <text x="154.6" y="558.0" class="label" text-anchor="end">Atlantic Av</text>
 <text x="169.2" y="558.0" class="label" text-anchor="middle">R</text>
 <text x="183.8" y="558.0" class="label" text-anchor="start">DeKalb Av</text>
-<text x="403.0" y="558.0" class="label" text-anchor="end">8:26 AM</text>
-<path class="s0" d="M411.0,548.0h195.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-195.2z"><title>Atlantic Av R DeKalb Av 8:26 AM, Peak per car: 83</title></path>
-<text x="614.2" y="558.0">83</text>
+<text x="403.0" y="558.0" class="label" text-anchor="end">8:51 AM</text>
+<path class="s0" d="M411.0,548.0h197.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-197.6z"><title>Atlantic Av R DeKalb Av 8:51 AM, Peak per car: 84</title></path>
+<text x="616.6" y="558.0">84</text>
 <text x="154.6" y="578.0" class="label" text-anchor="end">Marcy Av</text>
 <text x="169.2" y="578.0" class="label" text-anchor="middle">Z</text>
 <text x="183.8" y="578.0" class="label" text-anchor="start">Delancey St-Essex St</text>

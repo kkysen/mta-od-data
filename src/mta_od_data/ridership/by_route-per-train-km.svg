@@ -65,8 +65,8 @@ text {
 <path class="s0" d="M37.2,288.0h132.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-132.6z"><title>Z, Aug-Dec 2025: 40.9</title></path>
 <text x="177.8" y="298.0">40.9</text>
 <text x="29.2" y="318.0" class="label" text-anchor="end">R</text>
-<path class="s0" d="M37.2,308.0h130.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-130.9z"><title>R, Aug-Dec 2025: 40.4</title></path>
-<text x="176.1" y="318.0">40.4</text>
+<path class="s0" d="M37.2,308.0h131.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-131.2z"><title>R, Aug-Dec 2025: 40.5</title></path>
+<text x="176.4" y="318.0">40.5</text>
 <text x="29.2" y="338.0" class="label" text-anchor="end">E</text>
 <path class="s0" d="M37.2,328.0h128.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-128.6z"><title>E, Aug-Dec 2025: 39.7</title></path>
 <text x="173.8" y="338.0">39.7</text>
@@ -91,12 +91,12 @@ text {
 <text x="29.2" y="478.0" class="label" text-anchor="end">F</text>
 <path class="s0" d="M37.2,468.0h102.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-102.5z"><title>F, Aug-Dec 2025: 31.9</title></path>
 <text x="147.7" y="478.0">31.9</text>
-<text x="29.2" y="498.0" class="label" text-anchor="end">FL</text>
-<path class="s0" d="M37.2,488.0h102.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-102.5z"><title>FL, Aug-Dec 2025: 31.9</title></path>
+<text x="29.2" y="498.0" class="label" text-anchor="end">N</text>
+<path class="s0" d="M37.2,488.0h102.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-102.5z"><title>N, Aug-Dec 2025: 31.9</title></path>
 <text x="147.7" y="498.0">31.9</text>
-<text x="29.2" y="518.0" class="label" text-anchor="end">N</text>
-<path class="s0" d="M37.2,508.0h102.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-102.5z"><title>N, Aug-Dec 2025: 31.9</title></path>
-<text x="147.7" y="518.0">31.9</text>
+<text x="29.2" y="518.0" class="label" text-anchor="end">FL</text>
+<path class="s0" d="M37.2,508.0h102.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-102.2z"><title>FL, Aug-Dec 2025: 31.8</title></path>
+<text x="147.4" y="518.0">31.8</text>
 <text x="29.2" y="538.0" class="label" text-anchor="end">G</text>
 <path class="s0" d="M37.2,528.0h96.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-96.5z"><title>G, Aug-Dec 2025: 30.1</title></path>
 <text x="141.7" y="538.0">30.1</text>
@@ -107,8 +107,8 @@ text {
 <path class="s0" d="M37.2,568.0h88.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-88.5z"><title>A, Aug-Dec 2025: 27.7</title></path>
 <text x="133.7" y="578.0">27.7</text>
 <text x="29.2" y="598.0" class="label" text-anchor="end">2</text>
-<path class="s0" d="M37.2,588.0h86.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-86.8z"><title>2, Aug-Dec 2025: 27.2</title></path>
-<text x="132.0" y="598.0">27.2</text>
+<path class="s0" d="M37.2,588.0h86.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-86.5z"><title>2, Aug-Dec 2025: 27.1</title></path>
+<text x="131.7" y="598.0">27.1</text>
 <text x="29.2" y="618.0" class="label" text-anchor="end">FS</text>
 <path class="s0" d="M37.2,608.0h83.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-83.1z"><title>FS, Aug-Dec 2025: 26.1</title></path>
 <text x="128.3" y="618.0">26.1</text>

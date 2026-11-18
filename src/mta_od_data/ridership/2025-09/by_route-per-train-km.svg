@@ -71,8 +71,8 @@ text {
 <path class="s0" d="M37.2,328.0h134.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-134.9z"><title>E, Sep 2025: 41.6</title></path>
 <text x="180.1" y="338.0">41.6</text>
 <text x="29.2" y="358.0" class="label" text-anchor="end">R</text>
-<path class="s0" d="M37.2,348.0h132.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-132.6z"><title>R, Sep 2025: 40.9</title></path>
-<text x="177.8" y="358.0">40.9</text>
+<path class="s0" d="M37.2,348.0h132.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-132.9z"><title>R, Sep 2025: 41.0</title></path>
+<text x="178.1" y="358.0">41.0</text>
 <text x="29.2" y="378.0" class="label" text-anchor="end">C</text>
 <path class="s0" d="M37.2,368.0h127.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-127.6z"><title>C, Sep 2025: 39.4</title></path>
 <text x="172.8" y="378.0">39.4</text>
@@ -107,8 +107,8 @@ text {
 <path class="s0" d="M37.2,568.0h91.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-91.8z"><title>A, Sep 2025: 28.7</title></path>
 <text x="137.0" y="578.0">28.7</text>
 <text x="29.2" y="598.0" class="label" text-anchor="end">2</text>
-<path class="s0" d="M37.2,588.0h90.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.5z"><title>2, Sep 2025: 28.3</title></path>
-<text x="135.7" y="598.0">28.3</text>
+<path class="s0" d="M37.2,588.0h90.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.2z"><title>2, Sep 2025: 28.2</title></path>
+<text x="135.4" y="598.0">28.2</text>
 <text x="29.2" y="618.0" class="label" text-anchor="end">FS</text>
 <path class="s0" d="M37.2,608.0h90.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.2z"><title>FS, Sep 2025: 28.2</title></path>
 <text x="135.4" y="618.0">28.2</text>

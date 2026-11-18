@@ -218,7 +218,13 @@ but not 59 St-Columbus Circle's 1 and A/B/C/D, crossing at an angle,
 nor 74 St-Broadway's 7, on the el over Jackson Hts-Roosevelt Av.
 `transfers.txt`'s footpaths between different stations are kept,
 and every other pair of a complex's stops gets a footpath
-of 60s plus their straight-line distance at `speeds`' 3 mph walk.
+as between a station's platforms:
+their straight-line distance at `speeds`' 3 mph walk,
+up or down the flights between their platforms' OSM `level`s,
+or up a flight and down where those are on one level or unknown,
+not Anita's flat 60s on top of the walk.
+Only South Ferry's 1 and Whitehall St's R and W have no `transfers.txt` row on any version so far,
+both on OSM's level -3, 127 m apart: 117s, not 154s.
 Cross-platform changes are free under both.
 
 Over these guesses, where OSM maps a station's insides well enough to join two platforms,
@@ -389,13 +395,11 @@ In order:
 3. Fix OSM's over-long stairs,
    checked against the measured stations and the depths measured by hand
    (Lenox Av about 14 ft, St Nicholas Av's southbound 46 steps, about 24.5 ft).
-4. Climb OSM's levels, instead of a flat 60s,
-   for fallback transfers between a complex's stations.
-5. Measure the passage between 42 St-Port Authority and Times Sq,
+4. Measure the passage between 42 St-Port Authority and Times Sq,
    and check it against a timed 164s, by a fast walker.
-6. Read Candy Chan's station drawings:
+5. Read Candy Chan's station drawings:
    Grand Central first, then 96 St's underpass and overpass, and 4 Av-9 St.
-7. Check how much riders crowd near the stairs (`cars`, now half within about a car)
+6. Check how much riders crowd near the stairs (`cars`, now half within about a car)
    against timed transfers.
 
 Settled, so not to be asked again:

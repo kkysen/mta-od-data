@@ -25,8 +25,8 @@
   // changing to another of a station's platforms is up a flight of stairs,
   // across between the stops at `speeds`' walk, and down a flight,
   // (`platforms.csv`),
-  // and a complex's stops without a `transfers.txt` footpath are
-  // 60s plus their straight-line distance apart at `speeds`' walk;
+  // and a complex's stops without a `transfers.txt` footpath are the same,
+  // up or down the levels between their platforms, or up a flight and down;
   // or "gtfs", `transfers.txt` at its word,
   // whose flat 180s to change trains even across a platform is the less real.
   transfers: "osm",

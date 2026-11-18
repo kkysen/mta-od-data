@@ -21,18 +21,18 @@ Produced by `mta-od-data ridership --by trip --month 2025-09 --markdown-out src/
 | Q | 8:08 AM Coney Island-Stillwell Av to 96 St | 1,233 | 600 | 123 | DeKalb Av to Canal St | 8:44 AM | 22 |
 | B | 5:07 PM Bedford Park Blvd to Brighton Beach | 1,223 | 600 | 122 | 42 St-Bryant Pk to 34 St-Herald Sq | 5:46 PM | 22 |
 | A | 7:29 AM Inwood-207 St to Far Rockaway-Mott Av | 1,172 | 600 | 117 | 125 St to 59 St-Columbus Circle | 7:47 AM | 22 |
-| N | 8:17 AM Coney Island-Stillwell Av to 96 St | 1,114 | 600 | 111 | Atlantic Av to Canal St | 8:51 AM | 22 |
+| N | 8:17 AM Coney Island-Stillwell Av to 96 St | 1,112 | 600 | 111 | Atlantic Av to Canal St | 8:51 AM | 22 |
 | D | 7:43 AM Norwood-205 St to Coney Island-Stillwell Av | 1,091 | 600 | 109 | 7 Av to 47-50 Sts-Rockefeller Ctr | 8:17 AM | 22 |
 | FX | 4:58 PM Jamaica-179 St to Coney Island-Stillwell Av | 1,086 | 600 | 109 | Broadway-Lafayette St to 2 Av | 5:45 PM | 22 |
 | W | 8:50 AM Astoria-Ditmars Blvd to Whitehall St-South Ferry | 1,086 | 600 | 109 | Queensboro Plaza to Lexington Av/59 St | 9:01 AM | 22 |
 | 3 | 8:01 AM 145 St to New Lots Av | 988 | 510 | 116 | 34 St-Penn Station to 14 St | 8:21 AM | 22 |
-| C | 8:24 AM Euclid Av to 168 St | 979 | 600 | 98 | High St to Fulton St | 8:51 AM | 22 |
+| C | 8:24 AM Euclid Av to 168 St | 977 | 600 | 98 | High St to Fulton St | 8:51 AM | 22 |
 | 6 | 8:20 AM Parkchester to Brooklyn Bridge-City Hall | 932 | 510 | 110 | 77 St to 68 St-Hunter College | 8:49 AM | 22 |
 | 2 | 7:29 AM Wakefield-241 St to Flatbush Av-Brooklyn College | 924 | 510 | 109 | 72 St to Times Sq-42 St | 8:22 AM | 22 |
 | 7X | 5:12 PM 34 St-Hudson Yards to Flushing-Main St | 924 | 561 | 99 | 74 St-Broadway to Junction Blvd | 5:39 PM | 22 |
-| 1 | 7:19 AM South Ferry to Van Cortlandt Park-242 St | 918 | 510 | 108 | Times Sq-42 St to 50 St | 7:36 AM | 22 |
+| 1 | 7:19 AM South Ferry to Van Cortlandt Park-242 St | 917 | 510 | 108 | Times Sq-42 St to 50 St | 7:36 AM | 22 |
 | 6X | 8:46 AM Pelham Bay Park to Brooklyn Bridge-City Hall | 913 | 510 | 107 | 3 Av-138 St to 125 St | 9:11 AM | 22 |
-| R | 8:04 AM Bay Ridge-95 St to Forest Hills-71 Av | 830 | 600 | 83 | Atlantic Av to DeKalb Av | 8:26 AM | 22 |
+| R | 8:29 AM Bay Ridge-95 St to Forest Hills-71 Av | 839 | 600 | 84 | Atlantic Av to DeKalb Av | 8:51 AM | 22 |
 | M | 8:32 AM Forest Hills-71 Av to Middle Village-Metropolitan Av | 804 | 480 | 100 | Elmhurst Av to Jackson Hts-Roosevelt Av | 8:41 AM | 22 |
 | J | 8:22 AM Jamaica Center-Parsons/Archer to Broad St | 731 | 480 | 91 | Marcy Av to Delancey St-Essex St | 8:59 AM | 22 |
 | G | 8:06 AM Church Av to Court Sq | 576 | 300 | 115 | Greenpoint Av to 21 St | 8:38 AM | 22 |

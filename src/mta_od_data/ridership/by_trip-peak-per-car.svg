@@ -140,8 +140,8 @@ text {
 <text x="189.0" y="438.0" class="label" text-anchor="middle">1</text>
 <text x="203.6" y="438.0" class="label" text-anchor="start">50 St</text>
 <text x="396.4" y="438.0" class="label" text-anchor="end">7:36 AM</text>
-<path class="s0" d="M404.4,428.0h228.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-228.8z"><title>Times Sq-42 St 1 50 St 7:36 AM, Peak per car: 97</title></path>
-<text x="641.2" y="438.0">97</text>
+<path class="s0" d="M404.4,428.0h226.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-226.4z"><title>Times Sq-42 St 1 50 St 7:36 AM, Peak per car: 96</title></path>
+<text x="638.8" y="438.0">96</text>
 <text x="174.4" y="458.0" class="label" text-anchor="end">Atlantic Av</text>
 <text x="189.0" y="458.0" class="label" text-anchor="middle">D</text>
 <text x="203.6" y="458.0" class="label" text-anchor="start">36 St</text>
@@ -152,8 +152,8 @@ text {
 <text x="189.0" y="478.0" class="label" text-anchor="middle">C</text>
 <text x="203.6" y="478.0" class="label" text-anchor="start">Fulton St</text>
 <text x="396.4" y="478.0" class="label" text-anchor="end">8:51 AM</text>
-<path class="s0" d="M404.4,468.0h219.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-219.2z"><title>High St C Fulton St 8:51 AM, Peak per car: 93</title></path>
-<text x="631.6" y="478.0">93</text>
+<path class="s0" d="M404.4,468.0h216.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-216.8z"><title>High St C Fulton St 8:51 AM, Peak per car: 92</title></path>
+<text x="629.2" y="478.0">92</text>
 <text x="174.4" y="498.0" class="label" text-anchor="end">74 St-Broadway</text>
 <text x="189.0" y="498.0" class="label" text-anchor="middle">7X</text>
 <text x="203.6" y="498.0" class="label" text-anchor="start">Junction Blvd</text>
