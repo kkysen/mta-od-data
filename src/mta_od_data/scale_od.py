@@ -107,7 +107,7 @@ def scale_od(
         Option(
             help=(
                 "Output Parquet of each slice's origin and destination factors, "
-                "for `analyze`'s --od-factors"
+                "as a standalone fit"
             )
         ),
     ],

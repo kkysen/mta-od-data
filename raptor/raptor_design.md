@@ -617,9 +617,9 @@ Complexity is added only once the simple version works end to end.
    a train the same across dates with the same route, direction,
    first departure, and stops.
    Every report's busiest hour is by when its riders' trains are there.
-   It takes `--od-factors`
-   (from `mta-od-data scale-od`, by default `data/mta_od_2019_counted.factors.parquet`)
-   to count riders as if routed with the scaled OD data, without routing:
+   It counts riders, in a column of their own,
+   as if routed with the OD data scaled by `mta-od-data scale-od`'s factors
+   (to 2019's counted entries), without routing:
    with no crowding, riders' choices don't depend on how many ride,
    and `scale-od` scales each OD row by its origin's and destination's factors
    in its (month, weekday) slice, so each path's riders scale by them too.
@@ -631,7 +631,7 @@ Complexity is added only once the simple version works end to end.
    It likewise counts fare evaders, absent from the OD data, unless `--no-fare-evasion`:
    each path's riders over 1 less the evasion rate in its date's quarter
    (data.ny.gov's `6kj3-ijvb`, fetched to `data/fare_evasion.csv`),
-   or with `--od-factors`, that quarter's in the year scaled to,
+   or in the scaled column, that quarter's in the year scaled to,
    which the factors record.
 7. **Later, in any order**:
    directional stops and the transfer rules above;

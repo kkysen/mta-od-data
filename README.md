@@ -186,8 +186,8 @@ Fits factors, per complex and (month, weekday) slice,
 scaling the OD data's trips to another year's counted station entries
 (from mta.info's ridership spreadsheet),
 or with `--to-counts`, leveling it to its own year's counts.
-`ridership --od-factors` reads them, a column per factors file;
-without it, `ridership` fits the ones it scales to 2019 by itself.
+`ridership` fits the ones it scales to 2019 by itself, through the cache,
+so it needs no `scale-od` run first.
 
 ```sh
 uv run mta-od-data scale-od --year 2019 --out data/mta_od_scaled_to_2019.factors.parquet

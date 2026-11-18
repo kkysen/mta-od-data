@@ -5,7 +5,7 @@ from `mta-od-data raptor assign-range`'s paths.
 Each measure is a sum of paths' riders, so it's taken over
 `average_path_riders`' average of each path over the manifest's dates,
 once per way of counting riders (a column each):
-as in the OD data, and scaled by each `--od-factors` file,
+as in the OD data, and scaled to 2019's counted entries (`scale-od`'s factors),
 all with fare evaders unless `--no-fare-evasion`.
 
 - A place (complex, station, station direction)
@@ -469,25 +469,6 @@ def ridership(
             )
         ),
     ] = None,
-    manifest: Annotated[
-        Path | None,
-        Option(
-            help=(
-                "`mta-od-data raptor assign-range`'s manifest; "
-                "by default the reports' dates, routed if they haven't been"
-            )
-        ),
-    ] = None,
-    od_factors: Annotated[
-        list[Path] | None,
-        Option(
-            help=(
-                "Count riders as if routed with OD data scaled by these factors "
-                "(repeatable, a column each), from `mta-od-data scale-od`; "
-                "by default 2019's counted entries, fit if they haven't been"
-            )
-        ),
-    ] = None,
     unscaled: Annotated[
         bool, Option(help="Count riders as in the OD data, unscaled, first")
     ] = True,
@@ -533,11 +514,9 @@ def ridership(
             param_hint="--by",
         )
     # Only once the arguments are good, as these can route for minutes.
-    if od_factors is None:
-        od_factors = [fit_od_factors(DEFAULT_SCALED_TO, to_counts=True)]
-    # A built manifest's path is the cache's, so the report names how it was routed.
-    routing = f"`{manifest}`" if manifest else "as `raptor assign-range` routes them"
-    manifest = manifest or routed()
+    od_factors = [fit_od_factors(DEFAULT_SCALED_TO, to_counts=True)]
+    routing = "as `raptor assign-range` routes them"
+    manifest = routed()
     got = cached_compute(
         by, route, manifest, od_factors, unscaled, fare_evasion, lines, top
     )

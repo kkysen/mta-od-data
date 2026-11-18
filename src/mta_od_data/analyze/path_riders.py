@@ -82,7 +82,7 @@ FareEvasionOption = Annotated[
         help=(
             "Count fare evaders too: riders over 1 less the evasion rate "
             "in each date's quarter, from data.ny.gov, "
-            "or with --od-factors, the same quarter's in the year scaled to"
+            "or with scaled OD data, the same quarter's in the year scaled to"
         ),
     ),
 ]
