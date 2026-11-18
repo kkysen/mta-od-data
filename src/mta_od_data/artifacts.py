@@ -41,7 +41,11 @@ def files(root: Path, skip: Collection[Path] = ()) -> list[Path]:
     but those under `skip` and Python's `__pycache__`."""
     found: list[Path] = []
     for parent, dirs, names in os.walk(root):
-        dirs[:] = sorted(d for d in dirs if d != "__pycache__")
+        # Not walked into at all: `raptor/target/` alone is over 100,000 files,
+        # which took 11 s to list on each key of a routing run.
+        dirs[:] = sorted(
+            d for d in dirs if d != "__pycache__" and Path(parent) / d not in skip
+        )
         found += (Path(parent) / n for n in sorted(names))
     return [f for f in found if not any(s in f.parents for s in skip)]
 
