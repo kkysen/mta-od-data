@@ -80,9 +80,10 @@ pub struct Streets<'a> {
 impl Streets<'_> {
     /// Walks the streets between the stations' entrances,
     /// timing walks measured inside stations by `config`'s speeds and cars,
-    /// so they're always the ones routing uses.
-    fn walk(&self, config: &Config) -> Result<StreetWalks> {
-        let stations = walks::load_stations(self.access, &config.speeds, &config.cars)?;
+    /// so they're always the ones routing uses,
+    /// with the modeled stations' in `dir`, beside the config.
+    fn walk(&self, config: &Config, dir: &Path) -> Result<StreetWalks> {
+        let stations = walks::load_stations(self.access, dir, &config.speeds, &config.cars)?;
         let osm = streets::osm::Osm::read(self.osm)?;
         let graph = streets::Graph::build(&osm);
         drop(osm);
@@ -195,6 +196,10 @@ pub fn assign_dates(
     // Writes `dhat-heap.json` to the working directory when dropped.
     #[cfg(feature = "dhat-heap")]
     let _profiler = dhat::Profiler::new_heap();
+    // The walks and passages measured for `raptor` are read from beside its config.
+    let dir = config
+        .parent()
+        .with_context(|| format!("{} is in no directory", config.display()))?;
     let (config, config_text) = Config::load(config)?;
 
     let platforms = match config.transfers {
@@ -202,10 +207,10 @@ pub fn assign_dates(
         Transfers::Gtfs => None,
     };
 
-    let passages = passages::load()?;
-    let lidar_walks = lidar::load()?;
-    let osm_walks = lidar::load_osm()?;
-    let street_walks = streets.map(|s| s.walk(&config)).transpose()?;
+    let passages = passages::load(dir)?;
+    let lidar_walks = lidar::load(dir)?;
+    let osm_walks = lidar::load_osm(dir)?;
+    let street_walks = streets.map(|s| s.walk(&config, dir)).transpose()?;
     let start = Instant::now();
     let timetables: Vec<(Timetable, Complexes)> = jobs
         .par_iter()

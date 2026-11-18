@@ -62,16 +62,22 @@ struct Row {
 /// each way off the first.
 pub type LidarWalks = HashMap<(String, String), Vec<LidarWalk>>;
 
-/// `raptor/lidar_walks.csv`'s walks, built in, so every run walks the same ones.
-pub fn load() -> Result<LidarWalks> {
-    parse(include_str!("../lidar_walks.csv"), "lidar_walks.csv")
+/// `lidar_walks.csv`'s walks, in `dir`, beside the config (`raptor/`):
+/// read each run rather than built in, so a stale build can't keep old ones.
+pub fn load(dir: &std::path::Path) -> Result<LidarWalks> {
+    parse(&read(dir, "lidar_walks.csv")?, "lidar_walks.csv")
 }
 
-/// `raptor/osm_walks.csv`'s, along OSM's indoor ways (`mta-od-data osm-walks`),
+fn read(dir: &std::path::Path, name: &str) -> Result<String> {
+    let path = dir.join(name);
+    std::fs::read_to_string(&path).with_context(|| format!("reading {}", path.display()))
+}
+
+/// `osm_walks.csv`'s, in `dir` too, along OSM's indoor ways (`mta-od-data osm-walks`),
 /// in the same form, where OSM joins two platforms;
 /// OSM is taken as right where it maps a walk at all.
-pub fn load_osm() -> Result<LidarWalks> {
-    parse(include_str!("../osm_walks.csv"), "osm_walks.csv")
+pub fn load_osm(dir: &std::path::Path) -> Result<LidarWalks> {
+    parse(&read(dir, "osm_walks.csv")?, "osm_walks.csv")
 }
 
 fn parse(text: &str, name: &str) -> Result<LidarWalks> {
@@ -178,14 +184,14 @@ pub struct PlatformAccess {
     pub entrances: Vec<Entrance>,
 }
 
-/// `raptor/lidar_access.csv`'s walks between modeled stations' street entrances
+/// `lidar_access.csv`'s walks, in `dir` (`raptor/`), between modeled stations' street entrances
 /// and their platforms (`mta-od-data lidar-access`), timed at `speeds`,
 /// through each fare gate in `GATE_SECS`, by platform:
 /// in, the quickest to anywhere on the platform, where riders board;
 /// out, on average from riders' spots along the train (`cars`),
 /// as a transfer off a platform is.
-pub fn access(speeds: &Speeds, cars: &Cars) -> Result<Vec<PlatformAccess>> {
-    parse_access(include_str!("../lidar_access.csv"), speeds, cars)
+pub fn access(dir: &std::path::Path, speeds: &Speeds, cars: &Cars) -> Result<Vec<PlatformAccess>> {
+    parse_access(&read(dir, "lidar_access.csv")?, speeds, cars)
 }
 
 fn parse_access(text: &str, speeds: &Speeds, cars: &Cars) -> Result<Vec<PlatformAccess>> {
@@ -281,7 +287,7 @@ mod tests {
 
     #[test]
     fn loads_times_square() {
-        let walks = load().unwrap();
+        let walks = load(std::path::Path::new(env!("CARGO_MANIFEST_DIR"))).unwrap();
         let up_to_down = &walks[&("w513706097".to_owned(), "w513706098".to_owned())];
         assert!(up_to_down[0].metres > 0.0);
         assert!(walks.contains_key(&("w513706084".to_owned(), "w513706097".to_owned())));
@@ -317,7 +323,8 @@ mod tests {
 
     #[test]
     fn union_sq_entrances_reach_the_l() {
-        let access = access(&Speeds::default(), &Cars::default()).unwrap();
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let access = access(dir, &Speeds::default(), &Cars::default()).unwrap();
         let l = access.iter().find(|p| p.station == "L03").unwrap();
         assert_eq!(l.entrances.len(), 12);
         assert!(l.entrances.iter().all(|e| e.in_secs < e.out_secs));

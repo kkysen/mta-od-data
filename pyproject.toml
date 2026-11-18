@@ -40,12 +40,6 @@ cache-keys = [
     { file = "Cargo.lock" },
     { file = "raptor/src/**/*.rs" },
     { file = "raptor/build.rs" },
-    # Built into the extension, by `include_str!`
-    # (`tests/test_cache_keys.py` checks every such file is here).
-    { file = "raptor/passages.json5" },
-    { file = "raptor/lidar_walks.csv" },
-    { file = "raptor/osm_walks.csv" },
-    { file = "raptor/lidar_access.csv" },
     { file = "streets/Cargo.toml" },
     { file = "streets/src/**/*.rs" },
 ]

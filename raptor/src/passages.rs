@@ -15,6 +15,7 @@
 //! and walked only when started then.
 
 use std::collections::HashMap;
+use std::path::Path;
 
 use anyhow::{Context, Result};
 use serde::Deserialize;
@@ -45,10 +46,14 @@ struct File {
     passages: Vec<Passage>,
 }
 
-/// `raptor/passages.json5`'s passages, built in, so every run walks the same ones.
-pub fn load() -> Result<Vec<Passage>> {
+/// `passages.json5`'s passages, in `dir`, beside the config (`raptor/`):
+/// read each run rather than built in, so a stale build can't keep old ones.
+pub fn load(dir: &Path) -> Result<Vec<Passage>> {
+    let path = dir.join("passages.json5");
+    let text =
+        std::fs::read_to_string(&path).with_context(|| format!("reading {}", path.display()))?;
     let file: File =
-        json5::from_str(include_str!("../passages.json5")).context("parsing passages.json5")?;
+        json5::from_str(&text).with_context(|| format!("parsing {}", path.display()))?;
     Ok(file.passages)
 }
 
@@ -163,7 +168,7 @@ mod tests {
 
     #[test]
     fn passages_parse() {
-        let passages = load().unwrap();
+        let passages = load(Path::new(env!("CARGO_MANIFEST_DIR"))).unwrap();
         assert_eq!(passages[0].complexes, [611, 609]);
     }
 }

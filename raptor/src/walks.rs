@@ -275,11 +275,12 @@ impl AccessRow {
 /// then again, as its own, for each stop `platform_edges.csv` beside it lists
 /// at an edge of its platform other than as long as the station's,
 /// timed for that edge;
-/// then each modeled platform's, its own station's complex's (`lidar::access`),
+/// then each modeled platform's, its own station's complex's (`lidar::access`, in `dir`),
 /// instead of its stops' there,
 /// timed at `speeds` with riders spread along the train by `cars`.
 pub fn load_stations(
     path: &std::path::Path,
+    dir: &std::path::Path,
     speeds: &Speeds,
     cars: &Cars,
 ) -> anyhow::Result<Vec<Station>> {
@@ -320,7 +321,7 @@ pub fn load_stations(
         .iter()
         .map(|(id, _)| station(id, None, None, None))
         .collect();
-    let modeled: Vec<lidar::PlatformAccess> = lidar::access(speeds, cars)?;
+    let modeled: Vec<lidar::PlatformAccess> = lidar::access(dir, speeds, cars)?;
     let is_modeled: HashSet<(&str, &str)> = modeled
         .iter()
         .map(|m| (m.station.as_str(), m.platform.as_str()))
