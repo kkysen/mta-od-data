@@ -33,6 +33,8 @@ from typer import Context, Option, Typer
 from mta_od_data.analyze.common import connection, load_names
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import DatePaths, date_paths, read_manifest
+from mta_od_data.artifacts import CACHE, cached_value, files, modules
+from mta_od_data.artifacts import key as artifact_key
 from mta_od_data.downloads import complexes_csv, stations_csv
 from mta_od_data.invocation import produced_by
 
@@ -180,6 +182,28 @@ def compare(
     return pairs, totals, days
 
 
+def cached_compare(
+    today: Path, free: Path, stations: Path
+) -> tuple[dict[tuple[str, str], Pair], Totals, int]:
+    """`compare`'s result, from the cache if it's there for the same inputs:
+    this module's source and what it imports, `stations` by content,
+    and every file of both routing runs by size and modification time,
+    as its 50 DuckDB passes over them take about 25 s.
+    The `raptor` extension it imports, through `builds`, by its sources."""
+    # Here, not at the top, as in `free_transfers`.
+    from mta_od_data.builds import EXTENSION, crate_sources
+
+    entry = artifact_key(
+        [*modules(__name__, {EXTENSION: crate_sources()}), stations],
+        [*files(today.parent), *files(free.parent)],
+        (),
+    )
+    return cached_value(
+        CACHE / "free-transfers" / f"{entry}.pickle",
+        lambda: compare(today, free, stations),
+    )
+
+
 def _duration(secs: float) -> str:
     """`secs` as `m:ss`, or `h:mm:ss` from an hour."""
     m, s = divmod(round(secs), 60)
@@ -270,7 +294,9 @@ def free_transfers(
     from mta_od_data.builds import routed
 
     stations = stations_csv()
-    pairs_by_key, totals, days = compare(routed(), routed(street_walks=True), stations)
+    pairs_by_key, totals, days = cached_compare(
+        routed(), routed(street_walks=True), stations
+    )
     pairs = sorted(pairs_by_key.values(), key=lambda p: (-p.saved, p.complexes))
     names = load_names(stations, complexes_csv()).complex
     report = render_markdown(pairs, totals, names, top_n)
