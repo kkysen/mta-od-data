@@ -64,7 +64,7 @@ from shapely.geometry.base import BaseGeometry
 from typer import Option, Typer
 
 from mta_od_data import DATA, access
-from mta_od_data.platforms import DEFAULT_EXTRACT
+from mta_od_data.platforms import fetch_extract
 
 app = Typer()
 
@@ -1933,15 +1933,13 @@ def model_access(
 
 @app.command()
 def lidar_access(
-    extract: Annotated[
-        Path, Option(help="Geofabrik's New York OSM extract")
-    ] = DEFAULT_EXTRACT,
     out: Annotated[
         Path, Option(help="Walks between entrances and platforms, for `raptor`")
     ] = DEFAULT_ACCESS_OUT,
 ) -> None:
     """Measure walks between each modeled station's street entrances and platforms
     off Sabrina Mielke's 3D models."""
+    extract = fetch_extract()
     rows = []
     for model in MODELS:
         handler = Outlines({int(w[1:]) for _, w in model.platforms})
@@ -1980,15 +1978,13 @@ def lidar_access(
 
 @app.command()
 def lidar_walks(
-    extract: Annotated[
-        Path, Option(help="Geofabrik's New York OSM extract")
-    ] = DEFAULT_EXTRACT,
     out: Annotated[
         Path, Option(help="Walks between platforms, for `raptor`")
     ] = DEFAULT_OUT,
 ) -> None:
     """Measure walks between each mapped station's platforms
     off Sabrina Mielke's LiDAR maps and 3D models."""
+    extract = fetch_extract()
     rows = []
     for m in MAPS:
         conns, proj, axes = connectors(m, extract)

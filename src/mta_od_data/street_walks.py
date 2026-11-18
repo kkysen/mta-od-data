@@ -10,13 +10,12 @@ as `streets` keeps every node of what it reads in memory.
 
 from csv import DictReader
 from pathlib import Path
-from urllib.request import urlretrieve
 
 import osmium
 import osmium.osm
 
 from mta_od_data import DATA
-from mta_od_data.platforms import DEFAULT_EXTRACT, EXTRACT_URL
+from mta_od_data.platforms import DEFAULT_EXTRACT, fetch_extract
 from mta_od_data.prepare import DEFAULT_STATIONS_CSV
 
 DEFAULT_STREETS = DATA / "osm" / "nyc-streets.osm.pbf"
@@ -84,18 +83,6 @@ def filter_streets(
                 kept += 1
     partial.rename(dest)
     return kept
-
-
-def fetch_extract(extract: Path = DEFAULT_EXTRACT) -> Path:
-    """Geofabrik's New York extract, fetched if missing."""
-    if not extract.exists():
-        extract.parent.mkdir(parents=True, exist_ok=True)
-        print(f"fetching {EXTRACT_URL}")
-        # Beside it and renamed into place, so an interrupted fetch leaves no extract.
-        part = extract.with_name(f"{extract.name}.part")
-        urlretrieve(EXTRACT_URL, part)
-        part.replace(extract)
-    return extract
 
 
 def cut(

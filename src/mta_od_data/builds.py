@@ -2,7 +2,7 @@
 so no command has to be run first, and none reads a stale earlier one's output.
 
 - Downloads, and the OD Parquet, are fetched or built when missing, and kept in `data/`
-  (`downloads`, `street_walks.fetch_extract`, `scale_od.fetch_spreadsheet`).
+  (`downloads`, `platforms.fetch_extract`, `scale_od.fetch_spreadsheet`).
 - What's derived from them is keyed on everything it's built from:
   the streets cut for walking (`streets`), `scale-od`'s factors (`od_factors`),
   and a routing run (`routed`).
@@ -25,12 +25,12 @@ from pathlib import Path
 from mta_od_data.access import TABLE as DEFAULT_ACCESS
 from mta_od_data.artifacts import CACHE, REPO, cached, files, key, modules
 from mta_od_data.downloads import gtfs_feeds, od_parquet
-from mta_od_data.platforms import DEFAULT_EXTRACT
+from mta_od_data.platforms import DEFAULT_EXTRACT, fetch_extract
 from mta_od_data.platforms import DEFAULT_OUT as DEFAULT_PLATFORMS
 from mta_od_data.raptor import DEFAULT_CONFIG, DEFAULT_STATIONS, ZSTD_LEVELS
 from mta_od_data.routing import route_range
 from mta_od_data.scale_od import MAPPING, fetch_spreadsheet, fit_factors
-from mta_od_data.street_walks import fetch_extract, filter_streets, station_bounds
+from mta_od_data.street_walks import filter_streets, station_bounds
 
 # The dates the reports route, as `assign-range` picks a weekday of each month in them.
 REPORT_FROM = date(2025, 8, 11)

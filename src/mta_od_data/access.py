@@ -44,7 +44,7 @@ from itertools import pairwise
 from math import atan2, cos, hypot, isnan, nan, pi, radians
 from pathlib import Path
 from statistics import median
-from typing import Annotated, Any
+from typing import Any
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
@@ -60,11 +60,12 @@ from shapely import (
     unary_union,
 )
 from shapely.ops import nearest_points, substring
-from typer import Option, Typer
+from typer import Typer
 
 from mta_od_data import DATA
 from mta_od_data.analyze.common import CACHE
-from mta_od_data.platforms import DEFAULT_EXTRACT
+from mta_od_data.downloads import stations_csv as fetch_stations
+from mta_od_data.platforms import DEFAULT_EXTRACT, fetch_extract
 from mta_od_data.platforms import DEFAULT_OUT as DEFAULT_PLATFORMS
 from mta_od_data.prepare import DEFAULT_STATIONS_CSV
 
@@ -846,19 +847,12 @@ def _drop_misattributed(rows: list[dict[str, object]]) -> list[dict[str, object]
 
 
 @app.command()
-def fetch_station_access(
-    stations: Annotated[
-        Path, Option(help="The station reference CSV")
-    ] = DEFAULT_STATIONS_CSV,
-    extract: Annotated[
-        Path, Option(help="Geofabrik's New York extract, for OSM's platforms")
-    ] = DEFAULT_EXTRACT,
-) -> None:
+def fetch_station_access() -> None:
     """
     Rebuild each station entrance's time to the platforms, `data/station_access.csv`,
     from the MTA's and OSM's data now, to review and commit.
     """
-    rows = build(stations, extract)
+    rows = build(fetch_stations(), fetch_extract())
     TABLE.parent.mkdir(parents=True, exist_ok=True)
     with TABLE.open("w", newline="") as f:
         out = DictWriter(f, COLUMNS, lineterminator="\n")

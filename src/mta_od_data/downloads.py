@@ -2,7 +2,7 @@
 where it's kept rather than in the cache: a download needn't be fetched again,
 and the MTA's or the Mobility Database's copy can change or go.
 Geofabrik's extract and the station ridership spreadsheet are fetched beside
-what reads them (`street_walks.fetch_extract`, `scale_od.fetch_spreadsheet`).
+what reads them (`platforms.fetch_extract`, `scale_od.fetch_spreadsheet`).
 
 The OD Parquet is here too: it's converted from a 27 GB CSV by `prepare`
 or downloaded from the `od-data` release, and both give the same file.

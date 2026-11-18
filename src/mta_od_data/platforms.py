@@ -59,7 +59,6 @@ from typer import Option, Typer
 
 from mta_od_data import DATA
 from mta_od_data.downloads import gtfs_feeds
-from mta_od_data.gtfs import DEFAULT_GTFS_DIR
 from mta_od_data.ridership.service import Feed, load_feed
 
 app = Typer()
@@ -214,14 +213,20 @@ def stop_coords(feed_zip: Path) -> dict[str, tuple[float, float]]:
         }
 
 
+def fetch_extract(extract: Path = DEFAULT_EXTRACT) -> Path:
+    """Geofabrik's New York extract, fetched if missing."""
+    if not extract.exists():
+        extract.parent.mkdir(parents=True, exist_ok=True)
+        print(f"fetching {EXTRACT_URL}")
+        # Beside it and renamed into place, so an interrupted fetch leaves no extract.
+        part = extract.with_name(f"{extract.name}.part")
+        urlretrieve(EXTRACT_URL, part)
+        part.replace(extract)
+    return extract
+
+
 @app.command()
 def fetch_platforms(
-    extract: Annotated[
-        Path, Option(help="Geofabrik's New York OSM extract, fetched if missing")
-    ] = DEFAULT_EXTRACT,
-    gtfs_dir: Annotated[
-        Path, Option(help="Feed versions, those missing fetched into it")
-    ] = DEFAULT_GTFS_DIR,
     out: Annotated[
         Path, Option(help="The platform of each route's stops")
     ] = DEFAULT_OUT,
@@ -237,10 +242,7 @@ def fetch_platforms(
 ) -> None:
     """Map each route's consecutive stops, in every feed version,
     to the OSM platforms its trains stop at there."""
-    if not extract.exists():
-        extract.parent.mkdir(parents=True, exist_ok=True)
-        print(f"fetching {EXTRACT_URL}")
-        urlretrieve(EXTRACT_URL, extract)
+    extract = fetch_extract()
     relations = Relations()
     relations.apply_file(str(extract))
     members = [m for _, ms in relations.relations for m in ms]
@@ -266,7 +268,7 @@ def fetch_platforms(
     # and each one's direction there.
     trains: Counter[tuple[str, str, str, str]] = Counter()
     directions: dict[tuple[str, str, str, str], str] = {}
-    for feed_zip in sorted(gtfs_feeds(gtfs_dir).glob("*.zip")):
+    for feed_zip in sorted(gtfs_feeds().glob("*.zip")):
         feed = load_feed(feed_zip)
         coords = stop_coords(feed_zip)
         served: defaultdict[str, set[str]] = defaultdict(set)

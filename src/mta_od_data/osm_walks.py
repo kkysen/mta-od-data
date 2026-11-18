@@ -47,7 +47,7 @@ from shapely.geometry import Point, Polygon
 from typer import Option, Typer
 
 from mta_od_data.lidar import DEFAULT_RISE, PlatformAxis, Walk, WayOff, useful
-from mta_od_data.platforms import DEFAULT_AREAS_OUT, DEFAULT_EXTRACT
+from mta_od_data.platforms import DEFAULT_AREAS_OUT, fetch_extract
 
 app = Typer()
 
@@ -420,14 +420,12 @@ def platform_walks(
 
 @app.command()
 def osm_walks(
-    extract: Annotated[
-        Path, Option(help="Geofabrik's New York OSM extract")
-    ] = DEFAULT_EXTRACT,
     out: Annotated[
         Path, Option(help="Walks between platforms, for `raptor`")
     ] = DEFAULT_OUT,
 ) -> None:
     """Walk between each station's platforms along OSM's indoor ways."""
+    extract = fetch_extract()
     with open(DEFAULT_AREAS_OUT) as f:
         wanted = {int(r["platform"][1:]) for r in csv.DictReader(f)}
     plats = Platforms(wanted)
