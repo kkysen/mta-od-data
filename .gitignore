@@ -3,8 +3,8 @@
 .ruff_cache/
 __pycache__/
 
-# Large or scratch outputs kept on disk, not in `/tmp` (tmpfs, RAM).
-.cache/
+# Scratch outputs for this repo, kept on disk, not in `/tmp` (tmpfs, RAM).
+.scratch/
 
 # Rust
 target/
