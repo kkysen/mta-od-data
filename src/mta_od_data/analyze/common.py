@@ -113,8 +113,8 @@ def intern[T: DataclassInstance](pool: dict[HashByField[T], T], value: T) -> T:
     mean what it says.
 
     By the fields, not by the id: ids are unique only within one
-    station file, so keying on them would hand a run with its own
-    `--stations` the rows of whichever file was read first.
+    station file, so keying on them would hand a run with another
+    station file the rows of whichever file was read first.
 
     Loading is the only way in, so a directly constructed one isn't
     interned; the tests build a few, and never two of equal value.

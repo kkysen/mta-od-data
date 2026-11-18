@@ -8,7 +8,6 @@ from typing import Annotated, Literal
 
 from typer import Context, Option, Typer
 
-from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
     Complex,
@@ -22,9 +21,8 @@ from mta_od_data.analyze.common import (
     complexes_of,
 )
 from mta_od_data.analyze.markdown import table_row, table_rule
-from mta_od_data.downloads import od_parquet
+from mta_od_data.downloads import complexes_csv, od_parquet, stations_csv
 from mta_od_data.invocation import produced_by
-from mta_od_data.prepare import DEFAULT_PARQUET
 
 app = Typer()
 
@@ -750,20 +748,6 @@ def render_notes(*, close_threshold_m: float) -> str:
 @app.command()
 def one_seat_rides(
     ctx: Context,
-    parquet: Annotated[
-        Path, Option(help="The OD Parquet, built or downloaded if missing")
-    ] = DEFAULT_PARQUET,
-    complexes_path: Annotated[Path, Option("--complexes")] = (DATA / "complexes.csv"),
-    stations_path: Annotated[
-        Path,
-        Option(
-            "--stations",
-            help=(
-                "Per-station reference CSV (a row per line's stop within "
-                "a complex), used for accurate nearest-other-trunk distances"
-            ),
-        ),
-    ] = DATA / "stations.csv",
     day_type: Annotated[DayType, Option()] = DayType.WEEKDAY,
     days: Annotated[
         str | None,
@@ -902,10 +886,6 @@ def one_seat_rides(
     \b
         # Same scenario, Saturdays instead of weekdays
         mta-od-data analyze one-seat-rides --day-type saturday
-
-    \b
-        # Same scenario, against a newer data extract
-        mta-od-data analyze one-seat-rides --parquet data/mta_od_2025.parquet
 
     \b
         # Write the RESULTS.md-style snapshot report automatically instead of
@@ -1075,6 +1055,7 @@ def one_seat_rides(
             )
             raise SystemExit(1)
 
+    complexes_path = complexes_csv()
     complexes_by_id = Complex.load_all(complexes_path)
     complexes = complexes_of(complexes_by_id)
     boundary_lat = complexes_by_id[boundary_complex_id].loc.lat
@@ -1112,7 +1093,7 @@ def one_seat_rides(
         '"Origin Station Complex ID" IN (' + ", ".join(str(i) for i in origin_ids) + ")"
     )
 
-    parquet = od_parquet(parquet)
+    parquet = od_parquet()
     try:
         coverage = DayCoverage.query(parquet, day_filter_sql, day_params)
     except DayFilterError as e:
@@ -1143,7 +1124,7 @@ def one_seat_rides(
     for origin_id, dest_id, riders in pairs:
         dest = complexes_by_id[dest_id] if dest_id < len(complexes_by_id) else None
         if dest is None:
-            # Almost certainly a stale --stations file against a newer
+            # Almost certainly a stale `data/stations.csv` against a newer
             # OD extract; dropping it would silently undercount.
             print(
                 f"error: destination complex {dest_id} not found in "
@@ -1159,7 +1140,7 @@ def one_seat_rides(
 
     total_riders = sum(r for _, _, r in scoped)
 
-    stations = Station.load_all(stations_path, complexes_by_id)
+    stations = Station.load_all(stations_csv(), complexes_by_id)
     stations_by_complex: dict[int, list[Station]] = {}
     for s in stations:
         stations_by_complex.setdefault(s.complex_id, []).append(s)

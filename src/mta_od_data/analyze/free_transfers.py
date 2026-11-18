@@ -33,8 +33,8 @@ from typer import Context, Option, Typer
 from mta_od_data.analyze.common import connection, load_names
 from mta_od_data.analyze.markdown import table_row, table_rule
 from mta_od_data.analyze.path_riders import DatePaths, date_paths, read_manifest
+from mta_od_data.downloads import complexes_csv, stations_csv
 from mta_od_data.invocation import produced_by
-from mta_od_data.prepare import DEFAULT_COMPLEXES_CSV, DEFAULT_STATIONS_CSV
 
 app = Typer()
 
@@ -259,26 +259,6 @@ CSV_FIELDS = [
 @app.command()
 def free_transfers(
     ctx: Context,
-    today: Annotated[
-        Path | None,
-        Option(
-            help="`assign-range`'s manifest as today, without `--street-walks`; "
-            "by default the reports' dates, routed if they haven't been"
-        ),
-    ] = None,
-    free: Annotated[
-        Path | None,
-        Option(
-            help="`assign-range --street-walks`' manifest, over the same dates; "
-            "by default the reports', routed if they haven't been"
-        ),
-    ] = None,
-    stations: Annotated[
-        Path, Option(help="The station reference CSV")
-    ] = DEFAULT_STATIONS_CSV,
-    complexes: Annotated[
-        Path, Option(help="The complex reference CSV, for names")
-    ] = DEFAULT_COMPLEXES_CSV,
     top_n: Annotated[int, Option(help="Transfers to list in the report")] = 50,
     csv_out: Annotated[Path | None, Option(help="Every transfer, as CSV")] = None,
     markdown_out: Annotated[Path | None, Option(help="The report")] = None,
@@ -289,11 +269,10 @@ def free_transfers(
     # which imports `analyze.common`, and so this package.
     from mta_od_data.builds import routed
 
-    today = today or routed()
-    free = free or routed(street_walks=True)
-    pairs_by_key, totals, days = compare(today, free, stations)
+    stations = stations_csv()
+    pairs_by_key, totals, days = compare(routed(), routed(street_walks=True), stations)
     pairs = sorted(pairs_by_key.values(), key=lambda p: (-p.saved, p.complexes))
-    names = load_names(stations, complexes).complex
+    names = load_names(stations, complexes_csv()).complex
     report = render_markdown(pairs, totals, names, top_n)
     print(report)
     if csv_out:

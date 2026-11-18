@@ -73,7 +73,7 @@ def test_a_file_is_read_once_until_its_text_changes(tmp_path: Path) -> None:
 
 def test_a_different_file_is_a_different_station(tmp_path: Path) -> None:
     """Interning is by value, not by id: ids are unique only within one
-    station file, so a run passed its own `--stations` must not be
+    station file, so a run on another station file must not be
     handed the rows of whichever file happened to be read first."""
     edited = tmp_path / "complexes.csv"
     edited.write_text(COMPLEXES.read_text().replace("Astoria-Ditmars Blvd", "Ditmars"))

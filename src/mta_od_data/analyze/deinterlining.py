@@ -30,7 +30,6 @@ from typing import Annotated, Any
 
 from typer import Context, Option, Typer
 
-from mta_od_data import DATA
 from mta_od_data.analyze.common import (
     DAY_TYPE_PRESETS,
     Complex,
@@ -54,9 +53,8 @@ from mta_od_data.analyze.scenarios import (
     ScenarioFile,
     StationIndex,
 )
-from mta_od_data.downloads import od_parquet
+from mta_od_data.downloads import complexes_csv, od_parquet, stations_csv
 from mta_od_data.invocation import produced_by
-from mta_od_data.prepare import DEFAULT_PARQUET
 
 app = Typer()
 
@@ -1500,20 +1498,6 @@ def deinterlining(
             ),
         ),
     ] = SCENARIOS_FILE,
-    parquet: Annotated[
-        Path, Option(help="The OD Parquet, built or downloaded if missing")
-    ] = DEFAULT_PARQUET,
-    complexes_path: Annotated[Path, Option("--complexes")] = (DATA / "complexes.csv"),
-    stations_path: Annotated[
-        Path,
-        Option(
-            "--stations",
-            help=(
-                "Per-station reference CSV (a row per line's stop within "
-                "a complex), used for accurate nearest-other-trunk distances"
-            ),
-        ),
-    ] = DATA / "stations.csv",
     day_type: Annotated[DayType, Option()] = DayType.WEEKDAY,
     days: Annotated[
         str | None,
@@ -1581,9 +1565,10 @@ def deinterlining(
     day_type_label = (
         "/".join(d.strip() for d in days.split(",")) if days else str(day_type)
     )
+    complexes_path = complexes_csv()
     complexes_by_id = Complex.load_all(complexes_path)
     complexes = complexes_of(complexes_by_id)
-    stations = Station.load_all(stations_path, complexes_by_id)
+    stations = Station.load_all(stations_csv(), complexes_by_id)
     station_index = StationIndex.build(complexes, stations)
     try:
         comparison = resolve_scenarios(
@@ -1624,7 +1609,7 @@ def deinterlining(
         f' OR "Destination Station Complex ID" IN ({scope_id_list}))'
     )
 
-    parquet = od_parquet(parquet)
+    parquet = od_parquet()
     try:
         coverage = DayCoverage.query(parquet, day_filter_sql, day_params)
     except DayFilterError as e:

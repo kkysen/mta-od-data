@@ -29,8 +29,8 @@ def generate_scenario_schema(
 
     Those `enum`s are an editor-time snapshot only:
     a real load re-checks
-    against whichever `--complexes`/`--stations` was actually
-    passed, which can legitimately differ from these defaults.
+    against the complexes and stations read then,
+    which can legitimately differ from these defaults.
 
     Regenerate `scenarios.schema.json` with:
 

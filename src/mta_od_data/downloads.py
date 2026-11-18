@@ -16,7 +16,16 @@ from pathlib import Path
 from mta_od_data.artifacts import REPO
 from mta_od_data.gtfs import DEFAULT_GTFS_DIR, VERSIONS_FILE, fetch_version
 from mta_od_data.gtfs import load_versions as load_version_ids
-from mta_od_data.prepare import DEFAULT_CSV_GLOB, DEFAULT_PARQUET, convert_od_to_parquet
+from mta_od_data.prepare import (
+    COMPLEXES_URL,
+    DEFAULT_COMPLEXES_CSV,
+    DEFAULT_CSV_GLOB,
+    DEFAULT_PARQUET,
+    DEFAULT_STATIONS_CSV,
+    STATIONS_URL,
+    convert_od_to_parquet,
+    fetch_csv,
+)
 
 # The release the OD Parquet is an asset of (see `README.md`).
 OD_RELEASE = "od-data"
@@ -47,6 +56,23 @@ def od_parquet(path: Path = DEFAULT_PARQUET) -> Path:
         check=True,
     )
     part.replace(path)
+    return path
+
+
+def complexes_csv() -> Path:
+    """The complex reference CSV, fetched from data.ny.gov if it's missing."""
+    return fetch_reference(COMPLEXES_URL, DEFAULT_COMPLEXES_CSV)
+
+
+def stations_csv() -> Path:
+    """The station reference CSV, fetched from data.ny.gov if it's missing."""
+    return fetch_reference(STATIONS_URL, DEFAULT_STATIONS_CSV)
+
+
+def fetch_reference(url: str, path: Path) -> Path:
+    if not path.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fetch_csv(url, path, force=False)
     return path
 
 
