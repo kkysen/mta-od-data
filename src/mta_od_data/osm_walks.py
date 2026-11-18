@@ -22,6 +22,9 @@ It stays inside the fare gates: never through a turnstile, gate, or entrance nod
 A flight climbs as many levels as its `level` spans, each `lidar.DEFAULT_RISE`,
 its run its length on the map;
 which end is up is from its `incline`, or else the levels of the ways at each end,
+or else of the areas each end is in or by, on one of its levels and not the other,
+as a flight drawn from a mezzanine's floor, its top end in it only,
+down to its bottom end, in both it and the platform under it;
 and each end joins only what's on its own level,
 so a flight drawn wholly inside a platform still climbs from it.
 An escalator runs the way its `conveying` says; where that's only `yes`,
@@ -31,10 +34,13 @@ Two indoor floors a level apart that share a side and don't overlap
 join along it, as OSM draws a passage sloping down from one level to the next,
 as the one from 42 St-Port Authority to Times Sq:
 crossing it climbs a level straight up, its run walked across the floors.
+A way with no `level` joins nothing on one, as one with only a `layer`
+is often the street's, as the sidewalks over Jay St-MetroTech's platforms.
 """
 
 import csv
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from itertools import pairwise
 from math import cos, hypot, radians
@@ -262,6 +268,8 @@ def edges(ways: Ways) -> tuple[list[Edge], dict[int, float]]:
                 sign = 1.0
             elif high in first or low in last:
                 sign = -1.0
+        if not sign:
+            sign = way_of_areas(within, nodes[0], nodes[-1], low, high)
         # Its bottom and top, apart from its end nodes, which OSM often draws
         # both inside the platform below and the floor above:
         # each joins the ways and areas on its own level by its end.
@@ -343,6 +351,24 @@ def level_changes(
                 if high - low == 1 and overlap <= 1.0:
                     out.extend((n, low, high) for n in side)
     return out
+
+
+def way_of_areas(
+    within: Callable[[int, float], list[int]],
+    first: int,
+    last: int,
+    low: float,
+    high: float,
+) -> float:
+    """Up from a flight's `first` node to its `last`, `1.0`, or down, `-1.0`,
+    by the areas each end is in or by, on one of its levels and not the other,
+    as OSM draws a flight from a mezzanine down to the floor below it
+    with its top end in the mezzanine only and its bottom in both;
+    `0.0` if they don't say, or disagree."""
+    on = [(bool(within(n, low)), bool(within(n, high))) for n in (first, last)]
+    up = on[0] == (True, False) or on[1] == (False, True)
+    down = on[0] == (False, True) or on[1] == (True, False)
+    return 0.0 if up == down else 1.0 if up else -1.0
 
 
 def walk_of(e: Edge, forward: bool) -> Walk:

@@ -33,675 +33,675 @@ text {
 <line class="grid" x1="691.8" x2="691.8" y1="84" y2="7840"/>
 <text x="691.8" y="7856.0" text-anchor="middle">800,000</text>
 <text x="200.8" y="109.0" class="label" text-anchor="end">Broadway-7 Av: 1</text>
-<path class="s0" d="M208.8,92.0h309.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-309.0z"><title>Broadway-7 Av: 1, Aug-Dec 2025: 518,495</title></path>
-<text x="525.8" y="102.0">518,495</text>
-<path class="s1" d="M208.8,106.0h411.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-411.0z"><title>Broadway-7 Av: 1, 2019: 687,307</title></path>
-<text x="627.8" y="116.0">687,307</text>
+<path class="s0" d="M208.8,92.0h309.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-309.0z"><title>Broadway-7 Av: 1, Aug-Dec 2025: 518,378</title></path>
+<text x="525.8" y="102.0">518,378</text>
+<path class="s1" d="M208.8,106.0h410.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-410.9z"><title>Broadway-7 Av: 1, 2019: 687,159</title></path>
+<text x="627.7" y="116.0">687,159</text>
 <text x="200.8" y="143.0" class="label" text-anchor="end">Flushing: 7</text>
-<path class="s0" d="M208.8,126.0h290.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-290.9z"><title>Flushing: 7, Aug-Dec 2025: 488,486</title></path>
-<text x="507.7" y="136.0">488,486</text>
-<path class="s1" d="M208.8,140.0h335.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-335.1z"><title>Flushing: 7, 2019: 561,645</title></path>
-<text x="551.9" y="150.0">561,645</text>
+<path class="s0" d="M208.8,126.0h290.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-290.8z"><title>Flushing: 7, Aug-Dec 2025: 488,275</title></path>
+<text x="507.6" y="136.0">488,275</text>
+<path class="s1" d="M208.8,140.0h334.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-334.9z"><title>Flushing: 7, 2019: 561,370</title></path>
+<text x="551.7" y="150.0">561,370</text>
 <text x="200.8" y="177.0" class="label" text-anchor="end">Lexington Av: 6</text>
-<path class="s0" d="M208.8,160.0h288.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-288.5z"><title>Lexington Av: 6, Aug-Dec 2025: 484,423</title></path>
-<text x="505.3" y="170.0">484,423</text>
-<path class="s1" d="M208.8,174.0h378.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-378.5z"><title>Lexington Av: 6, 2019: 633,502</title></path>
-<text x="595.3" y="184.0">633,502</text>
+<path class="s0" d="M208.8,160.0h288.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-288.1z"><title>Lexington Av: 6, Aug-Dec 2025: 483,876</title></path>
+<text x="504.9" y="170.0">483,876</text>
+<path class="s1" d="M208.8,174.0h378.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-378.1z"><title>Lexington Av: 6, 2019: 632,824</title></path>
+<text x="594.9" y="184.0">632,824</text>
 <text x="200.8" y="211.0" class="label" text-anchor="end">Lexington Av local: 6</text>
-<path class="s0" d="M208.8,194.0h288.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-288.5z"><title>Lexington Av local: 6, Aug-Dec 2025: 484,423</title></path>
-<text x="505.3" y="204.0">484,423</text>
-<path class="s1" d="M208.8,208.0h378.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-378.5z"><title>Lexington Av local: 6, 2019: 633,502</title></path>
-<text x="595.3" y="218.0">633,502</text>
+<path class="s0" d="M208.8,194.0h288.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-288.1z"><title>Lexington Av local: 6, Aug-Dec 2025: 483,876</title></path>
+<text x="504.9" y="204.0">483,876</text>
+<path class="s1" d="M208.8,208.0h378.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-378.1z"><title>Lexington Av local: 6, 2019: 632,824</title></path>
+<text x="594.9" y="218.0">632,824</text>
 <text x="200.8" y="245.0" class="label" text-anchor="end">Flushing: 7L</text>
-<path class="s0" d="M208.8,228.0h237.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-237.2z"><title>Flushing: 7L, Aug-Dec 2025: 399,501</title></path>
-<text x="454.0" y="238.0">399,501</text>
-<path class="s1" d="M208.8,242.0h273.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-273.4z"><title>Flushing: 7L, 2019: 459,441</title></path>
-<text x="490.2" y="252.0">459,441</text>
+<path class="s0" d="M208.8,228.0h237.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-237.1z"><title>Flushing: 7L, Aug-Dec 2025: 399,317</title></path>
+<text x="453.9" y="238.0">399,317</text>
+<path class="s1" d="M208.8,242.0h273.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-273.2z"><title>Flushing: 7L, 2019: 459,199</title></path>
+<text x="490.0" y="252.0">459,199</text>
 <text x="200.8" y="279.0" class="label" text-anchor="end">Broadway-7 Av local: 1</text>
-<path class="s0" d="M208.8,262.0h231.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-231.0z"><title>Broadway-7 Av local: 1, Aug-Dec 2025: 389,234</title></path>
-<text x="447.8" y="272.0">389,234</text>
-<path class="s1" d="M208.8,276.0h307.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-307.4z"><title>Broadway-7 Av local: 1, 2019: 515,764</title></path>
-<text x="524.2" y="286.0">515,764</text>
+<path class="s0" d="M208.8,262.0h231.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-231.0z"><title>Broadway-7 Av local: 1, Aug-Dec 2025: 389,162</title></path>
+<text x="447.8" y="272.0">389,162</text>
+<path class="s1" d="M208.8,276.0h307.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-307.3z"><title>Broadway-7 Av local: 1, 2019: 515,675</title></path>
+<text x="524.1" y="286.0">515,675</text>
 <text x="200.8" y="313.0" class="label" text-anchor="end">Canarsie: L</text>
-<path class="s0" d="M208.8,296.0h226.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-226.1z"><title>Canarsie: L, Aug-Dec 2025: 381,164</title></path>
-<text x="442.9" y="306.0">381,164</text>
-<path class="s1" d="M208.8,310.0h256.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-256.2z"><title>Canarsie: L, 2019: 431,011</title></path>
-<text x="473.0" y="320.0">431,011</text>
+<path class="s0" d="M208.8,296.0h226.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-226.2z"><title>Canarsie: L, Aug-Dec 2025: 381,323</title></path>
+<text x="443.0" y="306.0">381,323</text>
+<path class="s1" d="M208.8,310.0h256.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-256.4z"><title>Canarsie: L, 2019: 431,239</title></path>
+<text x="473.2" y="320.0">431,239</text>
 <text x="200.8" y="347.0" class="label" text-anchor="end">Lexington Av: 6L</text>
-<path class="s0" d="M208.8,330.0h216.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-216.7z"><title>Lexington Av: 6L, Aug-Dec 2025: 365,553</title></path>
-<text x="433.5" y="340.0">365,553</text>
-<path class="s1" d="M208.8,344.0h283.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-283.3z"><title>Lexington Av: 6L, 2019: 475,851</title></path>
-<text x="500.1" y="354.0">475,851</text>
+<path class="s0" d="M208.8,330.0h216.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-216.4z"><title>Lexington Av: 6L, Aug-Dec 2025: 365,096</title></path>
+<text x="433.2" y="340.0">365,096</text>
+<path class="s1" d="M208.8,344.0h283.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-283.0z"><title>Lexington Av: 6L, 2019: 475,290</title></path>
+<text x="499.8" y="354.0">475,290</text>
 <text x="200.8" y="381.0" class="label" text-anchor="end">Lexington Av local: 6L</text>
-<path class="s0" d="M208.8,364.0h216.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-216.7z"><title>Lexington Av local: 6L, Aug-Dec 2025: 365,553</title></path>
-<text x="433.5" y="374.0">365,553</text>
-<path class="s1" d="M208.8,378.0h283.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-283.3z"><title>Lexington Av local: 6L, 2019: 475,851</title></path>
-<text x="500.1" y="388.0">475,851</text>
+<path class="s0" d="M208.8,364.0h216.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-216.4z"><title>Lexington Av local: 6L, Aug-Dec 2025: 365,096</title></path>
+<text x="433.2" y="374.0">365,096</text>
+<path class="s1" d="M208.8,378.0h283.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-283.0z"><title>Lexington Av local: 6L, 2019: 475,290</title></path>
+<text x="499.8" y="388.0">475,290</text>
 <text x="200.8" y="415.0" class="label" text-anchor="end">6 Av: F</text>
-<path class="s0" d="M208.8,398.0h209.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-209.5z"><title>6 Av: F, Aug-Dec 2025: 353,685</title></path>
-<text x="426.3" y="408.0">353,685</text>
-<path class="s1" d="M208.8,412.0h268.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-268.0z"><title>6 Av: F, 2019: 450,575</title></path>
-<text x="484.8" y="422.0">450,575</text>
+<path class="s0" d="M208.8,398.0h209.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-209.3z"><title>6 Av: F, Aug-Dec 2025: 353,226</title></path>
+<text x="426.1" y="408.0">353,226</text>
+<path class="s1" d="M208.8,412.0h267.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-267.7z"><title>6 Av: F, 2019: 449,959</title></path>
+<text x="484.5" y="422.0">449,959</text>
 <text x="200.8" y="449.0" class="label" text-anchor="end">8 Av: A</text>
-<path class="s0" d="M208.8,432.0h207.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-207.3z"><title>8 Av: A, Aug-Dec 2025: 349,935</title></path>
-<text x="424.1" y="442.0">349,935</text>
-<path class="s1" d="M208.8,446.0h287.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-287.0z"><title>8 Av: A, 2019: 481,921</title></path>
-<text x="503.8" y="456.0">481,921</text>
+<path class="s0" d="M208.8,432.0h207.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-207.5z"><title>8 Av: A, Aug-Dec 2025: 350,327</title></path>
+<text x="424.3" y="442.0">350,327</text>
+<path class="s1" d="M208.8,446.0h287.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-287.3z"><title>8 Av: A, 2019: 482,484</title></path>
+<text x="504.1" y="456.0">482,484</text>
 <text x="200.8" y="483.0" class="label" text-anchor="end">6 Av: FL</text>
-<path class="s0" d="M208.8,466.0h206.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-206.7z"><title>6 Av: FL, Aug-Dec 2025: 348,926</title></path>
-<text x="423.5" y="476.0">348,926</text>
-<path class="s1" d="M208.8,480.0h264.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-264.3z"><title>6 Av: FL, 2019: 444,393</title></path>
-<text x="481.1" y="490.0">444,393</text>
+<path class="s0" d="M208.8,466.0h206.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-206.4z"><title>6 Av: FL, Aug-Dec 2025: 348,489</title></path>
+<text x="423.2" y="476.0">348,489</text>
+<path class="s1" d="M208.8,480.0h263.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-263.9z"><title>6 Av: FL, 2019: 443,805</title></path>
+<text x="480.7" y="490.0">443,805</text>
 <text x="200.8" y="517.0" class="label" text-anchor="end">Lexington Av: 4</text>
-<path class="s0" d="M208.8,500.0h197.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-197.2z"><title>Lexington Av: 4, Aug-Dec 2025: 333,254</title></path>
-<text x="414.0" y="510.0">333,254</text>
-<path class="s1" d="M208.8,514.0h270.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-270.6z"><title>Lexington Av: 4, 2019: 454,888</title></path>
-<text x="487.4" y="524.0">454,888</text>
+<path class="s0" d="M208.8,500.0h197.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-197.7z"><title>Lexington Av: 4, Aug-Dec 2025: 334,161</title></path>
+<text x="414.5" y="510.0">334,161</text>
+<path class="s1" d="M208.8,514.0h271.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-271.3z"><title>Lexington Av: 4, 2019: 456,063</title></path>
+<text x="488.1" y="524.0">456,063</text>
 <text x="200.8" y="551.0" class="label" text-anchor="end">Lexington Av express: 4</text>
-<path class="s0" d="M208.8,534.0h162.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-162.8z"><title>Lexington Av express: 4, Aug-Dec 2025: 276,317</title></path>
-<text x="379.6" y="544.0">276,317</text>
-<path class="s1" d="M208.8,548.0h220.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-220.6z"><title>Lexington Av express: 4, 2019: 371,993</title></path>
-<text x="437.4" y="558.0">371,993</text>
+<path class="s0" d="M208.8,534.0h163.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-163.4z"><title>Lexington Av express: 4, Aug-Dec 2025: 277,236</title></path>
+<text x="380.2" y="544.0">277,236</text>
+<path class="s1" d="M208.8,548.0h221.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-221.3z"><title>Lexington Av express: 4, 2019: 373,189</title></path>
+<text x="438.1" y="558.0">373,189</text>
 <text x="200.8" y="585.0" class="label" text-anchor="end">8 Av express: A</text>
-<path class="s0" d="M208.8,568.0h161.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-161.9z"><title>8 Av express: A, Aug-Dec 2025: 274,776</title></path>
-<text x="378.7" y="578.0">274,776</text>
-<path class="s1" d="M208.8,582.0h222.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-222.0z"><title>8 Av express: A, 2019: 374,386</title></path>
-<text x="438.8" y="592.0">374,386</text>
+<path class="s0" d="M208.8,568.0h161.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-161.7z"><title>8 Av express: A, Aug-Dec 2025: 274,527</title></path>
+<text x="378.5" y="578.0">274,527</text>
+<path class="s1" d="M208.8,582.0h221.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-221.8z"><title>8 Av express: A, 2019: 374,055</title></path>
+<text x="438.6" y="592.0">374,055</text>
 <text x="200.8" y="619.0" class="label" text-anchor="end">53 St: E</text>
-<path class="s0" d="M208.8,602.0h151.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-151.8z"><title>53 St: E, Aug-Dec 2025: 258,052</title></path>
-<text x="368.6" y="612.0">258,052</text>
-<path class="s1" d="M208.8,616.0h198.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-198.6z"><title>53 St: E, 2019: 335,592</title></path>
-<text x="415.4" y="626.0">335,592</text>
+<path class="s0" d="M208.8,602.0h151.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-151.7z"><title>53 St: E, Aug-Dec 2025: 257,887</title></path>
+<text x="368.5" y="612.0">257,887</text>
+<path class="s1" d="M208.8,616.0h198.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-198.5z"><title>53 St: E, 2019: 335,371</title></path>
+<text x="415.3" y="626.0">335,371</text>
 <text x="200.8" y="653.0" class="label" text-anchor="end">Lexington Av: 5</text>
-<path class="s0" d="M208.8,636.0h143.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.4z"><title>Lexington Av: 5, Aug-Dec 2025: 244,083</title></path>
-<text x="360.2" y="646.0">244,083</text>
-<path class="s1" d="M208.8,650.0h197.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-197.4z"><title>Lexington Av: 5, 2019: 333,601</title></path>
-<text x="414.2" y="660.0">333,601</text>
+<path class="s0" d="M208.8,636.0h143.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.2z"><title>Lexington Av: 5, Aug-Dec 2025: 243,743</title></path>
+<text x="360.0" y="646.0">243,743</text>
+<path class="s1" d="M208.8,650.0h197.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-197.2z"><title>Lexington Av: 5, 2019: 333,207</title></path>
+<text x="414.0" y="660.0">333,207</text>
 <text x="200.8" y="687.0" class="label" text-anchor="end">6 Av local: F</text>
-<path class="s0" d="M208.8,670.0h143.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.1z"><title>6 Av local: F, Aug-Dec 2025: 243,705</title></path>
-<text x="359.9" y="680.0">243,705</text>
-<path class="s1" d="M208.8,684.0h185.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-185.6z"><title>6 Av local: F, 2019: 314,076</title></path>
-<text x="402.4" y="694.0">314,076</text>
+<path class="s0" d="M208.8,670.0h143.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.0z"><title>6 Av local: F, Aug-Dec 2025: 243,554</title></path>
+<text x="359.8" y="680.0">243,554</text>
+<path class="s1" d="M208.8,684.0h185.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-185.5z"><title>6 Av local: F, 2019: 313,873</title></path>
+<text x="402.3" y="694.0">313,873</text>
 <text x="200.8" y="721.0" class="label" text-anchor="end">6 Av local: FL</text>
-<path class="s0" d="M208.8,704.0h141.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-141.3z"><title>6 Av local: FL, Aug-Dec 2025: 240,594</title></path>
-<text x="358.1" y="714.0">240,594</text>
-<path class="s1" d="M208.8,718.0h183.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-183.1z"><title>6 Av local: FL, 2019: 309,974</title></path>
-<text x="399.9" y="728.0">309,974</text>
+<path class="s0" d="M208.8,704.0h141.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-141.2z"><title>6 Av local: FL, Aug-Dec 2025: 240,450</title></path>
+<text x="358.0" y="714.0">240,450</text>
+<path class="s1" d="M208.8,718.0h183.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-183.0z"><title>6 Av local: FL, 2019: 309,781</title></path>
+<text x="399.8" y="728.0">309,781</text>
 <text x="200.8" y="755.0" class="label" text-anchor="end">Broadway-7 Av: 2</text>
-<path class="s0" d="M208.8,738.0h139.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.4z"><title>Broadway-7 Av: 2, Aug-Dec 2025: 237,511</title></path>
-<text x="356.2" y="748.0">237,511</text>
-<path class="s1" d="M208.8,752.0h194.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-194.1z"><title>Broadway-7 Av: 2, 2019: 328,098</title></path>
-<text x="410.9" y="762.0">328,098</text>
+<path class="s0" d="M208.8,738.0h139.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.4z"><title>Broadway-7 Av: 2, Aug-Dec 2025: 237,591</title></path>
+<text x="356.2" y="748.0">237,591</text>
+<path class="s1" d="M208.8,752.0h194.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-194.2z"><title>Broadway-7 Av: 2, 2019: 328,230</title></path>
+<text x="411.0" y="762.0">328,230</text>
 <text x="200.8" y="789.0" class="label" text-anchor="end">Broadway: R</text>
-<path class="s0" d="M208.8,772.0h135.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-135.6z"><title>Broadway: R, Aug-Dec 2025: 231,286</title></path>
-<text x="352.4" y="782.0">231,286</text>
-<path class="s1" d="M208.8,786.0h184.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-184.8z"><title>Broadway: R, 2019: 312,701</title></path>
-<text x="401.6" y="796.0">312,701</text>
+<path class="s0" d="M208.8,772.0h134.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-134.9z"><title>Broadway: R, Aug-Dec 2025: 230,087</title></path>
+<text x="351.7" y="782.0">230,087</text>
+<path class="s1" d="M208.8,786.0h183.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-183.8z"><title>Broadway: R, 2019: 311,068</title></path>
+<text x="400.6" y="796.0">311,068</text>
 <text x="200.8" y="823.0" class="label" text-anchor="end">Queens Blvd: E</text>
-<path class="s0" d="M208.8,806.0h134.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-134.1z"><title>Queens Blvd: E, Aug-Dec 2025: 228,671</title></path>
-<text x="350.9" y="816.0">228,671</text>
-<path class="s1" d="M208.8,820.0h167.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-167.3z"><title>Queens Blvd: E, 2019: 283,678</title></path>
-<text x="384.1" y="830.0">283,678</text>
+<path class="s0" d="M208.8,806.0h134.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-134.0z"><title>Queens Blvd: E, Aug-Dec 2025: 228,583</title></path>
+<text x="350.8" y="816.0">228,583</text>
+<path class="s1" d="M208.8,820.0h167.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-167.2z"><title>Queens Blvd: E, 2019: 283,567</title></path>
+<text x="384.0" y="830.0">283,567</text>
 <text x="200.8" y="857.0" class="label" text-anchor="end">Broadway: Q</text>
-<path class="s0" d="M208.8,840.0h132.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-132.6z"><title>Broadway: Q, Aug-Dec 2025: 226,255</title></path>
-<text x="349.4" y="850.0">226,255</text>
-<path class="s1" d="M208.8,854.0h176.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-176.4z"><title>Broadway: Q, 2019: 298,844</title></path>
-<text x="393.2" y="864.0">298,844</text>
+<path class="s0" d="M208.8,840.0h132.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-132.7z"><title>Broadway: Q, Aug-Dec 2025: 226,395</title></path>
+<text x="349.5" y="850.0">226,395</text>
+<path class="s1" d="M208.8,854.0h176.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-176.5z"><title>Broadway: Q, 2019: 299,003</title></path>
+<text x="393.3" y="864.0">299,003</text>
 <text x="200.8" y="891.0" class="label" text-anchor="end">Flushing local: 7</text>
-<path class="s0" d="M208.8,874.0h129.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.3z"><title>Flushing local: 7, Aug-Dec 2025: 220,813</title></path>
-<text x="346.1" y="884.0">220,813</text>
-<path class="s1" d="M208.8,888.0h144.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-144.7z"><title>Flushing local: 7, 2019: 246,214</title></path>
-<text x="361.5" y="898.0">246,214</text>
+<path class="s0" d="M208.8,874.0h129.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.3z"><title>Flushing local: 7, Aug-Dec 2025: 220,808</title></path>
+<text x="346.1" y="884.0">220,808</text>
+<path class="s1" d="M208.8,888.0h144.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-144.6z"><title>Flushing local: 7, 2019: 246,208</title></path>
+<text x="361.4" y="898.0">246,208</text>
 <text x="200.8" y="925.0" class="label" text-anchor="end">Flushing local: 7L</text>
-<path class="s0" d="M208.8,908.0h129.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.3z"><title>Flushing local: 7L, Aug-Dec 2025: 220,813</title></path>
-<text x="346.1" y="918.0">220,813</text>
-<path class="s1" d="M208.8,922.0h144.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-144.7z"><title>Flushing local: 7L, 2019: 246,214</title></path>
-<text x="361.5" y="932.0">246,214</text>
+<path class="s0" d="M208.8,908.0h129.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.3z"><title>Flushing local: 7L, Aug-Dec 2025: 220,808</title></path>
+<text x="346.1" y="918.0">220,808</text>
+<path class="s1" d="M208.8,922.0h144.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-144.6z"><title>Flushing local: 7L, 2019: 246,208</title></path>
+<text x="361.4" y="932.0">246,208</text>
 <text x="200.8" y="959.0" class="label" text-anchor="end">Broadway express: Q</text>
-<path class="s0" d="M208.8,942.0h129.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.1z"><title>Broadway express: Q, Aug-Dec 2025: 220,477</title></path>
-<text x="345.9" y="952.0">220,477</text>
-<path class="s1" d="M208.8,956.0h171.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-171.9z"><title>Broadway express: Q, 2019: 291,264</title></path>
-<text x="388.7" y="966.0">291,264</text>
+<path class="s0" d="M208.8,942.0h129.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.2z"><title>Broadway express: Q, Aug-Dec 2025: 220,617</title></path>
+<text x="346.0" y="952.0">220,617</text>
+<path class="s1" d="M208.8,956.0h171.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-171.9z"><title>Broadway express: Q, 2019: 291,426</title></path>
+<text x="388.7" y="966.0">291,426</text>
 <text x="200.8" y="993.0" class="label" text-anchor="end">Broadway-7 Av express: 2</text>
-<path class="s0" d="M208.8,976.0h123.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-123.0z"><title>Broadway-7 Av express: 2, Aug-Dec 2025: 210,333</title></path>
-<text x="339.8" y="986.0">210,333</text>
-<path class="s1" d="M208.8,990.0h171.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-171.5z"><title>Broadway-7 Av express: 2, 2019: 290,740</title></path>
-<text x="388.3" y="1000.0">290,740</text>
+<path class="s0" d="M208.8,976.0h122.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-122.8z"><title>Broadway-7 Av express: 2, Aug-Dec 2025: 210,074</title></path>
+<text x="339.6" y="986.0">210,074</text>
+<path class="s1" d="M208.8,990.0h171.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-171.3z"><title>Broadway-7 Av express: 2, 2019: 290,375</title></path>
+<text x="388.1" y="1000.0">290,375</text>
 <text x="200.8" y="1027.0" class="label" text-anchor="end">Lexington Av express: 5</text>
-<path class="s0" d="M208.8,1010.0h122.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-122.8z"><title>Lexington Av express: 5, Aug-Dec 2025: 209,958</title></path>
-<text x="339.6" y="1020.0">209,958</text>
-<path class="s1" d="M208.8,1024.0h167.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-167.1z"><title>Lexington Av express: 5, 2019: 283,339</title></path>
-<text x="383.9" y="1034.0">283,339</text>
+<path class="s0" d="M208.8,1010.0h122.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-122.6z"><title>Lexington Av express: 5, Aug-Dec 2025: 209,762</title></path>
+<text x="339.4" y="1020.0">209,762</text>
+<path class="s1" d="M208.8,1024.0h166.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-166.9z"><title>Lexington Av express: 5, 2019: 283,135</title></path>
+<text x="383.7" y="1034.0">283,135</text>
 <text x="200.8" y="1061.0" class="label" text-anchor="end">Queens Blvd west: E</text>
-<path class="s0" d="M208.8,1044.0h121.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.5z"><title>Queens Blvd west: E, Aug-Dec 2025: 207,826</title></path>
-<text x="338.3" y="1054.0">207,826</text>
-<path class="s1" d="M208.8,1058.0h150.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-150.9z"><title>Queens Blvd west: E, 2019: 256,539</title></path>
-<text x="367.7" y="1068.0">256,539</text>
+<path class="s0" d="M208.8,1044.0h121.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.4z"><title>Queens Blvd west: E, Aug-Dec 2025: 207,726</title></path>
+<text x="338.2" y="1054.0">207,726</text>
+<path class="s1" d="M208.8,1058.0h150.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-150.8z"><title>Queens Blvd west: E, 2019: 256,414</title></path>
+<text x="367.6" y="1068.0">256,414</text>
 <text x="200.8" y="1095.0" class="label" text-anchor="end">Broadway: N</text>
-<path class="s0" d="M208.8,1078.0h120.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-120.2z"><title>Broadway: N, Aug-Dec 2025: 205,749</title></path>
-<text x="337.0" y="1088.0">205,749</text>
-<path class="s1" d="M208.8,1092.0h150.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-150.2z"><title>Broadway: N, 2019: 255,451</title></path>
-<text x="367.0" y="1102.0">255,451</text>
+<path class="s0" d="M208.8,1078.0h120.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-120.2z"><title>Broadway: N, Aug-Dec 2025: 205,660</title></path>
+<text x="337.0" y="1088.0">205,660</text>
+<path class="s1" d="M208.8,1092.0h150.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-150.3z"><title>Broadway: N, 2019: 255,492</title></path>
+<text x="367.1" y="1102.0">255,492</text>
 <text x="200.8" y="1129.0" class="label" text-anchor="end">Queens Blvd express: E</text>
-<path class="s0" d="M208.8,1112.0h118.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-118.1z"><title>Queens Blvd express: E, Aug-Dec 2025: 202,216</title></path>
-<text x="334.9" y="1122.0">202,216</text>
-<path class="s1" d="M208.8,1126.0h147.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-147.1z"><title>Queens Blvd express: E, 2019: 250,291</title></path>
-<text x="363.9" y="1136.0">250,291</text>
-<text x="200.8" y="1163.0" class="label" text-anchor="end">Queens Blvd west express: E</text>
-<path class="s0" d="M208.8,1146.0h112.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-112.4z"><title>Queens Blvd west express: E, Aug-Dec 2025: 192,847</title></path>
-<text x="329.2" y="1156.0">192,847</text>
-<path class="s1" d="M208.8,1160.0h139.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.7z"><title>Queens Blvd west express: E, 2019: 237,960</title></path>
-<text x="356.5" y="1170.0">237,960</text>
-<text x="200.8" y="1197.0" class="label" text-anchor="end">6 Av: D</text>
-<path class="s0" d="M208.8,1180.0h112.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-112.4z"><title>6 Av: D, Aug-Dec 2025: 192,837</title></path>
-<text x="329.2" y="1190.0">192,837</text>
-<path class="s1" d="M208.8,1194.0h154.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-154.7z"><title>6 Av: D, 2019: 262,862</title></path>
-<text x="371.5" y="1204.0">262,862</text>
+<path class="s0" d="M208.8,1112.0h118.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-118.0z"><title>Queens Blvd express: E, Aug-Dec 2025: 202,135</title></path>
+<text x="334.8" y="1122.0">202,135</text>
+<path class="s1" d="M208.8,1126.0h147.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-147.1z"><title>Queens Blvd express: E, 2019: 250,189</title></path>
+<text x="363.9" y="1136.0">250,189</text>
+<text x="200.8" y="1163.0" class="label" text-anchor="end">6 Av: D</text>
+<path class="s0" d="M208.8,1146.0h112.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-112.4z"><title>6 Av: D, Aug-Dec 2025: 192,844</title></path>
+<text x="329.2" y="1156.0">192,844</text>
+<path class="s1" d="M208.8,1160.0h154.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-154.7z"><title>6 Av: D, 2019: 262,894</title></path>
+<text x="371.5" y="1170.0">262,894</text>
+<text x="200.8" y="1197.0" class="label" text-anchor="end">Queens Blvd west express: E</text>
+<path class="s0" d="M208.8,1180.0h112.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-112.4z"><title>Queens Blvd west express: E, Aug-Dec 2025: 192,758</title></path>
+<text x="329.2" y="1190.0">192,758</text>
+<path class="s1" d="M208.8,1194.0h139.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-139.6z"><title>Queens Blvd west express: E, 2019: 237,848</title></path>
+<text x="356.4" y="1204.0">237,848</text>
 <text x="200.8" y="1231.0" class="label" text-anchor="end">Queens Blvd: F</text>
-<path class="s0" d="M208.8,1214.0h110.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-110.9z"><title>Queens Blvd: F, Aug-Dec 2025: 190,384</title></path>
-<text x="327.7" y="1224.0">190,384</text>
-<path class="s1" d="M208.8,1228.0h144.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-144.4z"><title>Queens Blvd: F, 2019: 245,738</title></path>
-<text x="361.2" y="1238.0">245,738</text>
+<path class="s0" d="M208.8,1214.0h110.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-110.9z"><title>Queens Blvd: F, Aug-Dec 2025: 190,366</title></path>
+<text x="327.7" y="1224.0">190,366</text>
+<path class="s1" d="M208.8,1228.0h144.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-144.3z"><title>Queens Blvd: F, 2019: 245,713</title></path>
+<text x="361.1" y="1238.0">245,713</text>
 <text x="200.8" y="1265.0" class="label" text-anchor="end">Queens Blvd: FL</text>
-<path class="s0" d="M208.8,1248.0h110.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-110.3z"><title>Queens Blvd: FL, Aug-Dec 2025: 189,337</title></path>
-<text x="327.1" y="1258.0">189,337</text>
-<path class="s1" d="M208.8,1262.0h143.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.6z"><title>Queens Blvd: FL, 2019: 244,391</title></path>
-<text x="360.4" y="1272.0">244,391</text>
+<path class="s0" d="M208.8,1248.0h110.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-110.3z"><title>Queens Blvd: FL, Aug-Dec 2025: 189,319</title></path>
+<text x="327.1" y="1258.0">189,319</text>
+<path class="s1" d="M208.8,1262.0h143.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.5z"><title>Queens Blvd: FL, 2019: 244,366</title></path>
+<text x="360.3" y="1272.0">244,366</text>
 <text x="200.8" y="1299.0" class="label" text-anchor="end">8 Av: C</text>
-<path class="s0" d="M208.8,1282.0h109.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-109.8z"><title>8 Av: C, Aug-Dec 2025: 188,510</title></path>
-<text x="326.6" y="1292.0">188,510</text>
-<path class="s1" d="M208.8,1296.0h143.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.1z"><title>8 Av: C, 2019: 243,724</title></path>
-<text x="359.9" y="1306.0">243,724</text>
+<path class="s0" d="M208.8,1282.0h109.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-109.8z"><title>8 Av: C, Aug-Dec 2025: 188,568</title></path>
+<text x="326.6" y="1292.0">188,568</text>
+<path class="s1" d="M208.8,1296.0h143.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.2z"><title>8 Av: C, 2019: 243,825</title></path>
+<text x="360.0" y="1306.0">243,825</text>
 <text x="200.8" y="1333.0" class="label" text-anchor="end">8 Av: E</text>
-<path class="s0" d="M208.8,1316.0h108.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-108.5z"><title>8 Av: E, Aug-Dec 2025: 186,286</title></path>
-<text x="325.3" y="1326.0">186,286</text>
-<path class="s1" d="M208.8,1330.0h143.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.2z"><title>8 Av: E, 2019: 243,842</title></path>
-<text x="360.0" y="1340.0">243,842</text>
+<path class="s0" d="M208.8,1316.0h108.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-108.4z"><title>8 Av: E, Aug-Dec 2025: 186,163</title></path>
+<text x="325.2" y="1326.0">186,163</text>
+<path class="s1" d="M208.8,1330.0h143.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.1z"><title>8 Av: E, 2019: 243,668</title></path>
+<text x="359.9" y="1340.0">243,668</text>
 <text x="200.8" y="1367.0" class="label" text-anchor="end">8 Av local: E</text>
-<path class="s0" d="M208.8,1350.0h107.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-107.9z"><title>8 Av local: E, Aug-Dec 2025: 185,388</title></path>
-<text x="324.7" y="1360.0">185,388</text>
-<path class="s1" d="M208.8,1364.0h142.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-142.4z"><title>8 Av local: E, 2019: 242,426</title></path>
-<text x="359.2" y="1374.0">242,426</text>
+<path class="s0" d="M208.8,1350.0h107.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-107.9z"><title>8 Av local: E, Aug-Dec 2025: 185,266</title></path>
+<text x="324.7" y="1360.0">185,266</text>
+<path class="s1" d="M208.8,1364.0h142.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-142.3z"><title>8 Av local: E, 2019: 242,255</title></path>
+<text x="359.1" y="1374.0">242,255</text>
 <text x="200.8" y="1401.0" class="label" text-anchor="end">Broadway-7 Av: 3</text>
-<path class="s0" d="M208.8,1384.0h106.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-106.7z"><title>Broadway-7 Av: 3, Aug-Dec 2025: 183,406</title></path>
-<text x="323.5" y="1394.0">183,406</text>
-<path class="s1" d="M208.8,1398.0h148.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-148.7z"><title>Broadway-7 Av: 3, 2019: 252,913</title></path>
-<text x="365.5" y="1408.0">252,913</text>
+<path class="s0" d="M208.8,1384.0h106.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-106.7z"><title>Broadway-7 Av: 3, Aug-Dec 2025: 183,390</title></path>
+<text x="323.5" y="1394.0">183,390</text>
+<path class="s1" d="M208.8,1398.0h148.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-148.7z"><title>Broadway-7 Av: 3, 2019: 252,910</title></path>
+<text x="365.5" y="1408.0">252,910</text>
 <text x="200.8" y="1435.0" class="label" text-anchor="end">Fulton St: A</text>
-<path class="s0" d="M208.8,1418.0h101.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-101.2z"><title>Fulton St: A, Aug-Dec 2025: 174,305</title></path>
-<text x="318.0" y="1428.0">174,305</text>
-<path class="s1" d="M208.8,1432.0h143.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.8z"><title>Fulton St: A, 2019: 244,753</title></path>
-<text x="360.6" y="1442.0">244,753</text>
+<path class="s0" d="M208.8,1418.0h101.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-101.2z"><title>Fulton St: A, Aug-Dec 2025: 174,229</title></path>
+<text x="318.0" y="1428.0">174,229</text>
+<path class="s1" d="M208.8,1432.0h143.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-143.7z"><title>Fulton St: A, 2019: 244,644</title></path>
+<text x="360.5" y="1442.0">244,644</text>
 <text x="200.8" y="1469.0" class="label" text-anchor="end">Broadway-7 Av express: 3</text>
-<path class="s0" d="M208.8,1452.0h94.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-94.3z"><title>Broadway-7 Av express: 3, Aug-Dec 2025: 162,779</title></path>
-<text x="311.1" y="1462.0">162,779</text>
-<path class="s1" d="M208.8,1466.0h131.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-131.2z"><title>Broadway-7 Av express: 3, 2019: 223,983</title></path>
-<text x="348.0" y="1476.0">223,983</text>
+<path class="s0" d="M208.8,1452.0h94.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-94.1z"><title>Broadway-7 Av express: 3, Aug-Dec 2025: 162,511</title></path>
+<text x="310.9" y="1462.0">162,511</text>
+<path class="s1" d="M208.8,1466.0h131.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-131.0z"><title>Broadway-7 Av express: 3, 2019: 223,621</title></path>
+<text x="347.8" y="1476.0">223,621</text>
 <text x="200.8" y="1503.0" class="label" text-anchor="end">6 Av: B</text>
-<path class="s0" d="M208.8,1486.0h92.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-92.0z"><title>6 Av: B, Aug-Dec 2025: 158,929</title></path>
-<text x="308.8" y="1496.0">158,929</text>
-<path class="s1" d="M208.8,1500.0h121.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.7z"><title>6 Av: B, 2019: 208,174</title></path>
-<text x="338.5" y="1510.0">208,174</text>
+<path class="s0" d="M208.8,1486.0h91.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-91.7z"><title>6 Av: B, Aug-Dec 2025: 158,473</title></path>
+<text x="308.5" y="1496.0">158,473</text>
+<path class="s1" d="M208.8,1500.0h121.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.3z"><title>6 Av: B, 2019: 207,517</title></path>
+<text x="338.1" y="1510.0">207,517</text>
 <text x="200.8" y="1537.0" class="label" text-anchor="end">63 St: F</text>
-<path class="s0" d="M208.8,1520.0h90.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.9z"><title>63 St: F, Aug-Dec 2025: 157,203</title></path>
-<text x="307.7" y="1530.0">157,203</text>
-<path class="s1" d="M208.8,1534.0h117.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-117.5z"><title>63 St: F, 2019: 201,254</title></path>
-<text x="334.3" y="1544.0">201,254</text>
+<path class="s0" d="M208.8,1520.0h90.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.8z"><title>63 St: F, Aug-Dec 2025: 157,099</title></path>
+<text x="307.6" y="1530.0">157,099</text>
+<path class="s1" d="M208.8,1534.0h117.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-117.4z"><title>63 St: F, 2019: 201,110</title></path>
+<text x="334.2" y="1544.0">201,110</text>
 <text x="200.8" y="1571.0" class="label" text-anchor="end">8 Av local: C</text>
-<path class="s0" d="M208.8,1554.0h90.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.8z"><title>8 Av local: C, Aug-Dec 2025: 157,000</title></path>
-<text x="307.6" y="1564.0">157,000</text>
-<path class="s1" d="M208.8,1568.0h117.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-117.2z"><title>8 Av local: C, 2019: 200,814</title></path>
-<text x="334.0" y="1578.0">200,814</text>
+<path class="s0" d="M208.8,1554.0h90.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.7z"><title>8 Av local: C, Aug-Dec 2025: 156,917</title></path>
+<text x="307.5" y="1564.0">156,917</text>
+<path class="s1" d="M208.8,1568.0h117.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-117.2z"><title>8 Av local: C, 2019: 200,715</title></path>
+<text x="334.0" y="1578.0">200,715</text>
 <text x="200.8" y="1605.0" class="label" text-anchor="end">63 St: FL</text>
-<path class="s0" d="M208.8,1588.0h90.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.3z"><title>63 St: FL, Aug-Dec 2025: 156,233</title></path>
-<text x="307.1" y="1598.0">156,233</text>
-<path class="s1" d="M208.8,1602.0h116.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-116.7z"><title>63 St: FL, 2019: 199,991</title></path>
-<text x="333.5" y="1612.0">199,991</text>
+<path class="s0" d="M208.8,1588.0h90.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.3z"><title>63 St: FL, Aug-Dec 2025: 156,134</title></path>
+<text x="307.1" y="1598.0">156,134</text>
+<path class="s1" d="M208.8,1602.0h116.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-116.7z"><title>63 St: FL, 2019: 199,854</title></path>
+<text x="333.5" y="1612.0">199,854</text>
 <text x="200.8" y="1639.0" class="label" text-anchor="end">Jerome Av: 4</text>
-<path class="s0" d="M208.8,1622.0h89.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-89.9z"><title>Jerome Av: 4, Aug-Dec 2025: 155,604</title></path>
-<text x="306.7" y="1632.0">155,604</text>
-<path class="s1" d="M208.8,1636.0h129.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.7z"><title>Jerome Av: 4, 2019: 221,480</title></path>
-<text x="346.5" y="1646.0">221,480</text>
-<text x="200.8" y="1673.0" class="label" text-anchor="end">Broadway local: R</text>
-<path class="s0" d="M208.8,1656.0h88.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-88.0z"><title>Broadway local: R, Aug-Dec 2025: 152,358</title></path>
-<text x="304.8" y="1666.0">152,358</text>
-<path class="s1" d="M208.8,1670.0h121.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.7z"><title>Broadway local: R, 2019: 208,159</title></path>
-<text x="338.5" y="1680.0">208,159</text>
-<text x="200.8" y="1707.0" class="label" text-anchor="end">Brighton: Q</text>
-<path class="s0" d="M208.8,1690.0h87.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-87.7z"><title>Brighton: Q, Aug-Dec 2025: 151,886</title></path>
-<text x="304.5" y="1700.0">151,886</text>
-<path class="s1" d="M208.8,1704.0h116.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-116.9z"><title>Brighton: Q, 2019: 200,218</title></path>
-<text x="333.7" y="1714.0">200,218</text>
+<path class="s0" d="M208.8,1622.0h90.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.0z"><title>Jerome Av: 4, Aug-Dec 2025: 155,623</title></path>
+<text x="306.8" y="1632.0">155,623</text>
+<path class="s1" d="M208.8,1636.0h129.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-129.7z"><title>Jerome Av: 4, 2019: 221,500</title></path>
+<text x="346.5" y="1646.0">221,500</text>
+<text x="200.8" y="1673.0" class="label" text-anchor="end">Brighton: Q</text>
+<path class="s0" d="M208.8,1656.0h88.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-88.9z"><title>Brighton: Q, Aug-Dec 2025: 153,908</title></path>
+<text x="305.7" y="1666.0">153,908</text>
+<path class="s1" d="M208.8,1670.0h118.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-118.4z"><title>Brighton: Q, 2019: 202,695</title></path>
+<text x="335.2" y="1680.0">202,695</text>
+<text x="200.8" y="1707.0" class="label" text-anchor="end">Broadway local: R</text>
+<path class="s0" d="M208.8,1690.0h87.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-87.7z"><title>Broadway local: R, Aug-Dec 2025: 151,925</title></path>
+<text x="304.5" y="1700.0">151,925</text>
+<path class="s1" d="M208.8,1704.0h121.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-121.3z"><title>Broadway local: R, 2019: 207,544</title></path>
+<text x="338.1" y="1714.0">207,544</text>
 <text x="200.8" y="1741.0" class="label" text-anchor="end">4 Av: R</text>
-<path class="s0" d="M208.8,1724.0h82.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.9z"><title>4 Av: R, Aug-Dec 2025: 144,001</title></path>
-<text x="299.7" y="1734.0">144,001</text>
-<path class="s1" d="M208.8,1738.0h103.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-103.5z"><title>4 Av: R, 2019: 178,006</title></path>
-<text x="320.3" y="1748.0">178,006</text>
+<path class="s0" d="M208.8,1724.0h83.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-83.5z"><title>4 Av: R, Aug-Dec 2025: 144,982</title></path>
+<text x="300.3" y="1734.0">144,982</text>
+<path class="s1" d="M208.8,1738.0h104.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-104.4z"><title>4 Av: R, 2019: 179,472</title></path>
+<text x="321.2" y="1748.0">179,472</text>
 <text x="200.8" y="1775.0" class="label" text-anchor="end">6 Av express: D</text>
-<path class="s0" d="M208.8,1758.0h82.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.3z"><title>6 Av express: D, Aug-Dec 2025: 142,957</title></path>
-<text x="299.1" y="1768.0">142,957</text>
-<path class="s1" d="M208.8,1772.0h113.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-113.9z"><title>6 Av express: D, 2019: 195,213</title></path>
-<text x="330.7" y="1782.0">195,213</text>
+<path class="s0" d="M208.8,1758.0h82.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.4z"><title>6 Av express: D, Aug-Dec 2025: 143,116</title></path>
+<text x="299.2" y="1768.0">143,116</text>
+<path class="s1" d="M208.8,1772.0h114.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-114.0z"><title>6 Av express: D, 2019: 195,445</title></path>
+<text x="330.8" y="1782.0">195,445</text>
 <text x="200.8" y="1809.0" class="label" text-anchor="end">Broadway: W</text>
-<path class="s0" d="M208.8,1792.0h81.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.5z"><title>Broadway: W, Aug-Dec 2025: 141,681</title></path>
-<text x="298.3" y="1802.0">141,681</text>
-<path class="s1" d="M208.8,1806.0h108.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-108.0z"><title>Broadway: W, 2019: 185,471</title></path>
-<text x="324.8" y="1816.0">185,471</text>
+<path class="s0" d="M208.8,1792.0h81.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.5z"><title>Broadway: W, Aug-Dec 2025: 141,623</title></path>
+<text x="298.3" y="1802.0">141,623</text>
+<path class="s1" d="M208.8,1806.0h107.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-107.9z"><title>Broadway: W, 2019: 185,377</title></path>
+<text x="324.7" y="1816.0">185,377</text>
 <text x="200.8" y="1843.0" class="label" text-anchor="end">SAS Phase 1: Q</text>
-<path class="s0" d="M208.8,1826.0h81.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.4z"><title>SAS Phase 1: Q, Aug-Dec 2025: 141,510</title></path>
-<text x="298.2" y="1836.0">141,510</text>
-<path class="s1" d="M208.8,1840.0h107.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-107.1z"><title>SAS Phase 1: Q, 2019: 184,028</title></path>
-<text x="323.9" y="1850.0">184,028</text>
+<path class="s0" d="M208.8,1826.0h81.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.4z"><title>SAS Phase 1: Q, Aug-Dec 2025: 141,520</title></path>
+<text x="298.2" y="1836.0">141,520</text>
+<path class="s1" d="M208.8,1840.0h107.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-107.1z"><title>SAS Phase 1: Q, 2019: 184,042</title></path>
+<text x="323.9" y="1850.0">184,042</text>
 <text x="200.8" y="1877.0" class="label" text-anchor="end">Fulton St express: A</text>
-<path class="s0" d="M208.8,1860.0h78.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.8z"><title>Fulton St express: A, Aug-Dec 2025: 137,224</title></path>
-<text x="295.6" y="1870.0">137,224</text>
-<path class="s1" d="M208.8,1874.0h113.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-113.8z"><title>Fulton St express: A, 2019: 195,105</title></path>
-<text x="330.6" y="1884.0">195,105</text>
+<path class="s0" d="M208.8,1860.0h78.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.8z"><title>Fulton St express: A, Aug-Dec 2025: 137,155</title></path>
+<text x="295.6" y="1870.0">137,155</text>
+<path class="s1" d="M208.8,1874.0h113.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-113.7z"><title>Fulton St express: A, 2019: 195,009</title></path>
+<text x="330.5" y="1884.0">195,009</text>
 <text x="200.8" y="1911.0" class="label" text-anchor="end">Crosstown: G</text>
-<path class="s0" d="M208.8,1894.0h76.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.2z"><title>Crosstown: G, Aug-Dec 2025: 132,782</title></path>
-<text x="293.0" y="1904.0">132,782</text>
-<path class="s1" d="M208.8,1908.0h89.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-89.1z"><title>Crosstown: G, 2019: 154,161</title></path>
-<text x="305.9" y="1918.0">154,161</text>
+<path class="s0" d="M208.8,1894.0h76.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.1z"><title>Crosstown: G, Aug-Dec 2025: 132,699</title></path>
+<text x="292.9" y="1904.0">132,699</text>
+<path class="s1" d="M208.8,1908.0h89.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-89.0z"><title>Crosstown: G, 2019: 154,068</title></path>
+<text x="305.8" y="1918.0">154,068</text>
 <text x="200.8" y="1945.0" class="label" text-anchor="end">Jamaica: J</text>
-<path class="s0" d="M208.8,1928.0h75.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.1z"><title>Jamaica: J, Aug-Dec 2025: 131,066</title></path>
-<text x="291.9" y="1938.0">131,066</text>
-<path class="s1" d="M208.8,1942.0h103.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-103.1z"><title>Jamaica: J, 2019: 177,458</title></path>
-<text x="319.9" y="1952.0">177,458</text>
+<path class="s0" d="M208.8,1928.0h75.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.2z"><title>Jamaica: J, Aug-Dec 2025: 131,242</title></path>
+<text x="292.0" y="1938.0">131,242</text>
+<path class="s1" d="M208.8,1942.0h103.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-103.3z"><title>Jamaica: J, 2019: 177,673</title></path>
+<text x="320.1" y="1952.0">177,673</text>
 <text x="200.8" y="1979.0" class="label" text-anchor="end">Pelham: 6</text>
 <path class="s0" d="M208.8,1962.0h72.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-72.2z"><title>Pelham: 6, Aug-Dec 2025: 126,272</title></path>
 <text x="289.0" y="1972.0">126,272</text>
 <path class="s1" d="M208.8,1976.0h106.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-106.9z"><title>Pelham: 6, 2019: 183,651</title></path>
 <text x="323.7" y="1986.0">183,651</text>
 <text x="200.8" y="2013.0" class="label" text-anchor="end">6 Av: M</text>
-<path class="s0" d="M208.8,1996.0h71.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.9z"><title>6 Av: M, Aug-Dec 2025: 125,753</title></path>
-<text x="288.7" y="2006.0">125,753</text>
-<path class="s1" d="M208.8,2010.0h98.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-98.4z"><title>6 Av: M, 2019: 169,635</title></path>
-<text x="315.2" y="2020.0">169,635</text>
+<path class="s0" d="M208.8,1996.0h71.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-71.9z"><title>6 Av: M, Aug-Dec 2025: 125,731</title></path>
+<text x="288.7" y="2006.0">125,731</text>
+<path class="s1" d="M208.8,2010.0h98.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-98.4z"><title>6 Av: M, 2019: 169,600</title></path>
+<text x="315.2" y="2020.0">169,600</text>
 <text x="200.8" y="2047.0" class="label" text-anchor="end">Broadway local: N</text>
-<path class="s0" d="M208.8,2030.0h69.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-69.6z"><title>Broadway local: N, Aug-Dec 2025: 121,860</title></path>
-<text x="286.4" y="2040.0">121,860</text>
-<path class="s1" d="M208.8,2044.0h86.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-86.7z"><title>Broadway local: N, 2019: 150,268</title></path>
-<text x="303.5" y="2054.0">150,268</text>
+<path class="s0" d="M208.8,2030.0h69.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-69.6z"><title>Broadway local: N, Aug-Dec 2025: 121,938</title></path>
+<text x="286.4" y="2040.0">121,938</text>
+<path class="s1" d="M208.8,2044.0h86.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-86.8z"><title>Broadway local: N, 2019: 150,391</title></path>
+<text x="303.6" y="2054.0">150,391</text>
 <text x="200.8" y="2081.0" class="label" text-anchor="end">Lexington Av: 6X</text>
-<path class="s0" d="M208.8,2064.0h68.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.3z"><title>Lexington Av: 6X, Aug-Dec 2025: 119,714</title></path>
-<text x="285.1" y="2074.0">119,714</text>
-<path class="s1" d="M208.8,2078.0h91.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-91.8z"><title>Lexington Av: 6X, 2019: 158,733</title></path>
-<text x="308.6" y="2088.0">158,733</text>
+<path class="s0" d="M208.8,2064.0h68.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.2z"><title>Lexington Av: 6X, Aug-Dec 2025: 119,622</title></path>
+<text x="285.0" y="2074.0">119,622</text>
+<path class="s1" d="M208.8,2078.0h91.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-91.8z"><title>Lexington Av: 6X, 2019: 158,615</title></path>
+<text x="308.6" y="2088.0">158,615</text>
 <text x="200.8" y="2115.0" class="label" text-anchor="end">Lexington Av local: 6X</text>
-<path class="s0" d="M208.8,2098.0h68.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.3z"><title>Lexington Av local: 6X, Aug-Dec 2025: 119,714</title></path>
-<text x="285.1" y="2108.0">119,714</text>
-<path class="s1" d="M208.8,2112.0h91.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-91.8z"><title>Lexington Av local: 6X, 2019: 158,733</title></path>
-<text x="308.6" y="2122.0">158,733</text>
+<path class="s0" d="M208.8,2098.0h68.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-68.2z"><title>Lexington Av local: 6X, Aug-Dec 2025: 119,622</title></path>
+<text x="285.0" y="2108.0">119,622</text>
+<path class="s1" d="M208.8,2112.0h91.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-91.8z"><title>Lexington Av local: 6X, 2019: 158,615</title></path>
+<text x="308.6" y="2122.0">158,615</text>
 <text x="200.8" y="2149.0" class="label" text-anchor="end">6 Av express: B</text>
-<path class="s0" d="M208.8,2132.0h67.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.6z"><title>6 Av express: B, Aug-Dec 2025: 118,611</title></path>
-<text x="284.4" y="2142.0">118,611</text>
-<path class="s1" d="M208.8,2146.0h90.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.6z"><title>6 Av express: B, 2019: 156,722</title></path>
-<text x="307.4" y="2156.0">156,722</text>
+<path class="s0" d="M208.8,2132.0h67.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.4z"><title>6 Av express: B, Aug-Dec 2025: 118,257</title></path>
+<text x="284.2" y="2142.0">118,257</text>
+<path class="s1" d="M208.8,2146.0h90.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.3z"><title>6 Av express: B, 2019: 156,204</title></path>
+<text x="307.1" y="2156.0">156,204</text>
 <text x="200.8" y="2183.0" class="label" text-anchor="end">Broadway local: W</text>
-<path class="s0" d="M208.8,2166.0h66.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-66.9z"><title>Broadway local: W, Aug-Dec 2025: 117,490</title></path>
-<text x="283.7" y="2176.0">117,490</text>
-<path class="s1" d="M208.8,2180.0h90.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.2z"><title>Broadway local: W, 2019: 155,980</title></path>
-<text x="307.0" y="2190.0">155,980</text>
+<path class="s0" d="M208.8,2166.0h66.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-66.9z"><title>Broadway local: W, Aug-Dec 2025: 117,390</title></path>
+<text x="283.7" y="2176.0">117,390</text>
+<path class="s1" d="M208.8,2180.0h90.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-90.1z"><title>Broadway local: W, 2019: 155,831</title></path>
+<text x="306.9" y="2190.0">155,831</text>
 <text x="200.8" y="2217.0" class="label" text-anchor="end">Culver: F</text>
-<path class="s0" d="M208.8,2200.0h64.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.9z"><title>Culver: F, Aug-Dec 2025: 114,124</title></path>
-<text x="281.7" y="2210.0">114,124</text>
-<path class="s1" d="M208.8,2214.0h84.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-84.9z"><title>Culver: F, 2019: 147,243</title></path>
-<text x="301.7" y="2224.0">147,243</text>
+<path class="s0" d="M208.8,2200.0h64.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.8z"><title>Culver: F, Aug-Dec 2025: 113,994</title></path>
+<text x="281.6" y="2210.0">113,994</text>
+<path class="s1" d="M208.8,2214.0h84.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-84.8z"><title>Culver: F, 2019: 147,074</title></path>
+<text x="301.6" y="2224.0">147,074</text>
 <text x="200.8" y="2251.0" class="label" text-anchor="end">Queens Blvd west: F</text>
-<path class="s0" d="M208.8,2234.0h64.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.3z"><title>Queens Blvd west: F, Aug-Dec 2025: 113,091</title></path>
-<text x="281.1" y="2244.0">113,091</text>
-<path class="s1" d="M208.8,2248.0h86.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-86.6z"><title>Queens Blvd west: F, 2019: 150,091</title></path>
-<text x="303.4" y="2258.0">150,091</text>
+<path class="s0" d="M208.8,2234.0h64.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.3z"><title>Queens Blvd west: F, Aug-Dec 2025: 113,074</title></path>
+<text x="281.1" y="2244.0">113,074</text>
+<path class="s1" d="M208.8,2248.0h86.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-86.6z"><title>Queens Blvd west: F, 2019: 150,068</title></path>
+<text x="303.4" y="2258.0">150,068</text>
 <text x="200.8" y="2285.0" class="label" text-anchor="end">Queens Blvd west: FL</text>
-<path class="s0" d="M208.8,2268.0h63.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.9z"><title>Queens Blvd west: FL, Aug-Dec 2025: 112,460</title></path>
-<text x="280.7" y="2278.0">112,460</text>
-<path class="s1" d="M208.8,2282.0h86.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-86.1z"><title>Queens Blvd west: FL, 2019: 149,270</title></path>
-<text x="302.9" y="2292.0">149,270</text>
-<text x="200.8" y="2319.0" class="label" text-anchor="end">Culver: FL</text>
-<path class="s0" d="M208.8,2302.0h63.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.5z"><title>Culver: FL, Aug-Dec 2025: 111,732</title></path>
-<text x="280.3" y="2312.0">111,732</text>
-<path class="s1" d="M208.8,2316.0h83.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-83.0z"><title>Culver: FL, 2019: 144,038</title></path>
-<text x="299.8" y="2326.0">144,038</text>
-<text x="200.8" y="2353.0" class="label" text-anchor="end">4 Av local: R</text>
-<path class="s0" d="M208.8,2336.0h63.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.4z"><title>4 Av local: R, Aug-Dec 2025: 111,593</title></path>
-<text x="280.2" y="2346.0">111,593</text>
-<path class="s1" d="M208.8,2350.0h79.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-79.1z"><title>4 Av local: R, 2019: 137,661</title></path>
-<text x="295.9" y="2360.0">137,661</text>
+<path class="s0" d="M208.8,2268.0h63.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.9z"><title>Queens Blvd west: FL, Aug-Dec 2025: 112,443</title></path>
+<text x="280.7" y="2278.0">112,443</text>
+<path class="s1" d="M208.8,2282.0h86.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-86.1z"><title>Queens Blvd west: FL, 2019: 149,247</title></path>
+<text x="302.9" y="2292.0">149,247</text>
+<text x="200.8" y="2319.0" class="label" text-anchor="end">4 Av local: R</text>
+<path class="s0" d="M208.8,2302.0h63.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.5z"><title>4 Av local: R, Aug-Dec 2025: 111,797</title></path>
+<text x="280.3" y="2312.0">111,797</text>
+<path class="s1" d="M208.8,2316.0h79.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-79.3z"><title>4 Av local: R, 2019: 137,968</title></path>
+<text x="296.1" y="2326.0">137,968</text>
+<text x="200.8" y="2353.0" class="label" text-anchor="end">Culver: FL</text>
+<path class="s0" d="M208.8,2336.0h63.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.4z"><title>Culver: FL, Aug-Dec 2025: 111,607</title></path>
+<text x="280.2" y="2346.0">111,607</text>
+<path class="s1" d="M208.8,2350.0h82.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.9z"><title>Culver: FL, 2019: 143,877</title></path>
+<text x="299.7" y="2360.0">143,877</text>
 <text x="200.8" y="2387.0" class="label" text-anchor="end">Broadway express: N</text>
-<path class="s0" d="M208.8,2370.0h63.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.3z"><title>Broadway express: N, Aug-Dec 2025: 111,413</title></path>
-<text x="280.1" y="2380.0">111,413</text>
-<path class="s1" d="M208.8,2384.0h78.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.8z"><title>Broadway express: N, 2019: 137,155</title></path>
-<text x="295.6" y="2394.0">137,155</text>
+<path class="s0" d="M208.8,2370.0h63.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.3z"><title>Broadway express: N, Aug-Dec 2025: 111,492</title></path>
+<text x="280.1" y="2380.0">111,492</text>
+<path class="s1" d="M208.8,2384.0h79.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-79.0z"><title>Broadway express: N, 2019: 137,414</title></path>
+<text x="295.8" y="2394.0">137,414</text>
 <text x="200.8" y="2421.0" class="label" text-anchor="end">Culver local: F</text>
-<path class="s0" d="M208.8,2404.0h62.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.6z"><title>Culver local: F, Aug-Dec 2025: 110,336</title></path>
-<text x="279.4" y="2414.0">110,336</text>
-<path class="s1" d="M208.8,2418.0h81.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.9z"><title>Culver local: F, 2019: 142,333</title></path>
-<text x="298.7" y="2428.0">142,333</text>
+<path class="s0" d="M208.8,2404.0h62.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.5z"><title>Culver local: F, Aug-Dec 2025: 110,214</title></path>
+<text x="279.3" y="2414.0">110,214</text>
+<path class="s1" d="M208.8,2418.0h81.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.8z"><title>Culver local: F, 2019: 142,175</title></path>
+<text x="298.6" y="2428.0">142,175</text>
 <text x="200.8" y="2455.0" class="label" text-anchor="end">Culver local: FL</text>
-<path class="s0" d="M208.8,2438.0h61.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.7z"><title>Culver local: FL, Aug-Dec 2025: 108,815</title></path>
-<text x="278.5" y="2448.0">108,815</text>
-<path class="s1" d="M208.8,2452.0h80.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.7z"><title>Culver local: FL, 2019: 140,269</title></path>
-<text x="297.5" y="2462.0">140,269</text>
+<path class="s0" d="M208.8,2438.0h61.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.6z"><title>Culver local: FL, Aug-Dec 2025: 108,696</title></path>
+<text x="278.4" y="2448.0">108,696</text>
+<path class="s1" d="M208.8,2452.0h80.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-80.6z"><title>Culver local: FL, 2019: 140,116</title></path>
+<text x="297.4" y="2462.0">140,116</text>
 <text x="200.8" y="2489.0" class="label" text-anchor="end">Brighton local: Q</text>
-<path class="s0" d="M208.8,2472.0h61.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.4z"><title>Brighton local: Q, Aug-Dec 2025: 108,332</title></path>
-<text x="278.2" y="2482.0">108,332</text>
-<path class="s1" d="M208.8,2486.0h82.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.7z"><title>Brighton local: Q, 2019: 143,543</title></path>
-<text x="299.5" y="2496.0">143,543</text>
+<path class="s0" d="M208.8,2472.0h61.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.3z"><title>Brighton local: Q, Aug-Dec 2025: 108,233</title></path>
+<text x="278.1" y="2482.0">108,233</text>
+<path class="s1" d="M208.8,2486.0h82.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.6z"><title>Brighton local: Q, 2019: 143,418</title></path>
+<text x="299.4" y="2496.0">143,418</text>
 <text x="200.8" y="2523.0" class="label" text-anchor="end">Queens Blvd east: E</text>
-<path class="s0" d="M208.8,2506.0h59.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.7z"><title>Queens Blvd east: E, Aug-Dec 2025: 105,431</title></path>
-<text x="276.5" y="2516.0">105,431</text>
-<path class="s1" d="M208.8,2520.0h76.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.5z"><title>Queens Blvd east: E, 2019: 133,416</title></path>
-<text x="293.3" y="2530.0">133,416</text>
+<path class="s0" d="M208.8,2506.0h59.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.6z"><title>Queens Blvd east: E, Aug-Dec 2025: 105,347</title></path>
+<text x="276.4" y="2516.0">105,347</text>
+<path class="s1" d="M208.8,2520.0h76.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.5z"><title>Queens Blvd east: E, 2019: 133,312</title></path>
+<text x="293.3" y="2530.0">133,312</text>
 <text x="200.8" y="2557.0" class="label" text-anchor="end">63 St: Q</text>
-<path class="s0" d="M208.8,2540.0h58.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.8z"><title>63 St: Q, Aug-Dec 2025: 103,937</title></path>
-<text x="275.6" y="2550.0">103,937</text>
-<path class="s1" d="M208.8,2554.0h78.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.2z"><title>63 St: Q, 2019: 136,125</title></path>
-<text x="295.0" y="2564.0">136,125</text>
-<text x="200.8" y="2591.0" class="label" text-anchor="end">Upper Culver: F</text>
-<path class="s0" d="M208.8,2574.0h58.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.5z"><title>Upper Culver: F, Aug-Dec 2025: 103,518</title></path>
-<text x="275.3" y="2584.0">103,518</text>
-<path class="s1" d="M208.8,2588.0h76.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.2z"><title>Upper Culver: F, 2019: 132,882</title></path>
-<text x="293.0" y="2598.0">132,882</text>
-<text x="200.8" y="2625.0" class="label" text-anchor="end">Manhattan Bridge: Q</text>
-<path class="s0" d="M208.8,2608.0h58.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.2z"><title>Manhattan Bridge: Q, Aug-Dec 2025: 102,954</title></path>
-<text x="275.0" y="2618.0">102,954</text>
-<path class="s1" d="M208.8,2622.0h77.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.4z"><title>Manhattan Bridge: Q, 2019: 134,749</title></path>
-<text x="294.2" y="2632.0">134,749</text>
+<path class="s0" d="M208.8,2540.0h58.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.8z"><title>63 St: Q, Aug-Dec 2025: 103,979</title></path>
+<text x="275.6" y="2550.0">103,979</text>
+<path class="s1" d="M208.8,2554.0h78.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-78.2z"><title>63 St: Q, 2019: 136,182</title></path>
+<text x="295.0" y="2564.0">136,182</text>
+<text x="200.8" y="2591.0" class="label" text-anchor="end">Manhattan Bridge: Q</text>
+<path class="s0" d="M208.8,2574.0h58.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.5z"><title>Manhattan Bridge: Q, Aug-Dec 2025: 103,452</title></path>
+<text x="275.3" y="2584.0">103,452</text>
+<path class="s1" d="M208.8,2588.0h77.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-77.7z"><title>Manhattan Bridge: Q, 2019: 135,327</title></path>
+<text x="294.5" y="2598.0">135,327</text>
+<text x="200.8" y="2625.0" class="label" text-anchor="end">Upper Culver: F</text>
+<path class="s0" d="M208.8,2608.0h58.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.4z"><title>Upper Culver: F, Aug-Dec 2025: 103,431</title></path>
+<text x="275.2" y="2618.0">103,431</text>
+<path class="s1" d="M208.8,2622.0h76.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.2z"><title>Upper Culver: F, 2019: 132,774</title></path>
+<text x="293.0" y="2632.0">132,774</text>
 <text x="200.8" y="2659.0" class="label" text-anchor="end">Upper Culver: FL</text>
-<path class="s0" d="M208.8,2642.0h57.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.2z"><title>Upper Culver: FL, Aug-Dec 2025: 101,358</title></path>
-<text x="274.0" y="2652.0">101,358</text>
-<path class="s1" d="M208.8,2656.0h74.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.5z"><title>Upper Culver: FL, 2019: 129,982</title></path>
-<text x="291.3" y="2666.0">129,982</text>
+<path class="s0" d="M208.8,2642.0h57.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.1z"><title>Upper Culver: FL, Aug-Dec 2025: 101,275</title></path>
+<text x="273.9" y="2652.0">101,275</text>
+<path class="s1" d="M208.8,2656.0h74.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.4z"><title>Upper Culver: FL, 2019: 129,880</title></path>
+<text x="291.2" y="2666.0">129,880</text>
 <text x="200.8" y="2693.0" class="label" text-anchor="end">Upper Culver local: F</text>
-<path class="s0" d="M208.8,2676.0h57.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.2z"><title>Upper Culver local: F, Aug-Dec 2025: 101,358</title></path>
-<text x="274.0" y="2686.0">101,358</text>
-<path class="s1" d="M208.8,2690.0h74.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.5z"><title>Upper Culver local: F, 2019: 129,982</title></path>
-<text x="291.3" y="2700.0">129,982</text>
+<path class="s0" d="M208.8,2676.0h57.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.1z"><title>Upper Culver local: F, Aug-Dec 2025: 101,275</title></path>
+<text x="273.9" y="2686.0">101,275</text>
+<path class="s1" d="M208.8,2690.0h74.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.4z"><title>Upper Culver local: F, 2019: 129,880</title></path>
+<text x="291.2" y="2700.0">129,880</text>
 <text x="200.8" y="2727.0" class="label" text-anchor="end">Upper Culver local: FL</text>
-<path class="s0" d="M208.8,2710.0h57.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.2z"><title>Upper Culver local: FL, Aug-Dec 2025: 101,358</title></path>
-<text x="274.0" y="2720.0">101,358</text>
-<path class="s1" d="M208.8,2724.0h74.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.5z"><title>Upper Culver local: FL, 2019: 129,982</title></path>
-<text x="291.3" y="2734.0">129,982</text>
+<path class="s0" d="M208.8,2710.0h57.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.1z"><title>Upper Culver local: FL, Aug-Dec 2025: 101,275</title></path>
+<text x="273.9" y="2720.0">101,275</text>
+<path class="s1" d="M208.8,2724.0h74.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.4z"><title>Upper Culver local: FL, 2019: 129,880</title></path>
+<text x="291.2" y="2734.0">129,880</text>
 <text x="200.8" y="2761.0" class="label" text-anchor="end">White Plains Rd: 2</text>
-<path class="s0" d="M208.8,2744.0h55.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.9z"><title>White Plains Rd: 2, Aug-Dec 2025: 99,148</title></path>
-<text x="272.7" y="2754.0">99,148</text>
-<path class="s1" d="M208.8,2758.0h87.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-87.5z"><title>White Plains Rd: 2, 2019: 151,627</title></path>
-<text x="304.3" y="2768.0">151,627</text>
+<path class="s0" d="M208.8,2744.0h55.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.8z"><title>White Plains Rd: 2, Aug-Dec 2025: 99,126</title></path>
+<text x="272.6" y="2754.0">99,126</text>
+<path class="s1" d="M208.8,2758.0h87.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-87.5z"><title>White Plains Rd: 2, 2019: 151,594</title></path>
+<text x="304.3" y="2768.0">151,594</text>
 <text x="200.8" y="2795.0" class="label" text-anchor="end">Queens Blvd express: F</text>
-<path class="s0" d="M208.8,2778.0h55.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.3z"><title>Queens Blvd express: F, Aug-Dec 2025: 98,270</title></path>
-<text x="272.1" y="2788.0">98,270</text>
-<path class="s1" d="M208.8,2792.0h75.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.1z"><title>Queens Blvd express: F, 2019: 130,961</title></path>
-<text x="291.9" y="2802.0">130,961</text>
+<path class="s0" d="M208.8,2778.0h55.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.3z"><title>Queens Blvd express: F, Aug-Dec 2025: 98,257</title></path>
+<text x="272.1" y="2788.0">98,257</text>
+<path class="s1" d="M208.8,2792.0h75.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.1z"><title>Queens Blvd express: F, 2019: 130,941</title></path>
+<text x="291.9" y="2802.0">130,941</text>
 <text x="200.8" y="2829.0" class="label" text-anchor="end">Queens Blvd west express: F</text>
-<path class="s0" d="M208.8,2812.0h55.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.3z"><title>Queens Blvd west express: F, Aug-Dec 2025: 98,270</title></path>
-<text x="272.1" y="2822.0">98,270</text>
-<path class="s1" d="M208.8,2826.0h75.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.1z"><title>Queens Blvd west express: F, 2019: 130,961</title></path>
-<text x="291.9" y="2836.0">130,961</text>
+<path class="s0" d="M208.8,2812.0h55.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.3z"><title>Queens Blvd west express: F, Aug-Dec 2025: 98,257</title></path>
+<text x="272.1" y="2822.0">98,257</text>
+<path class="s1" d="M208.8,2826.0h75.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.1z"><title>Queens Blvd west express: F, 2019: 130,941</title></path>
+<text x="291.9" y="2836.0">130,941</text>
 <text x="200.8" y="2863.0" class="label" text-anchor="end">6 Av local: M</text>
-<path class="s0" d="M208.8,2846.0h55.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.1z"><title>6 Av local: M, Aug-Dec 2025: 97,885</title></path>
-<text x="271.9" y="2856.0">97,885</text>
-<path class="s1" d="M208.8,2860.0h76.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.2z"><title>6 Av local: M, 2019: 132,826</title></path>
-<text x="293.0" y="2870.0">132,826</text>
+<path class="s0" d="M208.8,2846.0h55.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.1z"><title>6 Av local: M, Aug-Dec 2025: 97,892</title></path>
+<text x="271.9" y="2856.0">97,892</text>
+<path class="s1" d="M208.8,2860.0h76.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-76.2z"><title>6 Av local: M, 2019: 132,836</title></path>
+<text x="293.0" y="2870.0">132,836</text>
 <text x="200.8" y="2897.0" class="label" text-anchor="end">Queens Blvd express: FL</text>
-<path class="s0" d="M208.8,2880.0h54.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.9z"><title>Queens Blvd express: FL, Aug-Dec 2025: 97,639</title></path>
-<text x="271.7" y="2890.0">97,639</text>
-<path class="s1" d="M208.8,2894.0h74.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.6z"><title>Queens Blvd express: FL, 2019: 130,140</title></path>
-<text x="291.4" y="2904.0">130,140</text>
+<path class="s0" d="M208.8,2880.0h54.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.9z"><title>Queens Blvd express: FL, Aug-Dec 2025: 97,625</title></path>
+<text x="271.7" y="2890.0">97,625</text>
+<path class="s1" d="M208.8,2894.0h74.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.6z"><title>Queens Blvd express: FL, 2019: 130,120</title></path>
+<text x="291.4" y="2904.0">130,120</text>
 <text x="200.8" y="2931.0" class="label" text-anchor="end">Queens Blvd west express: FL</text>
-<path class="s0" d="M208.8,2914.0h54.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.9z"><title>Queens Blvd west express: FL, Aug-Dec 2025: 97,639</title></path>
-<text x="271.7" y="2924.0">97,639</text>
-<path class="s1" d="M208.8,2928.0h74.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.6z"><title>Queens Blvd west express: FL, 2019: 130,140</title></path>
-<text x="291.4" y="2938.0">130,140</text>
+<path class="s0" d="M208.8,2914.0h54.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.9z"><title>Queens Blvd west express: FL, Aug-Dec 2025: 97,625</title></path>
+<text x="271.7" y="2924.0">97,625</text>
+<path class="s1" d="M208.8,2928.0h74.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.6z"><title>Queens Blvd west express: FL, 2019: 130,120</title></path>
+<text x="291.4" y="2938.0">130,120</text>
 <text x="200.8" y="2965.0" class="label" text-anchor="end">Lenox Av: 2</text>
-<path class="s0" d="M208.8,2948.0h54.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.4z"><title>Lenox Av: 2, Aug-Dec 2025: 96,733</title></path>
-<text x="271.2" y="2958.0">96,733</text>
-<path class="s1" d="M208.8,2962.0h82.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-82.0z"><title>Lenox Av: 2, 2019: 142,364</title></path>
-<text x="298.8" y="2972.0">142,364</text>
+<path class="s0" d="M208.8,2948.0h54.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.4z"><title>Lenox Av: 2, Aug-Dec 2025: 96,689</title></path>
+<text x="271.2" y="2958.0">96,689</text>
+<path class="s1" d="M208.8,2962.0h81.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-81.9z"><title>Lenox Av: 2, 2019: 142,296</title></path>
+<text x="298.7" y="2972.0">142,296</text>
 <text x="200.8" y="2999.0" class="label" text-anchor="end">Eastern Pkwy: 3</text>
-<path class="s0" d="M208.8,2982.0h53.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.5z"><title>Eastern Pkwy: 3, Aug-Dec 2025: 95,277</title></path>
-<text x="270.3" y="2992.0">95,277</text>
-<path class="s1" d="M208.8,2996.0h75.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.1z"><title>Eastern Pkwy: 3, 2019: 131,075</title></path>
-<text x="291.9" y="3006.0">131,075</text>
+<path class="s0" d="M208.8,2982.0h53.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.9z"><title>Eastern Pkwy: 3, Aug-Dec 2025: 95,893</title></path>
+<text x="270.7" y="2992.0">95,893</text>
+<path class="s1" d="M208.8,2996.0h75.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-75.6z"><title>Eastern Pkwy: 3, 2019: 131,893</title></path>
+<text x="292.4" y="3006.0">131,893</text>
 <text x="200.8" y="3033.0" class="label" text-anchor="end">Queens Blvd local: F</text>
-<path class="s0" d="M208.8,3016.0h53.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.2z"><title>Queens Blvd local: F, Aug-Dec 2025: 94,697</title></path>
-<text x="270.0" y="3026.0">94,697</text>
-<path class="s1" d="M208.8,3030.0h74.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.2z"><title>Queens Blvd local: F, 2019: 129,451</title></path>
-<text x="291.0" y="3040.0">129,451</text>
+<path class="s0" d="M208.8,3016.0h53.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-53.2z"><title>Queens Blvd local: F, Aug-Dec 2025: 94,687</title></path>
+<text x="270.0" y="3026.0">94,687</text>
+<path class="s1" d="M208.8,3030.0h74.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.1z"><title>Queens Blvd local: F, 2019: 129,437</title></path>
+<text x="290.9" y="3040.0">129,437</text>
 <text x="200.8" y="3067.0" class="label" text-anchor="end">Queens Blvd local: FL</text>
-<path class="s0" d="M208.8,3050.0h52.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.8z"><title>Queens Blvd local: FL, Aug-Dec 2025: 94,105</title></path>
-<text x="269.6" y="3060.0">94,105</text>
-<path class="s1" d="M208.8,3064.0h73.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.7z"><title>Queens Blvd local: FL, 2019: 128,654</title></path>
-<text x="290.5" y="3074.0">128,654</text>
+<path class="s0" d="M208.8,3050.0h52.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.8z"><title>Queens Blvd local: FL, Aug-Dec 2025: 94,096</title></path>
+<text x="269.6" y="3060.0">94,096</text>
+<path class="s1" d="M208.8,3064.0h73.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.7z"><title>Queens Blvd local: FL, 2019: 128,641</title></path>
+<text x="290.5" y="3074.0">128,641</text>
 <text x="200.8" y="3101.0" class="label" text-anchor="end">4 Av: N</text>
-<path class="s0" d="M208.8,3084.0h52.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.2z"><title>4 Av: N, Aug-Dec 2025: 93,120</title></path>
-<text x="269.0" y="3094.0">93,120</text>
-<path class="s1" d="M208.8,3098.0h60.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.1z"><title>4 Av: N, 2019: 106,213</title></path>
-<text x="276.9" y="3108.0">106,213</text>
+<path class="s0" d="M208.8,3084.0h52.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.2z"><title>4 Av: N, Aug-Dec 2025: 93,047</title></path>
+<text x="269.0" y="3094.0">93,047</text>
+<path class="s1" d="M208.8,3098.0h60.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.1z"><title>4 Av: N, 2019: 106,087</title></path>
+<text x="276.9" y="3108.0">106,087</text>
 <text x="200.8" y="3135.0" class="label" text-anchor="end">Flushing: 7X</text>
-<path class="s0" d="M208.8,3118.0h51.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.9z"><title>Flushing: 7X, Aug-Dec 2025: 92,615</title></path>
-<text x="268.7" y="3128.0">92,615</text>
-<path class="s1" d="M208.8,3132.0h60.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.2z"><title>Flushing: 7X, 2019: 106,391</title></path>
-<text x="277.0" y="3142.0">106,391</text>
+<path class="s0" d="M208.8,3118.0h51.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.9z"><title>Flushing: 7X, Aug-Dec 2025: 92,590</title></path>
+<text x="268.7" y="3128.0">92,590</text>
+<path class="s1" d="M208.8,3132.0h60.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.2z"><title>Flushing: 7X, 2019: 106,359</title></path>
+<text x="277.0" y="3142.0">106,359</text>
 <text x="200.8" y="3169.0" class="label" text-anchor="end">Pelham: 6L</text>
-<path class="s0" d="M208.8,3152.0h50.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-50.5z"><title>Pelham: 6L, Aug-Dec 2025: 90,193</title></path>
-<text x="267.3" y="3162.0">90,193</text>
-<path class="s1" d="M208.8,3166.0h74.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.0z"><title>Pelham: 6L, 2019: 129,145</title></path>
-<text x="290.8" y="3176.0">129,145</text>
+<path class="s0" d="M208.8,3152.0h50.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-50.5z"><title>Pelham: 6L, Aug-Dec 2025: 90,198</title></path>
+<text x="267.3" y="3162.0">90,198</text>
+<path class="s1" d="M208.8,3166.0h74.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.0z"><title>Pelham: 6L, 2019: 129,152</title></path>
+<text x="290.8" y="3176.0">129,152</text>
 <text x="200.8" y="3203.0" class="label" text-anchor="end">Fulton St: C</text>
-<path class="s0" d="M208.8,3186.0h50.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-50.2z"><title>Fulton St: C, Aug-Dec 2025: 89,783</title></path>
-<text x="267.0" y="3196.0">89,783</text>
-<path class="s1" d="M208.8,3200.0h66.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-66.9z"><title>Fulton St: C, 2019: 117,431</title></path>
-<text x="283.7" y="3210.0">117,431</text>
+<path class="s0" d="M208.8,3186.0h50.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-50.1z"><title>Fulton St: C, Aug-Dec 2025: 89,601</title></path>
+<text x="266.9" y="3196.0">89,601</text>
+<path class="s1" d="M208.8,3200.0h66.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-66.8z"><title>Fulton St: C, 2019: 117,201</title></path>
+<text x="283.6" y="3210.0">117,201</text>
 <text x="200.8" y="3237.0" class="label" text-anchor="end">Eastern Pkwy: 2</text>
-<path class="s0" d="M208.8,3220.0h48.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.9z"><title>Eastern Pkwy: 2, Aug-Dec 2025: 87,545</title></path>
-<text x="265.7" y="3230.0">87,545</text>
-<path class="s1" d="M208.8,3234.0h65.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-65.0z"><title>Eastern Pkwy: 2, 2019: 114,292</title></path>
-<text x="281.8" y="3244.0">114,292</text>
+<path class="s0" d="M208.8,3220.0h48.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.8z"><title>Eastern Pkwy: 2, Aug-Dec 2025: 87,517</title></path>
+<text x="265.6" y="3230.0">87,517</text>
+<path class="s1" d="M208.8,3234.0h65.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-65.0z"><title>Eastern Pkwy: 2, 2019: 114,340</title></path>
+<text x="281.8" y="3244.0">114,340</text>
 <text x="200.8" y="3271.0" class="label" text-anchor="end">8 Av: D</text>
-<path class="s0" d="M208.8,3254.0h48.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.5z"><title>8 Av: D, Aug-Dec 2025: 87,003</title></path>
-<text x="265.3" y="3264.0">87,003</text>
-<path class="s1" d="M208.8,3268.0h74.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.6z"><title>8 Av: D, 2019: 130,105</title></path>
-<text x="291.4" y="3278.0">130,105</text>
+<path class="s0" d="M208.8,3254.0h48.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.6z"><title>8 Av: D, Aug-Dec 2025: 87,058</title></path>
+<text x="265.4" y="3264.0">87,058</text>
+<path class="s1" d="M208.8,3268.0h74.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.6z"><title>8 Av: D, 2019: 130,188</title></path>
+<text x="291.4" y="3278.0">130,188</text>
 <text x="200.8" y="3305.0" class="label" text-anchor="end">8 Av express: D</text>
-<path class="s0" d="M208.8,3288.0h48.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.5z"><title>8 Av express: D, Aug-Dec 2025: 87,003</title></path>
-<text x="265.3" y="3298.0">87,003</text>
-<path class="s1" d="M208.8,3302.0h74.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.6z"><title>8 Av express: D, 2019: 130,105</title></path>
-<text x="291.4" y="3312.0">130,105</text>
+<path class="s0" d="M208.8,3288.0h48.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.6z"><title>8 Av express: D, Aug-Dec 2025: 87,058</title></path>
+<text x="265.4" y="3298.0">87,058</text>
+<path class="s1" d="M208.8,3302.0h74.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-74.6z"><title>8 Av express: D, 2019: 130,188</title></path>
+<text x="291.4" y="3312.0">130,188</text>
 <text x="200.8" y="3339.0" class="label" text-anchor="end">Brighton: B</text>
-<path class="s0" d="M208.8,3322.0h48.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.2z"><title>Brighton: B, Aug-Dec 2025: 86,519</title></path>
-<text x="265.0" y="3332.0">86,519</text>
-<path class="s1" d="M208.8,3336.0h67.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.3z"><title>Brighton: B, 2019: 118,157</title></path>
-<text x="284.1" y="3346.0">118,157</text>
+<path class="s0" d="M208.8,3322.0h48.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.4z"><title>Brighton: B, Aug-Dec 2025: 86,823</title></path>
+<text x="265.2" y="3332.0">86,823</text>
+<path class="s1" d="M208.8,3336.0h67.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-67.5z"><title>Brighton: B, 2019: 118,400</title></path>
+<text x="284.3" y="3346.0">118,400</text>
 <text x="200.8" y="3373.0" class="label" text-anchor="end">Queens Blvd: M</text>
-<path class="s0" d="M208.8,3356.0h47.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.0z"><title>Queens Blvd: M, Aug-Dec 2025: 84,470</title></path>
-<text x="263.8" y="3366.0">84,470</text>
-<path class="s1" d="M208.8,3370.0h64.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.2z"><title>Queens Blvd: M, 2019: 113,008</title></path>
-<text x="281.0" y="3380.0">113,008</text>
+<path class="s0" d="M208.8,3356.0h47.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.0z"><title>Queens Blvd: M, Aug-Dec 2025: 84,472</title></path>
+<text x="263.8" y="3366.0">84,472</text>
+<path class="s1" d="M208.8,3370.0h64.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.2z"><title>Queens Blvd: M, 2019: 113,010</title></path>
+<text x="281.0" y="3380.0">113,010</text>
 <text x="200.8" y="3407.0" class="label" text-anchor="end">Queens Blvd local: M</text>
-<path class="s0" d="M208.8,3390.0h46.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.7z"><title>Queens Blvd local: M, Aug-Dec 2025: 83,991</title></path>
-<text x="263.5" y="3400.0">83,991</text>
-<path class="s1" d="M208.8,3404.0h63.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.8z"><title>Queens Blvd local: M, 2019: 112,292</title></path>
-<text x="280.6" y="3414.0">112,292</text>
+<path class="s0" d="M208.8,3390.0h46.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.7z"><title>Queens Blvd local: M, Aug-Dec 2025: 83,994</title></path>
+<text x="263.5" y="3400.0">83,994</text>
+<path class="s1" d="M208.8,3404.0h63.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.8z"><title>Queens Blvd local: M, 2019: 112,294</title></path>
+<text x="280.6" y="3414.0">112,294</text>
 <text x="200.8" y="3441.0" class="label" text-anchor="end">Queens Blvd west: M</text>
-<path class="s0" d="M208.8,3424.0h46.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.7z"><title>Queens Blvd west: M, Aug-Dec 2025: 83,991</title></path>
-<text x="263.5" y="3434.0">83,991</text>
-<path class="s1" d="M208.8,3438.0h63.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.8z"><title>Queens Blvd west: M, 2019: 112,292</title></path>
-<text x="280.6" y="3448.0">112,292</text>
+<path class="s0" d="M208.8,3424.0h46.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.7z"><title>Queens Blvd west: M, Aug-Dec 2025: 83,994</title></path>
+<text x="263.5" y="3434.0">83,994</text>
+<path class="s1" d="M208.8,3438.0h63.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.8z"><title>Queens Blvd west: M, 2019: 112,294</title></path>
+<text x="280.6" y="3448.0">112,294</text>
 <text x="200.8" y="3475.0" class="label" text-anchor="end">Queens Blvd west local: M</text>
-<path class="s0" d="M208.8,3458.0h46.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.7z"><title>Queens Blvd west local: M, Aug-Dec 2025: 83,991</title></path>
-<text x="263.5" y="3468.0">83,991</text>
-<path class="s1" d="M208.8,3472.0h63.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.8z"><title>Queens Blvd west local: M, 2019: 112,292</title></path>
-<text x="280.6" y="3482.0">112,292</text>
+<path class="s0" d="M208.8,3458.0h46.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.7z"><title>Queens Blvd west local: M, Aug-Dec 2025: 83,994</title></path>
+<text x="263.5" y="3468.0">83,994</text>
+<path class="s1" d="M208.8,3472.0h63.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-63.8z"><title>Queens Blvd west local: M, 2019: 112,294</title></path>
+<text x="280.6" y="3482.0">112,294</text>
 <text x="200.8" y="3509.0" class="label" text-anchor="end">Queens Blvd: R</text>
-<path class="s0" d="M208.8,3492.0h45.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.8z"><title>Queens Blvd: R, Aug-Dec 2025: 82,523</title></path>
-<text x="262.6" y="3502.0">82,523</text>
-<path class="s1" d="M208.8,3506.0h62.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.7z"><title>Queens Blvd: R, 2019: 110,425</title></path>
-<text x="279.5" y="3516.0">110,425</text>
+<path class="s0" d="M208.8,3492.0h45.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.8z"><title>Queens Blvd: R, Aug-Dec 2025: 82,517</title></path>
+<text x="262.6" y="3502.0">82,517</text>
+<path class="s1" d="M208.8,3506.0h62.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.7z"><title>Queens Blvd: R, 2019: 110,417</title></path>
+<text x="279.5" y="3516.0">110,417</text>
 <text x="200.8" y="3543.0" class="label" text-anchor="end">Queens Blvd local: R</text>
-<path class="s0" d="M208.8,3526.0h45.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.8z"><title>Queens Blvd local: R, Aug-Dec 2025: 82,523</title></path>
-<text x="262.6" y="3536.0">82,523</text>
-<path class="s1" d="M208.8,3540.0h62.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.7z"><title>Queens Blvd local: R, 2019: 110,425</title></path>
-<text x="279.5" y="3550.0">110,425</text>
+<path class="s0" d="M208.8,3526.0h45.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.8z"><title>Queens Blvd local: R, Aug-Dec 2025: 82,517</title></path>
+<text x="262.6" y="3536.0">82,517</text>
+<path class="s1" d="M208.8,3540.0h62.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.7z"><title>Queens Blvd local: R, 2019: 110,417</title></path>
+<text x="279.5" y="3550.0">110,417</text>
 <text x="200.8" y="3577.0" class="label" text-anchor="end">Queens Blvd west: R</text>
-<path class="s0" d="M208.8,3560.0h45.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.8z"><title>Queens Blvd west: R, Aug-Dec 2025: 82,523</title></path>
-<text x="262.6" y="3570.0">82,523</text>
-<path class="s1" d="M208.8,3574.0h62.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.7z"><title>Queens Blvd west: R, 2019: 110,425</title></path>
-<text x="279.5" y="3584.0">110,425</text>
+<path class="s0" d="M208.8,3560.0h45.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.8z"><title>Queens Blvd west: R, Aug-Dec 2025: 82,517</title></path>
+<text x="262.6" y="3570.0">82,517</text>
+<path class="s1" d="M208.8,3574.0h62.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.7z"><title>Queens Blvd west: R, 2019: 110,417</title></path>
+<text x="279.5" y="3584.0">110,417</text>
 <text x="200.8" y="3611.0" class="label" text-anchor="end">Queens Blvd west local: R</text>
-<path class="s0" d="M208.8,3594.0h45.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.8z"><title>Queens Blvd west local: R, Aug-Dec 2025: 82,523</title></path>
-<text x="262.6" y="3604.0">82,523</text>
-<path class="s1" d="M208.8,3608.0h62.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.7z"><title>Queens Blvd west local: R, 2019: 110,425</title></path>
-<text x="279.5" y="3618.0">110,425</text>
+<path class="s0" d="M208.8,3594.0h45.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.8z"><title>Queens Blvd west local: R, Aug-Dec 2025: 82,517</title></path>
+<text x="262.6" y="3604.0">82,517</text>
+<path class="s1" d="M208.8,3608.0h62.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.7z"><title>Queens Blvd west local: R, 2019: 110,417</title></path>
+<text x="279.5" y="3618.0">110,417</text>
 <text x="200.8" y="3645.0" class="label" text-anchor="end">4 Av express: N</text>
-<path class="s0" d="M208.8,3628.0h45.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.8z"><title>4 Av express: N, Aug-Dec 2025: 82,493</title></path>
-<text x="262.6" y="3638.0">82,493</text>
-<path class="s1" d="M208.8,3642.0h52.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.8z"><title>4 Av express: N, 2019: 94,093</title></path>
-<text x="269.6" y="3652.0">94,093</text>
+<path class="s0" d="M208.8,3628.0h45.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.7z"><title>4 Av express: N, Aug-Dec 2025: 82,375</title></path>
+<text x="262.5" y="3638.0">82,375</text>
+<path class="s1" d="M208.8,3642.0h52.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-52.7z"><title>4 Av express: N, 2019: 93,910</title></path>
+<text x="269.5" y="3652.0">93,910</text>
 <text x="200.8" y="3679.0" class="label" text-anchor="end">Queens Blvd east: F</text>
-<path class="s0" d="M208.8,3662.0h45.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.6z"><title>Queens Blvd east: F, Aug-Dec 2025: 82,194</title></path>
-<text x="262.4" y="3672.0">82,194</text>
-<path class="s1" d="M208.8,3676.0h64.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.5z"><title>Queens Blvd east: F, 2019: 113,487</title></path>
-<text x="281.3" y="3686.0">113,487</text>
+<path class="s0" d="M208.8,3662.0h45.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.6z"><title>Queens Blvd east: F, Aug-Dec 2025: 82,185</title></path>
+<text x="262.4" y="3672.0">82,185</text>
+<path class="s1" d="M208.8,3676.0h64.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.5z"><title>Queens Blvd east: F, 2019: 113,473</title></path>
+<text x="281.3" y="3686.0">113,473</text>
 <text x="200.8" y="3713.0" class="label" text-anchor="end">West End: D</text>
-<path class="s0" d="M208.8,3696.0h45.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.4z"><title>West End: D, Aug-Dec 2025: 81,798</title></path>
-<text x="262.2" y="3706.0">81,798</text>
-<path class="s1" d="M208.8,3710.0h60.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.5z"><title>West End: D, 2019: 106,885</title></path>
-<text x="277.3" y="3720.0">106,885</text>
+<path class="s0" d="M208.8,3696.0h45.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.4z"><title>West End: D, Aug-Dec 2025: 81,809</title></path>
+<text x="262.2" y="3706.0">81,809</text>
+<path class="s1" d="M208.8,3710.0h60.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-60.5z"><title>West End: D, 2019: 106,901</title></path>
+<text x="277.3" y="3720.0">106,901</text>
 <text x="200.8" y="3747.0" class="label" text-anchor="end">Queens Blvd east: FL</text>
-<path class="s0" d="M208.8,3730.0h45.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.3z"><title>Queens Blvd east: FL, Aug-Dec 2025: 81,624</title></path>
-<text x="262.1" y="3740.0">81,624</text>
-<path class="s1" d="M208.8,3744.0h64.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.1z"><title>Queens Blvd east: FL, 2019: 112,719</title></path>
-<text x="280.9" y="3754.0">112,719</text>
-<text x="200.8" y="3781.0" class="label" text-anchor="end">Pelham local: 6</text>
-<path class="s0" d="M208.8,3764.0h44.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-44.7z"><title>Pelham local: 6, Aug-Dec 2025: 80,726</title></path>
-<text x="261.5" y="3774.0">80,726</text>
-<path class="s1" d="M208.8,3778.0h65.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-65.9z"><title>Pelham local: 6, 2019: 115,745</title></path>
-<text x="282.7" y="3788.0">115,745</text>
-<text x="200.8" y="3815.0" class="label" text-anchor="end">Pelham local: 6L</text>
-<path class="s0" d="M208.8,3798.0h44.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-44.7z"><title>Pelham local: 6L, Aug-Dec 2025: 80,726</title></path>
-<text x="261.5" y="3808.0">80,726</text>
-<path class="s1" d="M208.8,3812.0h65.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-65.9z"><title>Pelham local: 6L, 2019: 115,745</title></path>
-<text x="282.7" y="3822.0">115,745</text>
-<text x="200.8" y="3849.0" class="label" text-anchor="end">Eastern Pkwy: 4</text>
-<path class="s0" d="M208.8,3832.0h44.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-44.2z"><title>Eastern Pkwy: 4, Aug-Dec 2025: 79,812</title></path>
-<text x="261.0" y="3842.0">79,812</text>
-<path class="s1" d="M208.8,3846.0h61.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-61.7z"><title>Eastern Pkwy: 4, 2019: 108,834</title></path>
-<text x="278.5" y="3856.0">108,834</text>
+<path class="s0" d="M208.8,3730.0h45.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.3z"><title>Queens Blvd east: FL, Aug-Dec 2025: 81,614</title></path>
+<text x="262.1" y="3740.0">81,614</text>
+<path class="s1" d="M208.8,3744.0h64.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.0z"><title>Queens Blvd east: FL, 2019: 112,705</title></path>
+<text x="280.8" y="3754.0">112,705</text>
+<text x="200.8" y="3781.0" class="label" text-anchor="end">Eastern Pkwy: 4</text>
+<path class="s0" d="M208.8,3764.0h44.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-44.9z"><title>Eastern Pkwy: 4, Aug-Dec 2025: 80,929</title></path>
+<text x="261.7" y="3774.0">80,929</text>
+<path class="s1" d="M208.8,3778.0h62.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-62.5z"><title>Eastern Pkwy: 4, 2019: 110,184</title></path>
+<text x="279.3" y="3788.0">110,184</text>
+<text x="200.8" y="3815.0" class="label" text-anchor="end">Pelham local: 6</text>
+<path class="s0" d="M208.8,3798.0h44.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-44.7z"><title>Pelham local: 6, Aug-Dec 2025: 80,730</title></path>
+<text x="261.5" y="3808.0">80,730</text>
+<path class="s1" d="M208.8,3812.0h65.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-65.9z"><title>Pelham local: 6, 2019: 115,750</title></path>
+<text x="282.7" y="3822.0">115,750</text>
+<text x="200.8" y="3849.0" class="label" text-anchor="end">Pelham local: 6L</text>
+<path class="s0" d="M208.8,3832.0h44.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-44.7z"><title>Pelham local: 6L, Aug-Dec 2025: 80,730</title></path>
+<text x="261.5" y="3842.0">80,730</text>
+<path class="s1" d="M208.8,3846.0h65.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-65.9z"><title>Pelham local: 6L, 2019: 115,750</title></path>
+<text x="282.7" y="3856.0">115,750</text>
 <text x="200.8" y="3883.0" class="label" text-anchor="end">Concourse: D</text>
-<path class="s0" d="M208.8,3866.0h44.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-44.1z"><title>Concourse: D, Aug-Dec 2025: 79,656</title></path>
-<text x="260.9" y="3876.0">79,656</text>
-<path class="s1" d="M208.8,3880.0h73.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.1z"><title>Concourse: D, 2019: 127,722</title></path>
-<text x="289.9" y="3890.0">127,722</text>
+<path class="s0" d="M208.8,3866.0h44.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-44.1z"><title>Concourse: D, Aug-Dec 2025: 79,641</title></path>
+<text x="260.9" y="3876.0">79,641</text>
+<path class="s1" d="M208.8,3880.0h73.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-73.1z"><title>Concourse: D, 2019: 127,706</title></path>
+<text x="289.9" y="3890.0">127,706</text>
 <text x="200.8" y="3917.0" class="label" text-anchor="end">Sea Beach: N</text>
-<path class="s0" d="M208.8,3900.0h43.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.5z"><title>Sea Beach: N, Aug-Dec 2025: 78,680</title></path>
-<text x="260.3" y="3910.0">78,680</text>
-<path class="s1" d="M208.8,3914.0h48.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.2z"><title>Sea Beach: N, 2019: 86,472</title></path>
-<text x="265.0" y="3924.0">86,472</text>
+<path class="s0" d="M208.8,3900.0h43.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.4z"><title>Sea Beach: N, Aug-Dec 2025: 78,472</title></path>
+<text x="260.2" y="3910.0">78,472</text>
+<path class="s1" d="M208.8,3914.0h48.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-48.0z"><title>Sea Beach: N, 2019: 86,196</title></path>
+<text x="264.8" y="3924.0">86,196</text>
 <text x="200.8" y="3951.0" class="label" text-anchor="end">White Plains Rd: 5</text>
-<path class="s0" d="M208.8,3934.0h43.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.0z"><title>White Plains Rd: 5, Aug-Dec 2025: 77,855</title></path>
-<text x="259.8" y="3944.0">77,855</text>
-<path class="s1" d="M208.8,3948.0h64.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.4z"><title>White Plains Rd: 5, 2019: 113,219</title></path>
-<text x="281.2" y="3958.0">113,219</text>
+<path class="s0" d="M208.8,3934.0h43.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.0z"><title>White Plains Rd: 5, Aug-Dec 2025: 77,883</title></path>
+<text x="259.8" y="3944.0">77,883</text>
+<path class="s1" d="M208.8,3948.0h64.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.4z"><title>White Plains Rd: 5, 2019: 113,261</title></path>
+<text x="281.2" y="3958.0">113,261</text>
 <text x="200.8" y="3985.0" class="label" text-anchor="end">Fulton St local: C</text>
-<path class="s0" d="M208.8,3968.0h42.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.9z"><title>Fulton St local: C, Aug-Dec 2025: 77,697</title></path>
-<text x="259.7" y="3978.0">77,697</text>
-<path class="s1" d="M208.8,3982.0h57.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.9z"><title>Fulton St local: C, 2019: 102,454</title></path>
-<text x="274.7" y="3992.0">102,454</text>
-<text x="200.8" y="4019.0" class="label" text-anchor="end">4 Av: D</text>
-<path class="s0" d="M208.8,4002.0h42.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.2z"><title>4 Av: D, Aug-Dec 2025: 76,478</title></path>
-<text x="259.0" y="4012.0">76,478</text>
-<path class="s1" d="M208.8,4016.0h55.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.6z"><title>4 Av: D, 2019: 98,659</title></path>
-<text x="272.4" y="4026.0">98,659</text>
-<text x="200.8" y="4053.0" class="label" text-anchor="end">Eastern Pkwy express: 4</text>
-<path class="s0" d="M208.8,4036.0h42.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.1z"><title>Eastern Pkwy express: 4, Aug-Dec 2025: 76,383</title></path>
-<text x="258.9" y="4046.0">76,383</text>
-<path class="s1" d="M208.8,4050.0h58.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-58.9z"><title>Eastern Pkwy express: 4, 2019: 104,176</title></path>
-<text x="275.7" y="4060.0">104,176</text>
+<path class="s0" d="M208.8,3968.0h42.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.8z"><title>Fulton St local: C, Aug-Dec 2025: 77,548</title></path>
+<text x="259.6" y="3978.0">77,548</text>
+<path class="s1" d="M208.8,3982.0h57.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-57.7z"><title>Fulton St local: C, 2019: 102,264</title></path>
+<text x="274.5" y="3992.0">102,264</text>
+<text x="200.8" y="4019.0" class="label" text-anchor="end">Eastern Pkwy express: 4</text>
+<path class="s0" d="M208.8,4002.0h42.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.7z"><title>Eastern Pkwy express: 4, Aug-Dec 2025: 77,395</title></path>
+<text x="259.5" y="4012.0">77,395</text>
+<path class="s1" d="M208.8,4016.0h59.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-59.6z"><title>Eastern Pkwy express: 4, 2019: 105,388</title></path>
+<text x="276.4" y="4026.0">105,388</text>
+<text x="200.8" y="4053.0" class="label" text-anchor="end">4 Av: D</text>
+<path class="s0" d="M208.8,4036.0h42.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.6z"><title>4 Av: D, Aug-Dec 2025: 77,192</title></path>
+<text x="259.4" y="4046.0">77,192</text>
+<path class="s1" d="M208.8,4050.0h56.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-56.1z"><title>4 Av: D, 2019: 99,585</title></path>
+<text x="272.9" y="4060.0">99,585</text>
 <text x="200.8" y="4087.0" class="label" text-anchor="end">8 Av: B</text>
-<path class="s0" d="M208.8,4070.0h41.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.4z"><title>8 Av: B, Aug-Dec 2025: 75,191</title></path>
-<text x="258.2" y="4080.0">75,191</text>
-<path class="s1" d="M208.8,4084.0h54.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.7z"><title>8 Av: B, 2019: 97,221</title></path>
-<text x="271.5" y="4094.0">97,221</text>
+<path class="s0" d="M208.8,4070.0h41.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.4z"><title>8 Av: B, Aug-Dec 2025: 75,198</title></path>
+<text x="258.2" y="4080.0">75,198</text>
+<path class="s1" d="M208.8,4084.0h54.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.7z"><title>8 Av: B, 2019: 97,227</title></path>
+<text x="271.5" y="4094.0">97,227</text>
 <text x="200.8" y="4121.0" class="label" text-anchor="end">8 Av local: B</text>
-<path class="s0" d="M208.8,4104.0h41.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.4z"><title>8 Av local: B, Aug-Dec 2025: 75,191</title></path>
-<text x="258.2" y="4114.0">75,191</text>
-<path class="s1" d="M208.8,4118.0h54.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.7z"><title>8 Av local: B, 2019: 97,221</title></path>
-<text x="271.5" y="4128.0">97,221</text>
+<path class="s0" d="M208.8,4104.0h41.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.4z"><title>8 Av local: B, Aug-Dec 2025: 75,198</title></path>
+<text x="258.2" y="4114.0">75,198</text>
+<path class="s1" d="M208.8,4118.0h54.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.7z"><title>8 Av local: B, 2019: 97,227</title></path>
+<text x="271.5" y="4128.0">97,227</text>
 <text x="200.8" y="4155.0" class="label" text-anchor="end">White Plains Rd local: 2</text>
-<path class="s0" d="M208.8,4138.0h41.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.1z"><title>White Plains Rd local: 2, Aug-Dec 2025: 74,703</title></path>
-<text x="257.9" y="4148.0">74,703</text>
-<path class="s1" d="M208.8,4152.0h64.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.2z"><title>White Plains Rd local: 2, 2019: 112,979</title></path>
-<text x="281.0" y="4162.0">112,979</text>
+<path class="s0" d="M208.8,4138.0h41.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.1z"><title>White Plains Rd local: 2, Aug-Dec 2025: 74,682</title></path>
+<text x="257.9" y="4148.0">74,682</text>
+<path class="s1" d="M208.8,4152.0h64.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-64.2z"><title>White Plains Rd local: 2, 2019: 112,947</title></path>
+<text x="281.0" y="4162.0">112,947</text>
 <text x="200.8" y="4189.0" class="label" text-anchor="end">Eastern Pkwy: 5</text>
-<path class="s0" d="M208.8,4172.0h40.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-40.8z"><title>Eastern Pkwy: 5, Aug-Dec 2025: 74,173</title></path>
-<text x="257.6" y="4182.0">74,173</text>
-<path class="s1" d="M208.8,4186.0h55.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.2z"><title>Eastern Pkwy: 5, 2019: 98,077</title></path>
-<text x="272.0" y="4196.0">98,077</text>
+<path class="s0" d="M208.8,4172.0h41.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.1z"><title>Eastern Pkwy: 5, Aug-Dec 2025: 74,657</title></path>
+<text x="257.9" y="4182.0">74,657</text>
+<path class="s1" d="M208.8,4186.0h55.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-55.6z"><title>Eastern Pkwy: 5, 2019: 98,651</title></path>
+<text x="272.4" y="4196.0">98,651</text>
 <text x="200.8" y="4223.0" class="label" text-anchor="end">Concourse local: D</text>
-<path class="s0" d="M208.8,4206.0h39.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-39.7z"><title>Concourse local: D, Aug-Dec 2025: 72,329</title></path>
-<text x="256.5" y="4216.0">72,329</text>
-<path class="s1" d="M208.8,4220.0h65.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-65.6z"><title>Concourse local: D, 2019: 115,341</title></path>
-<text x="282.4" y="4230.0">115,341</text>
-<text x="200.8" y="4257.0" class="label" text-anchor="end">Manhattan Bridge: N</text>
-<path class="s0" d="M208.8,4240.0h38.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.7z"><title>Manhattan Bridge: N, Aug-Dec 2025: 70,733</title></path>
-<text x="255.5" y="4250.0">70,733</text>
-<path class="s1" d="M208.8,4254.0h46.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.4z"><title>Manhattan Bridge: N, 2019: 83,475</title></path>
-<text x="263.2" y="4264.0">83,475</text>
-<text x="200.8" y="4291.0" class="label" text-anchor="end">Eastern Pkwy local: 3</text>
-<path class="s0" d="M208.8,4274.0h38.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.6z"><title>Eastern Pkwy local: 3, Aug-Dec 2025: 70,590</title></path>
-<text x="255.4" y="4284.0">70,590</text>
-<path class="s1" d="M208.8,4288.0h54.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.3z"><title>Eastern Pkwy local: 3, 2019: 96,557</title></path>
-<text x="271.1" y="4298.0">96,557</text>
+<path class="s0" d="M208.8,4206.0h39.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-39.7z"><title>Concourse local: D, Aug-Dec 2025: 72,313</title></path>
+<text x="256.5" y="4216.0">72,313</text>
+<path class="s1" d="M208.8,4220.0h65.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-65.6z"><title>Concourse local: D, 2019: 115,323</title></path>
+<text x="282.4" y="4230.0">115,323</text>
+<text x="200.8" y="4257.0" class="label" text-anchor="end">Eastern Pkwy local: 3</text>
+<path class="s0" d="M208.8,4240.0h39.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-39.0z"><title>Eastern Pkwy local: 3, Aug-Dec 2025: 71,243</title></path>
+<text x="255.8" y="4250.0">71,243</text>
+<path class="s1" d="M208.8,4254.0h54.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-54.8z"><title>Eastern Pkwy local: 3, 2019: 97,435</title></path>
+<text x="271.6" y="4264.0">97,435</text>
+<text x="200.8" y="4291.0" class="label" text-anchor="end">Manhattan Bridge: N</text>
+<path class="s0" d="M208.8,4274.0h38.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.6z"><title>Manhattan Bridge: N, Aug-Dec 2025: 70,529</title></path>
+<text x="255.4" y="4284.0">70,529</text>
+<path class="s1" d="M208.8,4288.0h46.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-46.4z"><title>Manhattan Bridge: N, 2019: 83,412</title></path>
+<text x="263.2" y="4298.0">83,412</text>
 <text x="200.8" y="4325.0" class="label" text-anchor="end">Eastern Pkwy express: 5</text>
-<path class="s0" d="M208.8,4308.0h37.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-37.9z"><title>Eastern Pkwy express: 5, Aug-Dec 2025: 69,377</title></path>
-<text x="254.7" y="4318.0">69,377</text>
-<path class="s1" d="M208.8,4322.0h51.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.4z"><title>Eastern Pkwy express: 5, 2019: 91,814</title></path>
-<text x="268.2" y="4332.0">91,814</text>
-<text x="200.8" y="4359.0" class="label" text-anchor="end">Jamaica local: J</text>
-<path class="s0" d="M208.8,4342.0h36.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-36.3z"><title>Jamaica local: J, Aug-Dec 2025: 66,804</title></path>
-<text x="253.1" y="4352.0">66,804</text>
-<path class="s1" d="M208.8,4356.0h50.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-50.7z"><title>Jamaica local: J, 2019: 90,563</title></path>
-<text x="267.5" y="4366.0">90,563</text>
-<text x="200.8" y="4393.0" class="label" text-anchor="end">Brighton express: B</text>
-<path class="s0" d="M208.8,4376.0h36.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-36.2z"><title>Brighton express: B, Aug-Dec 2025: 66,575</title></path>
-<text x="253.0" y="4386.0">66,575</text>
-<path class="s1" d="M208.8,4390.0h51.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.8z"><title>Brighton express: B, 2019: 92,483</title></path>
-<text x="268.6" y="4400.0">92,483</text>
+<path class="s0" d="M208.8,4308.0h38.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-38.2z"><title>Eastern Pkwy express: 5, Aug-Dec 2025: 69,916</title></path>
+<text x="255.0" y="4318.0">69,916</text>
+<path class="s1" d="M208.8,4322.0h51.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.8z"><title>Eastern Pkwy express: 5, 2019: 92,458</title></path>
+<text x="268.6" y="4332.0">92,458</text>
+<text x="200.8" y="4359.0" class="label" text-anchor="end">Brighton express: B</text>
+<path class="s0" d="M208.8,4342.0h36.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-36.3z"><title>Brighton express: B, Aug-Dec 2025: 66,719</title></path>
+<text x="253.1" y="4352.0">66,719</text>
+<path class="s1" d="M208.8,4356.0h51.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-51.9z"><title>Brighton express: B, 2019: 92,665</title></path>
+<text x="268.7" y="4366.0">92,665</text>
+<text x="200.8" y="4393.0" class="label" text-anchor="end">Jamaica local: J</text>
+<path class="s0" d="M208.8,4376.0h36.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-36.3z"><title>Jamaica local: J, Aug-Dec 2025: 66,718</title></path>
+<text x="253.1" y="4386.0">66,718</text>
+<path class="s1" d="M208.8,4390.0h50.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-50.6z"><title>Jamaica local: J, 2019: 90,413</title></path>
+<text x="267.4" y="4400.0">90,413</text>
 <text x="200.8" y="4427.0" class="label" text-anchor="end">Eastern Pkwy local: 2</text>
-<path class="s0" d="M208.8,4410.0h35.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.9z"><title>Eastern Pkwy local: 2, Aug-Dec 2025: 66,086</title></path>
-<text x="252.7" y="4420.0">66,086</text>
-<path class="s1" d="M208.8,4424.0h47.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.7z"><title>Eastern Pkwy local: 2, 2019: 85,626</title></path>
-<text x="264.5" y="4434.0">85,626</text>
+<path class="s0" d="M208.8,4410.0h35.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.9z"><title>Eastern Pkwy local: 2, Aug-Dec 2025: 66,019</title></path>
+<text x="252.7" y="4420.0">66,019</text>
+<path class="s1" d="M208.8,4424.0h47.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.7z"><title>Eastern Pkwy local: 2, 2019: 85,631</title></path>
+<text x="264.5" y="4434.0">85,631</text>
 <text x="200.8" y="4461.0" class="label" text-anchor="end">4 Av express: D</text>
-<path class="s0" d="M208.8,4444.0h35.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.4z"><title>4 Av express: D, Aug-Dec 2025: 65,241</title></path>
-<text x="252.2" y="4454.0">65,241</text>
-<path class="s1" d="M208.8,4458.0h47.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.0z"><title>4 Av express: D, 2019: 84,411</title></path>
-<text x="263.8" y="4468.0">84,411</text>
+<path class="s0" d="M208.8,4444.0h35.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.7z"><title>4 Av express: D, Aug-Dec 2025: 65,829</title></path>
+<text x="252.5" y="4454.0">65,829</text>
+<path class="s1" d="M208.8,4458.0h47.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-47.4z"><title>4 Av express: D, 2019: 85,169</title></path>
+<text x="264.2" y="4468.0">85,169</text>
 <text x="200.8" y="4495.0" class="label" text-anchor="end">Manhattan Bridge: D</text>
-<path class="s0" d="M208.8,4478.0h32.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-32.6z"><title>Manhattan Bridge: D, Aug-Dec 2025: 60,660</title></path>
-<text x="249.4" y="4488.0">60,660</text>
-<path class="s1" d="M208.8,4492.0h42.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.9z"><title>Manhattan Bridge: D, 2019: 77,726</title></path>
-<text x="259.7" y="4502.0">77,726</text>
+<path class="s0" d="M208.8,4478.0h32.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-32.6z"><title>Manhattan Bridge: D, Aug-Dec 2025: 60,627</title></path>
+<text x="249.4" y="4488.0">60,627</text>
+<path class="s1" d="M208.8,4492.0h43.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.0z"><title>Manhattan Bridge: D, 2019: 77,779</title></path>
+<text x="259.8" y="4502.0">77,779</text>
 <text x="200.8" y="4529.0" class="label" text-anchor="end">Nassau St: J</text>
-<path class="s0" d="M208.8,4512.0h31.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-31.7z"><title>Nassau St: J, Aug-Dec 2025: 59,189</title></path>
-<text x="248.5" y="4522.0">59,189</text>
-<path class="s1" d="M208.8,4526.0h45.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.6z"><title>Nassau St: J, 2019: 82,231</title></path>
-<text x="262.4" y="4536.0">82,231</text>
+<path class="s0" d="M208.8,4512.0h31.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-31.6z"><title>Nassau St: J, Aug-Dec 2025: 58,903</title></path>
+<text x="248.4" y="4522.0">58,903</text>
+<path class="s1" d="M208.8,4526.0h45.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-45.4z"><title>Nassau St: J, 2019: 81,823</title></path>
+<text x="262.2" y="4536.0">81,823</text>
 <text x="200.8" y="4563.0" class="label" text-anchor="end">42 St Shuttle: GS</text>
-<path class="s0" d="M208.8,4546.0h31.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-31.5z"><title>42 St Shuttle: GS, Aug-Dec 2025: 58,777</title></path>
-<text x="248.3" y="4556.0">58,777</text>
-<path class="s1" d="M208.8,4560.0h43.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.7z"><title>42 St Shuttle: GS, 2019: 78,965</title></path>
-<text x="260.5" y="4570.0">78,965</text>
+<path class="s0" d="M208.8,4546.0h31.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-31.4z"><title>42 St Shuttle: GS, Aug-Dec 2025: 58,624</title></path>
+<text x="248.2" y="4556.0">58,624</text>
+<path class="s1" d="M208.8,4560.0h43.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-43.5z"><title>42 St Shuttle: GS, 2019: 78,757</title></path>
+<text x="260.3" y="4570.0">78,757</text>
 <text x="200.8" y="4597.0" class="label" text-anchor="end">Manhattan Bridge: B</text>
-<path class="s0" d="M208.8,4580.0h30.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-30.4z"><title>Manhattan Bridge: B, Aug-Dec 2025: 57,032</title></path>
-<text x="247.2" y="4590.0">57,032</text>
-<path class="s1" d="M208.8,4594.0h41.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.8z"><title>Manhattan Bridge: B, 2019: 75,800</title></path>
-<text x="258.6" y="4604.0">75,800</text>
+<path class="s0" d="M208.8,4580.0h30.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-30.2z"><title>Manhattan Bridge: B, Aug-Dec 2025: 56,673</title></path>
+<text x="247.0" y="4590.0">56,673</text>
+<path class="s1" d="M208.8,4594.0h41.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.4z"><title>Manhattan Bridge: B, 2019: 75,214</title></path>
+<text x="258.2" y="4604.0">75,214</text>
 <text x="200.8" y="4631.0" class="label" text-anchor="end">Jamaica: M</text>
-<path class="s0" d="M208.8,4614.0h30.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-30.1z"><title>Jamaica: M, Aug-Dec 2025: 56,554</title></path>
-<text x="246.9" y="4624.0">56,554</text>
-<path class="s1" d="M208.8,4628.0h41.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.7z"><title>Jamaica: M, 2019: 75,633</title></path>
-<text x="258.5" y="4638.0">75,633</text>
+<path class="s0" d="M208.8,4614.0h30.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-30.1z"><title>Jamaica: M, Aug-Dec 2025: 56,448</title></path>
+<text x="246.9" y="4624.0">56,448</text>
+<path class="s1" d="M208.8,4628.0h41.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-41.6z"><title>Jamaica: M, 2019: 75,492</title></path>
+<text x="258.4" y="4638.0">75,492</text>
 <text x="200.8" y="4665.0" class="label" text-anchor="end">Hillside Av: F</text>
 <path class="s0" d="M208.8,4648.0h29.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.5z"><title>Hillside Av: F, Aug-Dec 2025: 55,520</title></path>
 <text x="246.3" y="4658.0">55,520</text>
@@ -723,140 +723,140 @@ text {
 <path class="s1" d="M208.8,4764.0h42.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-42.3z"><title>Hillside Av local: FL, 2019: 76,658</title></path>
 <text x="259.1" y="4774.0">76,658</text>
 <text x="200.8" y="4801.0" class="label" text-anchor="end">Astoria: N</text>
-<path class="s0" d="M208.8,4784.0h28.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-28.9z"><title>Astoria: N, Aug-Dec 2025: 54,475</title></path>
-<text x="245.7" y="4794.0">54,475</text>
-<path class="s1" d="M208.8,4798.0h34.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-34.3z"><title>Astoria: N, 2019: 63,402</title></path>
-<text x="251.1" y="4808.0">63,402</text>
+<path class="s0" d="M208.8,4784.0h28.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-28.9z"><title>Astoria: N, Aug-Dec 2025: 54,470</title></path>
+<text x="245.7" y="4794.0">54,470</text>
+<path class="s1" d="M208.8,4798.0h34.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-34.3z"><title>Astoria: N, 2019: 63,397</title></path>
+<text x="251.1" y="4808.0">63,397</text>
 <text x="200.8" y="4835.0" class="label" text-anchor="end">Jamaica local: M</text>
-<path class="s0" d="M208.8,4818.0h25.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-25.8z"><title>Jamaica local: M, Aug-Dec 2025: 49,350</title></path>
-<text x="242.6" y="4828.0">49,350</text>
-<path class="s1" d="M208.8,4832.0h35.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.5z"><title>Jamaica local: M, 2019: 65,480</title></path>
-<text x="252.3" y="4842.0">65,480</text>
+<path class="s0" d="M208.8,4818.0h25.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-25.7z"><title>Jamaica local: M, Aug-Dec 2025: 49,243</title></path>
+<text x="242.5" y="4828.0">49,243</text>
+<path class="s1" d="M208.8,4832.0h35.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-35.4z"><title>Jamaica local: M, 2019: 65,338</title></path>
+<text x="252.2" y="4842.0">65,338</text>
 <text x="200.8" y="4869.0" class="label" text-anchor="end">Myrtle Av: M</text>
-<path class="s0" d="M208.8,4852.0h25.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-25.0z"><title>Myrtle Av: M, Aug-Dec 2025: 48,030</title></path>
-<text x="241.8" y="4862.0">48,030</text>
-<path class="s1" d="M208.8,4866.0h32.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-32.5z"><title>Myrtle Av: M, 2019: 60,453</title></path>
-<text x="249.3" y="4876.0">60,453</text>
+<path class="s0" d="M208.8,4852.0h24.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.9z"><title>Myrtle Av: M, Aug-Dec 2025: 47,944</title></path>
+<text x="241.7" y="4862.0">47,944</text>
+<path class="s1" d="M208.8,4866.0h32.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-32.4z"><title>Myrtle Av: M, 2019: 60,350</title></path>
+<text x="249.2" y="4876.0">60,350</text>
 <text x="200.8" y="4903.0" class="label" text-anchor="end">Culver: G</text>
-<path class="s0" d="M208.8,4886.0h24.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.5z"><title>Culver: G, Aug-Dec 2025: 47,176</title></path>
-<text x="241.3" y="4896.0">47,176</text>
-<path class="s1" d="M208.8,4900.0h29.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.8z"><title>Culver: G, 2019: 55,926</title></path>
-<text x="246.6" y="4910.0">55,926</text>
+<path class="s0" d="M208.8,4886.0h24.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.6z"><title>Culver: G, Aug-Dec 2025: 47,340</title></path>
+<text x="241.4" y="4896.0">47,340</text>
+<path class="s1" d="M208.8,4900.0h29.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.9z"><title>Culver: G, 2019: 56,128</title></path>
+<text x="246.7" y="4910.0">56,128</text>
 <text x="200.8" y="4937.0" class="label" text-anchor="end">53 St: M</text>
-<path class="s0" d="M208.8,4920.0h24.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.4z"><title>53 St: M, Aug-Dec 2025: 47,030</title></path>
-<text x="241.2" y="4930.0">47,030</text>
-<path class="s1" d="M208.8,4934.0h34.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-34.5z"><title>53 St: M, 2019: 63,723</title></path>
-<text x="251.3" y="4944.0">63,723</text>
+<path class="s0" d="M208.8,4920.0h24.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.4z"><title>53 St: M, Aug-Dec 2025: 47,018</title></path>
+<text x="241.2" y="4930.0">47,018</text>
+<path class="s1" d="M208.8,4934.0h34.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-34.5z"><title>53 St: M, 2019: 63,702</title></path>
+<text x="251.3" y="4944.0">63,702</text>
 <text x="200.8" y="4971.0" class="label" text-anchor="end">Astoria: W</text>
-<path class="s0" d="M208.8,4954.0h24.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.1z"><title>Astoria: W, Aug-Dec 2025: 46,548</title></path>
-<text x="240.9" y="4964.0">46,548</text>
-<path class="s1" d="M208.8,4968.0h29.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.1z"><title>Astoria: W, 2019: 54,820</title></path>
-<text x="245.9" y="4978.0">54,820</text>
+<path class="s0" d="M208.8,4954.0h24.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.1z"><title>Astoria: W, Aug-Dec 2025: 46,553</title></path>
+<text x="240.9" y="4964.0">46,553</text>
+<path class="s1" d="M208.8,4968.0h29.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.1z"><title>Astoria: W, 2019: 54,825</title></path>
+<text x="245.9" y="4978.0">54,825</text>
 <text x="200.8" y="5005.0" class="label" text-anchor="end">Nostrand Av: 5</text>
-<path class="s0" d="M208.8,4988.0h22.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-22.2z"><title>Nostrand Av: 5, Aug-Dec 2025: 43,348</title></path>
-<text x="239.0" y="4998.0">43,348</text>
-<path class="s1" d="M208.8,5002.0h29.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.8z"><title>Nostrand Av: 5, 2019: 55,985</title></path>
-<text x="246.6" y="5012.0">55,985</text>
+<path class="s0" d="M208.8,4988.0h22.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-22.3z"><title>Nostrand Av: 5, Aug-Dec 2025: 43,593</title></path>
+<text x="239.1" y="4998.0">43,593</text>
+<path class="s1" d="M208.8,5002.0h30.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-30.0z"><title>Nostrand Av: 5, 2019: 56,287</title></path>
+<text x="246.8" y="5012.0">56,287</text>
 <text x="200.8" y="5039.0" class="label" text-anchor="end">Pelham: 6X</text>
-<path class="s0" d="M208.8,5022.0h20.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.8z"><title>Pelham: 6X, Aug-Dec 2025: 41,121</title></path>
-<text x="237.6" y="5032.0">41,121</text>
-<path class="s1" d="M208.8,5036.0h33.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-33.2z"><title>Pelham: 6X, 2019: 61,649</title></path>
-<text x="250.0" y="5046.0">61,649</text>
+<path class="s0" d="M208.8,5022.0h20.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.8z"><title>Pelham: 6X, Aug-Dec 2025: 41,117</title></path>
+<text x="237.6" y="5032.0">41,117</text>
+<path class="s1" d="M208.8,5036.0h33.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-33.2z"><title>Pelham: 6X, 2019: 61,643</title></path>
+<text x="250.0" y="5046.0">61,643</text>
 <text x="200.8" y="5073.0" class="label" text-anchor="end">Nostrand Av: 2</text>
-<path class="s0" d="M208.8,5056.0h20.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.3z"><title>Nostrand Av: 2, Aug-Dec 2025: 40,268</title></path>
-<text x="237.1" y="5066.0">40,268</text>
-<path class="s1" d="M208.8,5070.0h27.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.3z"><title>Nostrand Av: 2, 2019: 51,842</title></path>
-<text x="244.1" y="5080.0">51,842</text>
+<path class="s0" d="M208.8,5056.0h20.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.2z"><title>Nostrand Av: 2, Aug-Dec 2025: 40,018</title></path>
+<text x="237.0" y="5066.0">40,018</text>
+<path class="s1" d="M208.8,5070.0h27.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.1z"><title>Nostrand Av: 2, 2019: 51,536</title></path>
+<text x="243.9" y="5080.0">51,536</text>
 <text x="200.8" y="5107.0" class="label" text-anchor="end">Lower Culver: F</text>
-<path class="s0" d="M208.8,5090.0h20.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.0z"><title>Lower Culver: F, Aug-Dec 2025: 39,757</title></path>
-<text x="236.8" y="5100.0">39,757</text>
-<path class="s1" d="M208.8,5104.0h28.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-28.6z"><title>Lower Culver: F, 2019: 54,072</title></path>
-<text x="245.4" y="5114.0">54,072</text>
+<path class="s0" d="M208.8,5090.0h20.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.0z"><title>Lower Culver: F, Aug-Dec 2025: 39,712</title></path>
+<text x="236.8" y="5100.0">39,712</text>
+<path class="s1" d="M208.8,5104.0h28.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-28.6z"><title>Lower Culver: F, 2019: 54,014</title></path>
+<text x="245.4" y="5114.0">54,014</text>
 <text x="200.8" y="5141.0" class="label" text-anchor="end">53 St: F</text>
-<path class="s0" d="M208.8,5124.0h19.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.7z"><title>53 St: F, Aug-Dec 2025: 39,208</title></path>
-<text x="236.5" y="5134.0">39,208</text>
-<path class="s1" d="M208.8,5138.0h26.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.9z"><title>53 St: F, 2019: 51,206</title></path>
-<text x="243.7" y="5148.0">51,206</text>
+<path class="s0" d="M208.8,5124.0h19.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.7z"><title>53 St: F, Aug-Dec 2025: 39,192</title></path>
+<text x="236.5" y="5134.0">39,192</text>
+<path class="s1" d="M208.8,5138.0h26.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.9z"><title>53 St: F, 2019: 51,182</title></path>
+<text x="243.7" y="5148.0">51,182</text>
 <text x="200.8" y="5175.0" class="label" text-anchor="end">53 St: FL</text>
-<path class="s0" d="M208.8,5158.0h19.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.5z"><title>53 St: FL, Aug-Dec 2025: 38,923</title></path>
-<text x="236.3" y="5168.0">38,923</text>
-<path class="s1" d="M208.8,5172.0h26.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.7z"><title>53 St: FL, 2019: 50,829</title></path>
-<text x="243.5" y="5182.0">50,829</text>
+<path class="s0" d="M208.8,5158.0h19.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.5z"><title>53 St: FL, Aug-Dec 2025: 38,908</title></path>
+<text x="236.3" y="5168.0">38,908</text>
+<path class="s1" d="M208.8,5172.0h26.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.7z"><title>53 St: FL, 2019: 50,806</title></path>
+<text x="243.5" y="5182.0">50,806</text>
 <text x="200.8" y="5209.0" class="label" text-anchor="end">Culver local: G</text>
-<path class="s0" d="M208.8,5192.0h19.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.1z"><title>Culver local: G, Aug-Dec 2025: 38,256</title></path>
-<text x="235.9" y="5202.0">38,256</text>
-<path class="s1" d="M208.8,5206.0h23.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-23.5z"><title>Culver local: G, 2019: 45,538</title></path>
-<text x="240.3" y="5216.0">45,538</text>
+<path class="s0" d="M208.8,5192.0h19.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.2z"><title>Culver local: G, Aug-Dec 2025: 38,439</title></path>
+<text x="236.0" y="5202.0">38,439</text>
+<path class="s1" d="M208.8,5206.0h23.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-23.6z"><title>Culver local: G, 2019: 45,762</title></path>
+<text x="240.4" y="5216.0">45,762</text>
 <text x="200.8" y="5243.0" class="label" text-anchor="end">Upper Culver: G</text>
-<path class="s0" d="M208.8,5226.0h19.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.1z"><title>Upper Culver: G, Aug-Dec 2025: 38,256</title></path>
-<text x="235.9" y="5236.0">38,256</text>
-<path class="s1" d="M208.8,5240.0h23.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-23.5z"><title>Upper Culver: G, 2019: 45,538</title></path>
-<text x="240.3" y="5250.0">45,538</text>
+<path class="s0" d="M208.8,5226.0h19.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.2z"><title>Upper Culver: G, Aug-Dec 2025: 38,439</title></path>
+<text x="236.0" y="5236.0">38,439</text>
+<path class="s1" d="M208.8,5240.0h23.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-23.6z"><title>Upper Culver: G, 2019: 45,762</title></path>
+<text x="240.4" y="5250.0">45,762</text>
 <text x="200.8" y="5277.0" class="label" text-anchor="end">Upper Culver local: G</text>
-<path class="s0" d="M208.8,5260.0h19.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.1z"><title>Upper Culver local: G, Aug-Dec 2025: 38,256</title></path>
-<text x="235.9" y="5270.0">38,256</text>
-<path class="s1" d="M208.8,5274.0h23.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-23.5z"><title>Upper Culver local: G, 2019: 45,538</title></path>
-<text x="240.3" y="5284.0">45,538</text>
+<path class="s0" d="M208.8,5260.0h19.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.2z"><title>Upper Culver local: G, Aug-Dec 2025: 38,439</title></path>
+<text x="236.0" y="5270.0">38,439</text>
+<path class="s1" d="M208.8,5274.0h23.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-23.6z"><title>Upper Culver local: G, 2019: 45,762</title></path>
+<text x="240.4" y="5284.0">45,762</text>
 <text x="200.8" y="5311.0" class="label" text-anchor="end">Lower Culver: FL</text>
-<path class="s0" d="M208.8,5294.0h19.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.0z"><title>Lower Culver: FL, Aug-Dec 2025: 38,175</title></path>
-<text x="235.8" y="5304.0">38,175</text>
-<path class="s1" d="M208.8,5308.0h27.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.4z"><title>Lower Culver: FL, 2019: 51,929</title></path>
-<text x="244.2" y="5318.0">51,929</text>
+<path class="s0" d="M208.8,5294.0h19.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-19.0z"><title>Lower Culver: FL, Aug-Dec 2025: 38,135</title></path>
+<text x="235.8" y="5304.0">38,135</text>
+<path class="s1" d="M208.8,5308.0h27.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.3z"><title>Lower Culver: FL, 2019: 51,877</title></path>
+<text x="244.1" y="5318.0">51,877</text>
 <text x="200.8" y="5345.0" class="label" text-anchor="end">Lower Culver local: F</text>
-<path class="s0" d="M208.8,5328.0h18.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-18.2z"><title>Lower Culver local: F, Aug-Dec 2025: 36,797</title></path>
-<text x="235.0" y="5338.0">36,797</text>
-<path class="s1" d="M208.8,5342.0h26.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.3z"><title>Lower Culver local: F, 2019: 50,247</title></path>
-<text x="243.1" y="5352.0">50,247</text>
+<path class="s0" d="M208.8,5328.0h18.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-18.2z"><title>Lower Culver local: F, Aug-Dec 2025: 36,759</title></path>
+<text x="235.0" y="5338.0">36,759</text>
+<path class="s1" d="M208.8,5342.0h26.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-26.3z"><title>Lower Culver local: F, 2019: 50,197</title></path>
+<text x="243.1" y="5352.0">50,197</text>
 <text x="200.8" y="5379.0" class="label" text-anchor="end">Pelham express: 6</text>
-<path class="s0" d="M208.8,5362.0h18.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-18.1z"><title>Pelham express: 6, Aug-Dec 2025: 36,609</title></path>
-<text x="234.9" y="5372.0">36,609</text>
-<path class="s1" d="M208.8,5376.0h29.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.2z"><title>Pelham express: 6, 2019: 54,969</title></path>
-<text x="246.0" y="5386.0">54,969</text>
+<path class="s0" d="M208.8,5362.0h18.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-18.1z"><title>Pelham express: 6, Aug-Dec 2025: 36,606</title></path>
+<text x="234.9" y="5372.0">36,606</text>
+<path class="s1" d="M208.8,5376.0h29.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.2z"><title>Pelham express: 6, 2019: 54,964</title></path>
+<text x="246.0" y="5386.0">54,964</text>
 <text x="200.8" y="5413.0" class="label" text-anchor="end">Pelham express: 6X</text>
-<path class="s0" d="M208.8,5396.0h18.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-18.1z"><title>Pelham express: 6X, Aug-Dec 2025: 36,563</title></path>
-<text x="234.9" y="5406.0">36,563</text>
-<path class="s1" d="M208.8,5410.0h29.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.1z"><title>Pelham express: 6X, 2019: 54,895</title></path>
-<text x="245.9" y="5420.0">54,895</text>
+<path class="s0" d="M208.8,5396.0h18.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-18.1z"><title>Pelham express: 6X, Aug-Dec 2025: 36,560</title></path>
+<text x="234.9" y="5406.0">36,560</text>
+<path class="s1" d="M208.8,5410.0h29.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-29.1z"><title>Pelham express: 6X, 2019: 54,890</title></path>
+<text x="245.9" y="5420.0">54,890</text>
 <text x="200.8" y="5447.0" class="label" text-anchor="end">Flushing express: 7</text>
-<path class="s0" d="M208.8,5430.0h17.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-17.5z"><title>Flushing express: 7, Aug-Dec 2025: 35,638</title></path>
-<text x="234.3" y="5440.0">35,638</text>
-<path class="s1" d="M208.8,5444.0h20.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.7z"><title>Flushing express: 7, 2019: 40,881</title></path>
-<text x="237.5" y="5454.0">40,881</text>
+<path class="s0" d="M208.8,5430.0h17.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-17.5z"><title>Flushing express: 7, Aug-Dec 2025: 35,641</title></path>
+<text x="234.3" y="5440.0">35,641</text>
+<path class="s1" d="M208.8,5444.0h20.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.7z"><title>Flushing express: 7, 2019: 40,885</title></path>
+<text x="237.5" y="5454.0">40,885</text>
 <text x="200.8" y="5481.0" class="label" text-anchor="end">Flushing express: 7X</text>
-<path class="s0" d="M208.8,5464.0h17.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-17.5z"><title>Flushing express: 7X, Aug-Dec 2025: 35,638</title></path>
-<text x="234.3" y="5474.0">35,638</text>
-<path class="s1" d="M208.8,5478.0h20.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.7z"><title>Flushing express: 7X, 2019: 40,881</title></path>
-<text x="237.5" y="5488.0">40,881</text>
+<path class="s0" d="M208.8,5464.0h17.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-17.5z"><title>Flushing express: 7X, Aug-Dec 2025: 35,641</title></path>
+<text x="234.3" y="5474.0">35,641</text>
+<path class="s1" d="M208.8,5478.0h20.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.7z"><title>Flushing express: 7X, 2019: 40,885</title></path>
+<text x="237.5" y="5488.0">40,885</text>
 <text x="200.8" y="5515.0" class="label" text-anchor="end">Lower Culver local: FL</text>
-<path class="s0" d="M208.8,5498.0h17.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-17.3z"><title>Lower Culver local: FL, Aug-Dec 2025: 35,258</title></path>
-<text x="234.1" y="5508.0">35,258</text>
-<path class="s1" d="M208.8,5512.0h25.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-25.1z"><title>Lower Culver local: FL, 2019: 48,159</title></path>
-<text x="241.9" y="5522.0">48,159</text>
+<path class="s0" d="M208.8,5498.0h17.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-17.3z"><title>Lower Culver local: FL, Aug-Dec 2025: 35,224</title></path>
+<text x="234.1" y="5508.0">35,224</text>
+<path class="s1" d="M208.8,5512.0h25.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-25.1z"><title>Lower Culver local: FL, 2019: 48,116</title></path>
+<text x="241.9" y="5522.0">48,116</text>
 <text x="200.8" y="5549.0" class="label" text-anchor="end">Concourse: B</text>
-<path class="s0" d="M208.8,5532.0h16.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-16.8z"><title>Concourse: B, Aug-Dec 2025: 34,387</title></path>
-<text x="233.6" y="5542.0">34,387</text>
-<path class="s1" d="M208.8,5546.0h27.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.9z"><title>Concourse: B, 2019: 52,779</title></path>
-<text x="244.7" y="5556.0">52,779</text>
+<path class="s0" d="M208.8,5532.0h16.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-16.7z"><title>Concourse: B, Aug-Dec 2025: 34,367</title></path>
+<text x="233.5" y="5542.0">34,367</text>
+<path class="s1" d="M208.8,5546.0h27.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.8z"><title>Concourse: B, 2019: 52,751</title></path>
+<text x="244.6" y="5556.0">52,751</text>
 <text x="200.8" y="5583.0" class="label" text-anchor="end">Concourse local: B</text>
-<path class="s0" d="M208.8,5566.0h16.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-16.8z"><title>Concourse local: B, Aug-Dec 2025: 34,385</title></path>
-<text x="233.6" y="5576.0">34,385</text>
-<path class="s1" d="M208.8,5580.0h27.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.9z"><title>Concourse local: B, 2019: 52,776</title></path>
-<text x="244.7" y="5590.0">52,776</text>
+<path class="s0" d="M208.8,5566.0h16.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-16.7z"><title>Concourse local: B, Aug-Dec 2025: 34,365</title></path>
+<text x="233.5" y="5576.0">34,365</text>
+<path class="s1" d="M208.8,5580.0h27.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-27.8z"><title>Concourse local: B, 2019: 52,747</title></path>
+<text x="244.6" y="5590.0">52,747</text>
 <text x="200.8" y="5617.0" class="label" text-anchor="end">White Plains Rd local: 5</text>
-<path class="s0" d="M208.8,5600.0h15.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-15.9z"><title>White Plains Rd local: 5, Aug-Dec 2025: 33,011</title></path>
-<text x="232.7" y="5610.0">33,011</text>
-<path class="s1" d="M208.8,5614.0h24.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.5z"><title>White Plains Rd local: 5, 2019: 47,132</title></path>
-<text x="241.3" y="5624.0">47,132</text>
+<path class="s0" d="M208.8,5600.0h15.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-15.9z"><title>White Plains Rd local: 5, Aug-Dec 2025: 33,027</title></path>
+<text x="232.7" y="5610.0">33,027</text>
+<path class="s1" d="M208.8,5614.0h24.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-24.5z"><title>White Plains Rd local: 5, 2019: 47,157</title></path>
+<text x="241.3" y="5624.0">47,157</text>
 <text x="200.8" y="5651.0" class="label" text-anchor="end">Queens Blvd local: E</text>
-<path class="s0" d="M208.8,5634.0h15.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-15.8z"><title>Queens Blvd local: E, Aug-Dec 2025: 32,875</title></path>
-<text x="232.6" y="5644.0">32,875</text>
-<path class="s1" d="M208.8,5648.0h20.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.8z"><title>Queens Blvd local: E, 2019: 41,001</title></path>
-<text x="237.6" y="5658.0">41,001</text>
+<path class="s0" d="M208.8,5634.0h15.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-15.8z"><title>Queens Blvd local: E, Aug-Dec 2025: 32,843</title></path>
+<text x="232.6" y="5644.0">32,843</text>
+<path class="s1" d="M208.8,5648.0h20.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-20.7z"><title>Queens Blvd local: E, 2019: 40,962</title></path>
+<text x="237.5" y="5658.0">40,962</text>
 <text x="200.8" y="5685.0" class="label" text-anchor="end">Lenox Av: 3</text>
-<path class="s0" d="M208.8,5668.0h15.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-15.8z"><title>Lenox Av: 3, Aug-Dec 2025: 32,776</title></path>
-<text x="232.6" y="5678.0">32,776</text>
-<path class="s1" d="M208.8,5682.0h25.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-25.1z"><title>Lenox Av: 3, 2019: 48,268</title></path>
-<text x="241.9" y="5692.0">48,268</text>
+<path class="s0" d="M208.8,5668.0h15.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-15.8z"><title>Lenox Av: 3, Aug-Dec 2025: 32,769</title></path>
+<text x="232.6" y="5678.0">32,769</text>
+<path class="s1" d="M208.8,5682.0h25.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-25.1z"><title>Lenox Av: 3, 2019: 48,260</title></path>
+<text x="241.9" y="5692.0">48,260</text>
 <text x="200.8" y="5719.0" class="label" text-anchor="end">Rockaway: A</text>
 <path class="s0" d="M208.8,5702.0h12.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-12.5z"><title>Rockaway: A, Aug-Dec 2025: 27,390</title></path>
 <text x="229.3" y="5712.0">27,390</text>
@@ -868,25 +868,25 @@ text {
 <path class="s1" d="M208.8,5750.0h18.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-18.9z"><title>Dyre Av: 5, 2019: 37,996</title></path>
 <text x="235.7" y="5760.0">37,996</text>
 <text x="200.8" y="5787.0" class="label" text-anchor="end">Jamaica express: J</text>
-<path class="s0" d="M208.8,5770.0h9.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-9.9z"><title>Jamaica express: J, Aug-Dec 2025: 22,953</title></path>
-<text x="226.7" y="5780.0">22,953</text>
-<path class="s1" d="M208.8,5784.0h15.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-15.0z"><title>Jamaica express: J, 2019: 31,459</title></path>
-<text x="231.8" y="5794.0">31,459</text>
+<path class="s0" d="M208.8,5770.0h9.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-9.8z"><title>Jamaica express: J, Aug-Dec 2025: 22,922</title></path>
+<text x="226.6" y="5780.0">22,922</text>
+<path class="s1" d="M208.8,5784.0h15.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-15.0z"><title>Jamaica express: J, 2019: 31,408</title></path>
+<text x="231.8" y="5794.0">31,408</text>
 <text x="200.8" y="5821.0" class="label" text-anchor="end">8 Av local: A</text>
-<path class="s0" d="M208.8,5804.0h9.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-9.3z"><title>8 Av local: A, Aug-Dec 2025: 22,052</title></path>
-<text x="226.1" y="5814.0">22,052</text>
-<path class="s1" d="M208.8,5818.0h13.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-13.5z"><title>8 Av local: A, 2019: 29,061</title></path>
-<text x="230.3" y="5828.0">29,061</text>
+<path class="s0" d="M208.8,5804.0h9.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-9.3z"><title>8 Av local: A, Aug-Dec 2025: 22,038</title></path>
+<text x="226.1" y="5814.0">22,038</text>
+<path class="s1" d="M208.8,5818.0h13.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-13.5z"><title>8 Av local: A, 2019: 29,043</title></path>
+<text x="230.3" y="5828.0">29,043</text>
 <text x="200.8" y="5855.0" class="label" text-anchor="end">White Plains Rd express: 5</text>
-<path class="s0" d="M208.8,5838.0h8.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-8.5z"><title>White Plains Rd express: 5, Aug-Dec 2025: 20,693</title></path>
-<text x="225.3" y="5848.0">20,693</text>
-<path class="s1" d="M208.8,5852.0h14.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-14.6z"><title>White Plains Rd express: 5, 2019: 30,757</title></path>
-<text x="231.4" y="5862.0">30,757</text>
+<path class="s0" d="M208.8,5838.0h8.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-8.5z"><title>White Plains Rd express: 5, Aug-Dec 2025: 20,698</title></path>
+<text x="225.3" y="5848.0">20,698</text>
+<path class="s1" d="M208.8,5852.0h14.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-14.6z"><title>White Plains Rd express: 5, 2019: 30,764</title></path>
+<text x="231.4" y="5862.0">30,764</text>
 <text x="200.8" y="5889.0" class="label" text-anchor="end">63 St: M</text>
-<path class="s0" d="M208.8,5872.0h6.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-6.9z"><title>63 St: M, Aug-Dec 2025: 18,099</title></path>
-<text x="223.7" y="5882.0">18,099</text>
-<path class="s1" d="M208.8,5886.0h10.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-10.2z"><title>63 St: M, 2019: 23,451</title></path>
-<text x="227.0" y="5896.0">23,451</text>
+<path class="s0" d="M208.8,5872.0h6.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-6.9z"><title>63 St: M, Aug-Dec 2025: 18,076</title></path>
+<text x="223.7" y="5882.0">18,076</text>
+<path class="s1" d="M208.8,5886.0h10.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-10.1z"><title>63 St: M, 2019: 23,420</title></path>
+<text x="226.9" y="5896.0">23,420</text>
 <text x="200.8" y="5923.0" class="label" text-anchor="end">Far Rockaway branch: A</text>
 <path class="s0" d="M208.8,5906.0h6.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-6.0z"><title>Far Rockaway branch: A, Aug-Dec 2025: 16,535</title></path>
 <text x="222.8" y="5916.0">16,535</text>
@@ -898,148 +898,148 @@ text {
 <path class="s1" d="M208.8,5954.0h10.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-10.8z"><title>Lefferts branch: A, 2019: 24,484</title></path>
 <text x="227.6" y="5964.0">24,484</text>
 <text x="200.8" y="5991.0" class="label" text-anchor="end">Queens Blvd west local: E</text>
-<path class="s0" d="M208.8,5974.0h5.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-5.1z"><title>Queens Blvd west local: E, Aug-Dec 2025: 15,093</title></path>
-<text x="221.9" y="5984.0">15,093</text>
-<path class="s1" d="M208.8,5988.0h7.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.3z"><title>Queens Blvd west local: E, 2019: 18,736</title></path>
-<text x="224.1" y="5998.0">18,736</text>
+<path class="s0" d="M208.8,5974.0h5.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-5.1z"><title>Queens Blvd west local: E, Aug-Dec 2025: 15,081</title></path>
+<text x="221.9" y="5984.0">15,081</text>
+<path class="s1" d="M208.8,5988.0h7.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.3z"><title>Queens Blvd west local: E, 2019: 18,723</title></path>
+<text x="224.1" y="5998.0">18,723</text>
 <text x="200.8" y="6025.0" class="label" text-anchor="end">Queens Blvd west local: F</text>
-<path class="s0" d="M208.8,6008.0h5.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-5.0z"><title>Queens Blvd west local: F, Aug-Dec 2025: 14,850</title></path>
-<text x="221.8" y="6018.0">14,850</text>
-<path class="s1" d="M208.8,6022.0h7.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.6z"><title>Queens Blvd west local: F, 2019: 19,169</title></path>
-<text x="224.4" y="6032.0">19,169</text>
+<path class="s0" d="M208.8,6008.0h5.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-5.0z"><title>Queens Blvd west local: F, Aug-Dec 2025: 14,847</title></path>
+<text x="221.8" y="6018.0">14,847</text>
+<path class="s1" d="M208.8,6022.0h7.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.6z"><title>Queens Blvd west local: F, 2019: 19,165</title></path>
+<text x="224.4" y="6032.0">19,165</text>
 <text x="200.8" y="6059.0" class="label" text-anchor="end">Queens Blvd west local: FL</text>
-<path class="s0" d="M208.8,6042.0h5.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-5.0z"><title>Queens Blvd west local: FL, Aug-Dec 2025: 14,850</title></path>
-<text x="221.8" y="6052.0">14,850</text>
-<path class="s1" d="M208.8,6056.0h7.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.6z"><title>Queens Blvd west local: FL, 2019: 19,169</title></path>
-<text x="224.4" y="6066.0">19,169</text>
+<path class="s0" d="M208.8,6042.0h5.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-5.0z"><title>Queens Blvd west local: FL, Aug-Dec 2025: 14,847</title></path>
+<text x="221.8" y="6052.0">14,847</text>
+<path class="s1" d="M208.8,6056.0h7.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.6z"><title>Queens Blvd west local: FL, 2019: 19,165</title></path>
+<text x="224.4" y="6066.0">19,165</text>
 <text x="200.8" y="6093.0" class="label" text-anchor="end">Concourse express: D</text>
-<path class="s0" d="M208.8,6076.0h4.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-4.9z"><title>Concourse express: D, Aug-Dec 2025: 14,816</title></path>
-<text x="221.7" y="6086.0">14,816</text>
-<path class="s1" d="M208.8,6090.0h11.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-11.0z"><title>Concourse express: D, 2019: 24,866</title></path>
-<text x="227.8" y="6100.0">24,866</text>
+<path class="s0" d="M208.8,6076.0h4.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-4.9z"><title>Concourse express: D, Aug-Dec 2025: 14,817</title></path>
+<text x="221.7" y="6086.0">14,817</text>
+<path class="s1" d="M208.8,6090.0h11.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-11.0z"><title>Concourse express: D, 2019: 24,868</title></path>
+<text x="227.8" y="6100.0">24,868</text>
 <text x="200.8" y="6127.0" class="label" text-anchor="end">Fulton St local: A</text>
-<path class="s0" d="M208.8,6110.0h4.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-4.6z"><title>Fulton St local: A, Aug-Dec 2025: 14,260</title></path>
-<text x="221.4" y="6120.0">14,260</text>
-<path class="s1" d="M208.8,6124.0h7.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.9z"><title>Fulton St local: A, 2019: 19,749</title></path>
-<text x="224.7" y="6134.0">19,749</text>
+<path class="s0" d="M208.8,6110.0h4.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-4.6z"><title>Fulton St local: A, Aug-Dec 2025: 14,225</title></path>
+<text x="221.4" y="6120.0">14,225</text>
+<path class="s1" d="M208.8,6124.0h7.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.9z"><title>Fulton St local: A, 2019: 19,699</title></path>
+<text x="224.7" y="6134.0">19,699</text>
 <text x="200.8" y="6161.0" class="label" text-anchor="end">Franklin Av Shuttle: FS</text>
-<path class="s0" d="M208.8,6144.0h4.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-4.3z"><title>Franklin Av Shuttle: FS, Aug-Dec 2025: 13,770</title></path>
-<text x="221.1" y="6154.0">13,770</text>
-<path class="s1" d="M208.8,6158.0h7.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-7.1z"><title>Franklin Av Shuttle: FS, 2019: 18,363</title></path>
-<text x="223.9" y="6168.0">18,363</text>
+<path class="s0" d="M208.8,6144.0h4.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-4.2z"><title>Franklin Av Shuttle: FS, Aug-Dec 2025: 13,566</title></path>
+<text x="221.0" y="6154.0">13,566</text>
+<path class="s1" d="M208.8,6158.0h6.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-6.9z"><title>Franklin Av Shuttle: FS, 2019: 18,097</title></path>
+<text x="223.7" y="6168.0">18,097</text>
 <text x="200.8" y="6195.0" class="label" text-anchor="end">4 Av local: N</text>
-<path class="s0" d="M208.8,6178.0h3.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-3.4z"><title>4 Av local: N, Aug-Dec 2025: 12,205</title></path>
-<text x="220.2" y="6188.0">12,205</text>
-<path class="s1" d="M208.8,6192.0h4.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-4.4z"><title>4 Av local: N, 2019: 13,868</title></path>
-<text x="221.2" y="6202.0">13,868</text>
+<path class="s0" d="M208.8,6178.0h3.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-3.4z"><title>4 Av local: N, Aug-Dec 2025: 12,196</title></path>
+<text x="220.2" y="6188.0">12,196</text>
+<path class="s1" d="M208.8,6192.0h4.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-4.4z"><title>4 Av local: N, 2019: 13,857</title></path>
+<text x="221.2" y="6202.0">13,857</text>
 <text x="200.8" y="6229.0" class="label" text-anchor="end">Broadway local: Q</text>
-<path class="s0" d="M208.8,6212.0h3.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-3.0z"><title>Broadway local: Q, Aug-Dec 2025: 11,547</title></path>
-<text x="219.8" y="6222.0">11,547</text>
-<path class="s1" d="M208.8,6226.0h5.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-5.0z"><title>Broadway local: Q, 2019: 14,931</title></path>
-<text x="221.8" y="6236.0">14,931</text>
+<path class="s0" d="M208.8,6212.0h3.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-3.0z"><title>Broadway local: Q, Aug-Dec 2025: 11,545</title></path>
+<text x="219.8" y="6222.0">11,545</text>
+<path class="s1" d="M208.8,6226.0h5.0a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-5.0z"><title>Broadway local: Q, 2019: 14,926</title></path>
+<text x="221.8" y="6236.0">14,926</text>
 <text x="200.8" y="6263.0" class="label" text-anchor="end">4 Av local: D</text>
-<path class="s0" d="M208.8,6246.0h1.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-1.8z"><title>4 Av local: D, Aug-Dec 2025: 9,525</title></path>
-<text x="218.6" y="6256.0">9,525</text>
-<path class="s1" d="M208.8,6260.0h3.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-3.3z"><title>4 Av local: D, 2019: 12,067</title></path>
-<text x="220.1" y="6270.0">12,067</text>
+<path class="s0" d="M208.8,6246.0h1.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-1.8z"><title>4 Av local: D, Aug-Dec 2025: 9,533</title></path>
+<text x="218.6" y="6256.0">9,533</text>
+<path class="s1" d="M208.8,6260.0h3.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-3.3z"><title>4 Av local: D, 2019: 12,076</title></path>
+<text x="220.1" y="6270.0">12,076</text>
 <text x="200.8" y="6297.0" class="label" text-anchor="end">Jamaica: Z</text>
-<path class="s0" d="M208.8,6280.0h1.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-1.4z"><title>Jamaica: Z, Aug-Dec 2025: 9,005</title></path>
-<text x="218.2" y="6290.0">9,005</text>
-<path class="s1" d="M208.8,6294.0h3.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-3.4z"><title>Jamaica: Z, 2019: 12,203</title></path>
-<text x="220.2" y="6304.0">12,203</text>
+<path class="s0" d="M208.8,6280.0h1.5a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-1.5z"><title>Jamaica: Z, Aug-Dec 2025: 9,042</title></path>
+<text x="218.3" y="6290.0">9,042</text>
+<path class="s1" d="M208.8,6294.0h3.4a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-3.4z"><title>Jamaica: Z, 2019: 12,255</title></path>
+<text x="220.2" y="6304.0">12,255</text>
 <text x="200.8" y="6331.0" class="label" text-anchor="end">Eastern Pkwy local: 4</text>
-<path class="s0" d="M208.8,6314.0h0.8a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-0.8z"><title>Eastern Pkwy local: 4, Aug-Dec 2025: 8,011</title></path>
-<text x="217.6" y="6324.0">8,011</text>
-<path class="s1" d="M208.8,6328.0h2.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-2.6z"><title>Eastern Pkwy local: 4, 2019: 11,006</title></path>
-<text x="219.4" y="6338.0">11,006</text>
+<path class="s0" d="M208.8,6314.0h0.9a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-0.9z"><title>Eastern Pkwy local: 4, Aug-Dec 2025: 8,034</title></path>
+<text x="217.7" y="6324.0">8,034</text>
+<path class="s1" d="M208.8,6328.0h2.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-2.7z"><title>Eastern Pkwy local: 4, 2019: 11,032</title></path>
+<text x="219.5" y="6338.0">11,032</text>
 <text x="200.8" y="6365.0" class="label" text-anchor="end">Lexington Av local: 4</text>
-<path class="s0" d="M208.8,6348.0h0.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-0.3z"><title>Lexington Av local: 4, Aug-Dec 2025: 7,042</title></path>
-<text x="217.1" y="6358.0">7,042</text>
-<path class="s1" d="M208.8,6362.0h1.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-1.7z"><title>Lexington Av local: 4, 2019: 9,412</title></path>
-<text x="218.5" y="6372.0">9,412</text>
+<path class="s0" d="M208.8,6348.0h0.2a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-0.2z"><title>Lexington Av local: 4, Aug-Dec 2025: 7,036</title></path>
+<text x="217.0" y="6358.0">7,036</text>
+<path class="s1" d="M208.8,6362.0h1.7a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-1.7z"><title>Lexington Av local: 4, 2019: 9,403</title></path>
+<text x="218.5" y="6372.0">9,403</text>
 <text x="200.8" y="6399.0" class="label" text-anchor="end">Broadway-7 Av local: 2</text>
-<path class="s0" d="M208.8,6382.0h0.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-0.1z"><title>Broadway-7 Av local: 2, Aug-Dec 2025: 6,780</title></path>
-<text x="216.9" y="6392.0">6,780</text>
-<path class="s1" d="M208.8,6396.0h1.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-1.6z"><title>Broadway-7 Av local: 2, 2019: 9,343</title></path>
-<text x="218.4" y="6406.0">9,343</text>
+<path class="s0" d="M208.8,6382.0h0.1a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-0.1z"><title>Broadway-7 Av local: 2, Aug-Dec 2025: 6,773</title></path>
+<text x="216.9" y="6392.0">6,773</text>
+<path class="s1" d="M208.8,6396.0h1.6a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-1.6z"><title>Broadway-7 Av local: 2, 2019: 9,335</title></path>
+<text x="218.4" y="6406.0">9,335</text>
 <text x="200.8" y="6433.0" class="label" text-anchor="end">SAS Phase 1: N</text>
-<path class="s0" d="M208.8,6416.0h0.0a3.3320962500000006,3.3320962500000006 0 0 1 3.3320962500000006,3.3320962500000006v5.3a3.3320962500000006,3.3320962500000006 0 0 1 -3.3320962500000006,3.3320962500000006h-0.0z"><title>SAS Phase 1: N, Aug-Dec 2025: 5,519</title></path>
-<text x="216.1" y="6426.0">5,519</text>
-<path class="s1" d="M208.8,6430.0h0.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-0.3z"><title>SAS Phase 1: N, 2019: 7,184</title></path>
-<text x="217.1" y="6440.0">7,184</text>
+<path class="s0" d="M208.8,6416.0h0.0a3.3339075000000005,3.3339075000000005 0 0 1 3.3339075000000005,3.3339075000000005v5.3a3.3339075000000005,3.3339075000000005 0 0 1 -3.3339075000000005,3.3339075000000005h-0.0z"><title>SAS Phase 1: N, Aug-Dec 2025: 5,522</title></path>
+<text x="216.1" y="6426.0">5,522</text>
+<path class="s1" d="M208.8,6430.0h0.3a4,4 0 0 1 4,4v4.0a4,4 0 0 1 -4,4h-0.3z"><title>SAS Phase 1: N, 2019: 7,187</title></path>
+<text x="217.1" y="6440.0">7,187</text>
 <text x="200.8" y="6467.0" class="label" text-anchor="end">6 Av: FX</text>
-<path class="s0" d="M208.8,6450.0h0.0a2.8726425000000004,2.8726425000000004 0 0 1 2.8726425000000004,2.8726425000000004v6.3a2.8726425000000004,2.8726425000000004 0 0 1 -2.8726425000000004,2.8726425000000004h-0.0z"><title>6 Av: FX, Aug-Dec 2025: 4,758</title></path>
-<text x="215.7" y="6460.0">4,758</text>
-<path class="s1" d="M208.8,6464.0h0.0a3.732382500000001,3.732382500000001 0 0 1 3.732382500000001,3.732382500000001v4.5a3.732382500000001,3.732382500000001 0 0 1 -3.732382500000001,3.732382500000001h-0.0z"><title>6 Av: FX, 2019: 6,182</title></path>
-<text x="216.5" y="6474.0">6,182</text>
+<path class="s0" d="M208.8,6450.0h0.0a2.8605675000000006,2.8605675000000006 0 0 1 2.8605675000000006,2.8605675000000006v6.3a2.8605675000000006,2.8605675000000006 0 0 1 -2.8605675000000006,2.8605675000000006h-0.0z"><title>6 Av: FX, Aug-Dec 2025: 4,738</title></path>
+<text x="215.7" y="6460.0">4,738</text>
+<path class="s1" d="M208.8,6464.0h0.0a3.7160812500000007,3.7160812500000007 0 0 1 3.7160812500000007,3.7160812500000007v4.6a3.7160812500000007,3.7160812500000007 0 0 1 -3.7160812500000007,3.7160812500000007h-0.0z"><title>6 Av: FX, 2019: 6,155</title></path>
+<text x="216.5" y="6474.0">6,155</text>
 <text x="200.8" y="6501.0" class="label" text-anchor="end">Nassau St: Z</text>
-<path class="s0" d="M208.8,6484.0h0.0a2.7555150000000004,2.7555150000000004 0 0 1 2.7555150000000004,2.7555150000000004v6.5a2.7555150000000004,2.7555150000000004 0 0 1 -2.7555150000000004,2.7555150000000004h-0.0z"><title>Nassau St: Z, Aug-Dec 2025: 4,564</title></path>
-<text x="215.6" y="6494.0">4,564</text>
-<path class="s1" d="M208.8,6498.0h0.0a3.8863387500000006,3.8863387500000006 0 0 1 3.8863387500000006,3.8863387500000006v4.2a3.8863387500000006,3.8863387500000006 0 0 1 -3.8863387500000006,3.8863387500000006h-0.0z"><title>Nassau St: Z, 2019: 6,437</title></path>
-<text x="216.7" y="6508.0">6,437</text>
+<path class="s0" d="M208.8,6484.0h0.0a2.7422325000000005,2.7422325000000005 0 0 1 2.7422325000000005,2.7422325000000005v6.5a2.7422325000000005,2.7422325000000005 0 0 1 -2.7422325000000005,2.7422325000000005h-0.0z"><title>Nassau St: Z, Aug-Dec 2025: 4,542</title></path>
+<text x="215.5" y="6494.0">4,542</text>
+<path class="s1" d="M208.8,6498.0h0.0a3.870037500000001,3.870037500000001 0 0 1 3.870037500000001,3.870037500000001v4.3a3.870037500000001,3.870037500000001 0 0 1 -3.870037500000001,3.870037500000001h-0.0z"><title>Nassau St: Z, 2019: 6,410</title></path>
+<text x="216.7" y="6508.0">6,410</text>
 <text x="200.8" y="6535.0" class="label" text-anchor="end">Jamaica local: Z</text>
-<path class="s0" d="M208.8,6518.0h0.0a2.6057850000000005,2.6057850000000005 0 0 1 2.6057850000000005,2.6057850000000005v6.8a2.6057850000000005,2.6057850000000005 0 0 1 -2.6057850000000005,2.6057850000000005h-0.0z"><title>Jamaica local: Z, Aug-Dec 2025: 4,316</title></path>
-<text x="215.4" y="6528.0">4,316</text>
-<path class="s1" d="M208.8,6532.0h0.0a3.577822500000001,3.577822500000001 0 0 1 3.577822500000001,3.577822500000001v4.8a3.577822500000001,3.577822500000001 0 0 1 -3.577822500000001,3.577822500000001h-0.0z"><title>Jamaica local: Z, 2019: 5,926</title></path>
-<text x="216.4" y="6542.0">5,926</text>
+<path class="s0" d="M208.8,6518.0h0.0a2.6069925000000005,2.6069925000000005 0 0 1 2.6069925000000005,2.6069925000000005v6.8a2.6069925000000005,2.6069925000000005 0 0 1 -2.6069925000000005,2.6069925000000005h-0.0z"><title>Jamaica local: Z, Aug-Dec 2025: 4,318</title></path>
+<text x="215.4" y="6528.0">4,318</text>
+<path class="s1" d="M208.8,6532.0h0.0a3.581445000000001,3.581445000000001 0 0 1 3.581445000000001,3.581445000000001v4.8a3.581445000000001,3.581445000000001 0 0 1 -3.581445000000001,3.581445000000001h-0.0z"><title>Jamaica local: Z, 2019: 5,932</title></path>
+<text x="216.4" y="6542.0">5,932</text>
 <text x="200.8" y="6569.0" class="label" text-anchor="end">63 St: N</text>
-<path class="s0" d="M208.8,6552.0h0.0a2.4856387500000006,2.4856387500000006 0 0 1 2.4856387500000006,2.4856387500000006v7.0a2.4856387500000006,2.4856387500000006 0 0 1 -2.4856387500000006,2.4856387500000006h-0.0z"><title>63 St: N, Aug-Dec 2025: 4,117</title></path>
-<text x="215.3" y="6562.0">4,117</text>
-<path class="s1" d="M208.8,6566.0h0.0a3.2493825000000007,3.2493825000000007 0 0 1 3.2493825000000007,3.2493825000000007v5.5a3.2493825000000007,3.2493825000000007 0 0 1 -3.2493825000000007,3.2493825000000007h-0.0z"><title>63 St: N, 2019: 5,382</title></path>
-<text x="216.0" y="6576.0">5,382</text>
+<path class="s0" d="M208.8,6552.0h0.0a2.4880537500000006,2.4880537500000006 0 0 1 2.4880537500000006,2.4880537500000006v7.0a2.4880537500000006,2.4880537500000006 0 0 1 -2.4880537500000006,2.4880537500000006h-0.0z"><title>63 St: N, Aug-Dec 2025: 4,121</title></path>
+<text x="215.3" y="6562.0">4,121</text>
+<path class="s1" d="M208.8,6566.0h0.0a3.2524012500000006,3.2524012500000006 0 0 1 3.2524012500000006,3.2524012500000006v5.5a3.2524012500000006,3.2524012500000006 0 0 1 -3.2524012500000006,3.2524012500000006h-0.0z"><title>63 St: N, 2019: 5,387</title></path>
+<text x="216.1" y="6576.0">5,387</text>
 <text x="200.8" y="6603.0" class="label" text-anchor="end">Jamaica express: Z</text>
-<path class="s0" d="M208.8,6586.0h0.0a2.4476025000000003,2.4476025000000003 0 0 1 2.4476025000000003,2.4476025000000003v7.1a2.4476025000000003,2.4476025000000003 0 0 1 -2.4476025000000003,2.4476025000000003h-0.0z"><title>Jamaica express: Z, Aug-Dec 2025: 4,054</title></path>
-<text x="215.2" y="6596.0">4,054</text>
-<path class="s1" d="M208.8,6600.0h0.0a3.3520200000000004,3.3520200000000004 0 0 1 3.3520200000000004,3.3520200000000004v5.3a3.3520200000000004,3.3520200000000004 0 0 1 -3.3520200000000004,3.3520200000000004h-0.0z"><title>Jamaica express: Z, 2019: 5,552</title></path>
-<text x="216.2" y="6610.0">5,552</text>
+<path class="s0" d="M208.8,6586.0h0.0a2.4427725000000007,2.4427725000000007 0 0 1 2.4427725000000007,2.4427725000000007v7.1a2.4427725000000007,2.4427725000000007 0 0 1 -2.4427725000000007,2.4427725000000007h-0.0z"><title>Jamaica express: Z, Aug-Dec 2025: 4,046</title></path>
+<text x="215.2" y="6596.0">4,046</text>
+<path class="s1" d="M208.8,6600.0h0.0a3.3471900000000008,3.3471900000000008 0 0 1 3.3471900000000008,3.3471900000000008v5.3a3.3471900000000008,3.3471900000000008 0 0 1 -3.3471900000000008,3.3471900000000008h-0.0z"><title>Jamaica express: Z, 2019: 5,544</title></path>
+<text x="216.1" y="6610.0">5,544</text>
 <text x="200.8" y="6637.0" class="label" text-anchor="end">6 Av local: FX</text>
-<path class="s0" d="M208.8,6620.0h0.0a1.8782662500000005,1.8782662500000005 0 0 1 1.8782662500000005,1.8782662500000005v8.2a1.8782662500000005,1.8782662500000005 0 0 1 -1.8782662500000005,1.8782662500000005h-0.0z"><title>6 Av local: FX, Aug-Dec 2025: 3,111</title></path>
-<text x="214.7" y="6630.0">3,111</text>
-<path class="s1" d="M208.8,6634.0h0.0a2.4765825000000006,2.4765825000000006 0 0 1 2.4765825000000006,2.4765825000000006v7.0a2.4765825000000006,2.4765825000000006 0 0 1 -2.4765825000000006,2.4765825000000006h-0.0z"><title>6 Av local: FX, 2019: 4,102</title></path>
-<text x="215.3" y="6644.0">4,102</text>
+<path class="s0" d="M208.8,6620.0h0.0a1.8734362500000004,1.8734362500000004 0 0 1 1.8734362500000004,1.8734362500000004v8.3a1.8734362500000004,1.8734362500000004 0 0 1 -1.8734362500000004,1.8734362500000004h-0.0z"><title>6 Av local: FX, Aug-Dec 2025: 3,103</title></path>
+<text x="214.7" y="6630.0">3,103</text>
+<path class="s1" d="M208.8,6634.0h0.0a2.4705450000000004,2.4705450000000004 0 0 1 2.4705450000000004,2.4705450000000004v7.1a2.4705450000000004,2.4705450000000004 0 0 1 -2.4705450000000004,2.4705450000000004h-0.0z"><title>6 Av local: FX, 2019: 4,092</title></path>
+<text x="215.3" y="6644.0">4,092</text>
 <text x="200.8" y="6671.0" class="label" text-anchor="end">Rockaway: H</text>
-<path class="s0" d="M208.8,6654.0h0.0a1.6760100000000002,1.6760100000000002 0 0 1 1.6760100000000002,1.6760100000000002v8.6a1.6760100000000002,1.6760100000000002 0 0 1 -1.6760100000000002,1.6760100000000002h-0.0z"><title>Rockaway: H, Aug-Dec 2025: 2,776</title></path>
-<text x="214.5" y="6664.0">2,776</text>
-<path class="s1" d="M208.8,6668.0h0.0a3.2777587500000007,3.2777587500000007 0 0 1 3.2777587500000007,3.2777587500000007v5.4a3.2777587500000007,3.2777587500000007 0 0 1 -3.2777587500000007,3.2777587500000007h-0.0z"><title>Rockaway: H, 2019: 5,429</title></path>
-<text x="216.1" y="6678.0">5,429</text>
+<path class="s0" d="M208.8,6654.0h0.0a1.6766137500000002,1.6766137500000002 0 0 1 1.6766137500000002,1.6766137500000002v8.6a1.6766137500000002,1.6766137500000002 0 0 1 -1.6766137500000002,1.6766137500000002h-0.0z"><title>Rockaway: H, Aug-Dec 2025: 2,777</title></path>
+<text x="214.5" y="6664.0">2,777</text>
+<path class="s1" d="M208.8,6668.0h0.0a3.2783625000000005,3.2783625000000005 0 0 1 3.2783625000000005,3.2783625000000005v5.4a3.2783625000000005,3.2783625000000005 0 0 1 -3.2783625000000005,3.2783625000000005h-0.0z"><title>Rockaway: H, 2019: 5,430</title></path>
+<text x="216.1" y="6678.0">5,430</text>
 <text x="200.8" y="6705.0" class="label" text-anchor="end">Rockaway Park branch: H</text>
-<path class="s0" d="M208.8,6688.0h0.0a1.6760100000000002,1.6760100000000002 0 0 1 1.6760100000000002,1.6760100000000002v8.6a1.6760100000000002,1.6760100000000002 0 0 1 -1.6760100000000002,1.6760100000000002h-0.0z"><title>Rockaway Park branch: H, Aug-Dec 2025: 2,776</title></path>
-<text x="214.5" y="6698.0">2,776</text>
-<path class="s1" d="M208.8,6702.0h0.0a3.2777587500000007,3.2777587500000007 0 0 1 3.2777587500000007,3.2777587500000007v5.4a3.2777587500000007,3.2777587500000007 0 0 1 -3.2777587500000007,3.2777587500000007h-0.0z"><title>Rockaway Park branch: H, 2019: 5,429</title></path>
-<text x="216.1" y="6712.0">5,429</text>
+<path class="s0" d="M208.8,6688.0h0.0a1.6766137500000002,1.6766137500000002 0 0 1 1.6766137500000002,1.6766137500000002v8.6a1.6766137500000002,1.6766137500000002 0 0 1 -1.6766137500000002,1.6766137500000002h-0.0z"><title>Rockaway Park branch: H, Aug-Dec 2025: 2,777</title></path>
+<text x="214.5" y="6698.0">2,777</text>
+<path class="s1" d="M208.8,6702.0h0.0a3.2783625000000005,3.2783625000000005 0 0 1 3.2783625000000005,3.2783625000000005v5.4a3.2783625000000005,3.2783625000000005 0 0 1 -3.2783625000000005,3.2783625000000005h-0.0z"><title>Rockaway Park branch: H, 2019: 5,430</title></path>
+<text x="216.1" y="6712.0">5,430</text>
 <text x="200.8" y="6739.0" class="label" text-anchor="end">Culver: FX</text>
-<path class="s0" d="M208.8,6722.0h0.0a1.5782025000000004,1.5782025000000004 0 0 1 1.5782025000000004,1.5782025000000004v8.8a1.5782025000000004,1.5782025000000004 0 0 1 -1.5782025000000004,1.5782025000000004h-0.0z"><title>Culver: FX, Aug-Dec 2025: 2,614</title></path>
-<text x="214.4" y="6732.0">2,614</text>
-<path class="s1" d="M208.8,6736.0h0.0a2.1125212500000004,2.1125212500000004 0 0 1 2.1125212500000004,2.1125212500000004v7.8a2.1125212500000004,2.1125212500000004 0 0 1 -2.1125212500000004,2.1125212500000004h-0.0z"><title>Culver: FX, 2019: 3,499</title></path>
-<text x="214.9" y="6746.0">3,499</text>
+<path class="s0" d="M208.8,6722.0h0.0a1.5745800000000003,1.5745800000000003 0 0 1 1.5745800000000003,1.5745800000000003v8.9a1.5745800000000003,1.5745800000000003 0 0 1 -1.5745800000000003,1.5745800000000003h-0.0z"><title>Culver: FX, Aug-Dec 2025: 2,608</title></path>
+<text x="214.4" y="6732.0">2,608</text>
+<path class="s1" d="M208.8,6736.0h0.0a2.1076912500000002,2.1076912500000002 0 0 1 2.1076912500000002,2.1076912500000002v7.8a2.1076912500000002,2.1076912500000002 0 0 1 -2.1076912500000002,2.1076912500000002h-0.0z"><title>Culver: FX, 2019: 3,491</title></path>
+<text x="214.9" y="6746.0">3,491</text>
 <text x="200.8" y="6773.0" class="label" text-anchor="end">Culver express: F</text>
-<path class="s0" d="M208.8,6756.0h0.0a1.4375287500000002,1.4375287500000002 0 0 1 1.4375287500000002,1.4375287500000002v9.1a1.4375287500000002,1.4375287500000002 0 0 1 -1.4375287500000002,1.4375287500000002h-0.0z"><title>Culver express: F, Aug-Dec 2025: 2,381</title></path>
-<text x="214.2" y="6766.0">2,381</text>
-<path class="s1" d="M208.8,6770.0h0.0a1.9271700000000003,1.9271700000000003 0 0 1 1.9271700000000003,1.9271700000000003v8.1a1.9271700000000003,1.9271700000000003 0 0 1 -1.9271700000000003,1.9271700000000003h-0.0z"><title>Culver express: F, 2019: 3,192</title></path>
-<text x="214.7" y="6780.0">3,192</text>
+<path class="s0" d="M208.8,6756.0h0.0a1.4345100000000004,1.4345100000000004 0 0 1 1.4345100000000004,1.4345100000000004v9.1a1.4345100000000004,1.4345100000000004 0 0 1 -1.4345100000000004,1.4345100000000004h-0.0z"><title>Culver express: F, Aug-Dec 2025: 2,376</title></path>
+<text x="214.2" y="6766.0">2,376</text>
+<path class="s1" d="M208.8,6770.0h0.0a1.9229437500000004,1.9229437500000004 0 0 1 1.9229437500000004,1.9229437500000004v8.2a1.9229437500000004,1.9229437500000004 0 0 1 -1.9229437500000004,1.9229437500000004h-0.0z"><title>Culver express: F, 2019: 3,185</title></path>
+<text x="214.7" y="6780.0">3,185</text>
 <text x="200.8" y="6807.0" class="label" text-anchor="end">Culver express: FX</text>
-<path class="s0" d="M208.8,6790.0h0.0a1.4375287500000002,1.4375287500000002 0 0 1 1.4375287500000002,1.4375287500000002v9.1a1.4375287500000002,1.4375287500000002 0 0 1 -1.4375287500000002,1.4375287500000002h-0.0z"><title>Culver express: FX, Aug-Dec 2025: 2,381</title></path>
-<text x="214.2" y="6800.0">2,381</text>
-<path class="s1" d="M208.8,6804.0h0.0a1.9271700000000003,1.9271700000000003 0 0 1 1.9271700000000003,1.9271700000000003v8.1a1.9271700000000003,1.9271700000000003 0 0 1 -1.9271700000000003,1.9271700000000003h-0.0z"><title>Culver express: FX, 2019: 3,192</title></path>
-<text x="214.7" y="6814.0">3,192</text>
+<path class="s0" d="M208.8,6790.0h0.0a1.4345100000000004,1.4345100000000004 0 0 1 1.4345100000000004,1.4345100000000004v9.1a1.4345100000000004,1.4345100000000004 0 0 1 -1.4345100000000004,1.4345100000000004h-0.0z"><title>Culver express: FX, Aug-Dec 2025: 2,376</title></path>
+<text x="214.2" y="6800.0">2,376</text>
+<path class="s1" d="M208.8,6804.0h0.0a1.9229437500000004,1.9229437500000004 0 0 1 1.9229437500000004,1.9229437500000004v8.2a1.9229437500000004,1.9229437500000004 0 0 1 -1.9229437500000004,1.9229437500000004h-0.0z"><title>Culver express: FX, 2019: 3,185</title></path>
+<text x="214.7" y="6814.0">3,185</text>
 <text x="200.8" y="6841.0" class="label" text-anchor="end">Upper Culver: FX</text>
-<path class="s0" d="M208.8,6824.0h0.0a1.4375287500000002,1.4375287500000002 0 0 1 1.4375287500000002,1.4375287500000002v9.1a1.4375287500000002,1.4375287500000002 0 0 1 -1.4375287500000002,1.4375287500000002h-0.0z"><title>Upper Culver: FX, Aug-Dec 2025: 2,381</title></path>
-<text x="214.2" y="6834.0">2,381</text>
-<path class="s1" d="M208.8,6838.0h0.0a1.9271700000000003,1.9271700000000003 0 0 1 1.9271700000000003,1.9271700000000003v8.1a1.9271700000000003,1.9271700000000003 0 0 1 -1.9271700000000003,1.9271700000000003h-0.0z"><title>Upper Culver: FX, 2019: 3,192</title></path>
-<text x="214.7" y="6848.0">3,192</text>
+<path class="s0" d="M208.8,6824.0h0.0a1.4345100000000004,1.4345100000000004 0 0 1 1.4345100000000004,1.4345100000000004v9.1a1.4345100000000004,1.4345100000000004 0 0 1 -1.4345100000000004,1.4345100000000004h-0.0z"><title>Upper Culver: FX, Aug-Dec 2025: 2,376</title></path>
+<text x="214.2" y="6834.0">2,376</text>
+<path class="s1" d="M208.8,6838.0h0.0a1.9229437500000004,1.9229437500000004 0 0 1 1.9229437500000004,1.9229437500000004v8.2a1.9229437500000004,1.9229437500000004 0 0 1 -1.9229437500000004,1.9229437500000004h-0.0z"><title>Upper Culver: FX, 2019: 3,185</title></path>
+<text x="214.7" y="6848.0">3,185</text>
 <text x="200.8" y="6875.0" class="label" text-anchor="end">Upper Culver express: F</text>
-<path class="s0" d="M208.8,6858.0h0.0a1.4375287500000002,1.4375287500000002 0 0 1 1.4375287500000002,1.4375287500000002v9.1a1.4375287500000002,1.4375287500000002 0 0 1 -1.4375287500000002,1.4375287500000002h-0.0z"><title>Upper Culver express: F, Aug-Dec 2025: 2,381</title></path>
-<text x="214.2" y="6868.0">2,381</text>
-<path class="s1" d="M208.8,6872.0h0.0a1.9271700000000003,1.9271700000000003 0 0 1 1.9271700000000003,1.9271700000000003v8.1a1.9271700000000003,1.9271700000000003 0 0 1 -1.9271700000000003,1.9271700000000003h-0.0z"><title>Upper Culver express: F, 2019: 3,192</title></path>
-<text x="214.7" y="6882.0">3,192</text>
+<path class="s0" d="M208.8,6858.0h0.0a1.4345100000000004,1.4345100000000004 0 0 1 1.4345100000000004,1.4345100000000004v9.1a1.4345100000000004,1.4345100000000004 0 0 1 -1.4345100000000004,1.4345100000000004h-0.0z"><title>Upper Culver express: F, Aug-Dec 2025: 2,376</title></path>
+<text x="214.2" y="6868.0">2,376</text>
+<path class="s1" d="M208.8,6872.0h0.0a1.9229437500000004,1.9229437500000004 0 0 1 1.9229437500000004,1.9229437500000004v8.2a1.9229437500000004,1.9229437500000004 0 0 1 -1.9229437500000004,1.9229437500000004h-0.0z"><title>Upper Culver express: F, 2019: 3,185</title></path>
+<text x="214.7" y="6882.0">3,185</text>
 <text x="200.8" y="6909.0" class="label" text-anchor="end">Upper Culver express: FX</text>
-<path class="s0" d="M208.8,6892.0h0.0a1.4375287500000002,1.4375287500000002 0 0 1 1.4375287500000002,1.4375287500000002v9.1a1.4375287500000002,1.4375287500000002 0 0 1 -1.4375287500000002,1.4375287500000002h-0.0z"><title>Upper Culver express: FX, Aug-Dec 2025: 2,381</title></path>
-<text x="214.2" y="6902.0">2,381</text>
-<path class="s1" d="M208.8,6906.0h0.0a1.9271700000000003,1.9271700000000003 0 0 1 1.9271700000000003,1.9271700000000003v8.1a1.9271700000000003,1.9271700000000003 0 0 1 -1.9271700000000003,1.9271700000000003h-0.0z"><title>Upper Culver express: FX, 2019: 3,192</title></path>
-<text x="214.7" y="6916.0">3,192</text>
+<path class="s0" d="M208.8,6892.0h0.0a1.4345100000000004,1.4345100000000004 0 0 1 1.4345100000000004,1.4345100000000004v9.1a1.4345100000000004,1.4345100000000004 0 0 1 -1.4345100000000004,1.4345100000000004h-0.0z"><title>Upper Culver express: FX, Aug-Dec 2025: 2,376</title></path>
+<text x="214.2" y="6902.0">2,376</text>
+<path class="s1" d="M208.8,6906.0h0.0a1.9229437500000004,1.9229437500000004 0 0 1 1.9229437500000004,1.9229437500000004v8.2a1.9229437500000004,1.9229437500000004 0 0 1 -1.9229437500000004,1.9229437500000004h-0.0z"><title>Upper Culver express: FX, 2019: 3,185</title></path>
+<text x="214.7" y="6916.0">3,185</text>
 <text x="200.8" y="6943.0" class="label" text-anchor="end">Hillside Av: E</text>
-<path class="s0" d="M208.8,6926.0h0.0a1.4025112500000003,1.4025112500000003 0 0 1 1.4025112500000003,1.4025112500000003v9.2a1.4025112500000003,1.4025112500000003 0 0 1 -1.4025112500000003,1.4025112500000003h-0.0z"><title>Hillside Av: E, Aug-Dec 2025: 2,323</title></path>
-<text x="214.2" y="6936.0">2,323</text>
+<path class="s0" d="M208.8,6926.0h0.0a1.4031150000000003,1.4031150000000003 0 0 1 1.4031150000000003,1.4031150000000003v9.2a1.4031150000000003,1.4031150000000003 0 0 1 -1.4031150000000003,1.4031150000000003h-0.0z"><title>Hillside Av: E, Aug-Dec 2025: 2,324</title></path>
+<text x="214.2" y="6936.0">2,324</text>
 <path class="s1" d="M208.8,6940.0h0.0a2.0129025000000005,2.0129025000000005 0 0 1 2.0129025000000005,2.0129025000000005v8.0a2.0129025000000005,2.0129025000000005 0 0 1 -2.0129025000000005,2.0129025000000005h-0.0z"><title>Hillside Av: E, 2019: 3,334</title></path>
 <text x="214.8" y="6950.0">3,334</text>
 <text x="200.8" y="6977.0" class="label" text-anchor="end">Hillside Av express: E</text>
@@ -1047,59 +1047,59 @@ text {
 <text x="214.1" y="6970.0">2,169</text>
 <path class="s1" d="M208.8,6974.0h0.0a1.8824925000000003,1.8824925000000003 0 0 1 1.8824925000000003,1.8824925000000003v8.2a1.8824925000000003,1.8824925000000003 0 0 1 -1.8824925000000003,1.8824925000000003h-0.0z"><title>Hillside Av express: E, 2019: 3,118</title></path>
 <text x="214.7" y="6984.0">3,118</text>
-<text x="200.8" y="7011.0" class="label" text-anchor="end">Lower Culver: FX</text>
-<path class="s0" d="M208.8,6994.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Lower Culver: FX, Aug-Dec 2025: 1,581</title></path>
-<text x="213.8" y="7004.0">1,581</text>
-<path class="s1" d="M208.8,7008.0h0.0a1.2938362500000002,1.2938362500000002 0 0 1 1.2938362500000002,1.2938362500000002v9.4a1.2938362500000002,1.2938362500000002 0 0 1 -1.2938362500000002,1.2938362500000002h-0.0z"><title>Lower Culver: FX, 2019: 2,143</title></path>
-<text x="214.1" y="7018.0">2,143</text>
-<text x="200.8" y="7045.0" class="label" text-anchor="end">Culver local: FX</text>
-<path class="s0" d="M208.8,7028.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Culver local: FX, Aug-Dec 2025: 1,539</title></path>
-<text x="213.8" y="7038.0">1,539</text>
-<path class="s1" d="M208.8,7042.0h0.0a1.2600262500000003,1.2600262500000003 0 0 1 1.2600262500000003,1.2600262500000003v9.5a1.2600262500000003,1.2600262500000003 0 0 1 -1.2600262500000003,1.2600262500000003h-0.0z"><title>Culver local: FX, 2019: 2,087</title></path>
-<text x="214.1" y="7052.0">2,087</text>
-<text x="200.8" y="7079.0" class="label" text-anchor="end">Lower Culver local: FX</text>
-<path class="s0" d="M208.8,7062.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Lower Culver local: FX, Aug-Dec 2025: 1,539</title></path>
-<text x="213.8" y="7072.0">1,539</text>
-<path class="s1" d="M208.8,7076.0h0.0a1.2600262500000003,1.2600262500000003 0 0 1 1.2600262500000003,1.2600262500000003v9.5a1.2600262500000003,1.2600262500000003 0 0 1 -1.2600262500000003,1.2600262500000003h-0.0z"><title>Lower Culver local: FX, 2019: 2,087</title></path>
-<text x="214.1" y="7086.0">2,087</text>
-<text x="200.8" y="7113.0" class="label" text-anchor="end">4 Av: W</text>
-<path class="s0" d="M208.8,7096.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>4 Av: W, Aug-Dec 2025: 1,527</title></path>
-<text x="213.8" y="7106.0">1,527</text>
-<path class="s1" d="M208.8,7110.0h0.0a1.1048625000000003,1.1048625000000003 0 0 1 1.1048625000000003,1.1048625000000003v9.8a1.1048625000000003,1.1048625000000003 0 0 1 -1.1048625000000003,1.1048625000000003h-0.0z"><title>4 Av: W, 2019: 1,830</title></path>
-<text x="213.9" y="7120.0">1,830</text>
+<text x="200.8" y="7011.0" class="label" text-anchor="end">4 Av: W</text>
+<path class="s0" d="M208.8,6994.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>4 Av: W, Aug-Dec 2025: 1,602</title></path>
+<text x="213.8" y="7004.0">1,602</text>
+<path class="s1" d="M208.8,7008.0h0.0a1.1682562500000002,1.1682562500000002 0 0 1 1.1682562500000002,1.1682562500000002v9.7a1.1682562500000002,1.1682562500000002 0 0 1 -1.1682562500000002,1.1682562500000002h-0.0z"><title>4 Av: W, 2019: 1,935</title></path>
+<text x="214.0" y="7018.0">1,935</text>
+<text x="200.8" y="7045.0" class="label" text-anchor="end">Lower Culver: FX</text>
+<path class="s0" d="M208.8,7028.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Lower Culver: FX, Aug-Dec 2025: 1,577</title></path>
+<text x="213.8" y="7038.0">1,577</text>
+<path class="s1" d="M208.8,7042.0h0.0a1.2902137500000002,1.2902137500000002 0 0 1 1.2902137500000002,1.2902137500000002v9.4a1.2902137500000002,1.2902137500000002 0 0 1 -1.2902137500000002,1.2902137500000002h-0.0z"><title>Lower Culver: FX, 2019: 2,137</title></path>
+<text x="214.1" y="7052.0">2,137</text>
+<text x="200.8" y="7079.0" class="label" text-anchor="end">Culver local: FX</text>
+<path class="s0" d="M208.8,7062.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Culver local: FX, Aug-Dec 2025: 1,535</title></path>
+<text x="213.8" y="7072.0">1,535</text>
+<path class="s1" d="M208.8,7076.0h0.0a1.2570075000000003,1.2570075000000003 0 0 1 1.2570075000000003,1.2570075000000003v9.5a1.2570075000000003,1.2570075000000003 0 0 1 -1.2570075000000003,1.2570075000000003h-0.0z"><title>Culver local: FX, 2019: 2,082</title></path>
+<text x="214.1" y="7086.0">2,082</text>
+<text x="200.8" y="7113.0" class="label" text-anchor="end">Lower Culver local: FX</text>
+<path class="s0" d="M208.8,7096.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Lower Culver local: FX, Aug-Dec 2025: 1,535</title></path>
+<text x="213.8" y="7106.0">1,535</text>
+<path class="s1" d="M208.8,7110.0h0.0a1.2570075000000003,1.2570075000000003 0 0 1 1.2570075000000003,1.2570075000000003v9.5a1.2570075000000003,1.2570075000000003 0 0 1 -1.2570075000000003,1.2570075000000003h-0.0z"><title>Lower Culver local: FX, 2019: 2,082</title></path>
+<text x="214.1" y="7120.0">2,082</text>
 <text x="200.8" y="7147.0" class="label" text-anchor="end">4 Av local: W</text>
-<path class="s0" d="M208.8,7130.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>4 Av local: W, Aug-Dec 2025: 1,109</title></path>
-<text x="213.8" y="7140.0">1,109</text>
-<path class="s1" d="M208.8,7144.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>4 Av local: W, 2019: 1,305</title></path>
-<text x="213.8" y="7154.0">1,305</text>
+<path class="s0" d="M208.8,7130.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>4 Av local: W, Aug-Dec 2025: 1,124</title></path>
+<text x="213.8" y="7140.0">1,124</text>
+<path class="s1" d="M208.8,7144.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>4 Av local: W, 2019: 1,325</title></path>
+<text x="213.8" y="7154.0">1,325</text>
 <text x="200.8" y="7181.0" class="label" text-anchor="end">Queens Blvd: FX</text>
-<path class="s0" d="M208.8,7164.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd: FX, Aug-Dec 2025: 1,047</title></path>
-<text x="213.8" y="7174.0">1,047</text>
+<path class="s0" d="M208.8,7164.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd: FX, Aug-Dec 2025: 1,046</title></path>
+<text x="213.8" y="7174.0">1,046</text>
 <path class="s1" d="M208.8,7178.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd: FX, 2019: 1,347</title></path>
 <text x="213.8" y="7188.0">1,347</text>
 <text x="200.8" y="7215.0" class="label" text-anchor="end">63 St: FX</text>
-<path class="s0" d="M208.8,7198.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>63 St: FX, Aug-Dec 2025: 989</title></path>
-<text x="213.8" y="7208.0">989</text>
-<path class="s1" d="M208.8,7212.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>63 St: FX, 2019: 1,290</title></path>
-<text x="213.8" y="7222.0">1,290</text>
+<path class="s0" d="M208.8,7198.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>63 St: FX, Aug-Dec 2025: 984</title></path>
+<text x="213.8" y="7208.0">984</text>
+<path class="s1" d="M208.8,7212.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>63 St: FX, 2019: 1,283</title></path>
+<text x="213.8" y="7222.0">1,283</text>
 <text x="200.8" y="7249.0" class="label" text-anchor="end">SAS Phase 1: R</text>
 <path class="s0" d="M208.8,7232.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>SAS Phase 1: R, Aug-Dec 2025: 788</title></path>
 <text x="213.8" y="7242.0">788</text>
 <path class="s1" d="M208.8,7246.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>SAS Phase 1: R, 2019: 1,011</title></path>
 <text x="213.8" y="7256.0">1,011</text>
 <text x="200.8" y="7283.0" class="label" text-anchor="end">Queens Blvd express: FX</text>
-<path class="s0" d="M208.8,7266.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd express: FX, Aug-Dec 2025: 632</title></path>
-<text x="213.8" y="7276.0">632</text>
+<path class="s0" d="M208.8,7266.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd express: FX, Aug-Dec 2025: 631</title></path>
+<text x="213.8" y="7276.0">631</text>
 <path class="s1" d="M208.8,7280.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd express: FX, 2019: 821</title></path>
 <text x="213.8" y="7290.0">821</text>
 <text x="200.8" y="7317.0" class="label" text-anchor="end">Queens Blvd west: FX</text>
-<path class="s0" d="M208.8,7300.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd west: FX, Aug-Dec 2025: 632</title></path>
-<text x="213.8" y="7310.0">632</text>
+<path class="s0" d="M208.8,7300.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd west: FX, Aug-Dec 2025: 631</title></path>
+<text x="213.8" y="7310.0">631</text>
 <path class="s1" d="M208.8,7314.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd west: FX, 2019: 821</title></path>
 <text x="213.8" y="7324.0">821</text>
 <text x="200.8" y="7351.0" class="label" text-anchor="end">Queens Blvd west express: FX</text>
-<path class="s0" d="M208.8,7334.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd west express: FX, Aug-Dec 2025: 632</title></path>
-<text x="213.8" y="7344.0">632</text>
+<path class="s0" d="M208.8,7334.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd west express: FX, Aug-Dec 2025: 631</title></path>
+<text x="213.8" y="7344.0">631</text>
 <path class="s1" d="M208.8,7348.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd west express: FX, 2019: 821</title></path>
 <text x="213.8" y="7358.0">821</text>
 <text x="200.8" y="7385.0" class="label" text-anchor="end">Queens Blvd local: FX</text>
@@ -1108,15 +1108,15 @@ text {
 <path class="s1" d="M208.8,7382.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd local: FX, 2019: 797</title></path>
 <text x="213.8" y="7392.0">797</text>
 <text x="200.8" y="7419.0" class="label" text-anchor="end">Queens Blvd east: FX</text>
-<path class="s0" d="M208.8,7402.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd east: FX, Aug-Dec 2025: 571</title></path>
-<text x="213.8" y="7412.0">571</text>
+<path class="s0" d="M208.8,7402.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd east: FX, Aug-Dec 2025: 570</title></path>
+<text x="213.8" y="7412.0">570</text>
 <path class="s1" d="M208.8,7416.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Queens Blvd east: FX, 2019: 768</title></path>
 <text x="213.8" y="7426.0">768</text>
 <text x="200.8" y="7453.0" class="label" text-anchor="end">Sea Beach: W</text>
-<path class="s0" d="M208.8,7436.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Sea Beach: W, Aug-Dec 2025: 504</title></path>
-<text x="213.8" y="7446.0">504</text>
-<path class="s1" d="M208.8,7450.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Sea Beach: W, 2019: 543</title></path>
-<text x="213.8" y="7460.0">543</text>
+<path class="s0" d="M208.8,7436.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Sea Beach: W, Aug-Dec 2025: 496</title></path>
+<text x="213.8" y="7446.0">496</text>
+<path class="s1" d="M208.8,7450.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Sea Beach: W, 2019: 534</title></path>
+<text x="213.8" y="7460.0">534</text>
 <text x="200.8" y="7487.0" class="label" text-anchor="end">63 St: R</text>
 <path class="s0" d="M208.8,7470.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>63 St: R, Aug-Dec 2025: 460</title></path>
 <text x="213.8" y="7480.0">460</text>
@@ -1143,20 +1143,20 @@ text {
 <path class="s1" d="M208.8,7620.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>53 St: FX, 2019: 376</title></path>
 <text x="213.8" y="7630.0">376</text>
 <text x="200.8" y="7657.0" class="label" text-anchor="end">Eastern Pkwy local: 5</text>
-<path class="s0" d="M208.8,7640.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Eastern Pkwy local: 5, Aug-Dec 2025: 183</title></path>
-<text x="213.8" y="7650.0">183</text>
-<path class="s1" d="M208.8,7654.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Eastern Pkwy local: 5, 2019: 259</title></path>
-<text x="213.8" y="7664.0">259</text>
+<path class="s0" d="M208.8,7640.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Eastern Pkwy local: 5, Aug-Dec 2025: 177</title></path>
+<text x="213.8" y="7650.0">177</text>
+<path class="s1" d="M208.8,7654.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Eastern Pkwy local: 5, 2019: 253</title></path>
+<text x="213.8" y="7664.0">253</text>
 <text x="200.8" y="7691.0" class="label" text-anchor="end">Hillside Av local: E</text>
 <path class="s0" d="M208.8,7674.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Hillside Av local: E, Aug-Dec 2025: 155</title></path>
 <text x="213.8" y="7684.0">155</text>
 <path class="s1" d="M208.8,7688.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Hillside Av local: E, 2019: 216</title></path>
 <text x="213.8" y="7698.0">216</text>
 <text x="200.8" y="7725.0" class="label" text-anchor="end">West End: W</text>
-<path class="s0" d="M208.8,7708.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>West End: W, Aug-Dec 2025: 69</title></path>
-<text x="213.8" y="7718.0">69</text>
-<path class="s1" d="M208.8,7722.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>West End: W, 2019: 89</title></path>
-<text x="213.8" y="7732.0">89</text>
+<path class="s0" d="M208.8,7708.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>West End: W, Aug-Dec 2025: 71</title></path>
+<text x="213.8" y="7718.0">71</text>
+<path class="s1" d="M208.8,7722.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>West End: W, 2019: 90</title></path>
+<text x="213.8" y="7732.0">90</text>
 <text x="200.8" y="7759.0" class="label" text-anchor="end">Concourse express: B</text>
 <path class="s0" d="M208.8,7742.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Concourse express: B, Aug-Dec 2025: 46</title></path>
 <text x="213.8" y="7752.0">46</text>
@@ -1165,8 +1165,8 @@ text {
 <text x="200.8" y="7793.0" class="label" text-anchor="end">Pelham express: 6L</text>
 <path class="s0" d="M208.8,7776.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Pelham express: 6L, Aug-Dec 2025: 46</title></path>
 <text x="213.8" y="7786.0">46</text>
-<path class="s1" d="M208.8,7790.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Pelham express: 6L, 2019: 75</title></path>
-<text x="213.8" y="7800.0">75</text>
+<path class="s1" d="M208.8,7790.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>Pelham express: 6L, 2019: 74</title></path>
+<text x="213.8" y="7800.0">74</text>
 <text x="200.8" y="7827.0" class="label" text-anchor="end">West End: R</text>
 <path class="s0" d="M208.8,7810.0h0.0a1,1 0 0 1 1,1v10.0a1,1 0 0 1 -1,1h0.0z"><title>West End: R, Aug-Dec 2025: 38</title></path>
 <text x="213.8" y="7820.0">38</text>

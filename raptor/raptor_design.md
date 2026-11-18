@@ -229,7 +229,12 @@ as OSM doesn't map fare gates, so a walk it finds between complexes
 may cross an unpaid mezzanine; free transfers are the MTA's complexes, and the passages.
 Two indoor floors a level apart sharing a side
 are a passage sloping from one level to the next, as 42 St-Port Authority's to Times Sq.
-Only 54 of 720 pairs of platforms whose outlines are within 150 m are joined so far.
+A flight with no `incline` and no tagged footway at either end
+climbs toward the end that's only in an area on its upper level,
+as Atlantic Av-Barclays Ctr's from the mezzanine down to the 2/3.
+Only 66 of 720 pairs of platforms whose outlines are within 150 m are joined so far:
+most stations' insides aren't in OSM, as Jay St-MetroTech's or Court Sq's,
+and ways with only a `layer`, no `level`, are left out, as they're often the street's.
 Pathways come over those, and walks measured off LiDAR maps and 3D models (`raptor/lidar_walks.csv`) over all.
 
 OSM's and LiDAR's walks may have several paths between two platforms,
